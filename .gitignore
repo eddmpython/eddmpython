@@ -1,0 +1,59 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+credentials/
+secrets/
+.secrets/
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# Local agent and editor state
+.claude/
+.codex/
+.agents/
+.cursor/
+.idea/
+.vscode/
+*.local.json
+.editorconfig
+
+# Agent rules are local harness, not repository content.
+AGENTS.md
+CLAUDE.md
+
+# JavaScript and Cloudflare
+node_modules/
+dist/
+build/
+.vite/
+.wrangler/
+.turbo/
+.npm/
+coverage/
+*.tsbuildinfo
+
+# Local data and generated exports
+cache/
+.cache/
+data/
+exports/
+tmp/
+.tmp/
+*.log
+*.pid
+*.db
+*.sqlite
+*.sqlite3
+
+# Operating system
+.DS_Store
+Thumbs.db
+Desktop.ini
