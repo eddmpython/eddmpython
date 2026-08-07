@@ -21,7 +21,7 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
         aria-label={`${product.name} 열기`}
         className={`order-first overflow-hidden rounded-xl bg-white/[0.06] p-1.5 ring-1 ring-white/10 transition-colors hover:ring-white/25 sm:p-2 md:order-none md:rounded-2xl md:p-3 ${
           flip ? "md:col-start-1" : "md:col-start-2"
-        } md:row-start-1`}
+        } md:row-start-1 md:sticky md:top-24 md:self-start`}
       >
         <div className="aspect-[16/10] overflow-hidden rounded-lg bg-carbon md:rounded-xl">
           <img
