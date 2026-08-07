@@ -12,7 +12,7 @@ const ORIGIN = "https://eddmpython.com";
 type PostMeta = { slug: string; title: string; date: string; summary: string };
 
 function readPosts(root: string): PostMeta[] {
-  const dir = join(root, "src", "posts");
+  const dir = join(root, "..", "blog");
   let names: string[] = [];
   try {
     names = readdirSync(dir).filter((f: string) => f.endsWith(".md"));
@@ -134,6 +134,8 @@ function blogPages(): Plugin {
 
 export default defineConfig({
   plugins: [react(), tailwindcss(), blogPages()],
+  // 글은 저장소 루트 blog/ 에 있다. dev 서버가 site/ 밖을 읽게 허용한다.
+  server: { fs: { allow: [".."] } },
   build: {
     outDir: OUT_DIR,
     emptyOutDir: true,
