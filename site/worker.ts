@@ -1,10 +1,9 @@
 /**
- * 정적 자산 서빙 + SPA 라우트 + 보안 헤더.
+ * 정적 자산 서빙 + 보안 헤더.
+ * 블로그는 빌드 타임에 실제 HTML 로 나오므로 SPA fallback 이 필요 없다.
+ * 없는 경로는 404 를 유지하되 빈 화면 대신 브랜드 화면을 그린다.
  * HTTPS 강제와 www 정리는 Cloudflare 영역 설정이 맡는다.
- * 알려진 앱 경로만 index.html 로 되돌린다. 나머지는 진짜 404 를 낸다.
  */
-
-const SPA_ROUTES = [/^\/blog(\/|$)/];
 
 const SECURITY_HEADERS: Record<string, string> = {
   "strict-transport-security": "max-age=31536000; includeSubDomains",
@@ -60,15 +59,6 @@ export default {
 
     const index = await env.ASSETS.fetch(new URL("/", url).toString());
 
-    // 앱이 아는 경로면 SPA 로 넘긴다.
-    if (SPA_ROUTES.some((re) => re.test(url.pathname))) {
-      return withHeaders(
-        new Response(index.body, { status: 200, headers: index.headers }),
-        true,
-      );
-    }
-
-    // 그 외에는 404 를 유지하되 빈 화면 대신 랜딩을 그린다.
     return withHeaders(
       new Response(index.body, { status: 404, headers: index.headers }),
       true,
