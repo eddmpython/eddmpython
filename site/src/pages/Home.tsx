@@ -9,7 +9,7 @@ import { Footer } from "../components/Footer";
 export function Home() {
   return (
     <div className="min-h-screen">
-      <main>
+      <main id="content">
         <Hero />
         <Products />
         <DataSources />

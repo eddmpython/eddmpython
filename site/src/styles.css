@@ -43,6 +43,12 @@ body {
   word-break: keep-all;
 }
 
+:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--eddm-sand) 80%, transparent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 ::selection {
   background-color: color-mix(in srgb, var(--eddm-sand) 30%, transparent);
 }

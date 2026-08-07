@@ -8,7 +8,6 @@ const CHANNELS = [
   { label: "GitHub", href: SOCIAL.github, Icon: GitHubIcon },
   { label: "Threads", href: SOCIAL.threads, Icon: ThreadsIcon },
   { label: "YouTube", href: SOCIAL.youtube, Icon: YouTubeIcon },
-  { label: "eddmpython@gmail.com", href: SOCIAL.mail, Icon: MailIcon },
 ];
 
 const REGISTRIES = [
@@ -26,7 +25,14 @@ export function Footer() {
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-ivory/50">
             복잡한 업무를, 실제로 작동하는 자동화로.
           </p>
-          <div className="mt-5 flex items-center gap-4">
+          <a
+            href={SOCIAL.mail}
+            className="mt-5 inline-flex items-center gap-2 text-sm text-ivory/70 transition-colors hover:text-ivory"
+          >
+            <MailIcon className="h-4 w-4" />
+            eddmpython@gmail.com
+          </a>
+          <div className="mt-4 flex items-center gap-4">
             {CHANNELS.map(({ label, href, Icon }) => (
               <a
                 key={label}

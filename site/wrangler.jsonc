@@ -15,6 +15,8 @@
     "directory": "../../eddmpython.out/site-dist",
     "binding": "ASSETS",
     "not_found_handling": "none",
+    // /blog 를 /blog/ 로 튕기지 않고 그대로 200 으로 낸다.
+    "html_handling": "drop-trailing-slash",
     // 보안 헤더를 모든 응답에 붙이려면 Worker 가 먼저 돌아야 한다.
     "run_worker_first": true
   },
