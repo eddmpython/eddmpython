@@ -1,0 +1,14 @@
+{
+  // eddmpython 브랜드 랜딩. 정적 자산 전용 Worker (xlpod 배포 패턴 참고).
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "eddmpython-site",
+  "compatibility_date": "2026-08-07",
+  "workers_dev": true,
+  "assets": {
+    // 빌드 산출물은 저장소 밖에 있다 (vite.config.ts 와 동일 경로).
+    "directory": "../../eddmpython.out/site-dist",
+    "not_found_handling": "single-page-application"
+  }
+  // 커스텀 도메인 연결은 workers.dev smoke 통과 후 별도 단계로 진행한다.
+  // "routes": [{ "pattern": "eddmpython.com", "custom_domain": true }]
+}

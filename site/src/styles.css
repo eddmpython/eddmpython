@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+/* 브랜드 토큰 정본. 값은 eddmpython 브랜드 시트의 비핑크 팔레트만 쓴다. */
+:root {
+  --eddm-carbon: #101514;
+  --eddm-ivory: #f5f3ee;
+  --eddm-sand: #d8be91;
+  --eddm-dartlab: #7da2e8;
+  --eddm-codaro: #dfa14e;
+  --eddm-xlpod: #57b98a;
+}
+
+@theme inline {
+  --color-carbon: var(--eddm-carbon);
+  --color-ivory: var(--eddm-ivory);
+  --color-sand: var(--eddm-sand);
+  --color-dartlab: var(--eddm-dartlab);
+  --color-codaro: var(--eddm-codaro);
+  --color-xlpod: var(--eddm-xlpod);
+}
+
+@theme {
+  --font-sans:
+    "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-mono:
+    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--eddm-carbon);
+  color: var(--eddm-ivory);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* 한국어 어절 단위 줄바꿈 */
+  word-break: keep-all;
+}
+
+::selection {
+  background-color: color-mix(in srgb, var(--eddm-sand) 30%, transparent);
+}
+
+/* 히어로 위쪽에 아주 옅은 모래빛 광원 하나. 장식은 이것 하나로 절제한다. */
+.hero-glow {
+  background:
+    radial-gradient(
+      620px 320px at 50% -40px,
+      color-mix(in srgb, var(--eddm-sand) 9%, transparent),
+      transparent 70%
+    );
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-up {
+  opacity: 0;
+  animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .fade-up {
+    animation: none;
+    opacity: 1;
+  }
+}
