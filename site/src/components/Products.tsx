@@ -57,10 +57,11 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
 
         <ul className="mt-6 space-y-2.5">
           {product.points.map((pt) => (
-            <li key={pt} className="flex gap-3 text-sm text-ivory/70">
-              <span aria-hidden="true" className="shrink-0 text-ivory/30">
-                —
-              </span>
+            <li key={pt} className="flex items-start gap-3 text-sm text-ivory/70">
+              <span
+                aria-hidden="true"
+                className="mt-2.5 h-px w-2.5 shrink-0 bg-ivory/30"
+              />
               {pt}
             </li>
           ))}

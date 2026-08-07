@@ -25,9 +25,10 @@ secrets/
 *.local.json
 .editorconfig
 
-# Agent rules are local harness, not repository content.
-AGENTS.md
-CLAUDE.md
+# Root agent rules are local harness, not repository content.
+# 경로를 루트에 고정한다. agent-template/ 의 공개 템플릿은 추적한다.
+/AGENTS.md
+/CLAUDE.md
 
 # JavaScript and Cloudflare
 node_modules/
