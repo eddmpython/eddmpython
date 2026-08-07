@@ -8,7 +8,7 @@ export function Blog() {
     <div className="min-h-screen">
       <div className="mx-auto w-full max-w-3xl px-6 pt-10 md:pt-20">
         <Nav />
-        <h1 className="text-3xl font-medium tracking-tight md:text-4xl">글</h1>
+        <h1 className="text-3xl font-medium tracking-tight md:text-4xl">블로그</h1>
         <p className="mt-4 max-w-lg text-ivory/60">
           만들면서 알게 된 것들을 적어 둡니다.
         </p>

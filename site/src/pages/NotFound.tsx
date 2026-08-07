@@ -25,7 +25,7 @@ export function NotFound() {
             to="/blog"
             className="rounded-lg border border-white/15 px-4 py-2.5 text-sm text-ivory transition-colors hover:bg-white/5"
           >
-            글 보기
+            블로그
           </Link>
         </div>
       </div>

@@ -102,7 +102,7 @@ function blogPages(): Plugin {
         writeFileSync(join(dirPath, "index.html"), html, "utf8");
       };
 
-      page("/blog", "글 · eddmpython", "만들면서 알게 된 것들을 적어 둡니다.");
+      page("/blog", "블로그 · eddmpython", "만들면서 알게 된 것들을 적어 둡니다.");
       for (const p of posts) {
         page(`/blog/${p.slug}`, `${p.title} · eddmpython`, p.summary);
       }

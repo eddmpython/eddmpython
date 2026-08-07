@@ -28,7 +28,7 @@ export function Post() {
             to="/blog"
             className="mt-6 inline-block text-ivory/70 transition-colors hover:text-ivory"
           >
-            글 목록으로
+            블로그 목록으로
           </Link>
         </div>
         <div className="mt-24">
@@ -56,7 +56,7 @@ export function Post() {
             to="/blog"
             className="text-sm text-ivory/60 transition-colors hover:text-ivory"
           >
-            글 목록으로
+            블로그 목록으로
           </Link>
         </div>
       </article>

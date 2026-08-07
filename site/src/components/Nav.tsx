@@ -6,7 +6,7 @@ import { SOCIAL } from "../social";
 const LINKS = [
   { label: "제품", to: "/#products" },
   { label: "데이터", to: "/#data" },
-  { label: "글", to: "/blog" },
+  { label: "블로그", to: "/blog" },
   { label: "FAQ", to: "/#faq" },
 ];
 

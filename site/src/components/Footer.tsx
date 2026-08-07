@@ -74,7 +74,7 @@ export function Footer() {
                 to="/blog"
                 className="text-ivory/70 transition-colors hover:text-ivory"
               >
-                글
+                블로그
               </Link>
             </li>
             {REGISTRIES.map((c) => (
