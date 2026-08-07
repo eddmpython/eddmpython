@@ -55,6 +55,19 @@ body {
     );
 }
 
+/* 쇼케이스 뒤 모래빛 광원 */
+.showcase-glow::before {
+  content: "";
+  position: absolute;
+  inset: -8% -12%;
+  background: radial-gradient(
+    55% 55% at 50% 40%,
+    color-mix(in srgb, var(--eddm-sand) 8%, transparent),
+    transparent 75%
+  );
+  pointer-events: none;
+}
+
 @keyframes fade-up {
   from {
     opacity: 0;
@@ -71,6 +84,21 @@ body {
   animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* 스크롤 진입 시 나타나는 요소 (useReveal 이 .in 을 붙인다) */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.15s ease;
+}
+
+.reveal.in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -78,5 +106,10 @@ body {
   .fade-up {
     animation: none;
     opacity: 1;
+  }
+  .reveal {
+    transition: none;
+    opacity: 1;
+    transform: none;
   }
 }

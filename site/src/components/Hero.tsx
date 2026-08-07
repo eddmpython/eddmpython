@@ -1,19 +1,22 @@
 import { PRODUCTS } from "../products";
 
-const TERMINAL_LINES: Array<{ prompt: string; text: string }> = [
-  { prompt: "$", text: "pip install dartlab" },
-  { prompt: "$", text: "python" },
-  { prompt: ">>>", text: "import dartlab" },
-  { prompt: ">>>", text: 'samsung = dartlab.Company("005930")' },
-  { prompt: ">>>", text: "samsung.story()" },
-];
+function WindowChrome({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-1.5 border-b border-white/10 bg-white/[0.02] px-4 py-2.5">
+      <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
+      <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
+      <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
+      <span className="ml-3 font-mono text-xs text-ivory/55">{label}</span>
+    </div>
+  );
+}
 
 export function Hero() {
   return (
-    <section className="hero-glow">
-      <div className="mx-auto w-full max-w-5xl px-6 pt-24 pb-20 md:pt-32">
+    <section className="hero-glow overflow-hidden">
+      <div className="mx-auto w-full max-w-5xl px-6 pt-24 md:pt-32">
         <h1
-          className="fade-up max-w-3xl text-4xl leading-[1.15] font-semibold tracking-tight md:text-6xl"
+          className="fade-up max-w-3xl bg-gradient-to-b from-ivory via-ivory to-ivory/60 bg-clip-text text-4xl leading-[1.15] font-semibold tracking-tight text-transparent md:text-6xl"
           style={{ animationDelay: "0.05s" }}
         >
           복잡한 업무를,
@@ -64,25 +67,36 @@ export function Hero() {
             </a>
           ))}
         </div>
+      </div>
 
+      {/* 실제 제품 화면 쇼케이스. DartLab Terminal 위에 xlpod 창이 겹친다. */}
+      <div className="mx-auto w-full max-w-5xl px-6 pt-16 pb-24 md:pb-32">
         <div
-          className="fade-up mt-16 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]"
+          className="fade-up showcase-glow relative"
           style={{ animationDelay: "0.45s" }}
         >
-          <div className="flex items-center gap-1.5 border-b border-white/10 px-4 py-3">
-            <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-            <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-            <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-            <span className="ml-3 font-mono text-xs text-ivory/55">terminal</span>
-          </div>
-          <div className="overflow-x-auto px-5 py-5 font-mono text-[13px] leading-7 md:text-sm">
-            {TERMINAL_LINES.map((line, i) => (
-              <div key={i} className="whitespace-pre">
-                <span className="select-none text-sand/70">{line.prompt} </span>
-                <span className="text-ivory/90">{line.text}</span>
-              </div>
-            ))}
-          </div>
+          <figure className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[0_24px_80px_-24px_rgba(0,0,0,0.8)]">
+            <WindowChrome label="dartlab terminal" />
+            <img
+              src="/shots/dartlab.webp"
+              alt="DartLab Terminal에서 삼성전자를 분석하는 실제 화면"
+              width={1800}
+              height={1125}
+              className="block w-full"
+            />
+          </figure>
+          <figure className="absolute -right-4 -bottom-10 hidden w-[38%] overflow-hidden rounded-xl border border-white/15 bg-carbon shadow-[0_24px_60px_-12px_rgba(0,0,0,0.85)] md:block">
+            <WindowChrome label="xlpod" />
+            <div className="aspect-[4/3] overflow-hidden">
+              <img
+                src="/shots/xlpod.webp"
+                alt="xlpod 시작 화면"
+                width={1200}
+                height={750}
+                className="h-full w-full scale-[1.35] object-cover"
+              />
+            </div>
+          </figure>
         </div>
       </div>
     </section>
