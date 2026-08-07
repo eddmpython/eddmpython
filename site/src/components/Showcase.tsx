@@ -41,10 +41,12 @@ export function Showcase() {
         </div>
       </div>
 
-      <div className="mt-5 flex min-h-6 items-center justify-center gap-2.5 text-sm">
-        <span className={`h-1.5 w-1.5 rounded-full ${current.dotClass}`} />
-        <span className="font-medium">{current.product}</span>
-        <span className="text-ivory/30">·</span>
+      <div className="mt-5 flex min-h-6 flex-wrap items-center justify-center gap-x-2.5 gap-y-1 px-2 text-center text-sm">
+        <span className="flex items-center gap-2.5">
+          <span className={`h-1.5 w-1.5 rounded-full ${current.dotClass}`} />
+          <span className="font-medium">{current.product}</span>
+        </span>
+        <span className="hidden text-ivory/30 sm:inline">·</span>
         <span className="text-ivory/60">{current.caption}</span>
       </div>
 

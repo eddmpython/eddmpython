@@ -4,7 +4,7 @@ export function Philosophy() {
   const ref = useReveal<HTMLElement>();
   return (
     <section id="philosophy" className="scroll-mt-16">
-      <div className="mx-auto w-full max-w-5xl px-6 py-20">
+      <div className="mx-auto w-full max-w-5xl px-6 py-16 md:py-24">
         <figure
           ref={ref}
           className="reveal rounded-2xl border border-white/10 bg-white/[0.03] px-8 py-14 text-center md:py-16"

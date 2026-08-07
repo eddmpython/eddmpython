@@ -54,7 +54,7 @@ export function CodeSection() {
 
   return (
     <section id="code" className="scroll-mt-16">
-      <div className="mx-auto w-full max-w-5xl px-6 py-20 md:py-24">
+      <div className="mx-auto w-full max-w-5xl px-6 py-16 md:py-24">
         <SectionHead
           title="한 줄로 부른다"
           description="DartLab 은 공시 데이터를 계층이 아니라 하나의 인터페이스로 노출합니다. 종목코드만 있으면 재무, 비율, 신용위험, 산업 위치까지 같은 문법으로 이어집니다."

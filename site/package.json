@@ -11,6 +11,7 @@
     "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
+    "pyproc": "0.0.14",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

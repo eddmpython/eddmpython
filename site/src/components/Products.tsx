@@ -1,6 +1,7 @@
 import { PRODUCTS, type Product } from "../products";
 import { SectionHead } from "./SectionHead";
 import { useReveal } from "../useReveal";
+import { PyCell } from "./PyCell";
 
 function ProductRow({ product, index }: { product: Product; index: number }) {
   const ref = useReveal<HTMLElement>();
@@ -10,10 +11,34 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
     <article
       id={product.id}
       ref={ref}
-      className="reveal group grid scroll-mt-24 items-center gap-8 md:grid-cols-2 md:gap-12"
+      className="reveal group flex scroll-mt-20 flex-col gap-7 md:grid md:grid-cols-2 md:items-center md:gap-12"
     >
-      <div className={flip ? "md:order-2" : ""}>
-        <div className="flex items-center gap-3">
+      {/* 모바일에서는 화면이 먼저 오고 CTA 가 맨 끝에 온다. */}
+      <a
+        href={product.primary.href}
+        target="_blank"
+        rel="noreferrer"
+        aria-label={`${product.name} 열기`}
+        className={`order-first overflow-hidden rounded-xl bg-white/[0.06] p-1.5 ring-1 ring-white/10 transition-colors hover:ring-white/25 sm:p-2 md:order-none md:rounded-2xl md:p-3 ${
+          flip ? "md:col-start-1" : "md:col-start-2"
+        } md:row-start-1`}
+      >
+        <div className="aspect-[16/10] overflow-hidden rounded-lg bg-carbon md:rounded-xl">
+          <img
+            src={product.heroShot}
+            alt={product.shotAlt}
+            loading="lazy"
+            width={1800}
+            height={1125}
+            className="h-full w-full object-cover transition-transform duration-500 md:group-hover:scale-[1.02]"
+          />
+        </div>
+      </a>
+
+      <div
+        className={`${flip ? "md:col-start-2" : "md:col-start-1"} md:row-start-1`}
+      >
+        <div className="flex flex-wrap items-center gap-3">
           <span className={`h-2 w-2 rounded-full ${product.dotClass}`} />
           <h3 className="text-xl font-medium tracking-tight md:text-2xl">
             {product.name}
@@ -23,7 +48,7 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
           </span>
         </div>
 
-        <p className="mt-5 text-lg leading-snug font-medium md:text-xl">
+        <p className="mt-4 text-lg leading-snug font-medium md:mt-5 md:text-xl">
           {product.tagline}
         </p>
         <p className="mt-3 max-w-md text-[15px] leading-relaxed text-ivory/60">
@@ -33,7 +58,7 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
         <ul className="mt-6 space-y-2.5">
           {product.points.map((pt) => (
             <li key={pt} className="flex gap-3 text-sm text-ivory/70">
-              <span aria-hidden="true" className="text-ivory/30">
+              <span aria-hidden="true" className="shrink-0 text-ivory/30">
                 —
               </span>
               {pt}
@@ -42,10 +67,16 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
         </ul>
 
         {product.install && (
-          <code className="mt-6 inline-block overflow-x-auto rounded-lg border border-white/10 bg-carbon px-3.5 py-2 font-mono text-[13px] whitespace-pre text-ivory/80">
+          <code className="mt-6 block overflow-x-auto rounded-lg border border-white/10 bg-carbon px-3.5 py-2.5 font-mono text-[13px] whitespace-pre text-ivory/80">
             <span className="select-none text-sand/70">$ </span>
             {product.install}
           </code>
+        )}
+
+        {product.cell && (
+          <div className="mt-6">
+            <PyCell initialCode={product.cell} />
+          </div>
         )}
 
         <div className="mt-7 flex flex-wrap gap-3">
@@ -53,7 +84,7 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
             href={product.primary.href}
             target="_blank"
             rel="noreferrer"
-            className="rounded-lg bg-ivory px-4 py-2 text-sm font-medium text-carbon transition-colors hover:bg-white"
+            className="rounded-lg bg-ivory px-4 py-2.5 text-sm font-medium text-carbon transition-colors hover:bg-white"
           >
             {product.primary.label}
           </a>
@@ -62,34 +93,13 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
               href={product.secondary.href}
               target="_blank"
               rel="noreferrer"
-              className="rounded-lg border border-white/15 px-4 py-2 text-sm text-ivory transition-colors hover:bg-white/5"
+              className="rounded-lg border border-white/15 px-4 py-2.5 text-sm text-ivory transition-colors hover:bg-white/5"
             >
               {product.secondary.label}
             </a>
           )}
         </div>
       </div>
-
-      <a
-        href={product.primary.href}
-        target="_blank"
-        rel="noreferrer"
-        aria-label={`${product.name} 열기`}
-        className={`overflow-hidden rounded-xl bg-white/[0.06] p-2 ring-1 ring-white/10 transition-colors hover:ring-white/25 sm:rounded-2xl sm:p-3 ${
-          flip ? "md:order-1" : ""
-        }`}
-      >
-        <div className="aspect-[16/10] overflow-hidden rounded-lg bg-carbon sm:rounded-xl">
-          <img
-            src={product.heroShot}
-            alt={product.shotAlt}
-            loading="lazy"
-            width={1800}
-            height={1125}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-          />
-        </div>
-      </a>
     </article>
   );
 }
@@ -97,12 +107,12 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
 export function Products() {
   return (
     <section id="products" className="scroll-mt-16">
-      <div className="mx-auto w-full max-w-5xl px-6 py-20 md:py-24">
+      <div className="mx-auto w-full max-w-5xl px-6 py-16 md:py-24">
         <SectionHead
           title="만들고 있는 것들"
-          description="각 제품은 독립적으로 배포되고 운영됩니다. 공시 데이터, Python 학습, 스프레드시트 자동화. 셋 다 같은 원칙으로 만듭니다."
+          description="각 제품은 독립적으로 배포되고 운영됩니다. 공시 데이터, Python 학습, 스프레드시트 자동화, 실행 파이프라인. 전부 같은 원칙으로 만듭니다."
         />
-        <div className="mt-14 space-y-20 md:space-y-24">
+        <div className="mt-12 space-y-16 md:mt-14 md:space-y-24">
           {PRODUCTS.map((p, i) => (
             <ProductRow key={p.id} product={p} index={i} />
           ))}

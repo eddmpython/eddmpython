@@ -12,6 +12,8 @@ export type Product = {
   heroShot: string;
   shotAlt: string;
   install?: string;
+  /* 이 제품 섹션에 실행 가능한 Python 셀을 붙인다. */
+  cell?: string;
   primary: { label: string; href: string };
   secondary?: { label: string; href: string };
 };
@@ -76,5 +78,27 @@ export const PRODUCTS: Product[] = [
     heroShot: "/shots/hero-xlpod.webp",
     shotAlt: "xlpod 시작 화면: Excel, Google Drive, OneDrive, SharePoint 연결",
     primary: { label: "앱 열기", href: "https://xlpod.eddmpython.com/" },
+  },
+  {
+    id: "pyproc",
+    name: "pyproc",
+    dotClass: "bg-pyproc",
+    status: "npm 배포 중",
+    tagline: "브라우저 안에 살아 있는 Python 컴퓨터.",
+    description:
+      "서버 없이 탭 안에서 진짜 CPython 을 돌리고, 그 상태를 탭이 닫혀도 유지합니다. 아래 셀이 바로 pyproc 으로 돌아갑니다.",
+    points: [
+      "애플리케이션 서버 없이 브라우저 안에서 실제 CPython 실행",
+      "탭을 닫아도 살아남는 영속 머신과 여러 탭 공유",
+      "체크포인트와 되감기, git 처럼 갈라지는 실행 히스토리",
+      "워커마다 독립 인터프리터로 실제 병렬 처리",
+      "서명된 머신 이미지로 통째 이식",
+    ],
+    heroShot: "/shots/hero-pyproc.webp",
+    shotAlt: "pyproc 데모 페이지: 브라우저 안 영속 Python 컴퓨터",
+    install: "npm install pyproc",
+    cell: 'total = sum(range(1, 101))\nf"1 부터 100 까지 합은 {total}"',
+    primary: { label: "데모 열기", href: "https://eddmpython.github.io/pyproc/" },
+    secondary: { label: "GitHub", href: "https://github.com/eddmpython/pyproc" },
   },
 ];

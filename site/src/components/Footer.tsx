@@ -10,7 +10,7 @@ const CHANNELS = [
 export function Footer() {
   return (
     <footer className="border-t border-white/10">
-      <div className="mx-auto grid w-full max-w-5xl gap-10 px-6 py-14 md:grid-cols-[1.4fr_1fr_1fr]">
+      <div className="mx-auto grid w-full max-w-5xl gap-10 px-6 py-12 md:py-14 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
           <Wordmark />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-ivory/50">

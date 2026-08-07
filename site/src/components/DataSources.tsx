@@ -13,7 +13,8 @@ const SOURCES: Source[] = [
   { name: "Google Sheets", note: "공유 링크로 열기" },
   { name: "OneDrive", note: "클라우드 저장소" },
   { name: "SharePoint", note: "조직 문서함" },
-  { name: "PyPI", note: "패키지 배포" },
+  { name: "PyPI", note: "Python 패키지" },
+  { name: "npm", note: "브라우저 런타임" },
   { name: "Hugging Face", note: "데이터셋 배포" },
 ];
 
@@ -34,12 +35,12 @@ function SourceCard({ source, index }: { source: Source; index: number }) {
 export function DataSources() {
   return (
     <section id="data" className="scroll-mt-16">
-      <div className="mx-auto w-full max-w-5xl px-6 py-20 md:py-24">
+      <div className="mx-auto w-full max-w-5xl px-6 py-16 md:py-24">
         <SectionHead
           title="쓰던 데이터와 파일 그대로"
           description="새 포맷으로 옮기지 않습니다. 이미 쓰고 있는 공시, 시세, 스프레드시트, 클라우드 저장소를 그 자리에서 읽고 결과를 원본에 되돌립니다."
         />
-        <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-5">
+        <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
           {SOURCES.map((s, i) => (
             <SourceCard key={s.name} source={s} index={i} />
           ))}

@@ -54,7 +54,7 @@ function Item({ q, a, index }: { q: string; a: string; index: number }) {
 export function Faq() {
   return (
     <section id="faq" className="scroll-mt-16">
-      <div className="mx-auto w-full max-w-5xl px-6 py-20 md:py-24">
+      <div className="mx-auto w-full max-w-5xl px-6 py-16 md:py-24">
         <SectionHead
           title="자주 묻는 것"
           description="쓰기 전에 확인하게 되는 것들을 모았습니다."

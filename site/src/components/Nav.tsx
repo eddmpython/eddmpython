@@ -8,18 +8,18 @@ const LINKS = [
   { label: "FAQ", href: "#faq" },
 ];
 
-export function Header() {
+export function Nav() {
   return (
-    <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-6 md:px-32">
+    <nav className="mb-14 flex flex-col items-center gap-5 md:mb-16 md:flex-row md:justify-between md:gap-0">
       <a href="/" aria-label="eddmpython 홈">
         <Wordmark />
       </a>
-      <nav className="flex items-center gap-5 text-sm text-ivory/70 md:gap-6">
+      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-ivory/70 md:gap-x-6">
         {LINKS.map((l) => (
           <a
             key={l.href}
             href={l.href}
-            className="hidden transition-colors hover:text-ivory sm:block"
+            className="transition-colors hover:text-ivory"
           >
             {l.label}
           </a>
@@ -33,7 +33,7 @@ export function Header() {
         >
           <GitHubIcon className="h-5 w-5" />
         </a>
-      </nav>
-    </header>
+      </div>
+    </nav>
   );
 }

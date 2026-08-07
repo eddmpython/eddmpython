@@ -1,11 +1,15 @@
 import { Showcase } from "./Showcase";
+import { Nav } from "./Nav";
 
 export function Hero() {
   return (
     <section className="relative">
-      <div className="relative mx-auto w-full max-w-7xl px-6 pt-20 md:px-32 md:pt-24">
+      {/* nav 는 별도 헤더 바가 아니라 히어로 컨테이너 안에 들어간다 (paseo 구조). */}
+      <div className="relative mx-auto w-full max-w-7xl px-6 pt-10 pb-10 md:px-32 md:pt-20 md:pb-12">
+        <Nav />
+
         <h1
-          className="fade-up text-3xl leading-tight font-medium tracking-tight md:text-5xl"
+          className="fade-up text-[2rem] leading-tight font-medium tracking-tight sm:text-4xl md:text-5xl"
           style={{ animationDelay: "0.05s" }}
         >
           복잡한 업무를,
@@ -13,7 +17,7 @@ export function Hero() {
           실제로 작동하는 자동화로.
         </h1>
         <p
-          className="fade-up mt-6 max-w-lg text-lg leading-relaxed text-ivory/70"
+          className="fade-up mt-6 max-w-lg text-base leading-relaxed text-ivory/70 sm:text-lg"
           style={{ animationDelay: "0.15s" }}
         >
           Python과 AI로 재무·데이터·반복 업무를 분석하고, 다시 실행할 수 있는
@@ -26,7 +30,7 @@ export function Hero() {
         >
           <a
             href="#products"
-            className="rounded-lg bg-ivory px-4 py-2 text-sm font-medium text-carbon transition-colors hover:bg-white"
+            className="rounded-lg bg-ivory px-4 py-2.5 text-sm font-medium text-carbon transition-colors hover:bg-white"
           >
             제품 보기
           </a>
@@ -34,7 +38,7 @@ export function Hero() {
             href="https://github.com/eddmpython"
             target="_blank"
             rel="noreferrer"
-            className="rounded-lg border border-white/15 px-4 py-2 text-sm text-ivory transition-colors hover:bg-white/5"
+            className="rounded-lg border border-white/15 px-4 py-2.5 text-sm text-ivory transition-colors hover:bg-white/5"
           >
             GitHub
           </a>
@@ -52,7 +56,7 @@ export function Hero() {
       </div>
 
       {/* 실제 제품 화면 뷰어. 아래 이름을 눌러 넘기고 자동 순환한다. */}
-      <div className="relative mx-auto w-full max-w-7xl px-6 pt-14 pb-16 md:px-8 md:pb-20">
+      <div className="relative mx-auto w-full max-w-7xl px-4 pb-16 sm:px-6 md:px-8 md:pb-20">
         <div className="fade-up" style={{ animationDelay: "0.45s" }}>
           <Showcase />
         </div>

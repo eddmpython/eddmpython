@@ -73,6 +73,16 @@ export const SLIDES: Slide[] = [
     href: "https://eddmpython.github.io/codaro/",
   },
   {
+    id: "pyproc",
+    product: "pyproc",
+    dotClass: "bg-pyproc",
+    label: "Python 머신",
+    caption: "서버 없이 브라우저 안에서 도는 영속 Python 컴퓨터",
+    shot: "/shots/hero-pyproc.webp",
+    alt: "pyproc 데모 페이지: 브라우저 안 영속 Python 컴퓨터",
+    href: "https://eddmpython.github.io/pyproc/",
+  },
+  {
     id: "xlpod",
     product: "xlpod",
     dotClass: "bg-xlpod",
