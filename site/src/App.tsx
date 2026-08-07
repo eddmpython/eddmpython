@@ -1,7 +1,10 @@
 import { Header } from "./components/Header";
 import { Hero } from "./components/Hero";
 import { Products } from "./components/Products";
+import { DataSources } from "./components/DataSources";
+import { CodeSection } from "./components/CodeSection";
 import { Philosophy } from "./components/Philosophy";
+import { Faq } from "./components/Faq";
 import { Footer } from "./components/Footer";
 
 export default function App() {
@@ -11,7 +14,10 @@ export default function App() {
       <main>
         <Hero />
         <Products />
+        <DataSources />
+        <CodeSection />
         <Philosophy />
+        <Faq />
       </main>
       <Footer />
     </div>

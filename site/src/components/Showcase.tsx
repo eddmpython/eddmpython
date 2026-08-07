@@ -23,18 +23,18 @@ export function Showcase() {
       onMouseEnter={() => (pausedRef.current = true)}
       onMouseLeave={() => (pausedRef.current = false)}
     >
-      <div className="overflow-hidden rounded-xl bg-white/[0.06] p-2 shadow-[0_50px_140px_-40px_rgba(0,0,0,0.95)] ring-1 ring-white/10 backdrop-blur-sm sm:rounded-2xl sm:p-3">
+      <div className="overflow-hidden rounded-xl bg-white/[0.06] p-2 ring-1 ring-white/10 sm:rounded-2xl sm:p-3">
         <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-carbon sm:rounded-xl">
           {PRODUCTS.map((p, i) => (
             <img
               key={p.id}
-              src={p.shot}
+              src={p.heroShot}
               alt={p.shotAlt}
               width={1800}
               height={1125}
               className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
                 i === active ? "opacity-100" : "opacity-0"
-              } ${p.heroShotClass ?? ""}`}
+              }`}
             />
           ))}
         </div>
