@@ -52,7 +52,7 @@ export function PyCell({
               .map((i) => i.why ?? i.code)
               .filter(Boolean)
               .join("\n") ||
-              "이 브라우저에서는 실행할 수 없습니다. Chrome 이나 Edge 에서 열어 주세요.",
+              "이 브라우저에서는 실행할 수 없습니다. Chrome 이나 Edge 에서 열어 주세요",
           );
         }
       })
@@ -119,7 +119,7 @@ export function PyCell({
       ? "Python 머신을 처음 띄우는 중입니다."
       : state === "installing"
         ? `${packages.join(", ")} 를 설치하고 있습니다. 처음 한 번만 걸립니다.`
-        : "실행을 누르면 결과가 여기에 나옵니다. 코드를 고쳐서 다시 실행해 보세요.";
+        : "실행을 누르면 결과가 여기에 나옵니다. 코드를 고쳐서 다시 실행해 보세요";
 
   return (
     <div className="overflow-hidden rounded-xl border border-white/10 bg-carbon">

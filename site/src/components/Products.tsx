@@ -111,7 +111,7 @@ export function Products() {
       <div className="mx-auto w-full max-w-5xl px-6 py-16 md:py-24">
         <SectionHead
           title="만들고 있는 것들"
-          description="공시 데이터, Python 학습, 스프레드시트, 그리고 그 셋을 떠받치는 실행 런타임. 각 제품 아래 셀은 설명이 아니라 진짜입니다. 눌러 보세요. 전부 pyproc 이 브라우저에 띄운 하나의 Python 머신에서 돕니다."
+          description="공시 데이터, Python 학습, 스프레드시트, 그리고 그 셋을 떠받치는 실행 런타임. 각 제품 아래 셀은 설명이 아니라 진짜입니다. 직접 눌러 볼 수 있고, 전부 pyproc 이 브라우저에 띄운 하나의 Python 머신에서 돕니다."
         />
         <div className="mt-12 space-y-16 md:mt-14 md:space-y-24">
           {PRODUCTS.map((p, i) => (

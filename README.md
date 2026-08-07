@@ -22,7 +22,7 @@ Python과 AI로 재무·데이터·반복 업무를 분석하고, 다시 실행�
 AI 코딩 에이전트에게 저장소를 맡길 때 쓰는 초기 규칙 템플릿입니다. 위 제품들을 만들면서
 실제로 사고가 났던 지점만 남긴 규칙이라, 그대로 복사해서 자리표시자만 채우면 됩니다.
 
-자세한 내용은 [agent-template/README.md](agent-template/README.md)를 보세요.
+자세한 내용은 [agent-template/README.md](agent-template/README.md)를 보세요
 
 ## site/
 
@@ -42,6 +42,6 @@ npm run deploy   # Cloudflare Workers 배포
 
 ## 라이선스
 
-코드는 MIT입니다. 브랜드 자산 (이름, 로고, 제품 스크린샷) 은 예외입니다. [LICENSE](LICENSE)를 보세요.
+코드는 MIT입니다. 브랜드 자산 (이름, 로고, 제품 스크린샷) 은 예외입니다. [LICENSE](LICENSE)를 보세요
 
 문의: [GitHub](https://github.com/eddmpython) · eddmpython@gmail.com

@@ -1,212 +1,227 @@
-import { useState } from "react";
-import { getMachine } from "../pymachine";
+import { useMemo, useRef, useState } from "react";
+import { calculate, cellId, colLetter, display, type Grid } from "../sheet";
 
 /**
- * xlpod 방식을 보여주는 작은 시트.
- * Python 으로 함수를 정의하고 셀 수식에서 그 함수를 부른다.
- * xlpod 소스를 쓰지 않고 인터페이스만 재현한 독립 구현이다.
+ * 작은 스프레드시트. 셀을 누르고 값이나 수식을 넣으면 즉시 다시 계산된다.
+ * xlpod 소스를 쓰지 않은 독립 구현이며, 쓰는 느낌만 그대로 보여 준다.
  */
 
-type Row = { name: string; price: string; formula: string };
+const COLS = 4;
+const ROWS = 5;
+const HEAD = ["제품", "단가", "수량", "금액"];
 
-const INITIAL_DEF = `def WITHTAX(price):
-    return round(price * 1.1)`;
-
-const INITIAL_ROWS: Row[] = [
-  { name: "노트북", price: "1450000", formula: "=WITHTAX(B1)" },
-  { name: "마우스", price: "32000", formula: "=WITHTAX(B2)" },
-  { name: "모니터", price: "280000", formula: "=WITHTAX(B3)" },
-];
-
-const FORMULA = /^=\s*([A-Za-z_]\w*)\s*\((.*)\)\s*$/;
-
-/** =NAME(B1, 10) 을 실제 값이 들어간 Python 호출로 바꾼다. */
-function toCall(formula: string, rows: Row[]): string | null {
-  const m = formula.match(FORMULA);
-  if (!m) return null;
-  const [, name, rawArgs] = m;
-  const args = rawArgs
-    .split(",")
-    .map((a) => a.trim())
-    .filter(Boolean)
-    .map((a) => {
-      const ref = a.match(/^([AB])([1-9]\d*)$/i);
-      if (!ref) return a;
-      const row = rows[Number(ref[2]) - 1];
-      if (!row) return "None";
-      return ref[1].toUpperCase() === "A"
-        ? JSON.stringify(row.name)
-        : row.price.trim() || "0";
-    });
-  return `${name}(${args.join(", ")})`;
-}
-
-const fmt = (v: string) => {
-  const n = Number(v);
-  return Number.isFinite(n) && v.trim() !== "" ? n.toLocaleString("ko-KR") : v;
+const INITIAL: Grid = {
+  A1: "노트북",
+  B1: "1450000",
+  C1: "2",
+  D1: "=B1*C1",
+  A2: "마우스",
+  B2: "32000",
+  C2: "5",
+  D2: "=B2*C2",
+  A3: "모니터",
+  B3: "280000",
+  C3: "1",
+  D3: "=B3*C3",
+  A5: "합계",
+  C5: "=SUM(C1:C3)",
+  D5: "=SUM(D1:D3)",
 };
 
+const IDS = Array.from({ length: COLS }, (_, c) =>
+  Array.from({ length: ROWS }, (_, r) => cellId(c, r)),
+).flat();
+
 export function SheetCell() {
-  const [def, setDef] = useState(INITIAL_DEF);
-  const [rows, setRows] = useState<Row[]>(INITIAL_ROWS);
-  const [results, setResults] = useState<string[]>([]);
-  const [state, setState] = useState<"idle" | "busy" | "done" | "error">("idle");
-  const [error, setError] = useState("");
+  const [grid, setGrid] = useState<Grid>(INITIAL);
+  const [active, setActive] = useState("D1");
+  const [editing, setEditing] = useState<string | null>(null);
+  const [draft, setDraft] = useState("");
+  const barRef = useRef<HTMLInputElement>(null);
 
-  function patch(i: number, key: keyof Row, value: string) {
-    setRows((rs) => rs.map((r, j) => (i === j ? { ...r, [key]: value } : r)));
+  const values = useMemo(() => calculate(grid, IDS), [grid]);
+
+  function commit(id: string, text: string) {
+    setGrid((g) => {
+      const next = { ...g };
+      if (text.trim() === "") delete next[id];
+      else next[id] = text;
+      return next;
+    });
   }
 
-  async function calculate() {
-    setState("busy");
-    setError("");
-    try {
-      const machine = await getMachine();
-      await machine.runAsync(def);
-      const next: string[] = [];
-      for (const row of rows) {
-        const call = toCall(row.formula, rows);
-        if (!call) {
-          next.push("#NAME?");
-          continue;
-        }
-        try {
-          const v = await machine.runAsync(call);
-          next.push(v === undefined || v === null ? "" : String(v));
-        } catch {
-          next.push("#VALUE!");
-        }
-      }
-      setResults(next);
-      setState("done");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-      setState("error");
-    }
+  function startEdit(id: string, seed?: string) {
+    setActive(id);
+    setEditing(id);
+    setDraft(seed ?? grid[id] ?? "");
   }
 
-  const status =
-    state === "busy" ? "계산 중" : state === "error" ? "오류" : "계산 준비됨";
+  function moveDown(id: string) {
+    const col = id.charCodeAt(0) - 65;
+    const row = Number(id.slice(1)) - 1;
+    if (row + 1 < ROWS) setActive(cellId(col, row + 1));
+  }
 
   return (
     <div className="overflow-hidden rounded-xl border border-white/10 bg-carbon">
       <div className="flex items-center gap-2 border-b border-white/10 bg-white/[0.03] px-4 py-2.5">
         <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-xlpod" />
         <span className="truncate font-mono text-xs text-ivory/55">
-          시트 · 셀 수식이 Python 함수를 부른다
-        </span>
-        <span
-          className="ml-auto shrink-0 font-mono text-xs text-ivory/55"
-          aria-live="polite"
-        >
-          {status}
+          시트 · 눌러서 값과 수식을 바꿔 보세요
         </span>
       </div>
 
-      <div className="grid gap-0 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
-        <div className="border-b border-white/10 md:border-r md:border-b-0">
-          <div className="px-4 pt-3 pb-1 font-mono text-xs text-ivory/55">
-            Python 정의
-          </div>
-          <textarea
-            value={def}
-            onChange={(e) => setDef(e.target.value)}
-            spellCheck={false}
-            aria-label="Python 함수 정의"
-            rows={Math.max(4, def.split("\n").length + 1)}
-            className="block w-full resize-y bg-transparent px-4 pb-4 font-mono text-[13px] leading-6 text-ivory/90 outline-none"
-          />
-        </div>
-
-        <div className="p-4">
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse font-mono text-[13px]">
-              <thead>
-                <tr className="text-ivory/45">
-                  <th className="w-8 pb-2 text-left font-normal"> </th>
-                  <th className="pb-2 text-left font-normal">A</th>
-                  <th className="pb-2 text-left font-normal">B</th>
-                  <th className="pb-2 text-left font-normal">C</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row, i) => (
-                  <tr key={i}>
-                    <td className="pr-2 text-ivory/35">{i + 1}</td>
-                    <td className="border border-white/10 px-2 py-1 text-ivory/80">
-                      {row.name}
-                    </td>
-                    <td className="border border-white/10 p-0">
-                      <input
-                        value={row.price}
-                        onChange={(e) => patch(i, "price", e.target.value)}
-                        inputMode="numeric"
-                        aria-label={`B${i + 1} 단가`}
-                        className="w-24 bg-transparent px-2 py-1 text-right text-ivory/90 outline-none"
-                      />
-                    </td>
-                    <td className="border border-white/10 p-0">
-                      <input
-                        value={
-                          results[i] !== undefined && state === "done"
-                            ? fmt(results[i])
-                            : row.formula
-                        }
-                        onChange={(e) => {
-                          patch(i, "formula", e.target.value);
-                          setState("idle");
-                          setResults([]);
-                        }}
-                        aria-label={`C${i + 1} 수식`}
-                        className={`w-full min-w-32 bg-transparent px-2 py-1 text-right outline-none ${
-                          state === "done" ? "text-xlpod" : "text-ivory/90"
-                        }`}
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+      {/* 수식 입력줄 */}
+      <div className="flex items-stretch border-b border-white/10">
+        <span className="flex w-14 shrink-0 items-center justify-center border-r border-white/10 font-mono text-xs text-ivory/55">
+          {active}
+        </span>
+        <input
+          ref={barRef}
+          value={editing === active ? draft : (grid[active] ?? "")}
+          onChange={(e) => {
+            setEditing(active);
+            setDraft(e.target.value);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              commit(active, editing === active ? draft : (grid[active] ?? ""));
+              setEditing(null);
+              moveDown(active);
+            }
+            if (e.key === "Escape") setEditing(null);
+          }}
+          onBlur={() => {
+            if (editing === active) {
+              commit(active, draft);
+              setEditing(null);
+            }
+          }}
+          spellCheck={false}
+          aria-label={`${active} 수식 입력줄`}
+          placeholder="값 또는 =B1*C1"
+          className="w-full bg-transparent px-3 py-2 font-mono text-[13px] text-ivory/90 outline-none"
+        />
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 border-t border-white/10 px-4 py-3">
-        <button
-          type="button"
-          onClick={calculate}
-          disabled={state === "busy"}
-          className="rounded-lg bg-ivory px-3.5 py-1.5 text-sm font-medium text-carbon transition-colors hover:bg-white disabled:opacity-50"
-        >
-          {state === "busy" ? "계산 중" : "계산"}
-        </button>
+      {/* 격자 */}
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[26rem] border-collapse font-mono text-[13px]">
+          <thead>
+            <tr>
+              <th className="w-9 border-r border-b border-white/10 bg-white/[0.02] p-0 font-normal" />
+              {HEAD.map((h, c) => (
+                <th
+                  key={c}
+                  className="border-r border-b border-white/10 bg-white/[0.02] px-2 py-1 text-left font-normal text-ivory/45"
+                >
+                  <span className="text-ivory/70">{colLetter(c)}</span>
+                  <span className="ml-2 text-[11px]">{h}</span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: ROWS }, (_, r) => (
+              <tr key={r}>
+                <td className="border-r border-b border-white/10 bg-white/[0.02] px-2 py-1 text-center text-ivory/45">
+                  {r + 1}
+                </td>
+                {Array.from({ length: COLS }, (_, c) => {
+                  const id = cellId(c, r);
+                  const isActive = id === active;
+                  const isEditing = editing === id;
+                  const v = values[id];
+                  const isFormula = (grid[id] ?? "").startsWith("=");
+                  const numeric = typeof v === "number";
+                  return (
+                    <td
+                      key={id}
+                      className={`border-r border-b p-0 ${
+                        isActive
+                          ? "border-xlpod/60 bg-xlpod/10 outline outline-1 outline-xlpod/60"
+                          : "border-white/10"
+                      }`}
+                    >
+                      {isEditing ? (
+                        <input
+                          autoFocus
+                          value={draft}
+                          onChange={(e) => setDraft(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              commit(id, draft);
+                              setEditing(null);
+                              moveDown(id);
+                            }
+                            if (e.key === "Escape") setEditing(null);
+                          }}
+                          onBlur={() => {
+                            commit(id, draft);
+                            setEditing(null);
+                          }}
+                          spellCheck={false}
+                          aria-label={`${id} 편집`}
+                          className="w-full bg-transparent px-2 py-1 text-right text-ivory outline-none"
+                        />
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setActive(id)}
+                          onDoubleClick={() => startEdit(id)}
+                          onKeyDown={(e) => {
+                            if (e.key.length === 1 && !e.metaKey && !e.ctrlKey) {
+                              startEdit(id, e.key);
+                              e.preventDefault();
+                            }
+                            if (e.key === "Enter") {
+                              startEdit(id);
+                              e.preventDefault();
+                            }
+                            if (e.key === "Delete" || e.key === "Backspace") {
+                              commit(id, "");
+                              e.preventDefault();
+                            }
+                          }}
+                          aria-label={`${id} ${grid[id] ?? "빈 칸"}`}
+                          className={`block w-full px-2 py-1 text-left ${
+                            numeric ? "text-right" : ""
+                          } ${
+                            typeof v === "string" && v.startsWith("#")
+                              ? "text-[#e0908a]"
+                              : isFormula
+                                ? "text-xlpod"
+                                : "text-ivory/85"
+                          }`}
+                        >
+                          {v === "" ? " " : display(v)}
+                        </button>
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-white/10 px-4 py-3 text-xs text-ivory/55">
         <button
           type="button"
           onClick={() => {
-            setDef(INITIAL_DEF);
-            setRows(INITIAL_ROWS);
-            setResults([]);
-            setState("idle");
-            setError("");
+            setGrid(INITIAL);
+            setActive("D1");
+            setEditing(null);
           }}
-          className="rounded-lg border border-white/15 px-3.5 py-1.5 text-sm text-ivory transition-colors hover:bg-white/5"
+          className="rounded-lg border border-white/15 px-3 py-1 text-sm text-ivory transition-colors hover:bg-white/5"
         >
           되돌리기
         </button>
-        <span className="text-xs text-ivory/55">
-          함수 이름과 단가를 바꿔도 됩니다. Chromium 계열 필요.
+        <span>
+          한 번 눌러 선택, 다시 눌러 편집. SUM, AVERAGE, MIN, MAX, ROUND 를 씁니다.
         </span>
       </div>
-
-      <output className="block border-t border-white/10 px-4 py-3 font-mono text-[12px] leading-5 whitespace-pre-wrap text-ivory/60">
-        {error ? (
-          <span className="text-[#e0908a]">{error}</span>
-        ) : state === "done" ? (
-          "C 열이 Python 함수가 돌려준 값입니다. 수식 칸을 고치면 다시 수식으로 돌아갑니다."
-        ) : (
-          "계산을 누르면 정의한 함수가 셀 수식에서 호출됩니다."
-        )}
-      </output>
     </div>
   );
 }

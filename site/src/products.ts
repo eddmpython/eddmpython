@@ -95,7 +95,7 @@ c.story()`,
     cells: [
       {
         label: "레슨: 값 모으기",
-        code: `# 도시별 매출을 합쳐 1위를 찾습니다. 숫자를 바꿔 보세요.
+        code: `# 도시별 매출을 합쳐 1위를 찾습니다. 숫자를 바꿔 보세요
 sales = [("서울", 120), ("부산", 85), ("대구", 64), ("서울", 40)]
 
 total = {}
@@ -118,7 +118,7 @@ cheap = [i["name"] for i in items if i["price"] < 300_000]
 f"30만원 미만: {cheap}"`,
       },
     ],
-    cellNote: "Codaro 학습 카드와 같은 방식입니다. 고쳐서 바로 실행해 보세요.",
+    cellNote: "Codaro 학습 카드와 같은 방식입니다. 고쳐서 바로 실행해 보세요",
     primary: { label: "Web Learn 열기", href: "https://eddmpython.github.io/codaro/" },
     secondary: {
       label: "Windows 런처",
@@ -166,7 +166,7 @@ f"30만원 미만: {cheap}"`,
     cells: [
       {
         label: "상태가 남는다",
-        code: `# 실행을 두 번 눌러 보세요. 머신이 값을 기억합니다.
+        code: `# 실행을 두 번 눌러 보세요 머신이 값을 기억합니다.
 counter = globals().get("counter", 0) + 1
 f"이 머신에서 {counter} 번째 실행"`,
       },
@@ -185,7 +185,7 @@ sorted(k for k in globals() if not k.startswith("_"))`,
       },
     ],
     cellNote:
-      "같은 머신을 페이지 전체가 나눠 씁니다. 위 제품 셀을 먼저 돌리고 여기서 확인해 보세요.",
+      "같은 머신을 페이지 전체가 나눠 씁니다. 위 제품 셀을 먼저 돌리고 여기서 확인해 보세요",
     primary: { label: "데모 열기", href: "https://eddmpython.github.io/pyproc/" },
     secondary: { label: "GitHub", href: "https://github.com/eddmpython/pyproc" },
   },
