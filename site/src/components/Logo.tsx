@@ -1,8 +1,8 @@
-import { MARK } from "../brand";
+import { MARK, BRAND } from "../brand";
 
 /**
  * eddmpython 스네이크 e 마크. 형태 정본은 src/brand.ts 에 있다.
- * currentColor 로 그려서 문맥 색을 따른다. 눈은 evenodd 구멍이라 배경이 비친다.
+ * 몸통과 머리는 currentColor 로 문맥 색을 따르고, 눈만 고정 색이다.
  */
 export function LogoMark({ className }: { className?: string }) {
   return (
@@ -15,7 +15,8 @@ export function LogoMark({ className }: { className?: string }) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path d={MARK.head} fill="currentColor" fillRule="evenodd" />
+      <path d={MARK.head} fill="currentColor" />
+      <path d={MARK.eye} fill={BRAND.eye} />
     </svg>
   );
 }

@@ -56,7 +56,8 @@ const markSvg = (width) => `
 <svg viewBox="${MARK.viewBox}" width="${width}" style="display:block">
   <path d="${MARK.body}" fill="none" stroke="${BRAND.ivory}" stroke-width="${MARK.strokeWidth}"
         stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="${MARK.head}" fill="${BRAND.ivory}" fill-rule="evenodd"/>
+  <path d="${MARK.head}" fill="${BRAND.ivory}"/>
+  <path d="${MARK.eye}" fill="${BRAND.eye}"/>
 </svg>`;
 
 const html = `<!doctype html>
