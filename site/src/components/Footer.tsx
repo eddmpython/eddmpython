@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Wordmark } from "./Logo";
+import { Logo } from "./Logo";
 import { PRODUCTS } from "../products";
 import { SOCIAL } from "../social";
 import { GitHubIcon, ThreadsIcon, YouTubeIcon, MailIcon } from "./icons";
@@ -21,7 +21,7 @@ export function Footer() {
     <footer className="border-t border-white/10">
       <div className="mx-auto grid w-full max-w-5xl gap-10 px-6 py-12 md:grid-cols-[1.4fr_1fr_1fr] md:py-14">
         <div>
-          <Wordmark />
+          <Logo />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-ivory/50">
             복잡한 업무를, 실제로 작동하는 자동화로.
           </p>

@@ -18,7 +18,7 @@ import { tmpdir } from "node:os";
 import { join, resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { MARK, BRAND } from "../src/brand.ts";
+import { SYMBOL, BRAND } from "../src/brand.ts";
 import { PRODUCTS } from "../src/products.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -52,12 +52,13 @@ function findBrowser() {
   );
 }
 
-const markSvg = (width) => `
-<svg viewBox="${MARK.viewBox}" width="${width}" style="display:block">
-  <path d="${MARK.body}" fill="none" stroke="${BRAND.ivory}" stroke-width="${MARK.strokeWidth}"
+/** 심볼 단독. components/Logo.tsx 의 LogoSymbol 과 같은 구성이다. */
+const symbolSvg = (width) => `
+<svg viewBox="${SYMBOL.viewBox}" width="${width}" style="display:block">
+  <path d="${SYMBOL.body}" fill="none" stroke="${BRAND.ivory}" stroke-width="${SYMBOL.strokeWidth}"
         stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="${MARK.head}" fill="${BRAND.ivory}"/>
-  <path d="${MARK.eye}" fill="${BRAND.eye}"/>
+  <path d="${SYMBOL.head}" fill="${BRAND.ivory}"/>
+  <path d="${SYMBOL.eye}" fill="${BRAND.eye}"/>
 </svg>`;
 
 const html = `<!doctype html>
@@ -83,7 +84,8 @@ const html = `<!doctype html>
   i{width:11px;height:11px;border-radius:50%;display:block}
 </style></head>
 <body>
-  <div style="flex:none">${markSvg(258)}</div>
+  <!-- 심볼과 워드마크가 떨어져 있어도 한 덩어리로 읽히는 로고 락업이다. -->
+  <div style="flex:none">${symbolSvg(258)}</div>
   <div>
     <div class="brand"><b>eddm</b><span>python</span></div>
     <h1>복잡한 업무를,<br>실제로 작동하는 자동화로.</h1>

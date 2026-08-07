@@ -1,7 +1,10 @@
 /**
- * 브랜드 마크 정본.
+ * 브랜드 심볼 정본.
  *
- * 마크 형태는 여기에서만 정의한다. 랜딩(React)과 favicon.svg(정적 파일)가
+ * 여기 있는 것은 심볼 하나뿐이다. 심볼에 워드마크를 붙인 로고 락업은
+ * components/Logo.tsx 가 조립한다. 이 파일에 글자를 넣지 않는다.
+ *
+ * 심볼 형태는 여기에서만 정의한다. 랜딩(React)과 favicon.svg(정적 파일)가
  * 같은 좌표를 읽으므로 둘이 어긋날 수 없다. favicon 은 vite.config.ts 의
  * brandAssets 플러그인이 이 모듈에서 생성한다. public/ 에 사본을 두지 않는다.
  *
@@ -14,7 +17,7 @@
  * 이 파일은 React 를 import 하지 않는다. vite.config.ts(Node)에서도 읽는다.
  */
 
-export const MARK = {
+export const SYMBOL = {
   viewBox: "0 0 100 72.36",
   width: 100,
   height: 72.36,
@@ -29,7 +32,7 @@ export const MARK = {
     "M81.79 36.32 C86.32 33.8 92.45 34.05 96.73 36.74 C100.42 39 101.09 42.28 98.24 44.96 " +
     "C94.8 48.15 88.84 48.74 84.56 46.47 C80.95 44.62 79.53 41.35 80.62 38.75 " +
     "C80.87 37.91 81.29 36.99 81.79 36.32 Z",
-  /** 눈. 머리 위에 얹는다. 마크에서 유일하게 색이 고정된 부분이다. */
+  /** 눈. 머리 위에 얹는다. 심볼에서 유일하게 색이 고정된 부분이다. */
   eye:
     "M89.93 37.58 C92.03 36.74 94.21 37.83 94.46 39.67 C94.71 41.6 93.12 43.11 91.27 42.78 " +
     "C89.43 42.53 88.51 40.6 89.26 38.92 C89.43 38.42 89.68 37.91 89.93 37.58 Z",
@@ -40,37 +43,38 @@ export const BRAND = {
   carbon: "#101514",
   ivory: "#f5f3ee",
   /**
-   * 마크의 눈 포인트. 저장소 강행규칙은 핑크 계열을 금지하지만 이 한 점만
-   * 운영자가 승인한 예외다. 랜딩, 파비콘, og 이미지의 마크 밖으로 넓히지 않는다.
+   * 심볼의 눈 포인트. 저장소 강행규칙은 핑크 계열을 금지하지만 이 한 점만
+   * 운영자가 승인한 예외다. 랜딩, 파비콘, og 이미지의 심볼 밖으로 넓히지 않는다.
    */
   eye: "#ff2d78",
 } as const;
 
 /**
- * 브라우저 탭 아이콘 본문.
+ * 브라우저 탭 아이콘 본문. 파비콘에는 로고가 아니라 심볼만 넣는다.
+ * 16px 짜리 정사각에 글자를 넣으면 읽히지 않는다.
  *
  * currentColor 를 쓸 수 없다. 파비콘은 문서 문맥 밖에서 렌더되어 상속받을 색이
- * 없고, 브라우저는 이를 검정으로 처리한다. 어두운 탭 배경에서 마크가 사라진다.
- * 그래서 칩 배경과 마크 색을 명시한다.
+ * 없고, 브라우저는 이를 검정으로 처리한다. 어두운 탭 배경에서 심볼이 사라진다.
+ * 그래서 칩 배경과 심볼 색을 명시한다.
  *
- * 마크가 가로 1.38:1 이라 정사각 안에서는 세로가 남는다. 칩을 깔아 그 여백을
+ * 심볼이 가로 1.38:1 이라 정사각 안에서는 세로가 남는다. 칩을 깔아 그 여백을
  * 형태로 쓰고, 16px 에서 획이 끊기지 않도록 스트로크를 광학 보정한다.
  */
 export function faviconSvg(): string {
   const scale = 0.84;
-  const w = MARK.width * scale;
-  const h = MARK.height * scale;
+  const w = SYMBOL.width * scale;
+  const h = SYMBOL.height * scale;
   const x = (100 - w) / 2;
   const y = (100 - h) / 2;
   // 16px 에서 1px 아래로 떨어지지 않게 굵힌다. 큰 크기에서는 차이가 보이지 않는다.
-  const stroke = MARK.strokeWidth * 1.18;
+  const stroke = SYMBOL.strokeWidth * 1.18;
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
   <rect width="100" height="100" rx="22" fill="${BRAND.carbon}"/>
   <g transform="translate(${x.toFixed(2)} ${y.toFixed(2)}) scale(${scale})">
-    <path d="${MARK.body}" fill="none" stroke="${BRAND.ivory}" stroke-width="${stroke.toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="${MARK.head}" fill="${BRAND.ivory}"/>
-    <path d="${MARK.eye}" fill="${BRAND.eye}"/>
+    <path d="${SYMBOL.body}" fill="none" stroke="${BRAND.ivory}" stroke-width="${stroke.toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="${SYMBOL.head}" fill="${BRAND.ivory}"/>
+    <path d="${SYMBOL.eye}" fill="${BRAND.eye}"/>
   </g>
 </svg>
 `;

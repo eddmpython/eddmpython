@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Wordmark } from "./Logo";
+import { Logo } from "./Logo";
 import { GitHubIcon, ThreadsIcon, YouTubeIcon, MailIcon } from "./icons";
 import { SOCIAL } from "../social";
 
@@ -23,7 +23,7 @@ export function Nav() {
   return (
     <nav className="mb-14 flex flex-col items-center gap-5 md:mb-16 md:flex-row md:justify-between md:gap-0">
       <Link to="/" aria-label="eddmpython 홈">
-        <Wordmark />
+        <Logo />
       </Link>
       <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2.5 text-sm text-ivory/70">
         {LINKS.map((l) => {
