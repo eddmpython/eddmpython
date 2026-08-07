@@ -57,7 +57,7 @@ export function CodeSection() {
       <div className="mx-auto w-full max-w-5xl px-6 py-16 md:py-24">
         <SectionHead
           title="한 줄로 부른다"
-          description="DartLab 은 공시 데이터를 계층이 아니라 하나의 인터페이스로 노출합니다. 종목코드만 있으면 재무, 비율, 신용위험, 산업 위치까지 같은 문법으로 이어집니다."
+          description="공시 데이터를 다루는 데 필요한 것은 종목코드 하나입니다. 재무와 비율에서 신용위험과 산업 위치까지, 내부 구조를 몰라도 같은 문법으로 이어집니다."
         />
 
         <div ref={ref} className="reveal mt-10">

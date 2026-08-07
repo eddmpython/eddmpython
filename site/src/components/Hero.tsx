@@ -51,7 +51,7 @@ export function Hero() {
           <span>다루는 것</span>
           <span>DART · SEC EDGAR</span>
           <span>Excel · Google Sheets</span>
-          <span>Python</span>
+          <span>브라우저 Python</span>
         </div>
       </div>
 

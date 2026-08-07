@@ -111,7 +111,7 @@ export function Products() {
       <div className="mx-auto w-full max-w-5xl px-6 py-16 md:py-24">
         <SectionHead
           title="만들고 있는 것들"
-          description="각 제품은 독립적으로 배포되고 운영됩니다. 공시 데이터, Python 학습, 스프레드시트 자동화, 실행 파이프라인. 전부 같은 원칙으로 만듭니다."
+          description="공시 데이터, Python 학습, 스프레드시트, 브라우저 런타임. 네 제품은 각자 배포되고 각자 운영되지만, 반복은 코드가 처리하고 판단만 사람이 한다는 같은 원칙 위에 있습니다."
         />
         <div className="mt-12 space-y-16 md:mt-14 md:space-y-24">
           {PRODUCTS.map((p, i) => (

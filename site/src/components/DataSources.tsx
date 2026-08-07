@@ -38,7 +38,7 @@ export function DataSources() {
       <div className="mx-auto w-full max-w-5xl px-6 py-16 md:py-24">
         <SectionHead
           title="쓰던 데이터와 파일 그대로"
-          description="새 포맷으로 옮기지 않습니다. 이미 쓰고 있는 공시, 시세, 스프레드시트, 클라우드 저장소를 그 자리에서 읽고 결과를 원본에 되돌립니다."
+          description="새 포맷으로 옮기라고 하지 않습니다. 이미 쓰고 있는 공시와 시세, 스프레드시트, 클라우드 저장소를 그 자리에서 읽고 결과를 원본에 되돌립니다."
         />
         <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
           {SOURCES.map((s, i) => (

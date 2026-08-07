@@ -1,23 +1,27 @@
 import { SectionHead } from "./SectionHead";
 import { useReveal } from "../useReveal";
 
-/* 답은 각 제품의 실제 동작에서만 가져온다. */
+/* 답은 각 제품의 실제 동작에서만 가져온다. 확인하지 않은 것은 쓰지 않는다. */
 const ITEMS: Array<{ q: string; a: string }> = [
   {
     q: "설치해야 쓸 수 있나요?",
-    a: "제품마다 다릅니다. Codaro Web Learn 과 xlpod 은 브라우저에서 바로 열립니다. DartLab 은 Python 라이브러리라 pip install dartlab 한 줄이면 됩니다.",
+    a: "제품마다 다릅니다. Codaro 학습과 xlpod, pyproc 데모는 브라우저에서 바로 열립니다. DartLab 은 Python 라이브러리라 pip install dartlab, pyproc 을 직접 붙이려면 npm install pyproc 입니다.",
   },
   {
     q: "데이터는 어디서 오나요?",
-    a: "DartLab 은 한국 DART 전자공시와 미국 SEC EDGAR, 그리고 금융위원회·한국거래소가 공공데이터포털로 공개하는 시세를 씁니다. 미리 정리한 데이터셋은 Hugging Face 로 배포합니다.",
+    a: "DartLab 은 한국 DART 전자공시와 미국 SEC EDGAR, 그리고 금융위원회와 한국거래소가 공공데이터포털로 공개하는 시세를 씁니다. 미리 정리한 데이터셋은 Hugging Face 로 배포합니다.",
   },
   {
     q: "내 파일은 어디에 저장되나요?",
     a: "xlpod 은 여러분이 연결한 원본에 되돌려 저장합니다. Excel 파일, Google Sheets, OneDrive, SharePoint 중 연 곳 그대로입니다. Codaro 는 Local 스튜디오로 넘어가면 내 컴퓨터의 실제 파일을 다룹니다.",
   },
   {
+    q: "브라우저에서 도는 Python 은 어디서 실행되나요?",
+    a: "여러분의 탭 안에서 실행됩니다. 서버로 코드를 보내지 않습니다. pyproc 은 WebAssembly 위에서 실제 CPython 을 띄우고, 그 상태를 탭이 닫혀도 유지합니다. 이 페이지의 실행 셀도 같은 방식입니다.",
+  },
+  {
     q: "어떤 브라우저가 필요한가요?",
-    a: "xlpod 에서 셀 안 Python 실행 기능은 Chromium 계열 (Chrome, Edge) 이 필요합니다. 그 외 기능과 Codaro Web Learn 은 최신 브라우저면 동작합니다.",
+    a: "xlpod 의 셀 안 Python 실행과 pyproc 은 Chromium 계열 (Chrome, Edge) 이 필요합니다. 그 외 기능과 Codaro 학습은 최신 브라우저면 동작합니다.",
   },
   {
     q: "Windows 에서만 되나요?",
@@ -37,10 +41,10 @@ function Item({ q, a, index }: { q: string; a: string; index: number }) {
       className="reveal group border-b border-white/10"
       style={{ transitionDelay: `${Math.min(index, 5) * 0.05}s` }}
     >
-      <summary className="flex cursor-pointer list-none items-center gap-3 py-5 text-[15px] font-medium transition-colors hover:text-ivory md:text-base [&::-webkit-details-marker]:hidden">
+      <summary className="flex cursor-pointer list-none items-start gap-3 py-5 text-[15px] font-medium transition-colors hover:text-ivory md:text-base [&::-webkit-details-marker]:hidden">
         <span
           aria-hidden="true"
-          className="text-ivory/40 transition-transform duration-200 group-open:rotate-45"
+          className="mt-0.5 shrink-0 text-ivory/40 transition-transform duration-200 group-open:rotate-45"
         >
           +
         </span>

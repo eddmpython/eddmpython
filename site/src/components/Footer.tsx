@@ -4,6 +4,7 @@ import { PRODUCTS } from "../products";
 const CHANNELS = [
   { label: "GitHub", href: "https://github.com/eddmpython" },
   { label: "PyPI · dartlab", href: "https://pypi.org/project/dartlab/" },
+  { label: "npm · pyproc", href: "https://www.npmjs.com/package/pyproc" },
   { label: "Hugging Face", href: "https://huggingface.co/eddmpython" },
 ];
 
