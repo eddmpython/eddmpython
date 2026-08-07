@@ -28,11 +28,11 @@ export const PRODUCTS: Product[] = [
     points: [
       "재무제표, 비율, 신용위험, 산업 위치를 Company 인터페이스 하나로",
       "한국과 미국 기업을 같은 문법으로 대칭 비교",
-      "공시 본문 횡단 검색과 전종목 스캔",
-      "미리 정리한 데이터셋을 Hugging Face 로 배포",
+      "공시뷰어로 분기 보고서 원문을 나란히 비교",
+      "2,664 개 상장사 전종목 스캔과 34 개 산업 지도",
     ],
-    heroShot: "/shots/hero-dartlab.webp",
-    shotAlt: "DartLab Terminal 에서 삼성전자를 분석하는 화면",
+    heroShot: "/shots/hero-viewer.webp",
+    shotAlt: "DartLab 공시뷰어에서 분기 보고서를 나란히 비교하는 화면",
     install: "pip install dartlab",
     primary: { label: "문서 보기", href: "https://eddmpython.github.io/dartlab/" },
     secondary: { label: "GitHub", href: "https://github.com/eddmpython/dartlab" },
@@ -46,13 +46,13 @@ export const PRODUCTS: Product[] = [
     description:
       "브라우저에서 배우고, 고치고, 바로 실행합니다. 설치도 가입도 필요 없습니다.",
     points: [
-      "페이지 안에서 Python 이 그대로 실행되는 학습 노트북",
+      "문법 목차가 아니라 남길 결과를 기준으로 472 개 레슨",
       "예제를 고쳐서 실행하고 결과를 즉시 확인",
       "실제 파일과 패키지가 필요해지면 Local 스튜디오로 이어짐",
       "학습 상태를 그대로 들고 넘어가 예약 자동화까지",
     ],
-    heroShot: "/shots/hero-codaro.webp",
-    shotAlt: "Codaro Web Learn 에서 브라우저로 Python 을 실행하는 화면",
+    heroShot: "/shots/hero-learn.webp",
+    shotAlt: "Codaro 학습 페이지에서 결과 기준으로 레슨을 고르는 화면",
     primary: { label: "Web Learn 열기", href: "https://eddmpython.github.io/codaro/" },
     secondary: {
       label: "Windows 런처",
