@@ -18,7 +18,7 @@ export function Footer() {
           </p>
         </div>
         <nav aria-label="제품">
-          <h3 className="text-sm font-medium text-ivory/40">제품</h3>
+          <h3 className="text-sm font-medium text-ivory/55">제품</h3>
           <ul className="mt-4 space-y-2.5 text-sm">
             {PRODUCTS.map((p) => (
               <li key={p.id}>
@@ -35,7 +35,7 @@ export function Footer() {
           </ul>
         </nav>
         <nav aria-label="채널">
-          <h3 className="text-sm font-medium text-ivory/40">채널</h3>
+          <h3 className="text-sm font-medium text-ivory/55">채널</h3>
           <ul className="mt-4 space-y-2.5 text-sm">
             {CHANNELS.map((c) => (
               <li key={c.label}>
@@ -53,7 +53,7 @@ export function Footer() {
         </nav>
       </div>
       <div className="border-t border-white/5">
-        <div className="mx-auto w-full max-w-5xl px-6 py-6 text-xs text-ivory/45">
+        <div className="mx-auto w-full max-w-5xl px-6 py-6 text-xs text-ivory/55">
           © 2026 eddmpython
         </div>
       </div>

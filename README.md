@@ -23,7 +23,7 @@ cd site
 npm install
 npm run dev      # 개발 서버
 npm run test     # 타입 체크
-npm run build    # 프로덕션 빌드 (산출물은 저장소 밖 ../eddmpython.out/site-dist)
+npm run build    # 프로덕션 빌드 (산출물은 저장소 형제 폴더 eddmpython.out/site-dist)
 npm run deploy   # Cloudflare Workers 배포 (wrangler)
 ```
 

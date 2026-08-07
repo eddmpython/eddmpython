@@ -3,8 +3,8 @@ import { PRODUCTS } from "../products";
 const TERMINAL_LINES: Array<{ prompt: string; text: string }> = [
   { prompt: "$", text: "pip install dartlab" },
   { prompt: "$", text: "python" },
-  { prompt: ">>>", text: "import dartlab as dl" },
-  { prompt: ">>>", text: 'samsung = dl.Company("005930")' },
+  { prompt: ">>>", text: "import dartlab" },
+  { prompt: ">>>", text: 'samsung = dartlab.Company("005930")' },
   { prompt: ">>>", text: "samsung.story()" },
 ];
 
@@ -73,7 +73,7 @@ export function Hero() {
             <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
             <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
             <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-            <span className="ml-3 font-mono text-xs text-ivory/40">terminal</span>
+            <span className="ml-3 font-mono text-xs text-ivory/55">terminal</span>
           </div>
           <div className="overflow-x-auto px-5 py-5 font-mono text-[13px] leading-7 md:text-sm">
             {TERMINAL_LINES.map((line, i) => (
