@@ -15,6 +15,8 @@ export type Product = {
   /* 이 제품 섹션에 붙는 실행 셀. 전부 pyproc 머신 위에서 돈다. */
   cells?: Array<{ label: string; code: string }>;
   cellPackages?: string[];
+  /* 기본 코드 셀 대신 시트 데모를 붙인다 (xlpod). */
+  cellKind?: "sheet";
   cellNote?: string;
   primary: { label: string; href: string };
   secondary?: { label: string; href: string };
@@ -139,23 +141,8 @@ f"30만원 미만: {cheap}"`,
     ],
     heroShot: "/shots/hero-xlpod.webp",
     shotAlt: "xlpod 시작 화면: Excel, Google Drive, OneDrive, SharePoint 연결",
-    cells: [
-      {
-        label: "시트 한 장 다루기",
-        code: `import polars as pl
-
-df = pl.DataFrame({
-    "제품": ["A", "B", "C", "A", "B"],
-    "수량": [3, 7, 2, 5, 1],
-    "단가": [12000, 8000, 25000, 12000, 8000],
-})
-
-df = df.with_columns((pl.col("수량") * pl.col("단가")).alias("매출"))
-df.group_by("제품").agg(pl.col("매출").sum()).sort("매출", descending=True)`,
-      },
-    ],
-    cellPackages: ["polars"],
-    cellNote: "xlpod 은 이 계산을 스프레드시트 셀 수식 안에서 합니다.",
+    cellKind: "sheet",
+    cellNote: "xlpod 은 이 방식으로 셀 수식이 Python 함수를 부릅니다.",
     primary: { label: "앱 열기", href: "https://xlpod.eddmpython.com/" },
   },
   {

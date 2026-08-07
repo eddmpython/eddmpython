@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { PyCell } from "./PyCell";
+import { SheetCell } from "./SheetCell";
 import type { Product } from "../products";
 
 /** 제품 섹션에 붙는 실행 셀. 프리셋 탭과 자체 코드 상태를 가진다. */
@@ -8,6 +9,7 @@ export function ProductCell({ product }: { product: Product }) {
   const [tab, setTab] = useState(0);
   const [code, setCode] = useState(cells[0]?.code ?? "");
 
+  if (product.cellKind === "sheet") return <SheetCell />;
   if (!cells.length) return null;
 
   const panelId = `${product.id}-cell`;

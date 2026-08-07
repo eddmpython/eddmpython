@@ -1,34 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-
-/* pyproc 이 고정한 Pyodide 배포판. 같은 버전을 CDN 에서 가져온다. */
-const ENGINE_INDEX = "https://cdn.jsdelivr.net/pyodide/v314.0.2/full/";
-
-type Machine = {
-  runAsync: (code: string) => Promise<unknown>;
-  loadPackages: (packages: string[]) => Promise<unknown>;
-};
+import { getMachine, ensurePackages } from "../pymachine";
 
 type EnvReport = {
   ok?: boolean;
   issues?: Array<{ code?: string; why?: string; fix?: string }>;
 };
-
-let booting: Promise<Machine> | null = null;
-
-/** pyproc 머신은 페이지에 하나만 띄우고 셀들이 나눠 쓴다. 실패하면 다시 시도할 수 있다. */
-function getMachine(): Promise<Machine> {
-  if (!booting) {
-    booting = import("pyproc")
-      .then((m) => m.boot({ indexURL: ENGINE_INDEX }) as Promise<Machine>)
-      .catch((e) => {
-        booting = null; // 한 번 실패했다고 세션 내내 막지 않는다.
-        throw e;
-      });
-  }
-  return booting;
-}
-
-const installed = new Set<string>();
 
 type State =
   | "idle"
@@ -108,16 +84,9 @@ export function PyCell({
     try {
       const machine = await getMachine();
 
-      const missing = packages.filter((p) => !installed.has(p));
-      if (missing.length) {
+      if (packages.length) {
         setState("installing");
-        await machine.loadPackages(["micropip"]);
-        await machine.runAsync(
-          `import micropip\n${missing
-            .map((p) => `await micropip.install(${JSON.stringify(p)})`)
-            .join("\n")}`,
-        );
-        missing.forEach((p) => installed.add(p));
+        await ensurePackages(machine, packages);
       }
 
       readyRef.current = true;

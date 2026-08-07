@@ -96,7 +96,7 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
         </div>
       </div>
 
-      {product.cells && (
+      {(product.cells || product.cellKind) && (
         <div className="md:col-span-2">
           <ProductCell product={product} />
         </div>
