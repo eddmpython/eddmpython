@@ -1,15 +1,5 @@
 import { PRODUCTS } from "../products";
-
-function WindowChrome({ label }: { label: string }) {
-  return (
-    <div className="flex items-center gap-1.5 border-b border-white/10 bg-white/[0.02] px-4 py-2.5">
-      <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-      <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-      <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-      <span className="ml-3 font-mono text-xs text-ivory/55">{label}</span>
-    </div>
-  );
-}
+import { Showcase } from "./Showcase";
 
 export function Hero() {
   return (
@@ -69,34 +59,10 @@ export function Hero() {
         </div>
       </div>
 
-      {/* 실제 제품 화면 쇼케이스. DartLab Terminal 위에 xlpod 창이 겹친다. */}
-      <div className="mx-auto w-full max-w-5xl px-6 pt-16 pb-24 md:pb-32">
-        <div
-          className="fade-up showcase-glow relative"
-          style={{ animationDelay: "0.45s" }}
-        >
-          <figure className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[0_24px_80px_-24px_rgba(0,0,0,0.8)]">
-            <WindowChrome label="dartlab terminal" />
-            <img
-              src="/shots/dartlab.webp"
-              alt="DartLab Terminal에서 삼성전자를 분석하는 실제 화면"
-              width={1800}
-              height={1125}
-              className="block w-full"
-            />
-          </figure>
-          <figure className="absolute -right-4 -bottom-10 hidden w-[38%] overflow-hidden rounded-xl border border-white/15 bg-carbon shadow-[0_24px_60px_-12px_rgba(0,0,0,0.85)] md:block">
-            <WindowChrome label="xlpod" />
-            <div className="aspect-[4/3] overflow-hidden">
-              <img
-                src="/shots/xlpod.webp"
-                alt="xlpod 시작 화면"
-                width={1200}
-                height={750}
-                className="h-full w-full scale-[1.35] object-cover"
-              />
-            </div>
-          </figure>
+      {/* 실제 제품 화면 뷰어. 탭으로 넘기고 자동 순환한다. */}
+      <div className="mx-auto w-full max-w-5xl px-6 pt-16 pb-20 md:pb-24">
+        <div className="fade-up" style={{ animationDelay: "0.45s" }}>
+          <Showcase />
         </div>
       </div>
     </section>

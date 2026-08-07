@@ -11,6 +11,8 @@ export type Product = {
   shotAlt: string;
   /* 카드 썸네일에서 추가로 적용할 이미지 클래스 (줌 등) */
   shotClass?: string;
+  /* 히어로 뷰어 슬라이드에서 적용할 이미지 클래스 */
+  heroShotClass?: string;
   install?: string;
   primary: { label: string; href: string };
   secondary?: { label: string; href: string };
@@ -58,6 +60,7 @@ export const PRODUCTS: Product[] = [
     shot: "/shots/xlpod.webp",
     shotAlt: "xlpod 시작 화면: Excel, Google Drive, OneDrive, SharePoint 연결",
     shotClass: "scale-[1.6] group-hover:scale-[1.66]",
+    heroShotClass: "scale-[1.25]",
     primary: { label: "앱 열기", href: "https://xlpod.eddmpython.com/" },
   },
 ];
