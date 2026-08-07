@@ -1,24 +1,21 @@
-/** eddmpython 스네이크 e 마크. currentColor 로 그려서 문맥 색을 따른다. */
+import { MARK } from "../brand";
+
+/**
+ * eddmpython 스네이크 e 마크. 형태 정본은 src/brand.ts 에 있다.
+ * currentColor 로 그려서 문맥 색을 따른다. 눈은 evenodd 구멍이라 배경이 비친다.
+ */
 export function LogoMark({ className }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 100 100"
-      className={className}
-      aria-hidden="true"
-      fill="currentColor"
-    >
+    <svg viewBox={MARK.viewBox} className={className} aria-hidden="true">
       <path
-        d="M 56.2 24.7 A 30 30 0 1 0 74.6 71.2"
+        d={MARK.body}
         fill="none"
         stroke="currentColor"
-        strokeWidth="12"
+        strokeWidth={MARK.strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
-      <path d="M 82.9 59.2 L 80.9 78.3 L 65.3 67.4 Z" />
-      <path
-        fillRule="evenodd"
-        d="M 61 18 m -10.5 0 a 10.5 10.5 0 1 0 21 0 a 10.5 10.5 0 1 0 -21 0 M 62.5 14.5 m -3 0 a 3 3 0 1 0 6 0 a 3 3 0 1 0 -6 0"
-      />
-      <path d="M 53.5 22 Q 54.5 38 43 49.5 Q 59 43 65 25 Q 60 20.5 53.5 22 Z" />
+      <path d={MARK.head} fill="currentColor" fillRule="evenodd" />
     </svg>
   );
 }
@@ -26,7 +23,8 @@ export function LogoMark({ className }: { className?: string }) {
 export function Wordmark() {
   return (
     <span className="flex items-center gap-2.5">
-      <LogoMark className="h-6 w-6 text-ivory" />
+      {/* 마크가 가로로 넓다. 높이를 텍스트에 맞추고 폭은 비율대로 둔다. */}
+      <LogoMark className="h-[19px] w-auto text-ivory" />
       <span className="text-[15px] tracking-tight">
         <span className="font-bold">eddm</span>
         <span className="font-normal text-ivory/80">python</span>

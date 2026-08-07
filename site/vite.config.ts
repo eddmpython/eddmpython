@@ -3,6 +3,7 @@ import { join, resolve } from "node:path";
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import { faviconSvg } from "./src/brand";
 
 // 빌드 산출물은 저장소 밖에 둔다 (CLAUDE.md 작업 산출물 규칙).
 // site/ 기준 두 단계 위는 sideProject/ 이므로 저장소 형제 폴더에 떨어진다.
@@ -132,8 +133,40 @@ function blogPages(): Plugin {
   };
 }
 
+/**
+ * favicon.svg 를 src/brand.ts 에서 만든다.
+ *
+ * public/ 에 사본을 두면 랜딩 마크를 고칠 때 파비콘만 옛 형태로 남는다.
+ * 소스를 하나로 두고 dev 는 미들웨어로, build 는 dist 파일로 같은 문자열을 낸다.
+ */
+function brandAssets(): Plugin {
+  let root = "";
+  let outDir = "";
+  return {
+    name: "eddm-brand-assets",
+    configResolved(cfg) {
+      root = cfg.root;
+      outDir = cfg.build.outDir;
+    },
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        if (req.url?.split("?")[0] !== "/favicon.svg") return next();
+        res.setHeader("Content-Type", "image/svg+xml");
+        res.end(faviconSvg());
+      });
+    },
+    closeBundle() {
+      writeFileSync(
+        join(resolve(root, outDir), "favicon.svg"),
+        faviconSvg(),
+        "utf8",
+      );
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react(), tailwindcss(), blogPages()],
+  plugins: [react(), tailwindcss(), brandAssets(), blogPages()],
   // 글은 저장소 루트 blog/ 에 있다. dev 서버가 site/ 밖을 읽게 허용한다.
   server: { fs: { allow: [".."] } },
   build: {

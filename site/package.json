@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "og": "node --experimental-strip-types scripts/og.mjs",
     "preview": "vite preview",
     "test": "tsc --noEmit",
     "deploy": "npm run build && wrangler deploy"
