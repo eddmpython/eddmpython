@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { PRODUCTS } from "../products";
 
-const ROTATE_MS = 5000;
+const ROTATE_MS = 6000;
 
-/** 제품 실화면을 무대 배경 위 한 프레임에서 넘겨 보는 뷰어 (paseo 히어로 구도). */
+/** 제품 실화면 뷰어. paseo 히어로 목업과 같은 이중 프레임 카드 + 하단 미니 전환. */
 export function Showcase() {
   const [active, setActive] = useState(0);
   const pausedRef = useRef(false);
@@ -18,49 +18,13 @@ export function Showcase() {
     return () => clearInterval(t);
   }, []);
 
-  const current = PRODUCTS[active];
-
   return (
     <div
-      className="stage-bg relative overflow-hidden rounded-3xl border border-white/10 px-4 pt-6 sm:px-8 md:px-14 md:pt-9"
       onMouseEnter={() => (pausedRef.current = true)}
       onMouseLeave={() => (pausedRef.current = false)}
     >
-      <div className="mb-6 flex flex-wrap items-center justify-center gap-2 md:mb-8">
-        {PRODUCTS.map((p, i) => (
-          <button
-            key={p.id}
-            type="button"
-            onClick={() => {
-              setActive(i);
-              pausedRef.current = true;
-            }}
-            aria-pressed={i === active}
-            className={`flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm backdrop-blur transition-colors ${
-              i === active
-                ? "border-white/25 bg-white/10 text-ivory"
-                : "border-white/10 bg-carbon/40 text-ivory/60 hover:border-white/20 hover:text-ivory"
-            }`}
-          >
-            <span className={`h-1.5 w-1.5 rounded-full ${p.dotClass}`} />
-            {p.name}
-          </button>
-        ))}
-      </div>
-
-      <figure className="mx-auto max-w-4xl overflow-hidden rounded-t-xl border border-b-0 border-white/15 bg-carbon shadow-[0_-8px_60px_-12px_rgba(0,0,0,0.6),0_24px_80px_-24px_rgba(0,0,0,0.9)]">
-        <div className="flex items-center gap-1.5 border-b border-white/10 bg-white/[0.03] px-4 py-2.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-          <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-          <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-          <span className="ml-3 font-mono text-xs text-ivory/55">
-            {current.name.toLowerCase()}
-          </span>
-          <span className="ml-auto hidden font-mono text-xs text-ivory/35 sm:block">
-            {current.tagline}
-          </span>
-        </div>
-        <div className="relative aspect-[16/10] overflow-hidden bg-carbon">
+      <div className="overflow-hidden rounded-xl bg-white/[0.06] p-2 shadow-[0_50px_140px_-40px_rgba(0,0,0,0.95)] ring-1 ring-white/10 backdrop-blur-sm sm:rounded-2xl sm:p-3">
+        <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-carbon sm:rounded-xl">
           {PRODUCTS.map((p, i) => (
             <img
               key={p.id}
@@ -74,7 +38,31 @@ export function Showcase() {
             />
           ))}
         </div>
-      </figure>
+      </div>
+
+      <div className="mt-6 flex items-center justify-center gap-6 text-sm">
+        {PRODUCTS.map((p, i) => (
+          <button
+            key={p.id}
+            type="button"
+            onClick={() => {
+              setActive(i);
+              pausedRef.current = true;
+            }}
+            aria-pressed={i === active}
+            className={`flex items-center gap-2 transition-colors ${
+              i === active ? "text-ivory" : "text-ivory/45 hover:text-ivory/80"
+            }`}
+          >
+            <span
+              className={`h-1.5 w-1.5 rounded-full transition-opacity ${p.dotClass} ${
+                i === active ? "opacity-100" : "opacity-40"
+              }`}
+            />
+            {p.name}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

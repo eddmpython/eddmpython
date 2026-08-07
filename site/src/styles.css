@@ -45,32 +45,6 @@ body {
   background-color: color-mix(in srgb, var(--eddm-sand) 30%, transparent);
 }
 
-/* 히어로 위쪽에 아주 옅은 모래빛 광원 하나. 장식은 이것 하나로 절제한다. */
-.hero-glow {
-  background:
-    radial-gradient(
-      620px 320px at 50% -40px,
-      color-mix(in srgb, var(--eddm-sand) 9%, transparent),
-      transparent 70%
-    );
-}
-
-/* 쇼케이스 무대 배경: 어두운 새벽빛 그라디언트 */
-.stage-bg {
-  background:
-    radial-gradient(
-      60% 85% at 18% 0%,
-      color-mix(in srgb, var(--eddm-sand) 11%, transparent),
-      transparent 62%
-    ),
-    radial-gradient(
-      55% 75% at 85% 12%,
-      color-mix(in srgb, var(--eddm-xlpod) 7%, transparent),
-      transparent 65%
-    ),
-    linear-gradient(180deg, #182019 0%, #111614 55%, var(--eddm-carbon) 100%);
-}
-
 @keyframes fade-up {
   from {
     opacity: 0;

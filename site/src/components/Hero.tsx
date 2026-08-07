@@ -3,8 +3,15 @@ import { Showcase } from "./Showcase";
 
 export function Hero() {
   return (
-    <section className="hero-glow overflow-hidden">
-      <div className="mx-auto w-full max-w-5xl px-6 pt-24 md:pt-32">
+    <section className="relative overflow-hidden">
+      {/* 히어로 전체를 덮는 분위기 배경. 하단은 카본으로 수렴해 다음 섹션과 이어진다. */}
+      <img
+        src="/shots/hero-bg.webp"
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+      />
+      <div className="relative mx-auto w-full max-w-5xl px-6 pt-24 md:pt-32">
         <h1
           className="fade-up max-w-3xl bg-gradient-to-b from-ivory via-ivory to-ivory/60 bg-clip-text text-4xl leading-[1.15] font-semibold tracking-tight text-transparent md:text-6xl"
           style={{ animationDelay: "0.05s" }}
@@ -59,8 +66,8 @@ export function Hero() {
         </div>
       </div>
 
-      {/* 실제 제품 화면 뷰어. 탭으로 넘기고 자동 순환한다. */}
-      <div className="mx-auto w-full max-w-5xl px-6 pt-16 pb-20 md:pb-24">
+      {/* 실제 제품 화면 뷰어. 아래 이름을 눌러 넘기고 자동 순환한다. */}
+      <div className="relative mx-auto w-full max-w-6xl px-6 pt-16 pb-16 md:pb-20">
         <div className="fade-up" style={{ animationDelay: "0.45s" }}>
           <Showcase />
         </div>
