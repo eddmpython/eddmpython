@@ -6,15 +6,16 @@ const ROTATE_MS = 5500;
 /** 라이브 제품 화면을 넘겨 보는 히어로 뷰어. */
 export function Showcase() {
   const [active, setActive] = useState(0);
+  const [stopped, setStopped] = useState(false);
   const pausedRef = useRef(false);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const t = setInterval(() => {
-      if (!pausedRef.current) setActive((i) => (i + 1) % SLIDES.length);
+      if (!pausedRef.current && !stopped) setActive((i) => (i + 1) % SLIDES.length);
     }, ROTATE_MS);
     return () => clearInterval(t);
-  }, []);
+  }, [stopped]);
 
   const current = SLIDES[active];
 
@@ -33,6 +34,7 @@ export function Showcase() {
               width={1800}
               height={1125}
               loading={i === 0 ? "eager" : "lazy"}
+              aria-hidden={i !== active}
               className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
                 i === active ? "opacity-100" : "opacity-0"
               }`}
@@ -46,7 +48,7 @@ export function Showcase() {
           <span className={`h-1.5 w-1.5 rounded-full ${current.dotClass}`} />
           <span className="font-medium">{current.product}</span>
         </span>
-        <span className="hidden text-ivory/30 sm:inline">·</span>
+        <span aria-hidden="true" className="hidden text-ivory/55 sm:inline">·</span>
         <span className="text-ivory/60">{current.caption}</span>
       </div>
 
@@ -70,6 +72,14 @@ export function Showcase() {
             {s.label}
           </button>
         ))}
+        <button
+          type="button"
+          onClick={() => setStopped((v) => !v)}
+          aria-pressed={stopped}
+          className="rounded-full border border-white/10 px-3 py-1 text-[13px] text-ivory/55 transition-colors hover:border-white/20 hover:text-ivory"
+        >
+          {stopped ? "자동 넘김 켜기" : "자동 넘김 멈춤"}
+        </button>
       </div>
     </div>
   );

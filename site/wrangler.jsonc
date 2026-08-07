@@ -1,7 +1,8 @@
 {
-  // eddmpython 브랜드 랜딩. 정적 자산 전용 Worker (xlpod 배포 패턴 참고).
+  // eddmpython 브랜드 랜딩. 정적 자산 + SPA 라우트 처리 Worker.
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "eddmpython-site",
+  "main": "worker.ts",
   "compatibility_date": "2026-08-07",
   "workers_dev": true,
   "routes": [
@@ -10,8 +11,12 @@
   ],
   "assets": {
     // 빌드 산출물은 저장소 밖에 있다 (vite.config.ts 와 동일 경로).
-    // 단일 페이지 정적 랜딩. router 가 없으므로 없는 경로는 404 를 낸다.
+    // 자산이 없으면 worker.ts 가 받아서 /blog 계열만 index.html 로 되돌린다.
     "directory": "../../eddmpython.out/site-dist",
-    "not_found_handling": "none"
-  }
+    "binding": "ASSETS",
+    "not_found_handling": "none",
+    // 보안 헤더를 모든 응답에 붙이려면 Worker 가 먼저 돌아야 한다.
+    "run_worker_first": true
+  },
+  "observability": { "enabled": true }
 }

@@ -24,11 +24,19 @@ SOFTWARE.
 
 Brand assets are not covered by the MIT License above.
 
-The eddmpython name, logo mark, wordmark, and the product screenshots under
-`site/public/shots/` are trademarks and copyrighted material of eddmpython.
-They are included so the site can be built and run as-is. They may not be used
-to identify a different product or organization, or in any way that implies
-endorsement by or affiliation with eddmpython.
+The eddmpython name, the logo mark and wordmark (including `site/public/favicon.svg`,
+`site/public/og.png`, and the SVG paths in `site/src/components/Logo.tsx`), and the
+product screenshots under `site/public/shots/` are excluded from the MIT grant. They
+are included so the site can be built and run as-is. They may not be used to identify
+a different product or organization, or in any way that implies endorsement by or
+affiliation with eddmpython.
 
-Product names referenced here (DartLab, Codaro, xlpod, pyproc) are licensed
-separately in their own repositories.
+The screenshots additionally depict third-party content that eddmpython does not own:
+public disclosure text filed by listed companies, market data published by the Korea
+Exchange and the Financial Services Commission through the national open data portal,
+and the names and marks of Microsoft, Google, and other platforms shown inside the
+captured product interfaces. Those remain the property of their respective owners and
+are reproduced here only to show the products in operation.
+
+Product names referenced here (DartLab, Codaro, xlpod, pyproc) are licensed separately
+in their own repositories.

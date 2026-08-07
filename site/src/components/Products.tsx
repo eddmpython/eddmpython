@@ -1,7 +1,7 @@
 import { PRODUCTS, type Product } from "../products";
 import { SectionHead } from "./SectionHead";
 import { useReveal } from "../useReveal";
-import { PyCell } from "./PyCell";
+import { ProductCell } from "./ProductCell";
 
 function ProductRow({ product, index }: { product: Product; index: number }) {
   const ref = useReveal<HTMLElement>();
@@ -76,7 +76,7 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
 
         {product.cell && (
           <div className="mt-6">
-            <PyCell initialCode={product.cell} />
+            <ProductCell initialCode={product.cell} />
           </div>
         )}
 

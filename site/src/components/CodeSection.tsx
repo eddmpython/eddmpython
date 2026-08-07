@@ -1,106 +1,94 @@
 import { useState } from "react";
 import { SectionHead } from "./SectionHead";
 import { useReveal } from "../useReveal";
+import { PyCell } from "./PyCell";
 
-type Line = Array<{ t: string; c?: string }>;
-type Tab = { key: string; label: string; lines: Line[] };
-
-const K = "text-[#c78ee0]"; // keyword
-const S = "text-[#9ecf8a]"; // string
-const C = "text-ivory/35"; // comment
-const F = "text-[#d8be91]"; // callable
-
-/* dartlab 공개 계약만 쓴다. 존재하지 않는 API 를 지어내지 않는다. */
-const TABS: Tab[] = [
+/* 전부 브라우저에서 실제로 도는 코드다. 실행 결과를 확인하고 넣었다. */
+const PRESETS = [
   {
     key: "company",
-    label: "기업 하나 읽기",
-    lines: [
-      [{ t: "import ", c: K }, { t: "dartlab" }],
-      [],
-      [{ t: "c = dartlab." }, { t: "Company", c: F }, { t: "(" }, { t: '"005930"', c: S }, { t: ")" }],
-      [{ t: "c." }, { t: "story", c: F }, { t: "()" }, { t: "        # 기업 전체 이야기", c: C }],
-      [{ t: "c.panel" }, { t: "            # 재무 시계열 격자", c: C }],
-      [{ t: "c.select" }, { t: "           # 원하는 항목만", c: C }],
-    ],
+    label: "기업 열기",
+    code: `import dartlab
+
+c = dartlab.Company("005930")
+c`,
   },
   {
-    key: "search",
-    label: "공시 본문 찾기",
-    lines: [
-      [{ t: "import ", c: K }, { t: "dartlab" }],
-      [],
-      [{ t: "dartlab." }, { t: "search", c: F }, { t: "(" }, { t: '"무상증자"', c: S }, { t: ")" }],
-      [{ t: "# 공시 본문을 횡단 검색한다", c: C }],
-    ],
+    key: "panel",
+    label: "재무제표",
+    code: `import dartlab
+
+c = dartlab.Company("005930")
+c.panel("IS")`,
   },
   {
-    key: "edgar",
-    label: "미국 기업 대칭",
-    lines: [
-      [{ t: "import ", c: K }, { t: "dartlab" }],
-      [],
-      [{ t: "# 한국 DART 와 미국 SEC EDGAR 를 같은 문법으로", c: C }],
-      [{ t: "kr = dartlab." }, { t: "Company", c: F }, { t: "(" }, { t: '"005930"', c: S }, { t: ")" }],
-      [{ t: "us = dartlab." }, { t: "Company", c: F }, { t: "(" }, { t: '"AAPL"', c: S }, { t: ")" }],
-    ],
+    key: "ratios",
+    label: "비율",
+    code: `import dartlab
+
+c = dartlab.Company("005930")
+c.panel("ratios")`,
+  },
+  {
+    key: "story",
+    label: "전체 이야기",
+    code: `import dartlab
+
+c = dartlab.Company("005930")
+c.story()`,
   },
 ];
 
 export function CodeSection() {
   const [tab, setTab] = useState(0);
+  const [code, setCode] = useState(PRESETS[0].code);
   const ref = useReveal<HTMLDivElement>();
-  const lines = TABS[tab].lines;
 
   return (
     <section id="code" className="scroll-mt-16">
       <div className="mx-auto w-full max-w-5xl px-6 py-16 md:py-24">
         <SectionHead
-          title="한 줄로 부른다"
-          description="공시 데이터를 다루는 데 필요한 것은 종목코드 하나입니다. 재무와 비율에서 신용위험과 산업 위치까지, 내부 구조를 몰라도 같은 문법으로 이어집니다."
+          title="여기서 바로 돌려 보세요"
+          description="아래 셀은 그림이 아닙니다. pyproc 머신이 브라우저 안에 뜨고, DartLab 을 설치하고, 실제 공시 데이터를 가져옵니다. 종목코드를 바꿔도 됩니다."
         />
 
         <div ref={ref} className="reveal mt-10">
-          <div className="flex flex-wrap gap-2" role="tablist">
-            {TABS.map((t, i) => (
+          <div className="flex flex-wrap gap-2">
+            {PRESETS.map((p, i) => (
               <button
-                key={t.key}
+                key={p.key}
                 type="button"
-                role="tab"
-                aria-selected={i === tab}
-                onClick={() => setTab(i)}
+                aria-pressed={i === tab}
+                aria-controls="dartlab-cell"
+                onClick={() => {
+                  setTab(i);
+                  setCode(p.code);
+                }}
                 className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
                   i === tab
                     ? "border-white/25 bg-white/10 text-ivory"
                     : "border-white/10 text-ivory/55 hover:border-white/20 hover:text-ivory"
                 }`}
               >
-                {t.label}
+                {p.label}
               </button>
             ))}
           </div>
 
-          <div className="mt-5 overflow-x-auto rounded-xl border border-white/10 bg-white/[0.03] px-5 py-5 md:px-6">
-            <pre className="min-h-[9.5rem] font-mono text-[13px] leading-7 md:text-sm">
-              {lines.map((line, i) => (
-                <div key={i}>
-                  {line.length === 0 ? (
-                    <>&nbsp;</>
-                  ) : (
-                    line.map((seg, j) => (
-                      <span key={j} className={seg.c ?? "text-ivory/90"}>
-                        {seg.t}
-                      </span>
-                    ))
-                  )}
-                </div>
-              ))}
-            </pre>
+          <div className="mt-5" id="dartlab-cell">
+            <PyCell
+              code={code}
+              onCodeChange={setCode}
+              packages={["dartlab"]}
+              minRows={5}
+              hint="첫 실행은 런타임과 패키지를 받느라 30초쯤 걸립니다. Chromium 계열 필요."
+            />
           </div>
 
-          <div className="mt-5 flex flex-wrap items-center gap-4 text-sm">
+          <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm">
             <code className="rounded-lg border border-white/10 bg-carbon px-3.5 py-2 font-mono text-[13px] text-ivory/80">
-              <span className="select-none text-sand/70">$ </span>pip install dartlab
+              <span className="select-none text-sand/70">$ </span>pip install
+              dartlab
             </code>
             <a
               href="https://eddmpython.github.io/dartlab/"
@@ -108,7 +96,7 @@ export function CodeSection() {
               rel="noreferrer"
               className="text-ivory/70 transition-colors hover:text-ivory"
             >
-              전체 문서 보기 →
+              전체 문서 보기
             </a>
           </div>
         </div>
