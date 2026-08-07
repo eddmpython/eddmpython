@@ -12,8 +12,10 @@ export type Product = {
   heroShot: string;
   shotAlt: string;
   install?: string;
-  /* 이 제품 섹션에 실행 가능한 Python 셀을 붙인다. */
-  cell?: string;
+  /* 이 제품 섹션에 붙는 실행 셀. 전부 pyproc 머신 위에서 돈다. */
+  cells?: Array<{ label: string; code: string }>;
+  cellPackages?: string[];
+  cellNote?: string;
   primary: { label: string; href: string };
   secondary?: { label: string; href: string };
 };
@@ -36,6 +38,39 @@ export const PRODUCTS: Product[] = [
     heroShot: "/shots/hero-viewer.webp",
     shotAlt: "DartLab 공시뷰어에서 분기 보고서를 나란히 비교하는 화면",
     install: "pip install dartlab",
+    cells: [
+      {
+        label: "기업 열기",
+        code: `import dartlab
+
+c = dartlab.Company("005930")
+c`,
+      },
+      {
+        label: "재무제표",
+        code: `import dartlab
+
+c = dartlab.Company("005930")
+c.panel("IS")`,
+      },
+      {
+        label: "비율",
+        code: `import dartlab
+
+c = dartlab.Company("005930")
+c.panel("ratios")`,
+      },
+      {
+        label: "전체 이야기",
+        code: `import dartlab
+
+c = dartlab.Company("005930")
+c.story()`,
+      },
+    ],
+    cellPackages: ["dartlab"],
+    cellNote:
+      "종목코드를 바꿔도 됩니다. 첫 실행은 런타임과 DartLab 을 받느라 30초쯤 걸립니다.",
     primary: { label: "문서 보기", href: "https://eddmpython.github.io/dartlab/" },
     secondary: { label: "GitHub", href: "https://github.com/eddmpython/dartlab" },
   },
@@ -55,6 +90,33 @@ export const PRODUCTS: Product[] = [
     ],
     heroShot: "/shots/hero-learn.webp",
     shotAlt: "Codaro 학습 페이지에서 결과 기준으로 레슨을 고르는 화면",
+    cells: [
+      {
+        label: "레슨: 값 모으기",
+        code: `# 도시별 매출을 합쳐 1위를 찾습니다. 숫자를 바꿔 보세요.
+sales = [("서울", 120), ("부산", 85), ("대구", 64), ("서울", 40)]
+
+total = {}
+for city, amount in sales:
+    total[city] = total.get(city, 0) + amount
+
+top = max(total, key=total.get)
+f"{total} 에서 1위는 {top}"`,
+      },
+      {
+        label: "레슨: 조건으로 거르기",
+        code: `# 조건에 맞는 것만 남깁니다.
+items = [
+    {"name": "노트북", "price": 1_450_000},
+    {"name": "마우스", "price": 32_000},
+    {"name": "모니터", "price": 280_000},
+]
+
+cheap = [i["name"] for i in items if i["price"] < 300_000]
+f"30만원 미만: {cheap}"`,
+      },
+    ],
+    cellNote: "Codaro 학습 카드와 같은 방식입니다. 고쳐서 바로 실행해 보세요.",
     primary: { label: "Web Learn 열기", href: "https://eddmpython.github.io/codaro/" },
     secondary: {
       label: "Windows 런처",
@@ -77,6 +139,23 @@ export const PRODUCTS: Product[] = [
     ],
     heroShot: "/shots/hero-xlpod.webp",
     shotAlt: "xlpod 시작 화면: Excel, Google Drive, OneDrive, SharePoint 연결",
+    cells: [
+      {
+        label: "시트 한 장 다루기",
+        code: `import polars as pl
+
+df = pl.DataFrame({
+    "제품": ["A", "B", "C", "A", "B"],
+    "수량": [3, 7, 2, 5, 1],
+    "단가": [12000, 8000, 25000, 12000, 8000],
+})
+
+df = df.with_columns((pl.col("수량") * pl.col("단가")).alias("매출"))
+df.group_by("제품").agg(pl.col("매출").sum()).sort("매출", descending=True)`,
+      },
+    ],
+    cellPackages: ["polars"],
+    cellNote: "xlpod 은 이 계산을 스프레드시트 셀 수식 안에서 합니다.",
     primary: { label: "앱 열기", href: "https://xlpod.eddmpython.com/" },
   },
   {
@@ -86,7 +165,7 @@ export const PRODUCTS: Product[] = [
     status: "npm 배포 중",
     tagline: "브라우저 안에 살아 있는 Python 컴퓨터.",
     description:
-      "서버 없이 탭 안에서 진짜 CPython 을 돌리고, 그 상태를 탭이 닫혀도 유지합니다. 아래 셀이 바로 pyproc 으로 돌아갑니다.",
+      "서버 없이 탭 안에서 진짜 CPython 을 돌리고, 그 상태를 탭이 닫혀도 유지합니다. 이 페이지의 모든 실행 셀이 pyproc 위에서 돕니다.",
     points: [
       "애플리케이션 서버 없이 브라우저 안에서 실제 CPython 실행",
       "탭을 닫아도 살아남는 영속 머신과 여러 탭 공유",
@@ -97,7 +176,29 @@ export const PRODUCTS: Product[] = [
     heroShot: "/shots/hero-pyproc.webp",
     shotAlt: "pyproc 데모 페이지: 브라우저 안 영속 Python 컴퓨터",
     install: "npm install pyproc",
-    cell: 'total = sum(range(1, 101))\nf"1 부터 100 까지 합은 {total}"',
+    cells: [
+      {
+        label: "상태가 남는다",
+        code: `# 실행을 두 번 눌러 보세요. 머신이 값을 기억합니다.
+counter = globals().get("counter", 0) + 1
+f"이 머신에서 {counter} 번째 실행"`,
+      },
+      {
+        label: "무거운 준비는 한 번만",
+        code: `# 한 번 만든 데이터는 다음 실행에도 그대로 있습니다.
+if "data" not in globals():
+    data = list(range(1_000_000))
+
+f"{len(data):,} 개 유지 중 · 합계 {sum(data):,}"`,
+      },
+      {
+        label: "위 셀이 남긴 것",
+        code: `# DartLab 이나 xlpod 셀을 먼저 돌렸다면 그 결과가 여기 그대로 있습니다.
+sorted(k for k in globals() if not k.startswith("_"))`,
+      },
+    ],
+    cellNote:
+      "같은 머신을 페이지 전체가 나눠 씁니다. 위 제품 셀을 먼저 돌리고 여기서 확인해 보세요.",
     primary: { label: "데모 열기", href: "https://eddmpython.github.io/pyproc/" },
     secondary: { label: "GitHub", href: "https://github.com/eddmpython/pyproc" },
   },

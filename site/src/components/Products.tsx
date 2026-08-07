@@ -11,7 +11,7 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
     <article
       id={product.id}
       ref={ref}
-      className="reveal group flex scroll-mt-20 flex-col gap-7 md:grid md:grid-cols-2 md:items-center md:gap-12"
+      className="reveal group flex scroll-mt-20 flex-col gap-7 md:grid md:grid-cols-2 md:items-center md:gap-x-12 md:gap-y-8"
     >
       {/* 모바일에서는 화면이 먼저 오고 CTA 가 맨 끝에 온다. */}
       <a
@@ -21,7 +21,7 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
         aria-label={`${product.name} 열기`}
         className={`max-md:order-first overflow-hidden rounded-xl bg-white/[0.06] p-1.5 ring-1 ring-white/10 transition-colors hover:ring-white/25 sm:p-2 md:order-none md:rounded-2xl md:p-3 ${
           flip ? "md:col-start-1" : "md:col-start-2"
-        } md:row-start-1 md:sticky md:top-24 md:self-start`}
+        } md:row-start-1`}
       >
         <div className="aspect-[16/10] overflow-hidden rounded-lg bg-carbon md:rounded-xl">
           <img
@@ -74,12 +74,6 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
           </code>
         )}
 
-        {product.cell && (
-          <div className="mt-6">
-            <ProductCell initialCode={product.cell} />
-          </div>
-        )}
-
         <div className="mt-7 flex flex-wrap gap-3">
           <a
             href={product.primary.href}
@@ -101,6 +95,12 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
           )}
         </div>
       </div>
+
+      {product.cells && (
+        <div className="md:col-span-2">
+          <ProductCell product={product} />
+        </div>
+      )}
     </article>
   );
 }
@@ -111,7 +111,7 @@ export function Products() {
       <div className="mx-auto w-full max-w-5xl px-6 py-16 md:py-24">
         <SectionHead
           title="만들고 있는 것들"
-          description="공시 데이터, Python 학습, 스프레드시트, 브라우저 런타임. 네 제품은 각자 배포되고 각자 운영되지만, 반복은 코드가 처리하고 판단만 사람이 한다는 같은 원칙 위에 있습니다."
+          description="공시 데이터, Python 학습, 스프레드시트, 그리고 그 셋을 떠받치는 실행 런타임. 각 제품 아래 셀은 설명이 아니라 진짜입니다. 눌러 보세요. 전부 pyproc 이 브라우저에 띄운 하나의 Python 머신에서 돕니다."
         />
         <div className="mt-12 space-y-16 md:mt-14 md:space-y-24">
           {PRODUCTS.map((p, i) => (
