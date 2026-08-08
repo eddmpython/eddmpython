@@ -56,6 +56,23 @@ blog/YYYY-MM-DD-slug.md
 `readerQuestion` 과 `readerTakeaway` 가 필수인 이유는 이것이 없으면 글이 기능 나열로
 흘러가기 때문이다. 쓰는 방법은 `blog/PIPELINE.md` 를 본다.
 
+## 섹션은 제목, 이미지, 설명으로 읽힌다
+
+모든 H2는 아래 순서를 지킨다.
+
+1. 독자의 다음 궁금증을 여는 H2
+2. H2 바로 뒤의 고유한 섹션 이미지와 캡션
+3. 이미지를 실제 사례와 판단으로 연결하는 설명
+
+섹션 이미지는 `blog/media/plan.json`에서 `role: section`, 실제 H2와 같은 `sectionHeading`,
+`visualProfile: dark-editorial-v1`을 가진다. 다른 H2의 이미지를 재사용하지 않는다. 이미지는 차콜과
+그레이 중심의 낮은 채도로 만들고 글자, 숫자, 코드, 로고를 바이트 안에 굽지 않는다. 제목과 캡션은
+HTML로 렌더해야 모바일, 검색, 접근성 표면에서 같은 문장을 유지할 수 있다.
+
+DartLab 카드뉴스의 원칙 중 이미지와 큰 문장을 분리하고, 각 이미지가 그 문장이 말하는 장면을 맡는
+부분을 가져왔다. 세로 카드 비율과 화려한 SNS 장식은 가져오지 않는다. 블로그 본문에는 3:2 가로형과
+충분한 설명이 맞다. 구체적인 프롬프트와 눈검수 기준은 `blog/PIPELINE.md`가 정본이다.
+
 ## 이미지는 Git 에 넣지 않는다
 
 본문 이미지와 글별 공유 이미지의 **바이트는 저장소에 커밋하지 않는다.**
@@ -74,8 +91,8 @@ cd site && npm run verify:media
 
 ## 글 하나 발행하는 순서
 
-1. `blog/YYYY-MM-DD-slug.md` 를 쓴다. 규칙은 `blog/PIPELINE.md`
-2. 이미지를 만들고 `blog/media/plan.json` 에 의미와 출처를 남긴다
+1. `blog/YYYY-MM-DD-slug.md` 를 쓰고 모든 H2의 이미지 자리를 함께 정한다. 규칙은 `blog/PIPELINE.md`
+2. 섹션별 이미지를 만들고 `blog/media/plan.json` 에 H2, 의미, 출처, 최종 프롬프트를 남긴다
 3. `publish_media.py` 로 Hugging Face 에 올리고 `catalog.json` 을 갱신한다
 4. `cd site && npm test` 로 frontmatter 와 타입을 확인한다
 5. `npm run verify:media` 로 원격 객체를 확인한다

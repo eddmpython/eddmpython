@@ -119,15 +119,16 @@ export function Markdown({ children }: { children: string }) {
           const picture = onlyImage(node);
           if (picture) {
             return (
-              <figure className="my-8">
+              <figure className="my-7 overflow-hidden rounded-xl border border-white/10 bg-black/20">
                 <img
                   src={picture.src}
                   alt={picture.alt}
                   loading="lazy"
-                  className="block w-full rounded-xl border border-white/10"
+                  decoding="async"
+                  className="aspect-[3/2] w-full object-cover saturate-[0.72]"
                 />
                 {picture.title && (
-                  <figcaption className="mt-3 text-center text-sm leading-relaxed text-ivory/45">
+                  <figcaption className="border-t border-white/8 bg-white/[0.02] px-4 py-3 text-left text-sm leading-relaxed text-ivory/48">
                     {picture.title}
                   </figcaption>
                 )}

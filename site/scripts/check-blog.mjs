@@ -37,6 +37,8 @@ const mimeBySuffix = new Map([
   [".gif", "image/gif"],
 ]);
 const imageRef = /!\[([^\]]*)\]\(\s*<?([^\s)>]+)>?(?:\s+["'][^"']*["'])?\s*\)/g;
+const leadSectionImage =
+  /^!\[([^\]]+)\]\(\s*<?([^\s)>]+)>?\s+["']([^"']+)["']\s*\)\s*(?:\r?\n|$)/;
 
 function fail(file, message) {
   throw new Error(`${file}: ${message}`);
@@ -63,6 +65,17 @@ function parseFrontmatter(file, raw) {
 function validDate(value) {
   const parsed = new Date(`${value}T00:00:00Z`);
   return !Number.isNaN(parsed.valueOf()) && parsed.toISOString().slice(0, 10) === value;
+}
+
+function h2Sections(body) {
+  const headings = [...body.matchAll(/^##[ \t]+(.+?)\s*$/gm)];
+  return headings.map((heading, index) => ({
+    heading: heading[1].trim(),
+    content: body.slice(
+      heading.index + heading[0].length,
+      headings[index + 1]?.index ?? body.length,
+    ).trimStart(),
+  }));
 }
 
 async function filesUnder(dir) {
@@ -120,6 +133,8 @@ for (const [id, entry] of Object.entries(plan.assets)) {
   const required = [
     "post",
     "assetKey",
+    "role",
+    "visualProfile",
     "alt",
     "placement",
     "narrativeUse",
@@ -132,6 +147,15 @@ for (const [id, entry] of Object.entries(plan.assets)) {
     fail("blog/media/plan.json", `${id}의 post 또는 assetKey가 id와 다릅니다`);
   }
   if (entry.sourcePolicy !== "auto") fail("blog/media/plan.json", `${id}의 sourcePolicy는 auto여야 합니다`);
+  if (!["hero", "section", "support"].includes(entry.role)) {
+    fail("blog/media/plan.json", `${id}의 role을 지원하지 않습니다`);
+  }
+  if (entry.role === "section" && !String(entry.sectionHeading ?? "").trim()) {
+    fail("blog/media/plan.json", `${id}의 sectionHeading이 비었습니다`);
+  }
+  if (entry.visualProfile !== "dark-editorial-v1") {
+    fail("blog/media/plan.json", `${id}의 visualProfile은 dark-editorial-v1이어야 합니다`);
+  }
   if (!["imagegen", "official", "licensed"].includes(entry.sourceKind)) {
     fail("blog/media/plan.json", `${id}의 sourceKind를 지원하지 않습니다`);
   }
@@ -150,6 +174,7 @@ for (const [id, entry] of Object.entries(plan.assets)) {
 
 const urlsByPost = new Map();
 const assetUrlById = new Map();
+const assetIdByPostUrl = new Map();
 const altByPostUrl = new Map();
 const objectByPostUrl = new Map();
 for (const [id, record] of Object.entries(catalog.assets)) {
@@ -182,6 +207,7 @@ for (const [id, record] of Object.entries(catalog.assets)) {
   }
   const url = `https://huggingface.co/datasets/${catalog.repo}/resolve/main/${record.path}`;
   assetUrlById.set(id, url);
+  assetIdByPostUrl.set(`${record.post}|${url}`, id);
   altByPostUrl.set(`${record.post}|${url}`, String(plan.assets[id].alt));
   objectByPostUrl.set(`${record.post}|${url}`, object);
   if (!urlsByPost.has(record.post)) urlsByPost.set(record.post, new Set());
@@ -235,12 +261,45 @@ for (const file of posts) {
 
   if (!body) fail(file, "본문이 비었습니다");
   if (/^[ \t]*# /m.test(body)) fail(file, "본문 H1은 쓰지 않습니다. 제목은 frontmatter가 맡습니다");
-  if ((body.match(/^## /gm) ?? []).length < 3) fail(file, "독자 흐름을 나누는 H2가 3개보다 적습니다");
+  const sections = h2Sections(body);
+  if (sections.length < 3) fail(file, "독자 흐름을 나누는 H2가 3개보다 적습니다");
   if ((body.match(/^```/gm) ?? []).length % 2 !== 0) fail(file, "코드 펜스가 닫히지 않았습니다");
   if (/[\u2013\u2014]/u.test(raw)) fail(file, "em dash 또는 en dash가 있습니다");
   if (/\b(?:TODO|TBD)\b/.test(raw)) fail(file, "미완성 표식이 남았습니다");
 
   const slug = file.replace(/\.md$/, "");
+  const sectionAssets = new Set();
+  for (const section of sections) {
+    const lead = section.content.match(leadSectionImage);
+    if (!lead) {
+      fail(file, `H2 바로 뒤에 대체 텍스트와 캡션이 있는 섹션 이미지가 필요합니다: ${section.heading}`);
+    }
+    const [, alt, url, caption] = lead;
+    if (!caption.trim()) fail(file, `섹션 이미지 캡션이 비었습니다: ${section.heading}`);
+    const id = assetIdByPostUrl.get(`${slug}|${url}`);
+    if (!id) fail(file, `섹션 이미지가 catalog.json의 글 매핑에 없습니다: ${section.heading}`);
+    const entry = plan.assets[id];
+    if (entry.role !== "section" || entry.sectionHeading !== section.heading) {
+      fail(file, `섹션 이미지 계획이 H2와 맞지 않습니다: ${section.heading}`);
+    }
+    if (alt.trim() !== entry.alt) {
+      fail(file, `섹션 이미지 대체 텍스트가 plan.json과 다릅니다: ${section.heading}`);
+    }
+    if (sectionAssets.has(id)) fail(file, `서로 다른 H2가 같은 섹션 이미지를 재사용합니다: ${id}`);
+    sectionAssets.add(id);
+
+    const prose = section.content
+      .slice(lead[0].length)
+      .replace(/```[\s\S]*?```/g, " ")
+      .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/[#*_`>|\[\]-]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (prose.length < 120) {
+      fail(file, `섹션 이미지 뒤 설명이 120자보다 짧습니다: ${section.heading}`);
+    }
+  }
   const refs = [];
   for (const match of body.matchAll(imageRef)) {
     if (!match[1].trim()) fail(file, "이미지 대체 텍스트가 비었습니다");

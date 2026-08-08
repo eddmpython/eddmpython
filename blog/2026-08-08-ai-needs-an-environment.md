@@ -1,17 +1,17 @@
 ---
 title: AI에게 프롬프트보다 먼저 필요한 것
 date: 2026-08-08
-modified: 2026-08-08
+modified: 2026-08-09
 author: eddmpython
 section: AI 작업 환경
 summary: 같은 AI가 어떤 저장소에서는 든든한 동료가 되고 다른 곳에서는 매번 길을 잃는 이유를 작업 환경의 차이에서 살펴봅니다.
 readerQuestion: 같은 AI가 저장소에 따라 전혀 다른 동료처럼 일하는 이유는 무엇일까?
 readerTakeaway: AI의 작업 품질은 긴 프롬프트보다 경계와 증거와 검증이 저장소 안에 놓인 방식에 더 오래 좌우된다.
-ogImage: https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/08/08c616218e3993d3019bb26ccea228e358fdf96a30336554193fb09f2cbda710.png
+ogImage: https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/11/118381f89feb8d2c84d2fd6f4d6e7da52bf0c1bbb63e3f29f695dbcdb7daaf73.webp
 ogImageAlt: 서로 다른 두 진입 경로가 하나의 정돈된 작업 환경으로 합쳐지는 모습
 ogImageWidth: 1536
 ogImageHeight: 1024
-ogImageType: image/png
+ogImageType: image/webp
 ---
 
 새 대화를 열 때마다 프로젝트를 처음 보는 동료가 자리에 앉는다고 생각해 봅시다. 그 동료는 코드를
@@ -24,9 +24,9 @@ ogImageType: image/png
 뒤 딛고 설 작업장입니다. 이 저장소에는 그 작업장을 만드는 파일이 두 개 있습니다.
 `AGENTS.md`가 입구를 열고, `CLAUDE.md`가 실제 규칙을 맡습니다.
 
-![서로 다른 두 진입 경로가 하나의 정돈된 작업 환경으로 합쳐지는 모습](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/08/08c616218e3993d3019bb26ccea228e358fdf96a30336554193fb09f2cbda710.png "서로 다른 입구가 하나의 작업 환경으로 이어진다")
-
 ## 긴 프롬프트는 한 번의 대화를 구하지만 환경은 다음 대화도 구합니다
+
+![한 번 쓰고 사라지는 요청 메모와 반복 작업을 지탱하는 고정 작업 환경의 대비](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/71/710fb217b5ff64f54d8932e7111cd5669319d6393295c96dc7b46c4f77775761.webp "프롬프트는 오늘의 요청을, 환경은 반복되는 판단을 맡는다")
 
 프롬프트는 지금 할 일을 설명합니다. 작업 환경은 일을 하다가 마주칠 갈림길의 기준을 남깁니다.
 둘은 비슷해 보이지만 수명이 다릅니다.
@@ -45,6 +45,8 @@ ogImageType: image/png
 매번 말하지 않아도 되는 것을 저장소가 말하게 만들어야 합니다.
 
 ## 작업 환경은 다섯 가지 질문에 답해야 합니다
+
+![하나의 저장소 작업대를 둘러싼 다섯 개의 서로 다른 확인 지점](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/c6/c6c68286dca4b9ce7ce538938c782bb5b8670c032a4b946e0e0ddf978733463f.webp "좋은 작업 환경은 다섯 갈림길에서 추측을 줄인다")
 
 환경이라고 하면 Python 버전이나 운영체제부터 떠올리기 쉽습니다. 그것도 맞지만 충분하지 않습니다.
 AI가 파일을 열고 변경을 끝내기까지 반복해서 만나는 질문은 다섯 가지입니다.
@@ -67,6 +69,8 @@ AI가 파일을 열고 변경을 끝내기까지 반복해서 만나는 질문�
 어떤 외부 변경은 승인이 필요한지를 앞에 둡니다.
 
 ## 입구는 짧게, 규칙은 한곳에 둡니다
+
+![서로 다른 두 진입 경로가 하나의 정돈된 작업 환경으로 합쳐지는 모습](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/11/118381f89feb8d2c84d2fd6f4d6e7da52bf0c1bbb63e3f29f695dbcdb7daaf73.webp "서로 다른 입구가 하나의 작업 환경으로 이어진다")
 
 왜 파일이 두 개나 필요할까요. 배경은 하나의 표준 파일 이름이 없다는 데 있습니다. Claude는
 `CLAUDE.md`를 읽고, Codex를 비롯한 여러 에이전트는 `AGENTS.md`를 먼저 읽습니다. Claude와 일하며
@@ -98,6 +102,8 @@ AI가 파일을 열고 변경을 끝내기까지 반복해서 만나는 질문�
 
 ## 좋은 규칙은 실제 실패의 모양을 닮습니다
 
+![깨진 작업 경로에서 확인 지점과 안전 난간이 만들어지는 모습](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/0d/0d17c5f74d34115c4fc9dd372b260b896faaeee1cafde0810c648b1d4cc94465.webp "실패의 위치를 알아야 행동을 바꾸는 규칙을 세울 수 있다")
+
 처음부터 완벽한 규칙집을 만들 수는 없습니다. 일반적인 모범 사례를 모아 붙이면 문서는 금방
 길어지지만, 정작 이 저장소에서 일어나는 사고는 막지 못합니다. 지금의 템플릿에는 실제 작업에서
 되풀이된 실패가 남아 있습니다.
@@ -119,6 +125,8 @@ AI가 파일을 열고 변경을 끝내기까지 반복해서 만나는 질문�
 반대로 "최선을 다한다", "안전하게 작업한다" 같은 문장은 옳지만 행동을 바꾸지 못합니다.
 
 ## 이번에는 템플릿 자체도 고쳤습니다
+
+![헐거운 작업 틀이 세 개의 정밀한 보강 부품으로 단단해지는 과정](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/8d/8d7e756072345c3fde690e01bf3573c8cd1a59b99f88d991be2817837845b8d5.webp "발견한 문제는 설명에 머물지 않고 실제 작업 틀의 수정으로 이어진다")
 
 환경에 관한 글을 쓰면서 [공개용 `CLAUDE.md`](https://github.com/eddmpython/eddmpython/blob/main/agent-template/CLAUDE.md)를
 다시 읽어 보니 세 곳이 말과 맞지 않았습니다.
@@ -145,6 +153,8 @@ AI가 파일을 열고 변경을 끝내기까지 반복해서 만나는 질문�
 
 ## 작은 저장소에서는 작게 시작해도 됩니다
 
+![네 개의 기본 도구만 갖춘 작고 단단한 저장소 작업대](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/2f/2fbb1e26b069ae904ed8e058a3071a37e7c3dc9440b87bc7445b060bc11e1217.webp "작은 저장소는 네 가지 기본 요소만으로도 추측을 크게 줄일 수 있다")
+
 환경을 만든다고 100줄짜리 규칙부터 쓸 필요는 없습니다. 오히려 처음에는 아래 네 가지면 충분합니다.
 
 1. 이 저장소가 소유하는 것과 소유하지 않는 것을 한 문단으로 씁니다.
@@ -164,6 +174,8 @@ AI가 파일을 열고 변경을 끝내기까지 반복해서 만나는 질문�
 환경은 많이 적는 기술이 아니라, 추측이 생기는 자리에 가장 작은 확정 사실을 놓는 기술에 가깝습니다.
 
 ## 환경이 있어도 판단을 다시 열어야 할 때가 있습니다
+
+![안전한 기본 경로 옆에서 새로운 증거에 따라 다시 열리는 판단의 갈림길](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/74/742afbe9dcc6fa1b3572d7c705e355ce3c64e25d877bd728a81f120318b1fbb0.webp "규칙은 판단을 닫는 답안이 아니라 새 증거를 확인하는 출발점이다")
 
 규칙을 잘 갖췄다고 모든 작업이 자동으로 안전해지는 것은 아닙니다. 오히려 언제 규칙을 의심할지도
 환경의 일부여야 합니다.

@@ -59,7 +59,17 @@ def plan_entry(plan: dict[str, object], asset_id: str) -> dict[str, object]:
     entry = plan["assets"].get(asset_id)
     if not isinstance(entry, dict):
         raise ValueError(f"이미지 계획이 없음: {asset_id}")
-    required = ("post", "assetKey", "alt", "placement", "narrativeUse", "sourcePolicy", "sourceKind")
+    required = (
+        "post",
+        "assetKey",
+        "role",
+        "visualProfile",
+        "alt",
+        "placement",
+        "narrativeUse",
+        "sourcePolicy",
+        "sourceKind",
+    )
     missing = [key for key in required if not str(entry.get(key) or "").strip()]
     if missing:
         raise ValueError(f"이미지 계획 필드가 비었음: {asset_id}: {', '.join(missing)}")
@@ -67,6 +77,13 @@ def plan_entry(plan: dict[str, object], asset_id: str) -> dict[str, object]:
         raise ValueError(f"이미지 계획의 post 또는 assetKey가 id와 다름: {asset_id}")
     if entry["sourcePolicy"] != "auto":
         raise ValueError(f"sourcePolicy는 auto여야 함: {asset_id}")
+    role = str(entry["role"])
+    if role not in {"hero", "section", "support"}:
+        raise ValueError(f"지원하지 않는 이미지 role: {asset_id}: {role}")
+    if role == "section" and not str(entry.get("sectionHeading") or "").strip():
+        raise ValueError(f"section 이미지 계획에는 sectionHeading이 필요함: {asset_id}")
+    if entry["visualProfile"] != "dark-editorial-v1":
+        raise ValueError(f"visualProfile은 dark-editorial-v1이어야 함: {asset_id}")
     source_kind = str(entry["sourceKind"])
     if source_kind not in {"imagegen", "official", "licensed"}:
         raise ValueError(f"지원하지 않는 sourceKind: {asset_id}: {source_kind}")
@@ -360,6 +377,14 @@ def publish(asset_id: str, explicit_file: str | None, dry_run: bool, create_repo
         "sha256": sha256,
         "path": remote_path,
     }
+    referenced_objects = {
+        str(record.get("sha256"))
+        for record in next_assets.values()
+        if isinstance(record, dict) and record.get("sha256")
+    }
+    for object_sha in list(next_objects):
+        if object_sha not in referenced_objects:
+            del next_objects[object_sha]
 
     save_json(CATALOG_PATH, next_catalog)
     post_path.write_text(next_raw, encoding="utf-8")
