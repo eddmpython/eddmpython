@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "check:blog": "node scripts/check-blog.mjs",
+    "build": "npm run test && vite build",
     "og": "node --experimental-strip-types scripts/og.mjs",
     "preview": "vite preview",
-    "test": "tsc --noEmit",
+    "test": "npm run check:blog && tsc --noEmit",
     "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {

@@ -11,6 +11,17 @@ Python 과 AI 로 재무, 데이터, 반복 업무를 분석하고 다시 실행
 이 저장소는 브랜드 랜딩, 제품 카탈로그, 블로그, 그리고 공개용 AI 에이전트 규칙 템플릿을
 담습니다. 각 제품의 소스는 저장소별로 분리되어 있습니다.
 
+## 저장소 구성
+
+| 경로 | 역할 |
+|---|---|
+| `site/` | React 랜딩, 제품 진입점, 블로그 렌더링과 Cloudflare Worker |
+| `blog/` | 발행 글과 집필 파이프라인의 정본 |
+| `agent-template/` | 프로젝트에 복사해 쓰는 공개용 AI 작업 환경 템플릿 |
+
+이 저장소는 각 제품의 소개와 진입점을 소유합니다. DartLab, Codaro, xlpod, pyproc의 제품 소스와
+인증, 라이선스, 배포 계약은 각 제품 저장소가 소유합니다.
+
 ## 제품
 
 ### DartLab · 한국 DART 와 미국 SEC EDGAR 공시를 Python 한 줄로
@@ -49,21 +60,28 @@ npm install pyproc
 
 [데모](https://eddmpython.github.io/pyproc/) · [npm](https://www.npmjs.com/package/pyproc) · [GitHub](https://github.com/eddmpython/pyproc)
 
-## agent-template
+## AI 작업 환경 템플릿
 
 AI 코딩 에이전트에게 저장소를 맡길 때 루트에 두는 규칙 템플릿입니다. Claude Code, Cursor,
-Codex 등 `CLAUDE.md` 나 `AGENTS.md` 를 읽는 도구에 그대로 쓸 수 있습니다.
+Codex처럼 `CLAUDE.md`나 `AGENTS.md`를 읽는 도구가 같은 제품 경계와 검증 절차에 도착하게 합니다.
 
 위 제품들을 만들면서 실제로 사고가 났던 지점을 역산해서 남겼습니다. 거짓 실패를 사실로
 보고한 일, 지킬 코드가 없는데 게이트만 늘린 일, 참조 대상을 읽지 않고 반영했다고 말한 일
 같은 것들입니다. 일반론은 넣지 않았습니다.
 
-자세한 내용은 [agent-template/README.md](agent-template/README.md) 에 있습니다.
+두 파일의 역할, 자리표시자, 적용 순서는 [agent-template/README.md](agent-template/README.md)에
+있습니다.
 
-## blog
+## 블로그
 
-발행하는 글의 정본입니다. 마크다운 파일 하나를 넣으면 빌드가 페이지, sitemap, RSS 를
-함께 만듭니다.
+제품 발표보다 만들면서 확인한 실패, 결정, 작업 방식을 설명합니다. 첫 글은 같은 AI도 저장소에
+따라 다르게 일하는 이유와 이 저장소의 에이전트 템플릿을 함께 다룹니다.
+
+[AI에게 프롬프트보다 먼저 필요한 것](blog/2026-08-08-ai-needs-an-environment.md)
+
+발행 글은 `blog/YYYY-MM-DD-slug.md`가 정본입니다. 사이트 빌드가 글 페이지, sitemap, RSS를 함께
+만듭니다. 주제 선정, 사실 검토, 글맛 편집, 발행 검증은 [블로그 파이프라인](blog/PIPELINE.md)을
+따릅니다.
 
 ## site
 
@@ -79,7 +97,8 @@ Workers 에서 서빙합니다. 빌드 타임에 모든 경로를 HTML 로 프�
 cd site
 npm install
 npm run dev      # 개발 서버
-npm run test     # 타입 체크
+npm run check:blog # 글 파일과 frontmatter 검사
+npm run test     # 블로그 검사와 타입 체크
 npm run build    # 프로덕션 빌드 (산출물은 저장소 형제 폴더 eddmpython.out)
 npm run deploy   # Cloudflare Workers 배포
 ```
