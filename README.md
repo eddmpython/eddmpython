@@ -18,6 +18,7 @@ Python 과 AI 로 재무, 데이터, 반복 업무를 분석하고 다시 실행
 | `site/` | React 랜딩, 제품 진입점, 블로그 렌더링과 Cloudflare Worker |
 | `blog/` | 발행 글과 집필 파이프라인의 정본 |
 | `agent-template/` | 프로젝트에 복사해 쓰는 공개용 AI 작업 환경 템플릿 |
+| `skills/` | 배포, 도메인, SEO, 발행 등 운영 절차의 정본 |
 
 이 저장소는 각 제품의 소개와 진입점을 소유합니다. DartLab, Codaro, xlpod, pyproc의 제품 소스와
 인증, 라이선스, 배포 계약은 각 제품 저장소가 소유합니다.
