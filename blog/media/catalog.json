@@ -1,7 +1,19 @@
 {
-  "version": 1,
-  "repo": "eddmpython/eddmpython-media",
+  "assets": {
+    "2026-08-08-ai-needs-an-environment/workbench": {
+      "assetKey": "workbench",
+      "path": "objects/sha256/08/08c616218e3993d3019bb26ccea228e358fdf96a30336554193fb09f2cbda710.png",
+      "post": "2026-08-08-ai-needs-an-environment",
+      "sha256": "08c616218e3993d3019bb26ccea228e358fdf96a30336554193fb09f2cbda710"
+    }
+  },
   "objectPrefix": "objects/sha256",
-  "objects": {},
-  "assets": {}
+  "objects": {
+    "08c616218e3993d3019bb26ccea228e358fdf96a30336554193fb09f2cbda710": {
+      "bytes": 2365498,
+      "path": "objects/sha256/08/08c616218e3993d3019bb26ccea228e358fdf96a30336554193fb09f2cbda710.png"
+    }
+  },
+  "repo": "eddmpython/eddmpython-media",
+  "version": 1
 }

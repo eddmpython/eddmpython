@@ -4,6 +4,7 @@ date: 2026-08-08
 summary: 같은 AI가 어떤 저장소에서는 든든한 동료가 되고 다른 곳에서는 매번 길을 잃는 이유를 작업 환경의 차이에서 살펴봅니다.
 readerQuestion: 같은 AI가 저장소에 따라 전혀 다른 동료처럼 일하는 이유는 무엇일까?
 readerTakeaway: AI의 작업 품질은 긴 프롬프트보다 경계와 증거와 검증이 저장소 안에 놓인 방식에 더 오래 좌우된다.
+ogImage: https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/08/08c616218e3993d3019bb26ccea228e358fdf96a30336554193fb09f2cbda710.png
 ---
 
 새 대화를 열 때마다 프로젝트를 처음 보는 동료가 자리에 앉는다고 생각해 봅시다. 그 동료는 코드를
@@ -15,6 +16,8 @@ readerTakeaway: AI의 작업 품질은 긴 프롬프트보다 경계와 증거�
 저장소를 바꾸면 전혀 다른 사람처럼 일합니다. 차이를 만드는 것은 부탁의 문장보다 그 부탁을 받은
 뒤 딛고 설 작업장입니다. 이 저장소에는 그 작업장을 만드는 파일이 두 개 있습니다.
 `AGENTS.md`가 입구를 열고, `CLAUDE.md`가 실제 규칙을 맡습니다.
+
+![서로 다른 두 진입 경로가 하나의 정돈된 작업 환경으로 합쳐지는 모습](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/08/08c616218e3993d3019bb26ccea228e358fdf96a30336554193fb09f2cbda710.png "서로 다른 입구가 하나의 작업 환경으로 이어진다")
 
 ## 긴 프롬프트는 한 번의 대화를 구하지만 환경은 다음 대화도 구합니다
 

@@ -1,4 +1,15 @@
 {
   "version": 1,
-  "assets": {}
+  "assets": {
+    "2026-08-08-ai-needs-an-environment/workbench": {
+      "post": "2026-08-08-ai-needs-an-environment",
+      "assetKey": "workbench",
+      "alt": "서로 다른 두 진입 경로가 하나의 정돈된 작업 환경으로 합쳐지는 모습",
+      "placement": "첫 두 문단 뒤",
+      "narrativeUse": "AGENTS.md와 CLAUDE.md라는 서로 다른 입구가 하나의 규칙 정본으로 이어진다는 글의 중심 생각을 보여 준다.",
+      "sourcePolicy": "auto",
+      "sourceKind": "imagegen",
+      "prompt": "Create a wide editorial hero illustration for a Korean technical blog article about building a reliable working environment for AI coding agents. Use case: blog hero image and inline editorial illustration. Asset type: polished cinematic 3D conceptual illustration. Composition: two clearly distinct entry corridors approach from the left and right, then converge into one calm, organized software workbench at the center. The two entrances symbolize AGENTS.md and CLAUDE.md, while the shared workbench symbolizes one canonical set of repository rules. Show subtle evidence checkpoints, guardrails, neatly arranged tools, file-like panels, and a visible verification path leading forward. The meaning should be understandable without labels. Style: sophisticated, minimal, tactile architectural model, precise geometry, soft volumetric light, premium editorial art, credible rather than futuristic fantasy. Palette: carbon black, warm ivory, muted amber, small cool steel-blue accents. Avoid pink and neon. Layout: wide 3:2 landscape, strong central convergence, generous breathing room, clear focal point, readable at thumbnail size, suitable behind neither text nor UI. Must not include: any written words, letters, labels, code, logos, brand marks, robots, humanoids, brains, floating chat bubbles, product screenshots, watermarks, pink, visual clutter. Render as one coherent scene with crisp details and natural material lighting."
+    }
+  }
 }
