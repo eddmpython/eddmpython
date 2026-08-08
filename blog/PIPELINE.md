@@ -29,6 +29,7 @@ date: YYYY-MM-DD
 summary: 목록과 검색 결과에서 글을 열 이유를 설명하는 문장
 readerQuestion: 이 글이 끝까지 답할 질문은 무엇인가?
 readerTakeaway: 독자가 글을 덮고 기억할 한 문장
+ogImage: 선택. 발행 전에는 media://asset-key, 발행 뒤에는 HF 객체 URL
 ---
 ```
 
@@ -86,18 +87,99 @@ readerTakeaway: 독자가 글을 덮고 기억할 한 문장
 마지막 H2는 요약 목록으로 끝내지 않는다. 조건이 달라질 때 무엇을 확인하고 기존 판단을 언제
 버려야 하는지 2개 이상 보여 준다.
 
-## 5. 발행한다
+## 5. 이미지를 기획한다
+
+이미지는 글을 꾸미기 위해 넣지 않는다. 설명만으로 공간, 장면, 물성, 전후 차이를 따라가기 어려울 때
+사용한다. 각 이미지는 어느 문단 뒤에서 무엇을 이해시키는지 먼저 정한다.
+
+이미지 의미의 정본은 `blog/media/plan.json`이다. 키는 `<글 slug>/<assetKey>`이고 아래 필드를
+가진다.
+
+```json
+{
+  "2026-08-08-example/hero": {
+    "post": "2026-08-08-example",
+    "assetKey": "hero",
+    "alt": "이미지를 보지 못해도 내용을 이해할 수 있는 설명",
+    "placement": "첫 두 문단 뒤",
+    "narrativeUse": "독자가 글의 문제 장면을 한눈에 이해한다",
+    "sourcePolicy": "auto",
+    "sourceKind": "imagegen",
+    "prompt": "최종 생성에 사용한 프롬프트"
+  }
+}
+```
+
+실제 제품, 인물, 행사, 장소처럼 모양이 사실과 맞아야 하는 이미지는 공식 자료나 사용 가능한
+라이선스 이미지를 쓴다. 이때 `sourceKind`는 `official` 또는 `licensed`이고 `sourceUrl`, `credit`,
+`licensed` 이미지에는 `license`를 함께 기록한다.
+
+개념 장면, 분위기, 아직 사진으로 존재하지 않는 설명용 장면은 Codex의 기본 `image_gen` 도구로
+만들 수 있다. 생성 전 plan에 피사체, 배치, 독해 역할, 대체 텍스트, 최종 프롬프트를 먼저 적는다.
+생성본은 눈으로 확인하고 가짜 공식 로고, 가짜 제품 화면, 읽을 수 없는 글자, 사실과 다른 장치를
+찾는다. 한 번에 여러 요소를 고치지 않고 가장 큰 결함 하나씩 다시 생성한다.
+
+ImageGen 결과는 기본 생성 경로에만 남겨 두지 않는다. 최종 선택본을 다음 저장소 밖 경로로 옮긴다.
+
+```text
+../eddmpython.out/blog-media/<글 slug>/<assetKey>.webp
+```
+
+PNG, JPG, GIF도 지원하지만 새 래스터는 용량과 품질을 확인한 WebP를 우선한다. Git 저장소의
+`blog/` 아래에는 SVG를 포함한 이미지 파일을 두지 않는다.
+
+## 6. Hugging Face에 발행한다
+
+이미지 바이트의 정본은 공개 Hugging Face 데이터셋 `eddmpython/eddmpython-media`다. Git에는
+의미 계약인 `blog/media/plan.json`과 저장 계약인 `blog/media/catalog.json`만 남긴다.
+
+본문에는 먼저 자리표시자를 둔다.
+
+```markdown
+![대체 텍스트](media://hero "독자에게 보이는 선택 캡션")
+```
+
+같은 이미지를 공유 카드에도 쓰려면 frontmatter에 `ogImage: media://hero`를 추가한다. 발행 전 준비는
+한 번만 한다.
+
+```bash
+python -m pip install -r blog/requirements.txt
+hf auth login
+```
+
+HF 데이터셋을 처음 만들 때만 `--create-repo`를 붙인다.
+
+```bash
+python -X utf8 blog/scripts/publish_media.py --asset 2026-08-08-example/hero --create-repo
+```
+
+이후에는 `--create-repo` 없이 같은 명령을 쓴다. 스크립트는 다음 순서를 바꾸지 않는다.
+
+1. plan과 저장소 밖 작업본을 검증한다.
+2. 파일 바이트의 SHA-256을 계산한다.
+3. `objects/sha256/<앞 두 글자>/<전체 해시>.<확장자>`에 올린다.
+4. 원격 객체가 실제로 존재하는지 다시 확인한다.
+5. catalog를 갱신하고 본문의 `media://`를 HF URL로 바꾼다.
+6. 성공한 로컬 작업본과 빈 staging 폴더를 삭제한다.
+
+업로드나 원격 확인이 실패하면 본문과 catalog를 바꾸지 않는다. `HF_TOKEN`을 쓸 때는 환경변수나
+Hugging Face 로컬 로그인 저장소에만 두고 Git, 문서, 로그에 값을 남기지 않는다.
+
+## 7. 발행한다
 
 사이트 디렉터리에서 다음 순서로 확인한다.
 
 ```bash
 npm run check:blog
+npm run verify:media
 npm test
 npm run build
 ```
 
 `check:blog`는 파일명, frontmatter, 날짜, 질문과 답, 최소 본문 구조, 미완성 표식, 금지 문자를
-검사한다. 기계 검사는 글맛을 판정하지 않는다. 통과 뒤 `/blog`와 글 상세 화면을 데스크톱과
-모바일 폭에서 직접 읽고, 제목 줄바꿈, 본문 폭, 표와 코드의 가로 넘침을 확인한다.
+검사한다. 이미지가 있으면 plan, catalog, 본문 HF URL, 대체 텍스트, SHA-256 경로가 서로 맞는지도
+검사하고 `blog/` 아래 로컬 이미지 파일을 차단한다. 기계 검사는 글맛과 이미지의 사실 적합성을
+판정하지 않는다. 통과 뒤 `/blog`와 글 상세 화면을 데스크톱과 모바일 폭에서 직접 읽고, 제목 줄바꿈,
+본문 폭, 이미지 크기와 캡션, 표와 코드의 가로 넘침을 확인한다.
 
 발행 후에는 다음 글을 늘이기보다 이 글의 질문과 답이 실제 화면에서도 선명한지 먼저 본다.

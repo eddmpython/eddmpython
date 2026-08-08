@@ -25,6 +25,10 @@ type PageMeta = {
   description: string;
   type: string;
   published?: string;
+  image: string;
+  imageAlt: string;
+  imageWidth?: number;
+  imageHeight?: number;
   jsonLd: unknown[];
 };
 
@@ -155,6 +159,26 @@ function prerender(): Plugin {
           .replace(
             /<meta property="og:type" content="[\s\S]*?"\s*\/>/,
             `<meta property="og:type" content="${meta.type}" />`,
+          )
+          .replace(
+            /<meta property="og:image" content="[\s\S]*?"\s*\/>/,
+            `<meta property="og:image" content="${escape(meta.image)}" />`,
+          )
+          .replace(
+            /<meta property="og:image:alt" content="[\s\S]*?"\s*\/>/,
+            `<meta property="og:image:alt" content="${escape(meta.imageAlt)}" />`,
+          )
+          .replace(
+            /<meta property="og:image:width" content="[\s\S]*?"\s*\/>/,
+            meta.imageWidth
+              ? `<meta property="og:image:width" content="${meta.imageWidth}" />`
+              : "",
+          )
+          .replace(
+            /<meta property="og:image:height" content="[\s\S]*?"\s*\/>/,
+            meta.imageHeight
+              ? `<meta property="og:image:height" content="${meta.imageHeight}" />`
+              : "",
           )
           .replace(
             /<link rel="canonical" href="[\s\S]*?"\s*\/>/,

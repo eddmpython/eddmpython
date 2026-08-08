@@ -21,6 +21,28 @@ function onlyUrl(children: ReactNode): string | null {
   return href;
 }
 
+function onlyImage(node: unknown): { src: string; alt: string; title: string } | null {
+  const paragraph = node as {
+    children?: Array<{
+      type?: string;
+      tagName?: string;
+      value?: string;
+      properties?: { src?: unknown; alt?: unknown; title?: unknown };
+    }>;
+  };
+  const children = (paragraph.children ?? []).filter(
+    (child) => child.type !== "text" || child.value?.trim(),
+  );
+  if (children.length !== 1 || children[0].tagName !== "img") return null;
+  const properties = children[0].properties ?? {};
+  if (typeof properties.src !== "string") return null;
+  return {
+    src: properties.src,
+    alt: typeof properties.alt === "string" ? properties.alt : "",
+    title: typeof properties.title === "string" ? properties.title : "",
+  };
+}
+
 function YouTube({ id }: { id: string }) {
   return (
     <span className="my-7 block overflow-hidden rounded-xl border border-white/10">
@@ -93,7 +115,25 @@ export function Markdown({ children }: { children: string }) {
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
       components={{
-        p({ children: kids }) {
+        p({ children: kids, node }) {
+          const picture = onlyImage(node);
+          if (picture) {
+            return (
+              <figure className="my-8">
+                <img
+                  src={picture.src}
+                  alt={picture.alt}
+                  loading="lazy"
+                  className="block w-full rounded-xl border border-white/10"
+                />
+                {picture.title && (
+                  <figcaption className="mt-3 text-center text-sm leading-relaxed text-ivory/45">
+                    {picture.title}
+                  </figcaption>
+                )}
+              </figure>
+            );
+          }
           const url = onlyUrl(kids);
           if (url) {
             const yt = url.match(YOUTUBE);

@@ -10,6 +10,10 @@ export type PageMeta = {
   description: string;
   type: "website" | "article";
   published?: string;
+  image: string;
+  imageAlt: string;
+  imageWidth?: number;
+  imageHeight?: number;
   jsonLd: unknown[];
 };
 
@@ -64,6 +68,10 @@ export function homeMeta(): PageMeta {
     description:
       "공시 데이터, Python 학습, 스프레드시트 자동화, 브라우저 Python 런타임. DartLab, Codaro, xlpod, pyproc 을 만듭니다. 설치 없이 브라우저에서 바로 실행해 볼 수 있습니다.",
     type: "website",
+    image: `${ORIGIN}/og.png`,
+    imageAlt: "eddmpython 로고와 DartLab, Codaro, xlpod, pyproc 제품 이름",
+    imageWidth: 1200,
+    imageHeight: 630,
     jsonLd: [
       { "@context": "https://schema.org", "@graph": [ORG, SITE] },
       {
@@ -83,6 +91,10 @@ export function blogMeta(): PageMeta {
     description:
       "eddmpython 제품을 만들면서 알게 된 것들을 적어 둡니다. 사용법, 만든 이유, 실패에서 배운 것.",
     type: "website",
+    image: `${ORIGIN}/og.png`,
+    imageAlt: "eddmpython 블로그",
+    imageWidth: 1200,
+    imageHeight: 630,
     jsonLd: [
       {
         "@context": "https://schema.org",
@@ -111,6 +123,10 @@ export function postMeta(post: Post): PageMeta {
     description: post.summary,
     type: "article",
     published: post.date,
+    image: post.ogImage ?? `${ORIGIN}/og.png`,
+    imageAlt: post.title,
+    imageWidth: post.ogImage ? undefined : 1200,
+    imageHeight: post.ogImage ? undefined : 630,
     jsonLd: [
       {
         "@context": "https://schema.org",
@@ -122,7 +138,7 @@ export function postMeta(post: Post): PageMeta {
         datePublished: post.date,
         dateModified: post.date,
         inLanguage: "ko-KR",
-        image: `${ORIGIN}/og.png`,
+        image: post.ogImage ?? `${ORIGIN}/og.png`,
         author: { "@id": `${ORIGIN}/#org` },
         publisher: { "@id": `${ORIGIN}/#org` },
       },

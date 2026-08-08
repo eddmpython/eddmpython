@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "check:blog": "node scripts/check-blog.mjs",
+    "verify:media": "python -X utf8 ../blog/scripts/publish_media.py --verify",
     "build": "npm run test && vite build",
     "og": "node --experimental-strip-types scripts/og.mjs",
     "preview": "vite preview",

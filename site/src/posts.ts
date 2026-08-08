@@ -3,6 +3,7 @@ export type Post = {
   title: string;
   date: string;
   summary: string;
+  ogImage?: string;
   body: string;
 };
 
@@ -29,6 +30,7 @@ function parse(path: string, raw: string): Post {
     title: meta.title ?? slug,
     date: meta.date ?? "",
     summary: meta.summary ?? "",
+    ogImage: meta.ogImage || undefined,
     body: match[2].trim(),
   };
 }

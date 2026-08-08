@@ -84,6 +84,10 @@ Codex처럼 `CLAUDE.md`나 `AGENTS.md`를 읽는 도구가 같은 제품 경계�
 만듭니다. 주제 선정, 사실 검토, 글맛 편집, 발행 검증은 [블로그 파이프라인](blog/PIPELINE.md)을
 따릅니다.
 
+본문 이미지와 글별 공유 이미지는 Git에 넣지 않습니다. ImageGen, 공식 자료, 라이선스 이미지의
+의미와 출처는 `blog/media/plan.json`에 남기고, 실제 파일은 Hugging Face의 콘텐츠 주소 객체로
+발행합니다. `blog/media/catalog.json`이 글과 원격 객체의 대응을 맡습니다.
+
 ## site
 
 브랜드 랜딩입니다. React 19, TypeScript, Vite, Tailwind CSS v4 로 만들고 Cloudflare
@@ -99,6 +103,7 @@ cd site
 npm install
 npm run dev      # 개발 서버
 npm run check:blog # 글 파일과 frontmatter 검사
+npm run verify:media # catalog에 등록한 HF 이미지 원격 확인
 npm run test     # 블로그 검사와 타입 체크
 npm run build    # 프로덕션 빌드 (산출물은 저장소 형제 폴더 eddmpython.out)
 npm run deploy   # Cloudflare Workers 배포
