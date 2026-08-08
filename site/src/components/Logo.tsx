@@ -12,20 +12,18 @@ import { SYMBOL, BRAND } from "../brand";
  * 심볼 형태 정본은 src/brand.ts 다. 여기서 좌표를 다시 적지 않는다.
  */
 
-/** 심볼 단독. 몸통과 머리는 currentColor 를 따르고 눈만 고정 색이다. */
+/** 심볼 단독. 몸통과 머리와 혀는 currentColor 를 따르고 눈만 고정 색이다. */
 export function LogoSymbol({ className }: { className?: string }) {
   return (
     <svg viewBox={SYMBOL.viewBox} className={className} aria-hidden="true">
-      <path
-        d={SYMBOL.body}
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={SYMBOL.strokeWidth}
-        strokeLinecap="round"
-        strokeLinejoin="round"
+      <path d={SYMBOL.shape} fill="currentColor" fillRule="evenodd" />
+      <ellipse
+        cx={SYMBOL.eye.cx}
+        cy={SYMBOL.eye.cy}
+        rx={SYMBOL.eye.rx}
+        ry={SYMBOL.eye.ry}
+        fill={BRAND.eye}
       />
-      <path d={SYMBOL.head} fill="currentColor" />
-      <path d={SYMBOL.eye} fill={BRAND.eye} />
     </svg>
   );
 }
@@ -44,8 +42,8 @@ export function Wordmark({ className }: { className?: string }) {
 export function Logo() {
   return (
     <span className="flex items-center gap-2.5">
-      {/* 심볼이 가로로 넓다. 높이를 글자에 맞추고 폭은 비율대로 둔다. */}
-      <LogoSymbol className="h-[19px] w-auto text-ivory" />
+      {/* 심볼이 정사각에 가깝다. 높이를 글자에 맞추고 폭은 비율대로 둔다. */}
+      <LogoSymbol className="h-[21px] w-auto text-ivory" />
       <Wordmark />
     </span>
   );
