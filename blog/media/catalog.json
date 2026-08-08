@@ -11,7 +11,10 @@
   "objects": {
     "08c616218e3993d3019bb26ccea228e358fdf96a30336554193fb09f2cbda710": {
       "bytes": 2365498,
-      "path": "objects/sha256/08/08c616218e3993d3019bb26ccea228e358fdf96a30336554193fb09f2cbda710.png"
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/08/08c616218e3993d3019bb26ccea228e358fdf96a30336554193fb09f2cbda710.png",
+      "width": 1536
     }
   },
   "repo": "eddmpython/eddmpython-media",

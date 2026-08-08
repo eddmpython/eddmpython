@@ -20,21 +20,29 @@
 ## 발행 파일 계약
 
 발행 글은 `blog/YYYY-MM-DD-slug.md` 한 파일이다. 대문자 영문 운영 문서는 사이트 글 목록에서
-제외한다. frontmatter에는 다섯 필드를 둔다.
+제외한다. frontmatter에는 검색과 집필이 함께 쓰는 여덟 필드를 둔다.
 
 ```yaml
 ---
 title: 독자가 읽을 제목
 date: YYYY-MM-DD
+modified: 마지막으로 본문을 의미 있게 고친 YYYY-MM-DD
+author: 화면과 구조화 데이터에 함께 표시할 작성자
+section: 글을 분류하는 한 개의 상위 주제
 summary: 목록과 검색 결과에서 글을 열 이유를 설명하는 문장
 readerQuestion: 이 글이 끝까지 답할 질문은 무엇인가?
 readerTakeaway: 독자가 글을 덮고 기억할 한 문장
 ogImage: 선택. 발행 전에는 media://asset-key, 발행 뒤에는 HF 객체 URL
+ogImageAlt: ogImage가 있으면 필수. plan의 alt와 같은 설명
+ogImageWidth: ogImage가 있으면 필수. 원본 픽셀 너비
+ogImageHeight: ogImage가 있으면 필수. 원본 픽셀 높이
+ogImageType: ogImage가 있으면 필수. image/png 같은 MIME
 ---
 ```
 
 `readerQuestion`과 `readerTakeaway`는 제작 메모가 아니라 글의 공개 계약이다. 본문이 다른
-질문으로 새거나 답이 바뀌면 frontmatter와 본문을 함께 고친다.
+질문으로 새거나 답이 바뀌면 frontmatter와 본문을 함께 고친다. `modified`는 빌드한 날이 아니라
+본문, 대표 이미지, 구조화 데이터처럼 검색 결과의 의미가 실제로 달라진 날만 올린다.
 
 ## 1. 재료를 찾는다
 
@@ -139,7 +147,8 @@ PNG, JPG, GIF도 지원하지만 새 래스터는 용량과 품질을 확인한 
 ![대체 텍스트](media://hero "독자에게 보이는 선택 캡션")
 ```
 
-같은 이미지를 공유 카드에도 쓰려면 frontmatter에 `ogImage: media://hero`를 추가한다. 발행 전 준비는
+같은 이미지를 공유 카드에도 쓰려면 frontmatter에 `ogImage: media://hero`를 추가한다. 업로더가
+plan의 대체 텍스트와 실제 이미지의 너비, 높이, MIME을 frontmatter에 함께 기록한다. 발행 전 준비는
 한 번만 한다.
 
 ```bash
@@ -159,7 +168,7 @@ python -X utf8 blog/scripts/publish_media.py --asset 2026-08-08-example/hero --c
 2. 파일 바이트의 SHA-256을 계산한다.
 3. `objects/sha256/<앞 두 글자>/<전체 해시>.<확장자>`에 올린다.
 4. 원격 객체가 실제로 존재하는지 다시 확인한다.
-5. catalog를 갱신하고 본문의 `media://`를 HF URL로 바꾼다.
+5. catalog에 바이트 수, MIME, 너비, 높이를 기록하고 본문의 `media://`를 HF URL로 바꾼다.
 6. 성공한 로컬 작업본과 빈 staging 폴더를 삭제한다.
 
 업로드나 원격 확인이 실패하면 본문과 catalog를 바꾸지 않는다. `HF_TOKEN`을 쓸 때는 환경변수나

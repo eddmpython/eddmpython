@@ -3,27 +3,37 @@ import { POSTS, type Post } from "./posts";
 
 export const ORIGIN = "https://eddmpython.com";
 
-/** 검색 결과와 공유 카드에 나가는 문구. 페이지마다 다르게 준다. */
+/** 검색 결과, 공유 카드, sitemap, RSS가 함께 쓰는 페이지 계약. */
 export type PageMeta = {
   path: string;
   title: string;
+  socialTitle: string;
   description: string;
   type: "website" | "article";
   published?: string;
+  modified?: string;
+  author?: string;
+  section?: string;
   image: string;
   imageAlt: string;
-  imageWidth?: number;
-  imageHeight?: number;
+  imageType: string;
+  imageWidth: number;
+  imageHeight: number;
   jsonLd: unknown[];
 };
 
+const ORG_ID = `${ORIGIN}/#org`;
+const SITE_ID = `${ORIGIN}/#site`;
+const BLOG_ID = `${ORIGIN}/blog#blog`;
+const DEFAULT_IMAGE = `${ORIGIN}/og.png`;
+
 const ORG = {
   "@type": "Organization",
-  "@id": `${ORIGIN}/#org`,
+  "@id": ORG_ID,
   name: "eddmpython",
   url: ORIGIN,
   logo: `${ORIGIN}/favicon.svg`,
-  image: `${ORIGIN}/og.png`,
+  image: DEFAULT_IMAGE,
   email: "eddmpython@gmail.com",
   description:
     "Python 과 AI 로 재무, 데이터, 반복 업무를 분석하고 다시 실행할 수 있는 도구로 만듭니다.",
@@ -37,43 +47,89 @@ const ORG = {
 
 const SITE = {
   "@type": "WebSite",
-  "@id": `${ORIGIN}/#site`,
+  "@id": SITE_ID,
   url: ORIGIN,
   name: "eddmpython",
   inLanguage: "ko-KR",
-  publisher: { "@id": `${ORIGIN}/#org` },
+  publisher: { "@id": ORG_ID },
 };
 
-/* 제품은 SoftwareApplication 으로 노출한다. 실제 배포 채널만 적는다. */
-const APPS = PRODUCTS.map((p, i) => ({
+const BLOG = {
+  "@type": "Blog",
+  "@id": BLOG_ID,
+  url: `${ORIGIN}/blog`,
+  name: "eddmpython 블로그",
+  description:
+    "제품을 만들면서 확인한 실패, 결정, 작업 방식을 독자가 다시 쓸 수 있는 판단 기준으로 설명합니다.",
+  inLanguage: "ko-KR",
+  isPartOf: { "@id": SITE_ID },
+  publisher: { "@id": ORG_ID },
+};
+
+const APPS = PRODUCTS.map((product, index) => ({
   "@type": "ListItem",
-  position: i + 1,
+  position: index + 1,
   item: {
     "@type": "SoftwareApplication",
-    name: p.name,
-    description: `${p.tagline} ${p.description}`,
-    url: p.primary.href,
+    name: product.name,
+    description: `${product.tagline} ${product.description}`,
+    url: product.primary.href,
     applicationCategory: "DeveloperApplication",
-    operatingSystem: p.install?.startsWith("pip")
+    operatingSystem: product.install?.startsWith("pip")
       ? "Windows, macOS, Linux"
       : "Web",
-    author: { "@id": `${ORIGIN}/#org` },
+    author: { "@id": ORG_ID },
   },
 }));
 
+function graph(...items: unknown[]) {
+  return { "@context": "https://schema.org", "@graph": items };
+}
+
+function breadcrumbs(
+  id: string,
+  items: Array<{ name: string; url: string }>,
+) {
+  return {
+    "@type": "BreadcrumbList",
+    "@id": id,
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+}
+
+function postImage(post: Post, url: string) {
+  return {
+    "@type": "ImageObject",
+    "@id": `${url}#primaryimage`,
+    url: post.ogImage ?? DEFAULT_IMAGE,
+    contentUrl: post.ogImage ?? DEFAULT_IMAGE,
+    width: post.ogImageWidth ?? 1200,
+    height: post.ogImageHeight ?? 630,
+    caption: post.ogImageAlt ?? post.title,
+  };
+}
+
 export function homeMeta(): PageMeta {
+  const title = "eddmpython · 복잡한 업무를, 실제로 작동하는 자동화로";
   return {
     path: "/",
-    title: "eddmpython · 복잡한 업무를, 실제로 작동하는 자동화로",
+    title,
+    socialTitle: title,
     description:
       "공시 데이터, Python 학습, 스프레드시트 자동화, 브라우저 Python 런타임. DartLab, Codaro, xlpod, pyproc 을 만듭니다. 설치 없이 브라우저에서 바로 실행해 볼 수 있습니다.",
     type: "website",
-    image: `${ORIGIN}/og.png`,
+    image: DEFAULT_IMAGE,
     imageAlt: "eddmpython 로고와 DartLab, Codaro, xlpod, pyproc 제품 이름",
+    imageType: "image/png",
     imageWidth: 1200,
     imageHeight: 630,
     jsonLd: [
-      { "@context": "https://schema.org", "@graph": [ORG, SITE] },
+      graph(ORG, SITE),
       {
         "@context": "https://schema.org",
         "@type": "ItemList",
@@ -85,63 +141,125 @@ export function homeMeta(): PageMeta {
 }
 
 export function blogMeta(): PageMeta {
+  const path = "/blog";
+  const url = `${ORIGIN}${path}`;
+  const breadcrumbId = `${url}#breadcrumb`;
+  const latestModified = POSTS.map((post) => post.modified).sort().at(-1);
+  const blogPosts = POSTS.map((post) => ({
+    "@type": "BlogPosting",
+    "@id": `${ORIGIN}/blog/${post.slug}#article`,
+    headline: post.title,
+    url: `${ORIGIN}/blog/${post.slug}`,
+    datePublished: post.date,
+    dateModified: post.modified,
+    author: { "@id": ORG_ID },
+  }));
+
   return {
-    path: "/blog",
+    path,
     title: "블로그 · eddmpython",
+    socialTitle: "eddmpython 블로그",
     description:
-      "eddmpython 제품을 만들면서 알게 된 것들을 적어 둡니다. 사용법, 만든 이유, 실패에서 배운 것.",
+      "제품을 만들면서 확인한 실패, 결정, 작업 방식을 독자가 다시 쓸 수 있는 판단 기준으로 설명합니다.",
     type: "website",
-    image: `${ORIGIN}/og.png`,
+    modified: latestModified,
+    image: DEFAULT_IMAGE,
     imageAlt: "eddmpython 블로그",
+    imageType: "image/png",
     imageWidth: 1200,
     imageHeight: 630,
     jsonLd: [
-      {
-        "@context": "https://schema.org",
-        "@type": "Blog",
-        "@id": `${ORIGIN}/blog#blog`,
-        url: `${ORIGIN}/blog`,
-        name: "eddmpython 블로그",
-        inLanguage: "ko-KR",
-        publisher: { "@id": `${ORIGIN}/#org` },
-        blogPost: POSTS.map((p) => ({
-          "@type": "BlogPosting",
-          headline: p.title,
-          url: `${ORIGIN}/blog/${p.slug}`,
-          datePublished: p.date,
-        })),
-      },
+      graph(
+        ORG,
+        SITE,
+        { ...BLOG, blogPost: blogPosts },
+        {
+          "@type": "CollectionPage",
+          "@id": url,
+          url,
+          name: "eddmpython 블로그",
+          description:
+            "제품을 만들면서 확인한 실패, 결정, 작업 방식을 독자가 다시 쓸 수 있는 판단 기준으로 설명합니다.",
+          inLanguage: "ko-KR",
+          isPartOf: { "@id": SITE_ID },
+          breadcrumb: { "@id": breadcrumbId },
+          mainEntity: { "@id": BLOG_ID },
+        },
+        breadcrumbs(breadcrumbId, [
+          { name: "eddmpython", url: ORIGIN },
+          { name: "블로그", url },
+        ]),
+      ),
     ],
   };
 }
 
 export function postMeta(post: Post): PageMeta {
-  const url = `${ORIGIN}/blog/${post.slug}`;
+  const path = `/blog/${post.slug}`;
+  const url = `${ORIGIN}${path}`;
+  const breadcrumbId = `${url}#breadcrumb`;
+  const articleId = `${url}#article`;
+  const image = postImage(post, url);
+
   return {
-    path: `/blog/${post.slug}`,
+    path,
     title: `${post.title} · eddmpython`,
+    socialTitle: post.title,
     description: post.summary,
     type: "article",
     published: post.date,
-    image: post.ogImage ?? `${ORIGIN}/og.png`,
-    imageAlt: post.title,
-    imageWidth: post.ogImage ? undefined : 1200,
-    imageHeight: post.ogImage ? undefined : 630,
+    modified: post.modified,
+    author: post.author,
+    section: post.section,
+    image: post.ogImage ?? DEFAULT_IMAGE,
+    imageAlt: post.ogImageAlt ?? post.title,
+    imageType: post.ogImageType ?? "image/png",
+    imageWidth: post.ogImageWidth ?? 1200,
+    imageHeight: post.ogImageHeight ?? 630,
     jsonLd: [
-      {
-        "@context": "https://schema.org",
-        "@type": "BlogPosting",
-        headline: post.title,
-        description: post.summary,
-        url,
-        mainEntityOfPage: url,
-        datePublished: post.date,
-        dateModified: post.date,
-        inLanguage: "ko-KR",
-        image: post.ogImage ?? `${ORIGIN}/og.png`,
-        author: { "@id": `${ORIGIN}/#org` },
-        publisher: { "@id": `${ORIGIN}/#org` },
-      },
+      graph(
+        ORG,
+        SITE,
+        BLOG,
+        image,
+        {
+          "@type": "WebPage",
+          "@id": url,
+          url,
+          name: post.title,
+          description: post.summary,
+          inLanguage: "ko-KR",
+          isPartOf: { "@id": SITE_ID },
+          breadcrumb: { "@id": breadcrumbId },
+          primaryImageOfPage: { "@id": image["@id"] },
+          mainEntity: { "@id": articleId },
+          datePublished: post.date,
+          dateModified: post.modified,
+        },
+        {
+          "@type": "BlogPosting",
+          "@id": articleId,
+          url,
+          headline: post.title,
+          description: post.summary,
+          mainEntityOfPage: { "@id": url },
+          isPartOf: { "@id": BLOG_ID },
+          datePublished: post.date,
+          dateModified: post.modified,
+          inLanguage: "ko-KR",
+          articleSection: post.section,
+          image: { "@id": image["@id"] },
+          thumbnailUrl: image.contentUrl,
+          author: { "@id": ORG_ID },
+          publisher: { "@id": ORG_ID },
+          isAccessibleForFree: true,
+        },
+        breadcrumbs(breadcrumbId, [
+          { name: "eddmpython", url: ORIGIN },
+          { name: "블로그", url: `${ORIGIN}/blog` },
+          { name: post.title, url },
+        ]),
+      ),
     ],
   };
 }

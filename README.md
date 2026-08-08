@@ -104,12 +104,15 @@ npm install
 npm run dev      # 개발 서버
 npm run check:blog # 글 파일과 frontmatter 검사
 npm run verify:media # catalog에 등록한 HF 이미지 원격 확인
+npm run verify:seo # 빌드된 HTML, JSON-LD, sitemap, RSS 계약 확인
 npm run test     # 블로그 검사와 타입 체크
 npm run build    # 프로덕션 빌드 (산출물은 저장소 형제 폴더 eddmpython.out)
 npm run deploy   # Cloudflare Workers 배포
 ```
 
-빌드 산출물은 작업 트리를 더럽히지 않도록 저장소 밖으로 내보냅니다.
+빌드 산출물은 작업 트리를 더럽히지 않도록 저장소 밖으로 내보냅니다. 글의 제목, 설명, 작성자,
+수정일, 대표 이미지 정보는 같은 frontmatter에서 HTML 메타, Open Graph, Twitter 카드,
+`BlogPosting`, sitemap, RSS로 퍼집니다. `npm run build`는 이 값들이 서로 다르면 성공하지 않습니다.
 
 ## 라이선스
 

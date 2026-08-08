@@ -6,6 +6,9 @@ const postName = /^(\d{4}-\d{2}-\d{2})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$/;
 const requiredMeta = [
   "title",
   "date",
+  "modified",
+  "author",
+  "section",
   "summary",
   "readerQuestion",
   "readerTakeaway",
@@ -27,6 +30,12 @@ const mediaSuffixes = new Set([
 ]);
 const assetId = /^(20\d{2}-\d{2}-\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*)\/([a-z0-9]+(?:-[a-z0-9]+)*)$/;
 const sha256 = /^[0-9a-f]{64}$/;
+const mimeBySuffix = new Map([
+  [".webp", "image/webp"],
+  [".png", "image/png"],
+  [".jpg", "image/jpeg"],
+  [".gif", "image/gif"],
+]);
 const imageRef = /!\[([^\]]*)\]\(\s*<?([^\s)>]+)>?(?:\s+["'][^"']*["'])?\s*\)/g;
 
 function fail(file, message) {
@@ -142,6 +151,7 @@ for (const [id, entry] of Object.entries(plan.assets)) {
 const urlsByPost = new Map();
 const assetUrlById = new Map();
 const altByPostUrl = new Map();
+const objectByPostUrl = new Map();
 for (const [id, record] of Object.entries(catalog.assets)) {
   const match = id.match(assetId);
   if (!match || !record || typeof record !== "object") {
@@ -157,12 +167,23 @@ for (const [id, record] of Object.entries(catalog.assets)) {
     fail("blog/media/catalog.json", `${id}가 콘텐츠 주소 경로를 쓰지 않습니다`);
   }
   const object = catalog.objects[record.sha256];
-  if (!object || object.path !== record.path || !Number.isInteger(object.bytes) || object.bytes <= 0) {
+  if (
+    !object ||
+    object.path !== record.path ||
+    !Number.isInteger(object.bytes) ||
+    object.bytes <= 0 ||
+    !Number.isInteger(object.width) ||
+    object.width <= 0 ||
+    !Number.isInteger(object.height) ||
+    object.height <= 0 ||
+    object.mime !== mimeBySuffix.get(suffix)
+  ) {
     fail("blog/media/catalog.json", `${id}의 objects 레코드가 없거나 잘못됐습니다`);
   }
   const url = `https://huggingface.co/datasets/${catalog.repo}/resolve/main/${record.path}`;
   assetUrlById.set(id, url);
   altByPostUrl.set(`${record.post}|${url}`, String(plan.assets[id].alt));
+  objectByPostUrl.set(`${record.post}|${url}`, object);
   if (!urlsByPost.has(record.post)) urlsByPost.set(record.post, new Set());
   urlsByPost.get(record.post).add(url);
 }
@@ -189,7 +210,18 @@ for (const file of posts) {
   const fileDate = file.match(postName)[1];
 
   if (!validDate(meta.get("date"))) fail(file, "date가 유효한 YYYY-MM-DD 형식이 아닙니다");
+  if (!validDate(meta.get("modified"))) {
+    fail(file, "modified가 유효한 YYYY-MM-DD 형식이 아닙니다");
+  }
   if (meta.get("date") !== fileDate) fail(file, "파일명 날짜와 date가 다릅니다");
+  if (meta.get("modified") < meta.get("date")) {
+    fail(file, "modified가 최초 발행일보다 빠릅니다");
+  }
+  if (meta.get("title").length < 10 || meta.get("title").length > 70) {
+    fail(file, "title은 10자 이상 70자 이하로 씁니다");
+  }
+  if (meta.get("author").length > 80) fail(file, "author가 80자를 넘습니다");
+  if (meta.get("section").length > 50) fail(file, "section이 50자를 넘습니다");
   if (meta.get("summary").length < 40 || meta.get("summary").length > 180) {
     fail(file, "summary는 40자 이상 180자 이하로 씁니다");
   }
@@ -214,7 +246,12 @@ for (const file of posts) {
     if (!match[1].trim()) fail(file, "이미지 대체 텍스트가 비었습니다");
     refs.push({ url: match[2], alt: match[1].trim(), body: true });
   }
-  if (meta.get("ogImage")) refs.push({ url: meta.get("ogImage"), alt: "", body: false });
+  if (meta.get("ogImage")) {
+    const ogFields = ["ogImageAlt", "ogImageWidth", "ogImageHeight", "ogImageType"];
+    const missingOg = ogFields.filter((key) => !meta.get(key));
+    if (missingOg.length) fail(file, `ogImage 메타가 비었습니다: ${missingOg.join(", ")}`);
+    refs.push({ url: meta.get("ogImage"), alt: "", body: false });
+  }
   const allowedUrls = urlsByPost.get(slug) ?? new Set();
   for (const { url: ref, alt, body: isBodyImage } of refs) {
     if (ref.startsWith("media://")) fail(file, `발행 전 이미지 자리표시자가 남았습니다: ${ref}`);
@@ -224,6 +261,23 @@ for (const file of posts) {
     if (!allowedUrls.has(ref)) fail(file, `catalog.json의 글 매핑 밖 이미지 참조: ${ref}`);
     if (isBodyImage && alt !== altByPostUrl.get(`${slug}|${ref}`)) {
       fail(file, `본문 대체 텍스트가 plan.json과 다릅니다: ${ref}`);
+    }
+    if (!isBodyImage) {
+      const object = objectByPostUrl.get(`${slug}|${ref}`);
+      if (!object) fail(file, `ogImage의 객체 메타를 찾을 수 없습니다: ${ref}`);
+      if (meta.get("ogImageAlt") !== altByPostUrl.get(`${slug}|${ref}`)) {
+        fail(file, "ogImageAlt가 plan.json의 alt와 다릅니다");
+      }
+      if (
+        Number(meta.get("ogImageWidth")) !== object.width ||
+        Number(meta.get("ogImageHeight")) !== object.height ||
+        meta.get("ogImageType") !== object.mime
+      ) {
+        fail(file, "ogImage 크기 또는 MIME이 catalog.json과 다릅니다");
+      }
+      if (object.width * object.height < 50000) {
+        fail(file, "ogImage는 검색 대표 이미지로 쓰기에는 해상도가 너무 작습니다");
+      }
     }
     referencedMedia.add(ref);
   }

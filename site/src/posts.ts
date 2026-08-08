@@ -2,8 +2,15 @@ export type Post = {
   slug: string;
   title: string;
   date: string;
+  modified: string;
+  author: string;
+  section: string;
   summary: string;
   ogImage?: string;
+  ogImageAlt?: string;
+  ogImageWidth?: number;
+  ogImageHeight?: number;
+  ogImageType?: string;
   body: string;
 };
 
@@ -18,7 +25,16 @@ function parse(path: string, raw: string): Post {
   const slug = path.replace(/^.*\//, "").replace(/\.md$/, "");
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
   if (!match) {
-    return { slug, title: slug, date: "", summary: "", body: raw.trim() };
+    return {
+      slug,
+      title: slug,
+      date: "",
+      modified: "",
+      author: "",
+      section: "",
+      summary: "",
+      body: raw.trim(),
+    };
   }
   const meta: Record<string, string> = {};
   for (const line of match[1].split(/\r?\n/)) {
@@ -29,8 +45,15 @@ function parse(path: string, raw: string): Post {
     slug,
     title: meta.title ?? slug,
     date: meta.date ?? "",
+    modified: meta.modified ?? meta.date ?? "",
+    author: meta.author ?? "eddmpython",
+    section: meta.section ?? "블로그",
     summary: meta.summary ?? "",
     ogImage: meta.ogImage || undefined,
+    ogImageAlt: meta.ogImageAlt || undefined,
+    ogImageWidth: meta.ogImageWidth ? Number(meta.ogImageWidth) : undefined,
+    ogImageHeight: meta.ogImageHeight ? Number(meta.ogImageHeight) : undefined,
+    ogImageType: meta.ogImageType || undefined,
     body: match[2].trim(),
   };
 }

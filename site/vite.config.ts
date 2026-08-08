@@ -22,13 +22,18 @@ const escape = (s: string) =>
 type PageMeta = {
   path: string;
   title: string;
+  socialTitle: string;
   description: string;
   type: string;
   published?: string;
+  modified?: string;
+  author?: string;
+  section?: string;
   image: string;
   imageAlt: string;
-  imageWidth?: number;
-  imageHeight?: number;
+  imageType: string;
+  imageWidth: number;
+  imageHeight: number;
   jsonLd: unknown[];
 };
 
@@ -128,11 +133,16 @@ function prerender(): Plugin {
         const ld = meta.jsonLd
           .map(
             (o) =>
-              `<script type="application/ld+json">${JSON.stringify(o)}</script>`,
+              `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, "\\u003c")}</script>`,
           )
           .join("");
         const article = meta.published
-          ? `<meta property="article:published_time" content="${meta.published}" />`
+          ? [
+              `<meta property="article:published_time" content="${meta.published}" />`,
+              `<meta property="article:modified_time" content="${meta.modified ?? meta.published}" />`,
+              `<meta property="article:author" content="${ORIGIN}" />`,
+              `<meta property="article:section" content="${escape(meta.section ?? "블로그")}" />`,
+            ].join("")
           : "";
 
         const html = shell
@@ -141,15 +151,19 @@ function prerender(): Plugin {
             `<title>${escape(meta.title)}</title>`,
           )
           .replace(
-            /<meta name="description" content="[\s\S]*?"\s*\/>/,
+            /<meta\s+name="description"\s+content="[\s\S]*?"\s*\/>/,
             `<meta name="description" content="${escape(meta.description)}" />`,
           )
           .replace(
-            /<meta property="og:title" content="[\s\S]*?"\s*\/>/,
-            `<meta property="og:title" content="${escape(meta.title)}" />`,
+            /<meta name="author" content="[\s\S]*?"\s*\/>/,
+            `<meta name="author" content="${escape(meta.author ?? "eddmpython")}" />`,
           )
           .replace(
-            /<meta property="og:description" content="[\s\S]*?"\s*\/>/,
+            /<meta property="og:title" content="[\s\S]*?"\s*\/>/,
+            `<meta property="og:title" content="${escape(meta.socialTitle)}" />`,
+          )
+          .replace(
+            /<meta\s+property="og:description"\s+content="[\s\S]*?"\s*\/>/,
             `<meta property="og:description" content="${escape(meta.description)}" />`,
           )
           .replace(
@@ -165,20 +179,40 @@ function prerender(): Plugin {
             `<meta property="og:image" content="${escape(meta.image)}" />`,
           )
           .replace(
+            /<meta property="og:image:secure_url" content="[\s\S]*?"\s*\/>/,
+            `<meta property="og:image:secure_url" content="${escape(meta.image)}" />`,
+          )
+          .replace(
+            /<meta property="og:image:type" content="[\s\S]*?"\s*\/>/,
+            `<meta property="og:image:type" content="${escape(meta.imageType)}" />`,
+          )
+          .replace(
             /<meta property="og:image:alt" content="[\s\S]*?"\s*\/>/,
             `<meta property="og:image:alt" content="${escape(meta.imageAlt)}" />`,
           )
           .replace(
             /<meta property="og:image:width" content="[\s\S]*?"\s*\/>/,
-            meta.imageWidth
-              ? `<meta property="og:image:width" content="${meta.imageWidth}" />`
-              : "",
+            `<meta property="og:image:width" content="${meta.imageWidth}" />`,
           )
           .replace(
             /<meta property="og:image:height" content="[\s\S]*?"\s*\/>/,
-            meta.imageHeight
-              ? `<meta property="og:image:height" content="${meta.imageHeight}" />`
-              : "",
+            `<meta property="og:image:height" content="${meta.imageHeight}" />`,
+          )
+          .replace(
+            /<meta name="twitter:title" content="[\s\S]*?"\s*\/>/,
+            `<meta name="twitter:title" content="${escape(meta.socialTitle)}" />`,
+          )
+          .replace(
+            /<meta name="twitter:description" content="[\s\S]*?"\s*\/>/,
+            `<meta name="twitter:description" content="${escape(meta.description)}" />`,
+          )
+          .replace(
+            /<meta name="twitter:image" content="[\s\S]*?"\s*\/>/,
+            `<meta name="twitter:image" content="${escape(meta.image)}" />`,
+          )
+          .replace(
+            /<meta name="twitter:image:alt" content="[\s\S]*?"\s*\/>/,
+            `<meta name="twitter:image:alt" content="${escape(meta.imageAlt)}" />`,
           )
           .replace(
             /<link rel="canonical" href="[\s\S]*?"\s*\/>/,
@@ -193,25 +227,28 @@ function prerender(): Plugin {
         writeFileSync(join(dirPath, "index.html"), html, "utf8");
       }
 
-      const today = new Date().toISOString().slice(0, 10);
       writeFileSync(
         join(dist, "sitemap.xml"),
         `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages
           .map(
             (p) =>
-              `  <url>\n    <loc>${ORIGIN}${p.path}</loc>\n    <lastmod>${p.published ?? today}</lastmod>\n  </url>`,
+              `  <url>\n    <loc>${ORIGIN}${p.path}</loc>${p.modified ? `\n    <lastmod>${p.modified}</lastmod>` : ""}\n  </url>`,
           )
           .join("\n")}\n</urlset>\n`,
         "utf8",
       );
 
       const posts = pages.filter((p) => p.type === "article");
+      const latestModified = posts
+        .map((post) => post.modified ?? post.published ?? "")
+        .sort()
+        .at(-1);
       writeFileSync(
         join(dist, "rss.xml"),
-        `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0">\n  <channel>\n    <title>eddmpython</title>\n    <link>${ORIGIN}/blog</link>\n    <description>복잡한 업무를, 실제로 작동하는 자동화로.</description>\n    <language>ko</language>\n${posts
+        `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n  <channel>\n    <title>eddmpython 블로그</title>\n    <link>${ORIGIN}/blog</link>\n    <atom:link href="${ORIGIN}/rss.xml" rel="self" type="application/rss+xml" />\n    <description>제품을 만들면서 확인한 실패, 결정, 작업 방식을 독자가 다시 쓸 수 있는 판단 기준으로 설명합니다.</description>\n    <language>ko-KR</language>${latestModified ? `\n    <lastBuildDate>${new Date(`${latestModified}T00:00:00+09:00`).toUTCString()}</lastBuildDate>` : ""}\n${posts
           .map(
             (p) =>
-              `    <item>\n      <title>${escape(p.title.replace(" · eddmpython", ""))}</title>\n      <link>${ORIGIN}${p.path}</link>\n      <guid>${ORIGIN}${p.path}</guid>\n      <pubDate>${new Date(p.published ?? today).toUTCString()}</pubDate>\n      <description>${escape(p.description)}</description>\n    </item>`,
+              `    <item>\n      <title>${escape(p.socialTitle)}</title>\n      <link>${ORIGIN}${p.path}</link>\n      <guid isPermaLink="true">${ORIGIN}${p.path}</guid>\n      <pubDate>${new Date(`${p.published}T00:00:00+09:00`).toUTCString()}</pubDate>${p.section ? `\n      <category>${escape(p.section)}</category>` : ""}\n      <description>${escape(p.description)}</description>\n    </item>`,
           )
           .join("\n")}\n  </channel>\n</rss>\n`,
         "utf8",

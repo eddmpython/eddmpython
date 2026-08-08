@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import re
+import struct
 from copy import deepcopy
 from pathlib import Path
 
@@ -19,6 +20,12 @@ STAGING_ROOT = REPO_ROOT.parent / "eddmpython.out" / "blog-media"
 DEFAULT_HF_REPO = "eddmpython/eddmpython-media"
 OBJECT_PREFIX = "objects/sha256"
 IMAGE_SUFFIXES = (".webp", ".png", ".jpg", ".jpeg", ".gif")
+IMAGE_MIME = {
+    ".webp": "image/webp",
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".gif": "image/gif",
+}
 ASSET_ID_RE = re.compile(
     r"(?P<post>20\d{2}-\d{2}-\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*)/"
     r"(?P<key>[a-z0-9]+(?:-[a-z0-9]+)*)"
@@ -94,6 +101,87 @@ def validate_magic(path: Path) -> None:
         raise ValueError(f"확장자와 이미지 바이트가 다름: {path}")
 
 
+def image_metadata(path: Path) -> dict[str, object]:
+    data = path.read_bytes()
+    suffix = canonical_suffix(path)
+    width = 0
+    height = 0
+
+    if suffix == ".png" and len(data) >= 24:
+        width, height = struct.unpack(">II", data[16:24])
+    elif suffix == ".gif" and len(data) >= 10:
+        width, height = struct.unpack("<HH", data[6:10])
+    elif suffix == ".jpg":
+        offset = 2
+        start_of_frame = {
+            0xC0,
+            0xC1,
+            0xC2,
+            0xC3,
+            0xC5,
+            0xC6,
+            0xC7,
+            0xC9,
+            0xCA,
+            0xCB,
+            0xCD,
+            0xCE,
+            0xCF,
+        }
+        while offset + 4 <= len(data):
+            if data[offset] != 0xFF:
+                offset += 1
+                continue
+            while offset < len(data) and data[offset] == 0xFF:
+                offset += 1
+            if offset >= len(data):
+                break
+            marker = data[offset]
+            offset += 1
+            if marker in {0x01, *range(0xD0, 0xD9)}:
+                continue
+            if offset + 2 > len(data):
+                break
+            segment_length = int.from_bytes(data[offset : offset + 2], "big")
+            if segment_length < 2 or offset + segment_length > len(data):
+                break
+            if marker in start_of_frame and segment_length >= 7:
+                height = int.from_bytes(data[offset + 3 : offset + 5], "big")
+                width = int.from_bytes(data[offset + 5 : offset + 7], "big")
+                break
+            offset += segment_length
+    elif suffix == ".webp" and len(data) >= 30:
+        offset = 12
+        while offset + 8 <= len(data):
+            chunk = data[offset : offset + 4]
+            chunk_size = int.from_bytes(data[offset + 4 : offset + 8], "little")
+            payload = offset + 8
+            if payload + chunk_size > len(data):
+                break
+            if chunk == b"VP8X" and chunk_size >= 10:
+                width = int.from_bytes(data[payload + 4 : payload + 7], "little") + 1
+                height = int.from_bytes(data[payload + 7 : payload + 10], "little") + 1
+                break
+            if chunk == b"VP8L" and chunk_size >= 5 and data[payload] == 0x2F:
+                dimensions = int.from_bytes(data[payload + 1 : payload + 5], "little")
+                width = (dimensions & 0x3FFF) + 1
+                height = ((dimensions >> 14) & 0x3FFF) + 1
+                break
+            if (
+                chunk == b"VP8 "
+                and chunk_size >= 10
+                and data[payload + 3 : payload + 6] == b"\x9d\x01\x2a"
+            ):
+                width = int.from_bytes(data[payload + 6 : payload + 8], "little") & 0x3FFF
+                height = int.from_bytes(data[payload + 8 : payload + 10], "little") & 0x3FFF
+                break
+            offset = payload + chunk_size + (chunk_size % 2)
+
+    if width <= 0 or height <= 0:
+        raise ValueError(f"이미지 크기를 읽을 수 없음: {path}")
+    return {"width": width, "height": height, "mime": IMAGE_MIME[suffix]}
+
+
 def staging_path(post: str, key: str, explicit: str | None) -> Path:
     stage_dir = (STAGING_ROOT / post).resolve()
     if explicit:
@@ -126,13 +214,53 @@ def object_url(repo: str, remote_path: str) -> str:
     return f"https://huggingface.co/datasets/{repo}/resolve/main/{remote_path}"
 
 
-def updated_post(raw: str, key: str, next_url: str, old_url: str | None) -> str:
+def upsert_frontmatter(raw: str, values: dict[str, object]) -> str:
+    match = re.match(r"^---\r?\n(?P<meta>[\s\S]*?)\r?\n---\r?\n", raw)
+    if not match:
+        raise ValueError("글 frontmatter를 읽을 수 없음")
+    meta = match.group("meta")
+    for key, value in values.items():
+        line = f"{key}: {value}"
+        pattern = re.compile(rf"^{re.escape(key)}:\s*.*$", re.MULTILINE)
+        if pattern.search(meta):
+            meta = pattern.sub(line, meta, count=1)
+        else:
+            meta = f"{meta}\n{line}"
+    return f"---\n{meta}\n---\n{raw[match.end():]}"
+
+
+def updated_post(
+    raw: str,
+    key: str,
+    next_url: str,
+    old_url: str | None,
+    alt: str,
+    metadata: dict[str, object],
+) -> str:
     placeholder = f"media://{key}"
+    og_candidates = [re.escape(placeholder)]
+    if old_url:
+        og_candidates.append(re.escape(old_url))
+    used_as_og = bool(
+        re.search(rf"^ogImage:\s*(?:{'|'.join(og_candidates)})\s*$", raw, re.MULTILINE)
+    )
     if placeholder in raw:
-        return raw.replace(placeholder, next_url)
-    if old_url and old_url in raw:
-        return raw.replace(old_url, next_url)
-    raise ValueError(f"본문이나 ogImage에 이미지 자리표시자가 없음: {placeholder}")
+        updated = raw.replace(placeholder, next_url)
+    elif old_url and old_url in raw:
+        updated = raw.replace(old_url, next_url)
+    else:
+        raise ValueError(f"본문이나 ogImage에 이미지 자리표시자가 없음: {placeholder}")
+    if not used_as_og:
+        return updated
+    return upsert_frontmatter(
+        updated,
+        {
+            "ogImageAlt": alt,
+            "ogImageWidth": metadata["width"],
+            "ogImageHeight": metadata["height"],
+            "ogImageType": metadata["mime"],
+        },
+    )
 
 
 def resolve_token() -> str | None:
@@ -159,6 +287,7 @@ def publish(asset_id: str, explicit_file: str | None, dry_run: bool, create_repo
 
     local_path = staging_path(post, key, explicit_file)
     validate_magic(local_path)
+    metadata = image_metadata(local_path)
     suffix = canonical_suffix(local_path)
     sha256 = hashlib.sha256(local_path.read_bytes()).hexdigest()
     remote_path = object_path(sha256, suffix)
@@ -180,7 +309,7 @@ def publish(asset_id: str, explicit_file: str | None, dry_run: bool, create_repo
     if isinstance(old_record, dict) and old_record.get("path"):
         old_url = object_url(repo, str(old_record["path"]))
     raw = post_path.read_text(encoding="utf-8")
-    next_raw = updated_post(raw, key, next_url, old_url)
+    next_raw = updated_post(raw, key, next_url, old_url, str(entry["alt"]), metadata)
 
     if dry_run:
         print(f"{asset_id}: {local_path} -> {next_url}")
@@ -218,7 +347,13 @@ def publish(asset_id: str, explicit_file: str | None, dry_run: bool, create_repo
     next_objects = next_catalog["objects"]
     next_assets = next_catalog["assets"]
     assert isinstance(next_objects, dict) and isinstance(next_assets, dict)
-    next_objects[sha256] = {"bytes": local_path.stat().st_size, "path": remote_path}
+    next_objects[sha256] = {
+        "bytes": local_path.stat().st_size,
+        "height": metadata["height"],
+        "mime": metadata["mime"],
+        "path": remote_path,
+        "width": metadata["width"],
+    }
     next_assets[asset_id] = {
         "post": post,
         "assetKey": key,
