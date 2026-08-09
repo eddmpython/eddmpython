@@ -2,6 +2,7 @@ import { readdir, readFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 
 const blogDir = resolve(process.cwd(), "../blog");
+const codaroEmbedsPath = resolve(blogDir, "embeds/codaro-cells.json");
 const postName = /^(\d{4}-\d{2}-\d{2})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$/;
 const requiredMeta = [
   "title",
@@ -39,6 +40,8 @@ const mimeBySuffix = new Map([
 const imageRef = /!\[([^\]]*)\]\(\s*<?([^\s)>]+)>?(?:\s+["'][^"']*["'])?\s*\)/g;
 const leadSectionImage =
   /^!\[([^\]]+)\]\(\s*<?([^\s)>]+)>?\s+["']([^"']+)["']\s*\)\s*(?:\r?\n|$)/;
+const codaroEmbedRef =
+  /^https:\/\/eddmpython\.com\/codaro\/run\/\?example=([a-z0-9]+(?:-[a-z0-9]+)*)\s*$/gm;
 
 function fail(file, message) {
   throw new Error(`${file}: ${message}`);
@@ -110,6 +113,7 @@ if (localMedia.length) {
 
 const plan = await loadJson(resolve(blogDir, "media/plan.json"), "blog/media/plan.json");
 const catalog = await loadJson(resolve(blogDir, "media/catalog.json"), "blog/media/catalog.json");
+const codaroEmbeds = await loadJson(codaroEmbedsPath, "blog/embeds/codaro-cells.json");
 if (plan.version !== 1 || !plan.assets || typeof plan.assets !== "object") {
   fail("blog/media/plan.json", "version 또는 assets 계약이 잘못됐습니다");
 }
@@ -123,6 +127,26 @@ if (
   typeof catalog.assets !== "object"
 ) {
   fail("blog/media/catalog.json", "미디어 카탈로그 계약이 잘못됐습니다");
+}
+if (
+  codaroEmbeds.version !== 1 ||
+  !codaroEmbeds.examples ||
+  typeof codaroEmbeds.examples !== "object"
+) {
+  fail("blog/embeds/codaro-cells.json", "version 또는 examples 계약이 잘못됐습니다");
+}
+for (const [id, example] of Object.entries(codaroEmbeds.examples)) {
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id) || !example || typeof example !== "object") {
+    fail("blog/embeds/codaro-cells.json", `올바르지 않은 example id: ${id}`);
+  }
+  const required = ["title", "description", "code", "hint", "fullUrl"];
+  const missing = required.filter((key) => !String(example[key] ?? "").trim());
+  if (missing.length) {
+    fail("blog/embeds/codaro-cells.json", `${id} 필드가 비었습니다: ${missing.join(", ")}`);
+  }
+  if (!String(example.fullUrl).startsWith("https://eddmpython.com/codaro/run/")) {
+    fail("blog/embeds/codaro-cells.json", `${id}의 fullUrl이 Codaro Web Run이 아닙니다`);
+  }
 }
 
 for (const [id, entry] of Object.entries(plan.assets)) {
@@ -230,6 +254,7 @@ if (!posts.length) fail("blog", "발행 글이 한 편도 없습니다");
 
 const titles = new Map();
 const referencedMedia = new Set();
+const referencedCodaroEmbeds = new Set();
 for (const file of posts) {
   const raw = await readFile(resolve(blogDir, file), "utf8");
   const { meta, body } = parseFrontmatter(file, raw);
@@ -266,6 +291,17 @@ for (const file of posts) {
   if ((body.match(/^```/gm) ?? []).length % 2 !== 0) fail(file, "코드 펜스가 닫히지 않았습니다");
   if (/[\u2013\u2014]/u.test(raw)) fail(file, "em dash 또는 en dash가 있습니다");
   if (/\b(?:TODO|TBD)\b/.test(raw)) fail(file, "미완성 표식이 남았습니다");
+
+  for (const match of body.matchAll(codaroEmbedRef)) {
+    const id = match[1];
+    if (!codaroEmbeds.examples[id]) fail(file, `등록되지 않은 Codaro 실습 셀: ${id}`);
+    referencedCodaroEmbeds.add(id);
+  }
+  if (/eddmpython\.com\/codaro\/run\/\?example=/.test(body) && !codaroEmbedRef.test(body)) {
+    codaroEmbedRef.lastIndex = 0;
+    fail(file, "Codaro 실습 셀 URL은 다른 내용 없는 한 줄로 둡니다");
+  }
+  codaroEmbedRef.lastIndex = 0;
 
   const slug = file.replace(/\.md$/, "");
   const sectionAssets = new Set();
@@ -349,6 +385,12 @@ for (const [id, entry] of Object.entries(plan.assets)) {
 
 for (const [id, url] of assetUrlById) {
   if (!referencedMedia.has(url)) fail("blog/media/catalog.json", `${id}가 글 본문이나 ogImage에서 쓰이지 않습니다`);
+}
+
+for (const id of Object.keys(codaroEmbeds.examples)) {
+  if (!referencedCodaroEmbeds.has(id)) {
+    fail("blog/embeds/codaro-cells.json", `${id}가 어떤 글에서도 쓰이지 않습니다`);
+  }
 }
 
 console.log(`blog check: ${posts.length} post${posts.length === 1 ? "" : "s"}`);

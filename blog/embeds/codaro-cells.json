@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "examples": {
+    "city-sales-ranking": {
+      "title": "도시별 매출을 합쳐 1위 찾기",
+      "description": "금액을 바꾸거나 도시를 추가한 뒤 실행해서 집계 결과가 어떻게 달라지는지 확인합니다.",
+      "code": "sales = [(\"서울\", 120), (\"부산\", 85), (\"대구\", 64), (\"서울\", 40)]\n\ntotals = {}\nfor city, amount in sales:\n    totals[city] = totals.get(city, 0) + amount\n\nranking = sorted(totals.items(), key=lambda row: row[1], reverse=True)\nf\"합계: {totals}\\n1위: {ranking[0][0]} ({ranking[0][1]:,}만원)\"",
+      "hint": "가입 없이 브라우저 안에서 실행됩니다",
+      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
+    }
+  }
+}

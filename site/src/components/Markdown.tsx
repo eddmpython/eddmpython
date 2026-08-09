@@ -1,11 +1,14 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { CodaroCellEmbed } from "./CodaroCellEmbed";
 
 const YOUTUBE =
   /^https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=([\w-]{6,})|youtu\.be\/([\w-]{6,}))/;
 const THREADS = /^https?:\/\/(?:www\.)?threads\.(?:net|com)\/@[\w.]+\/post\/[\w-]+/;
 const IMAGE = /\.(png|jpe?g|gif|webp|avif|svg)(\?.*)?$/i;
+const CODARO_CELL =
+  /^https:\/\/eddmpython\.com\/codaro\/run\/\?example=([a-z0-9]+(?:-[a-z0-9]+)*)$/;
 
 function onlyUrl(children: ReactNode): string | null {
   const list = Array.isArray(children) ? children : [children];
@@ -137,6 +140,10 @@ export function Markdown({ children }: { children: string }) {
           }
           const url = onlyUrl(kids);
           if (url) {
+            const codaroCell = url.match(CODARO_CELL);
+            if (codaroCell) {
+              return <CodaroCellEmbed exampleId={codaroCell[1]} />;
+            }
             const yt = url.match(YOUTUBE);
             if (yt) return <YouTube id={yt[1] ?? yt[2]} />;
             if (THREADS.test(url)) return <Threads url={url} />;
