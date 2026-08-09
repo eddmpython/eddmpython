@@ -218,6 +218,7 @@ npm run check:blog
 npm run verify:media
 npm test
 npm run build
+npm run deploy
 ```
 
 `check:blog`는 파일명, frontmatter, 날짜, 질문과 답, 최소 본문 구조, 미완성 표식, 금지 문자를
@@ -226,5 +227,10 @@ npm run build
 SHA-256 경로의 정합을 확인하고 `blog/` 아래 로컬 이미지 파일을 차단한다. 기계 검사는 글맛과
 이미지의 사실 적합성을 판정하지 않는다. 통과 뒤 `/blog`와 글 상세 화면을 데스크톱과 모바일 폭에서
 직접 읽고, 제목 줄바꿈, 본문 폭, 이미지 크기와 캡션, 표와 코드의 가로 넘침을 확인한다.
+
+배포 뒤에는 캐시버스터를 붙인 실제 글 URL을 다시 읽는다. 모든 H2의 고유한 이미지가 렌더됐는지,
+`og:image`와 `twitter:image`가 plan과 catalog에서 정한 Hugging Face 객체인지 확인한다. `/blog`,
+`rss.xml`, `sitemap.xml`의 반영과 홈, favicon, 404, `xlpod.eddmpython.com`의 상태도 확인한다. Git push,
+HF 업로드, 빌드 통과는 각각 중간 단계이며 이 실사이트 확인 전에는 발행이 끝난 것이 아니다.
 
 발행 후에는 다음 글을 늘이기보다 이 글의 질문과 답이 실제 화면에서도 선명한지 먼저 본다.

@@ -97,7 +97,14 @@ cd site && npm run verify:media
 4. `cd site && npm test` 로 frontmatter 와 타입을 확인한다
 5. `npm run verify:media` 로 원격 객체를 확인한다
 6. `npm run deploy`
-7. `/blog` 목록과 글 페이지, `rss.xml` 을 눈으로 확인한다
+7. 캐시버스터를 붙인 글 페이지에서 H2별 본문 이미지 수와 URL, `og:image`, `twitter:image`를
+   plan과 catalog의 기대값에 대조한다
+8. `/blog`, `rss.xml`, `sitemap.xml`의 반영과 홈, favicon, 404, `xlpod.eddmpython.com`의 상태를
+   확인한다
+
+1단계부터 8단계까지가 한 번의 발행이다. Git push, HF 업로드, 빌드 성공 중 하나에서 멈추지 않는다.
+메인 사이트는 Cloudflare Worker이므로 Git push만으로는 공개 화면이 바뀌지 않는다. 초안이나 검토만
+요청받은 경우를 제외하고 공개 글을 수정하거나 발행했다면 별도 지시를 기다리지 않고 이 절차를 끝낸다.
 
 ## 글을 지울 때
 
