@@ -228,6 +228,15 @@ async function primeFullPagePaint(page) {
   });
 }
 
+async function returnToPageTop(page) {
+  await page.evaluate(async () => {
+    window.scrollTo(0, 0);
+    await new Promise((resolveFrame) =>
+      requestAnimationFrame(() => requestAnimationFrame(resolveFrame)),
+    );
+  });
+}
+
 async function inspectPage(page) {
   return page.evaluate(() => {
     const root = document.documentElement;
@@ -357,6 +366,7 @@ export async function captureVisualEvidence({ baseUrl, routeFilters = [] } = {})
 
         if (requestFailures.length) errors.push(...requestFailures);
         try {
+          await returnToPageTop(page);
           const topFile = `${contract.id}.${viewport.id}.top.jpg`;
           await page.screenshot({
             path: join(runDir, topFile),

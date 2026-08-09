@@ -50,12 +50,30 @@ blog/YYYY-MM-DD-slug.md
 | `summary` | 목록과 검색 결과에 나가는 한두 문장 |
 | `readerQuestion` | 이 글이 답하는 독자 질문 하나 |
 | `readerTakeaway` | 독자가 들고 나가는 한 문장 |
+| `readerLevel` | `beginner`, `working`, `advanced` 중 하나 |
+| `readerStartingPoint` | 독자가 이미 아는 것과 아직 모르는 것을 적은 문장 |
 | `ogImage` | 공유 이미지 URL. Hugging Face 콘텐츠 주소 객체 |
 | `ogImageAlt` | 이미지 설명 |
 | `ogImageWidth` / `ogImageHeight` / `ogImageType` | 이미지 규격 |
 
-`readerQuestion` 과 `readerTakeaway` 가 필수인 이유는 이것이 없으면 글이 기능 나열로
-흘러가기 때문이다. 쓰는 방법은 `blog/PIPELINE.md` 를 본다.
+`readerQuestion` 과 `readerTakeaway` 가 없으면 글이 기능 나열로 흐르기 쉽다.
+`readerStartingPoint` 가 없으면 글쓴이가 아는 말을 독자도 안다고 착각하기 쉽다. 별도 지시가
+없으면 `readerLevel`은 `beginner`로 쓴다. 자세한 작성 방법은 `blog/PIPELINE.md`를 본다.
+
+## 초보자가 읽을 수 있는지 확인한다
+
+사용법 글은 제품 구조가 아니라 독자가 움직이는 순서로 쓴다. 어디를 여는지, 무엇을 누르는지,
+무엇을 바꾸는지, 성공하면 무엇이 보이는지, 다음 기능은 언제 필요한지 순서대로 설명한다.
+
+`beginner` 글에는 다음 제한을 적용한다.
+
+- H2는 32자를 넘기지 않는다
+- 일반 문단은 220자를 넘기지 않는다
+- 한 문장은 160자를 넘기지 않는다
+- 처음 나오는 기술 용어는 같은 자리에서 쉬운 말로 설명한다
+
+길이 검사는 `site/scripts/check-blog.mjs`가 맡는다. 용어 설명과 문단 사이의 순서는 사람이
+데스크톱과 모바일 화면을 읽으면서 확인한다.
 
 ## 섹션은 제목, 이미지, 설명으로 읽힌다
 
@@ -92,7 +110,8 @@ cd site && npm run verify:media
 
 ## 글 하나 발행하는 순서
 
-1. `blog/YYYY-MM-DD-slug.md` 를 쓰고 모든 H2의 이미지 자리를 함께 정한다. 규칙은 `blog/PIPELINE.md`
+1. 독자의 출발점과 첫 행동을 정한 뒤 `blog/YYYY-MM-DD-slug.md`를 쓰고 모든 H2의 이미지 자리를
+   함께 정한다. 규칙은 `blog/PIPELINE.md`
 2. 섹션별 이미지를 만들고 `blog/media/plan.json` 에 H2, 의미, 출처, 최종 프롬프트를 남긴다
 3. `publish_media.py` 로 Hugging Face 에 올리고 `catalog.json` 을 갱신한다
 4. `cd site && npm test` 로 frontmatter 와 타입을 확인한다

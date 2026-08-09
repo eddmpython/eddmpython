@@ -7,6 +7,8 @@ section: AI 작업 환경
 summary: 같은 AI가 어떤 저장소에서는 든든한 동료가 되고 다른 곳에서는 매번 길을 잃는 이유를 작업 환경의 차이에서 살펴봅니다.
 readerQuestion: 같은 AI가 저장소에 따라 전혀 다른 동료처럼 일하는 이유는 무엇일까?
 readerTakeaway: AI의 작업 품질은 긴 프롬프트보다 경계와 증거와 검증이 저장소 안에 놓인 방식에 더 오래 좌우된다.
+readerLevel: working
+readerStartingPoint: Git 저장소에서 AI 코딩 도구를 써 봤지만 AGENTS.md와 CLAUDE.md의 역할은 정리해 본 적이 없다.
 ogImage: https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/11/118381f89feb8d2c84d2fd6f4d6e7da52bf0c1bbb63e3f29f695dbcdb7daaf73.webp
 ogImageAlt: 서로 다른 두 진입 경로가 하나의 정돈된 작업 환경으로 합쳐지는 모습
 ogImageWidth: 1536

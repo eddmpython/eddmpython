@@ -13,7 +13,10 @@ const requiredMeta = [
   "summary",
   "readerQuestion",
   "readerTakeaway",
+  "readerLevel",
+  "readerStartingPoint",
 ];
+const readerLevels = new Set(["beginner", "working", "advanced"]);
 const allowedDocs = new Set(["PIPELINE.md"]);
 const mediaSuffixes = new Set([
   ".svg",
@@ -79,6 +82,26 @@ function h2Sections(body) {
       headings[index + 1]?.index ?? body.length,
     ).trimStart(),
   }));
+}
+
+function proseParagraphs(body) {
+  return body
+    .replace(/```[\s\S]*?```/g, " ")
+    .split(/(?:\r?\n){2,}/)
+    .map((block) => block.replace(/\r?\n/g, " ").replace(/\s+/g, " ").trim())
+    .filter(
+      (block) =>
+        block &&
+        !/^(?:#{1,6}\s|!\[|(?:\d+\.|[-*+])\s|>|https?:\/\/)/.test(block) &&
+        !block.split("|").every((part) => /^:?-+:?$/.test(part.trim())),
+    )
+    .map((block) =>
+      block
+        .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
+        .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+        .replace(/[*_`]/g, "")
+        .trim(),
+    );
 }
 
 async function filesUnder(dir) {
@@ -279,18 +302,51 @@ for (const file of posts) {
   if (!meta.get("readerQuestion").endsWith("?")) {
     fail(file, "readerQuestion은 물음표로 끝나는 질문이어야 합니다");
   }
+  if (!readerLevels.has(meta.get("readerLevel"))) {
+    fail(file, "readerLevel은 beginner, working, advanced 중 하나여야 합니다");
+  }
+  if (
+    meta.get("readerStartingPoint").length < 20 ||
+    meta.get("readerStartingPoint").length > 180
+  ) {
+    fail(file, "readerStartingPoint는 20자 이상 180자 이하로 씁니다");
+  }
   if (titles.has(meta.get("title"))) {
     fail(file, `${titles.get(meta.get("title"))}와 제목이 같습니다`);
   }
   titles.set(meta.get("title"), file);
 
   if (!body) fail(file, "본문이 비었습니다");
-  if (/^[ \t]*# /m.test(body)) fail(file, "본문 H1은 쓰지 않습니다. 제목은 frontmatter가 맡습니다");
+  const bodyOutsideCode = body.replace(/```[\s\S]*?```/g, " ");
+  if (/^[ \t]*# /m.test(bodyOutsideCode)) {
+    fail(file, "본문 H1은 쓰지 않습니다. 제목은 frontmatter가 맡습니다");
+  }
   const sections = h2Sections(body);
   if (sections.length < 3) fail(file, "독자 흐름을 나누는 H2가 3개보다 적습니다");
   if ((body.match(/^```/gm) ?? []).length % 2 !== 0) fail(file, "코드 펜스가 닫히지 않았습니다");
   if (/[\u2013\u2014]/u.test(raw)) fail(file, "em dash 또는 en dash가 있습니다");
   if (/\b(?:TODO|TBD)\b/.test(raw)) fail(file, "미완성 표식이 남았습니다");
+
+  if (meta.get("readerLevel") === "beginner") {
+    for (const section of sections) {
+      if (section.heading.length > 32) {
+        fail(file, `beginner 글의 H2가 32자를 넘습니다: ${section.heading}`);
+      }
+    }
+    for (const paragraph of proseParagraphs(body)) {
+      if (paragraph.length > 220) {
+        fail(file, `beginner 글의 문단이 220자를 넘습니다: ${paragraph.slice(0, 40)}...`);
+      }
+      const sentences = paragraph
+        .split(/(?<=[.!?])\s+/u)
+        .map((sentence) => sentence.trim())
+        .filter(Boolean);
+      const longSentence = sentences.find((sentence) => sentence.length > 160);
+      if (longSentence) {
+        fail(file, `beginner 글의 문장이 160자를 넘습니다: ${longSentence.slice(0, 40)}...`);
+      }
+    }
+  }
 
   for (const match of body.matchAll(codaroEmbedRef)) {
     const id = match[1];
