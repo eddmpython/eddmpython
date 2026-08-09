@@ -64,6 +64,11 @@ status: observed
 `npm run verify:seo` 가 빌드된 HTML 을 읽어 계약을 확인한다. `npm run build` 안에서
 자동으로 돈다. 실패하면 배포까지 가지 않는다.
 
+배포 뒤에는 Playwright 운영 검증으로 Cloudflare Web Analytics가 CSP에 막히지 않는지도 확인한다.
+자동 삽입 스크립트는 `static.cloudflareinsights.com`만 허용하고 측정 요청은 같은 출처의
+`/cdn-cgi/rum`을 사용한다. 검색 메타데이터가 맞아도 운영 브라우저 콘솔과 네트워크 오류가 남으면
+완료로 보지 않는다.
+
 ## 하지 말 것
 
 - 프리렌더를 끄고 SPA 로 되돌리지 않는다. 본문이 다시 0 자가 된다.
