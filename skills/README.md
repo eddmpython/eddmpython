@@ -48,6 +48,7 @@ dartlab 은 `engines` 와 `recipes` 를 더 두지만 이 저장소에는 그 �
 | [`operation.seoContract`](specs/operation/seoContract.md) | 프리렌더, 구조화 데이터, sitemap, RSS 가 지켜야 할 계약 |
 | [`operation.brandAssets`](specs/operation/brandAssets.md) | 심볼 정본과 파비콘, og 이미지 생성 |
 | [`operation.blogPublishing`](specs/operation/blogPublishing.md) | 글을 어디에 두고 무엇이 자동으로 만들어지나 |
+| [`operation.visualVerification`](specs/operation/visualVerification.md) | 데스크톱과 모바일 렌더 증거를 배포 승인에 묶는 방법 |
 | [`operation.workspace`](specs/operation/workspace.md) | 산출물과 임시 파일을 어디에 두나 |
 | [`operation.secrets`](specs/operation/secrets.md) | 공개 저장소에서 지켜야 할 경계 |
 

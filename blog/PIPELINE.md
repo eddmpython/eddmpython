@@ -230,6 +230,8 @@ npm run check:blog
 npm run verify:media
 npm test
 npm run build
+npm run verify:visual
+npm run approve:visual -- --run=<run-id>
 npm run deploy
 ```
 
@@ -237,8 +239,10 @@ npm run deploy
 검사한다. 모든 H2 바로 뒤에 고유한 섹션 이미지와 캡션이 있는지, 이미지 뒤 설명이 충분한지,
 `sectionHeading`이 실제 제목과 같은지도 검사한다. 이어 plan, catalog, 본문 HF URL, 대체 텍스트,
 SHA-256 경로의 정합을 확인하고 `blog/` 아래 로컬 이미지 파일을 차단한다. 기계 검사는 글맛과
-이미지의 사실 적합성을 판정하지 않는다. 통과 뒤 `/blog`와 글 상세 화면을 데스크톱과 모바일 폭에서
-직접 읽고, 제목 줄바꿈, 본문 폭, 이미지 크기와 캡션, 표와 코드의 가로 넘침을 확인한다.
+이미지의 사실 적합성을 판정하지 않는다. `verify:visual`은 sitemap의 모든 페이지를 데스크톱과 모바일
+폭으로 렌더하고 가로 넘침, 깨진 이미지, 브라우저 오류, H2와 이미지 수를 검사한다. 저장소 밖에 생성된
+두 화면 폭의 전체 스크린샷을 직접 읽고 제목 줄바꿈, 본문 폭, 이미지 크기와 캡션, 표와 코드의 가로
+넘침을 확인한 뒤 해당 run id를 승인한다. 승인 뒤 빌드가 바뀌면 `deploy`는 중단된다.
 
 배포 뒤에는 캐시버스터를 붙인 실제 글 URL을 다시 읽는다. 모든 H2의 고유한 이미지가 렌더됐는지,
 `og:image`와 `twitter:image`가 plan과 catalog에서 정한 Hugging Face 객체인지 확인한다. `/blog`,

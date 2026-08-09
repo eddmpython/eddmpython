@@ -13,6 +13,7 @@ whenToUse:
 verify:
   - cd site && npm test
   - cd site && npm run build
+  - cd site && npm run check:visual
   - npx wrangler deployments list --name eddmpython-site
 status: observed
 ---
@@ -43,8 +44,9 @@ status: observed
 중 어느 하나만 끝났다고 완료가 아니다. 수정, 개선, 발행 요청은 아래 세 단계가 모두 끝나야 완료다.
 
 1. 테스트와 프로덕션 빌드가 통과한다.
-2. `eddmpython-site` Cloudflare Worker에 실제 배포한다.
-3. 캐시버스터를 붙인 프로덕션 URL에서 변경 내용과 운영 경계를 확인한다.
+2. 데스크톱과 모바일 렌더 증거를 실제로 확인하고 현재 빌드에 승인한다.
+3. `eddmpython-site` Cloudflare Worker에 실제 배포한다.
+4. 캐시버스터를 붙인 프로덕션 URL에서 변경 내용과 운영 경계를 확인한다.
 
 초안 작성, 검토, 진단만 요청받은 경우에는 배포하지 않는다. 공개 변경을 요청받았다면 별도 배포
 지시를 기다리지 않는다. **Git push는 메인 사이트 배포가 아니며 완료 조건을 충족하지 않는다.**
@@ -56,17 +58,25 @@ status: observed
 
 ```bash
 cd site
+npm run build
+npm run verify:visual
+npm run approve:visual -- --run=<run-id>
 npm run deploy
 ```
 
-`deploy` 는 `build` 를 먼저 돌리고, `build` 는 `test` 와 `verify:seo` 를 품는다.
+`deploy` 는 `build` 를 다시 돌린 뒤 승인된 빌드 지문과 현재 빌드 지문을 비교하고 Wrangler를 실행한다.
+`build` 는 `test` 와 `verify:seo` 를 품는다. 시각 검증의 상세 계약은
+[`operation.visualVerification`](visualVerification.md)을 본다.
 즉 아래가 순서대로 통과해야 배포가 시작된다.
 
 1. `check:blog` 글 파일과 frontmatter 검사
 2. `tsc --noEmit` 타입 검사
 3. `vite build` 클라이언트 번들, SSR 번들, 프리렌더, sitemap, RSS, favicon
 4. `verify:seo` 빌드된 HTML 과 JSON-LD, sitemap, RSS 계약 확인
-5. `wrangler deploy`
+5. `verify:visual` 데스크톱과 모바일 렌더, 자동 화면 계약 확인
+6. 모든 스크린샷의 실제 확인과 `approve:visual` 승인
+7. `check:visual` 현재 빌드와 승인 지문 일치 확인
+8. `wrangler deploy`
 
 하나라도 실패하면 배포되지 않는다. 이 순서를 우회해 `wrangler deploy` 만 부르지 않는다.
 

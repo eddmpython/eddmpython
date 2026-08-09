@@ -140,9 +140,10 @@ export function PyCell({
         value={code}
         onChange={(e) => onCodeChange(e.target.value)}
         spellCheck={false}
+        wrap="off"
         aria-label="Python 코드"
         rows={Math.max(minRows, code.split("\n").length + 1)}
-        className="block w-full resize-y bg-transparent px-4 py-4 font-mono text-[13px] leading-6 text-ivory/90 outline-none focus-visible:bg-white/[0.03]"
+        className="block w-full resize-y overflow-x-auto bg-transparent px-4 py-4 font-mono text-[13px] leading-6 text-ivory/90 outline-none focus-visible:bg-white/[0.03]"
       />
 
       <div className="flex flex-wrap items-center gap-2 border-t border-white/10 px-4 py-3">
@@ -169,7 +170,7 @@ export function PyCell({
       </div>
 
       <output
-        className={`block max-h-72 overflow-auto border-t border-white/10 px-4 py-4 font-mono text-[12px] leading-5 break-words whitespace-pre ${
+        className={`block max-h-72 overflow-auto border-t border-white/10 px-4 py-4 font-mono text-[12px] leading-5 break-words whitespace-pre-wrap ${
           state === "error" || state === "unsupported"
             ? "text-[#e0908a]"
             : "text-ivory/70"
