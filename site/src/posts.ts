@@ -1,4 +1,7 @@
 export type Post = {
+  /** 파일 stem. media plan/catalog 키와 같다. */
+  id: string;
+  /** 공개 URL 경로. /blog/{slug} */
   slug: string;
   title: string;
   date: string;
@@ -21,13 +24,16 @@ const files = import.meta.glob("../../blog/20??-??-??-*.md", {
   eager: true,
 }) as Record<string, string>;
 
+const slugPattern = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
+
 function parse(path: string, raw: string): Post {
-  const slug = path.replace(/^.*\//, "").replace(/\.md$/, "");
+  const id = path.replace(/^.*\//, "").replace(/\.md$/, "");
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
   if (!match) {
     return {
-      slug,
-      title: slug,
+      id,
+      slug: id,
+      title: id,
       date: "",
       modified: "",
       author: "",
@@ -41,9 +47,14 @@ function parse(path: string, raw: string): Post {
     const kv = line.match(/^(\w+):\s*(.*)$/);
     if (kv) meta[kv[1]] = kv[2].trim();
   }
+  const slug = meta.slug ?? "";
+  if (!slugPattern.test(slug)) {
+    throw new Error(`${id}: slug frontmatter가 없거나 공개 URL 규칙에 맞지 않습니다`);
+  }
   return {
+    id,
     slug,
-    title: meta.title ?? slug,
+    title: meta.title ?? id,
     date: meta.date ?? "",
     modified: meta.modified ?? meta.date ?? "",
     author: meta.author ?? "eddmpython",
@@ -61,6 +72,11 @@ function parse(path: string, raw: string): Post {
 export const POSTS: Post[] = Object.entries(files)
   .map(([path, raw]) => parse(path, raw))
   .sort((a, b) => b.date.localeCompare(a.date) || b.slug.localeCompare(a.slug));
+
+const slugs = new Set(POSTS.map((post) => post.slug));
+if (slugs.size !== POSTS.length) {
+  throw new Error("blog slug가 중복됐습니다");
+}
 
 export function findPost(slug: string): Post | undefined {
   return POSTS.find((p) => p.slug === slug);

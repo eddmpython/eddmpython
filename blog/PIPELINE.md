@@ -21,13 +21,14 @@
 
 ## 발행 파일 계약
 
-발행 글은 `blog/YYYY-MM-DD-slug.md` 한 파일이다. 대문자 영문 운영 문서와
-`product-marketing.md`는 사이트 글 목록에서 제외한다. frontmatter에는 검색 정보와 독자 정보를
-함께 둔다.
+발행 글은 `blog/YYYY-MM-DD-kebab.md` 한 파일이다. 파일명의 날짜와 kebab은 정렬·미디어 키용
+**post id**다. 공개 URL은 frontmatter `slug`만 쓴다 (`/blog/{slug}`). 날짜를 URL에 넣지 않는다.
+대문자 영문 운영 문서와 `product-marketing.md`는 사이트 글 목록에서 제외한다.
 
 ```yaml
 ---
 title: 독자가 읽을 제목
+slug: 공개-경로-kebab
 date: YYYY-MM-DD
 modified: 마지막으로 본문을 의미 있게 고친 YYYY-MM-DD
 author: 화면과 구조화 데이터에 함께 표시할 작성자
@@ -44,6 +45,25 @@ ogImageHeight: ogImage가 있으면 필수. 원본 픽셀 높이
 ogImageType: ogImage가 있으면 필수. image/png 같은 MIME
 ---
 ```
+
+### 공개 slug 규칙
+
+공개 URL은 `/blog/{slug}` 한 형태다. 업계 기본과 같다. 날짜를 경로에 넣지 않고, 여러 단어는
+하이픈으로만 나눈다.
+
+| 규칙 | 내용 |
+|---|---|
+| 문자 | 소문자 영문, 숫자, 하이픈만. 날짜로 시작 금지 |
+| 길이 | 4자 이상 40자 이하. 보통 2~4 단어 |
+| 뜻 | 제목 전체를 옮기지 말고, 독자가 주제를 바로 읽게 짧게 |
+| 제품명 | 인지도가 약한 제품명을 slug 앞에 두지 않는다 |
+| 고정 | 한 번 공개한 slug는 바꾸지 않는다. 바꾸면 Worker `LEGACY_BLOG`에 301을 남긴다 |
+
+좋은 예: `no-install`, `ai-environment`.  
+나쁜 예: `2026-08-09-codaro-guide`(날짜), `run-python-without-install`(제목 나열로 김),
+`codaro_guide`(밑줄).
+
+미디어 plan/catalog 키의 `post` 필드는 파일 stem(post id)을 유지한다. 공개 slug와 달라도 된다.
 
 별도 지시가 없으면 `readerLevel`은 `beginner`로 잡는다. `readerStartingPoint`에는
 `초보자`라고만 쓰지 않는다. `Python을 설치해 본 적이 없고 셀과 .py의 뜻을 모른다`처럼
@@ -168,8 +188,8 @@ Web Run 링크에서 사용할 수 있다고 정확히 쓴다.
 이미지는 글을 꾸미기 위해 넣지 않는다. 설명만으로 공간, 장면, 물성, 전후 차이를 따라가기 어려울 때
 사용한다. 각 이미지는 어느 문단 뒤에서 무엇을 이해시키는지 먼저 정한다.
 
-이미지 의미의 정본은 `blog/media/plan.json`이다. 키는 `<글 slug>/<assetKey>`이고 아래 필드를
-가진다.
+이미지 의미의 정본은 `blog/media/plan.json`이다. 키는 `<post id>/<assetKey>`이고 아래 필드를
+가진다. post id는 파일 stem이며 공개 URL slug와 다를 수 있다.
 
 ```json
 {
@@ -223,7 +243,7 @@ DartLab 카드뉴스에서 가져오는 핵심은 이미지에 문장을 구워 
 ImageGen 결과는 기본 생성 경로에만 남겨 두지 않는다. 최종 선택본을 다음 저장소 밖 경로로 옮긴다.
 
 ```text
-../eddmpython.out/blog-media/<글 slug>/<assetKey>.webp
+../eddmpython.out/blog-media/<post id>/<assetKey>.webp
 ```
 
 PNG, JPG, GIF도 지원하지만 새 래스터는 용량과 품질을 확인한 WebP를 우선한다. Git 저장소의

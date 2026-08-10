@@ -145,7 +145,17 @@ function checkShared(html, path) {
 }
 
 const postFiles = (await readdir(blogRoot)).filter((name) => postName.test(name)).sort();
-const pages = ["/", "/blog", ...postFiles.map((name) => `/blog/${name.replace(/\.md$/, "")}`)];
+const postRoutes = [];
+for (const file of postFiles) {
+  const frontmatter = parseFrontmatter(
+    file,
+    await readFile(resolve(blogRoot, file), "utf8"),
+  );
+  const slug = frontmatter.get("slug");
+  if (!slug) fail(file, "slug frontmatter가 없습니다");
+  postRoutes.push({ file, slug, path: `/blog/${slug}` });
+}
+const pages = ["/", "/blog", ...postRoutes.map((post) => post.path)];
 for (const path of pages) checkShared(await pageHtml(path), path);
 
 const defaultImage = await readFile(resolve(distRoot, "og.png"));
@@ -164,9 +174,7 @@ if (nodesOfType(blogStructured, "BreadcrumbList").length !== 1) {
   fail("/blog", "탐색 경로 구조화 데이터가 없습니다");
 }
 
-for (const file of postFiles) {
-  const slug = file.replace(/\.md$/, "");
-  const path = `/blog/${slug}`;
+for (const { file, slug, path } of postRoutes) {
   const raw = await readFile(resolve(blogRoot, file), "utf8");
   const frontmatter = parseFrontmatter(file, raw);
   const html = await pageHtml(path);
@@ -217,9 +225,9 @@ if ((sitemap.match(/<loc>/g) ?? []).length !== pages.length) {
 if (/<loc>https:\/\/eddmpython\.com\/<\/loc>\s*<lastmod>/.test(sitemap)) {
   fail("sitemap.xml", "홈에 빌드 날짜를 수정일처럼 넣었습니다");
 }
-for (const file of postFiles) {
+for (const { file, path } of postRoutes) {
   const frontmatter = parseFrontmatter(file, await readFile(resolve(blogRoot, file), "utf8"));
-  const url = `${origin}/blog/${file.replace(/\.md$/, "")}`;
+  const url = `${origin}${path}`;
   if (!sitemap.includes(`<loc>${url}</loc>\n    <lastmod>${frontmatter.get("modified")}</lastmod>`)) {
     fail("sitemap.xml", `${file}의 실제 수정일이 없습니다`);
   }

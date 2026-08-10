@@ -1,7 +1,8 @@
 ---
 title: AI에게 프롬프트보다 먼저 필요한 것
+slug: ai-environment
 date: 2026-08-08
-modified: 2026-08-09
+modified: 2026-08-10
 author: eddmpython
 section: AI 작업 환경
 summary: 같은 AI가 어떤 저장소에서는 든든한 동료가 되고 다른 곳에서는 매번 길을 잃는 이유를 작업 환경의 차이에서 살펴봅니다.

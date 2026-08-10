@@ -24,6 +24,14 @@ const PROXIED: Record<string, string> = {
   pyproc: "https://eddmpython.github.io",
 };
 
+/** 예전 블로그 URL. 공개 경로는 짧은 slug만 쓴다. */
+const LEGACY_BLOG: Record<string, string> = {
+  "/blog/2026-08-09-codaro-guide": "/blog/no-install",
+  "/blog/2026-08-08-ai-needs-an-environment": "/blog/ai-environment",
+  "/blog/run-python-without-install": "/blog/no-install",
+  "/blog/ai-needs-an-environment": "/blog/ai-environment",
+};
+
 const SECURITY_HEADERS: Record<string, string> = {
   "strict-transport-security": "max-age=31536000; includeSubDomains",
   "x-content-type-options": "nosniff",
@@ -95,9 +103,26 @@ async function proxy(request: Request, url: URL, origin: string) {
   });
 }
 
+function redirect(to: string, requestUrl: URL): Response {
+  const target = new URL(to, requestUrl.origin);
+  target.search = requestUrl.search;
+  target.hash = requestUrl.hash;
+  return new Response(null, {
+    status: 301,
+    headers: {
+      location: target.toString(),
+      ...SECURITY_HEADERS,
+    },
+  });
+}
+
 export default {
   async fetch(request: Request, env: { ASSETS: Fetcher }): Promise<Response> {
     const url = new URL(request.url);
+    const pathname = url.pathname.replace(/\/$/, "") || "/";
+
+    const legacy = LEGACY_BLOG[pathname] ?? LEGACY_BLOG[url.pathname];
+    if (legacy) return redirect(legacy, url);
 
     const first = url.pathname.split("/")[1] ?? "";
     const upstream = PROXIED[first];

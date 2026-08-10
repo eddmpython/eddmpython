@@ -6,6 +6,7 @@ const codaroEmbedsPath = resolve(blogDir, "embeds/codaro-cells.json");
 const postName = /^(\d{4}-\d{2}-\d{2})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$/;
 const requiredMeta = [
   "title",
+  "slug",
   "date",
   "modified",
   "author",
@@ -18,6 +19,7 @@ const requiredMeta = [
 ];
 const readerLevels = new Set(["beginner", "working", "advanced"]);
 const allowedDocs = new Set(["PIPELINE.md", "product-marketing.md"]);
+const publicSlug = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const mediaSuffixes = new Set([
   ".svg",
   ".webp",
@@ -276,12 +278,15 @@ const posts = markdown.filter((name) => postName.test(name)).sort();
 if (!posts.length) fail("blog", "발행 글이 한 편도 없습니다");
 
 const titles = new Map();
+const slugs = new Map();
 const referencedMedia = new Set();
 const referencedCodaroEmbeds = new Set();
 for (const file of posts) {
   const raw = await readFile(resolve(blogDir, file), "utf8");
   const { meta, body } = parseFrontmatter(file, raw);
   const fileDate = file.match(postName)[1];
+  const postId = file.replace(/\.md$/, "");
+  const slug = meta.get("slug");
 
   if (!validDate(meta.get("date"))) fail(file, "date가 유효한 YYYY-MM-DD 형식이 아닙니다");
   if (!validDate(meta.get("modified"))) {
@@ -291,6 +296,13 @@ for (const file of posts) {
   if (meta.get("modified") < meta.get("date")) {
     fail(file, "modified가 최초 발행일보다 빠릅니다");
   }
+  if (!publicSlug.test(slug)) {
+    fail(file, "slug는 소문자·숫자·하이픈만 쓰고 날짜로 시작하지 않습니다");
+  }
+  if (slug.length < 4 || slug.length > 40) fail(file, "slug는 4자 이상 40자 이하로 씁니다");
+  if (/^\d{4}-\d{2}-\d{2}/.test(slug)) fail(file, "공개 slug에 발행일을 넣지 않습니다");
+  if (slugs.has(slug)) fail(file, `${slugs.get(slug)}와 slug가 같습니다`);
+  slugs.set(slug, file);
   if (meta.get("title").length < 10 || meta.get("title").length > 70) {
     fail(file, "title은 10자 이상 70자 이하로 씁니다");
   }
@@ -359,7 +371,6 @@ for (const file of posts) {
   }
   codaroEmbedRef.lastIndex = 0;
 
-  const slug = file.replace(/\.md$/, "");
   const sectionAssets = new Set();
   for (const section of sections) {
     const lead = section.content.match(leadSectionImage);
@@ -368,7 +379,7 @@ for (const file of posts) {
     }
     const [, alt, url, caption] = lead;
     if (!caption.trim()) fail(file, `섹션 이미지 캡션이 비었습니다: ${section.heading}`);
-    const id = assetIdByPostUrl.get(`${slug}|${url}`);
+    const id = assetIdByPostUrl.get(`${postId}|${url}`);
     if (!id) fail(file, `섹션 이미지가 catalog.json의 글 매핑에 없습니다: ${section.heading}`);
     const entry = plan.assets[id];
     if (entry.role !== "section" || entry.sectionHeading !== section.heading) {
@@ -403,20 +414,20 @@ for (const file of posts) {
     if (missingOg.length) fail(file, `ogImage 메타가 비었습니다: ${missingOg.join(", ")}`);
     refs.push({ url: meta.get("ogImage"), alt: "", body: false });
   }
-  const allowedUrls = urlsByPost.get(slug) ?? new Set();
+  const allowedUrls = urlsByPost.get(postId) ?? new Set();
   for (const { url: ref, alt, body: isBodyImage } of refs) {
     if (ref.startsWith("media://")) fail(file, `발행 전 이미지 자리표시자가 남았습니다: ${ref}`);
     if (!ref.startsWith(`https://huggingface.co/datasets/${catalog.repo}/resolve/main/${catalog.objectPrefix}/`)) {
       fail(file, `Hugging Face 콘텐츠 주소가 아닌 이미지 참조: ${ref}`);
     }
     if (!allowedUrls.has(ref)) fail(file, `catalog.json의 글 매핑 밖 이미지 참조: ${ref}`);
-    if (isBodyImage && alt !== altByPostUrl.get(`${slug}|${ref}`)) {
+    if (isBodyImage && alt !== altByPostUrl.get(`${postId}|${ref}`)) {
       fail(file, `본문 대체 텍스트가 plan.json과 다릅니다: ${ref}`);
     }
     if (!isBodyImage) {
-      const object = objectByPostUrl.get(`${slug}|${ref}`);
+      const object = objectByPostUrl.get(`${postId}|${ref}`);
       if (!object) fail(file, `ogImage의 객체 메타를 찾을 수 없습니다: ${ref}`);
-      if (meta.get("ogImageAlt") !== altByPostUrl.get(`${slug}|${ref}`)) {
+      if (meta.get("ogImageAlt") !== altByPostUrl.get(`${postId}|${ref}`)) {
         fail(file, "ogImageAlt가 plan.json의 alt와 다릅니다");
       }
       if (

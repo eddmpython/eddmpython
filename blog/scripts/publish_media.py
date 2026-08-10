@@ -53,7 +53,7 @@ def save_json(path: Path, payload: dict[str, object]) -> None:
 def plan_entry(plan: dict[str, object], asset_id: str) -> dict[str, object]:
     match = ASSET_ID_RE.fullmatch(asset_id)
     if not match:
-        raise ValueError("asset id는 <글 slug>/<영문 kebab-case 키> 형식이어야 함")
+        raise ValueError("asset id는 <post id>/<영문 kebab-case 키> 형식이어야 함")
     if plan.get("version") != 1 or not isinstance(plan.get("assets"), dict):
         raise ValueError("blog/media/plan.json 계약 위반")
     entry = plan["assets"].get(asset_id)
@@ -429,7 +429,7 @@ def verify_remote() -> None:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="블로그 이미지를 Hugging Face에 발행한다")
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--asset", help="plan.json의 <글 slug>/<assetKey>")
+    group.add_argument("--asset", help="plan.json의 <post id>/<assetKey>")
     group.add_argument("--verify", action="store_true", help="catalog의 HF 원격 객체를 전부 확인")
     parser.add_argument("--file", help="저장소 밖 staging 이미지 경로")
     parser.add_argument("--dry-run", action="store_true", help="업로드와 파일 수정 없이 계약만 확인")

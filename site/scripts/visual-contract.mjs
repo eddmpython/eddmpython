@@ -51,7 +51,7 @@ const ROUTE_RULES = [
     ],
   },
   {
-    match: (path) => path === "/blog/2026-08-09-codaro-guide",
+    match: (path) => path === "/blog/no-install",
     id: "codaro-guide",
     checks: [
       TEXT("article#content h1", "설치 없이 Python 첫 코드를 실행하는 방법"),

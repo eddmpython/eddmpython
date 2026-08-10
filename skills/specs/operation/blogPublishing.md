@@ -22,19 +22,22 @@ status: observed
 ## 정본은 한 곳이다
 
 ```
-blog/YYYY-MM-DD-slug.md
+blog/YYYY-MM-DD-kebab.md
 ```
 
-여기가 글의 정본이다. 사이트는 빌드 타임에 이 폴더를 읽는다 (`site/src/posts.ts` 의
+여기가 글의 정본이다. 파일명의 날짜+kebab은 post id(정렬·미디어 키)다. 공개 경로는
+frontmatter `slug`다. 사이트는 빌드 타임에 이 폴더를 읽는다 (`site/src/posts.ts` 의
 `import.meta.glob`). 런타임 fetch 도 CMS 도 없다.
 
 파일 하나를 넣으면 빌드가 함께 만든다.
 
-- `/blog/{slug}` 실제 HTML 페이지 (프리렌더)
+- `/blog/{slug}` 실제 HTML 페이지 (프리렌더, 날짜 없음)
 - `/blog` 목록의 항목
 - `sitemap.xml` 항목
 - `rss.xml` 항목
 - 페이지별 title, description, og, canonical, `BlogPosting` 구조화 데이터
+
+예전에 날짜가 들어간 URL은 Worker가 301로 새 slug로 보낸다.
 
 ## frontmatter 계약
 
@@ -43,7 +46,8 @@ blog/YYYY-MM-DD-slug.md
 | 필드 | 설명 |
 |---|---|
 | `title` | 질문이거나 주장. 명사 나열 금지. 인지도 없는 제품명을 앞에 두지 않음 (`blog/PIPELINE.md` 1.5절) |
-| `date` | 발행일 `YYYY-MM-DD` |
+| `slug` | 공개 URL `/blog/{slug}`. 짧은 소문자 kebab, 날짜 금지. 예: `no-install` |
+| `date` | 발행일 `YYYY-MM-DD` (파일명 날짜와 같음) |
 | `modified` | 마지막 수정일 |
 | `author` | 글쓴이 |
 | `section` | 글의 갈래 |
