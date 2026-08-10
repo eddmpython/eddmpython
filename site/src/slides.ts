@@ -1,6 +1,9 @@
+import type { ProductKey } from "./productMarks";
+
 /** 히어로 뷰어에 도는 실제 제품 화면. 전부 라이브 제품을 캡처한 것이다. */
 export type Slide = {
   id: string;
+  productKey: ProductKey;
   product: string;
   /* Tailwind 색 유틸 클래스 */
   dotClass: string;
@@ -14,6 +17,7 @@ export type Slide = {
 export const SLIDES: Slide[] = [
   {
     id: "terminal",
+    productKey: "dartlab",
     product: "DartLab",
     dotClass: "bg-dartlab",
     label: "터미널",
@@ -24,6 +28,7 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "viewer",
+    productKey: "dartlab",
     product: "DartLab",
     dotClass: "bg-dartlab",
     label: "공시뷰어",
@@ -34,6 +39,7 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "scan",
+    productKey: "dartlab",
     product: "DartLab",
     dotClass: "bg-dartlab",
     label: "전종목 스캔",
@@ -44,6 +50,7 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "map",
+    productKey: "dartlab",
     product: "DartLab",
     dotClass: "bg-dartlab",
     label: "산업지도",
@@ -54,6 +61,7 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "learn",
+    productKey: "codaro",
     product: "Codaro",
     dotClass: "bg-codaro",
     label: "학습",
@@ -64,6 +72,7 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "codaro",
+    productKey: "codaro",
     product: "Codaro",
     dotClass: "bg-codaro",
     label: "웹 실행",
@@ -74,6 +83,7 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "pyproc",
+    productKey: "pyproc",
     product: "pyproc",
     dotClass: "bg-pyproc",
     label: "Python 머신",
@@ -84,6 +94,7 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "xlpod",
+    productKey: "xlpod",
     product: "xlpod",
     dotClass: "bg-xlpod",
     label: "스프레드시트",
@@ -93,3 +104,8 @@ export const SLIDES: Slide[] = [
     href: "https://xlpod.eddmpython.com/",
   },
 ];
+
+export function firstSlideIndex(productKey: ProductKey): number {
+  const index = SLIDES.findIndex((slide) => slide.productKey === productKey);
+  return index < 0 ? 0 : index;
+}

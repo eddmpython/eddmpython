@@ -3,6 +3,8 @@
 /* 브랜드 토큰 정본. 값은 eddmpython 브랜드 시트의 비핑크 팔레트만 쓴다. */
 :root {
   --eddm-carbon: #101514;
+  /* carbon보다 한 단 어두운 면. 히어로 화면 프레임 받침 */
+  --eddm-ink: #0c0f0e;
   --eddm-ivory: #f5f3ee;
   --eddm-sand: #d8be91;
   --eddm-dartlab: #7da2e8;
@@ -13,6 +15,7 @@
 
 @theme inline {
   --color-carbon: var(--eddm-carbon);
+  --color-ink: var(--eddm-ink);
   --color-ivory: var(--eddm-ivory);
   --color-sand: var(--eddm-sand);
   --color-dartlab: var(--eddm-dartlab);
@@ -69,6 +72,21 @@ body {
   animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* 히어로 제품 마크. 화면이 그 제품으로 돌 때 살짝 숨 쉰다. */
+@keyframes product-mark-live {
+  0%,
+  100% {
+    transform: scale(1.1);
+  }
+  50% {
+    transform: scale(1.16);
+  }
+}
+
+.product-mark-live {
+  animation: product-mark-live 1.8s ease-in-out infinite;
+}
+
 /* 스크롤 진입 시 나타나는 요소 (useReveal 이 .in 을 붙인다) */
 .reveal {
   opacity: 0;
@@ -91,6 +109,9 @@ body {
   .fade-up {
     animation: none;
     opacity: 1;
+  }
+  .product-mark-live {
+    animation: none;
   }
   .reveal {
     transition: none;

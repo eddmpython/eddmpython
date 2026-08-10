@@ -29,6 +29,8 @@ const ROUTE_RULES = [
     checks: [
       VISIBLE("main#content"),
       TEXT("main#content h1", "실제로 작동하는 자동화로"),
+      TEXT("main#content", "다루는 것"),
+      COUNT('img[src^="/brand/"]', { min: 4 }),
       VISIBLE("#products"),
     ],
   },

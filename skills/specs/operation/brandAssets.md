@@ -30,6 +30,10 @@ status: observed
 `public/favicon.svg` 를 두지 않는다. 사본을 두면 랜딩 마크를 고칠 때 파비콘만 옛 형태로
 남는다. dev 는 미들웨어로, build 는 dist 파일로 같은 문자열을 낸다.
 
+제품 마크(DartLab·Codaro 아바타, xlpod·pyproc 마크)는 `site/public/brand/` 에 두고
+`src/productMarks.ts` 가 가리킨다. 제품 사이트 공개 brand URL에서 가져온 것이며, 제품
+소스를 복제한 것이 아니다.
+
 ## 심볼
 
 매듭을 이루며 스스로를 무는 뱀이다. Python 과 반복을 한 형태로 잡는다.

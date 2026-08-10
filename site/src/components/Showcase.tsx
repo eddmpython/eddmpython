@@ -3,19 +3,24 @@ import { SLIDES } from "../slides";
 
 const ROTATE_MS = 5500;
 
+type Props = {
+  active: number;
+  onActiveChange: (index: number) => void;
+  onRotate: () => void;
+};
+
 /** 라이브 제품 화면을 넘겨 보는 히어로 뷰어. */
-export function Showcase() {
-  const [active, setActive] = useState(0);
+export function Showcase({ active, onActiveChange, onRotate }: Props) {
   const [stopped, setStopped] = useState(false);
   const pausedRef = useRef(false);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const t = setInterval(() => {
-      if (!pausedRef.current && !stopped) setActive((i) => (i + 1) % SLIDES.length);
+      if (!pausedRef.current && !stopped) onRotate();
     }, ROTATE_MS);
     return () => clearInterval(t);
-  }, [stopped]);
+  }, [stopped, onRotate]);
 
   const current = SLIDES[active];
 
@@ -24,8 +29,9 @@ export function Showcase() {
       onMouseEnter={() => (pausedRef.current = true)}
       onMouseLeave={() => (pausedRef.current = false)}
     >
-      <div className="overflow-hidden rounded-xl bg-white/[0.06] p-2 ring-1 ring-white/10 sm:rounded-2xl sm:p-3">
-        <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-carbon sm:rounded-xl">
+      {/* 위·옆·아래 같은 패딩. 납작한 어두운 면 위에 얇은 프레임만 둔다. */}
+      <div className="overflow-hidden rounded-2xl bg-ink p-4 ring-1 ring-white/[0.08] sm:p-5">
+        <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-carbon">
           {SLIDES.map((s, i) => (
             <img
               key={s.id}
@@ -48,7 +54,9 @@ export function Showcase() {
           <span className={`h-1.5 w-1.5 rounded-full ${current.dotClass}`} />
           <span className="font-medium">{current.product}</span>
         </span>
-        <span aria-hidden="true" className="hidden text-ivory/55 sm:inline">·</span>
+        <span aria-hidden="true" className="hidden text-ivory/55 sm:inline">
+          ·
+        </span>
         <span className="text-ivory/60">{current.caption}</span>
       </div>
 
@@ -57,10 +65,7 @@ export function Showcase() {
           <button
             key={s.id}
             type="button"
-            onClick={() => {
-              setActive(i);
-              pausedRef.current = true;
-            }}
+            onClick={() => onActiveChange(i)}
             aria-label={`${s.product} ${s.label} 보기`}
             aria-pressed={i === active}
             className={`rounded-full border px-3 py-1 text-[13px] transition-colors ${

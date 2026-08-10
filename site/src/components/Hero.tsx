@@ -1,11 +1,25 @@
+import { useCallback, useState } from "react";
 import { Showcase } from "./Showcase";
 import { Nav } from "./Nav";
+import { ProductRail } from "./ProductRail";
+import { SLIDES, firstSlideIndex } from "../slides";
+import type { ProductKey } from "../productMarks";
 
 export function Hero() {
+  const [active, setActive] = useState(0);
+  const rotate = useCallback(() => {
+    setActive((index) => (index + 1) % SLIDES.length);
+  }, []);
+  const selectProduct = useCallback((key: ProductKey) => {
+    setActive(firstSlideIndex(key));
+  }, []);
+
+  const activeProduct = SLIDES[active]?.productKey ?? "dartlab";
+
   return (
-    <section className="relative">
-      {/* nav 는 별도 헤더 바가 아니라 히어로 컨테이너 안에 들어간다 (paseo 구조). */}
-      <div className="relative mx-auto w-full max-w-7xl px-6 pt-10 pb-10 md:px-32 md:pt-20 md:pb-12">
+    <section className="relative bg-carbon">
+      {/* 텍스트와 화면이 같은 가로 패딩을 쓴다. 한쪽만 넓게 빠지지 않게. */}
+      <div className="relative mx-auto w-full max-w-7xl px-6 pt-10 md:px-12 md:pt-20 lg:px-16">
         <Nav />
 
         <h1
@@ -44,21 +58,18 @@ export function Hero() {
           </a>
         </div>
 
-        <div
-          className="fade-up mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-ivory/50"
-          style={{ animationDelay: "0.35s" }}
-        >
-          <span>다루는 것</span>
-          <span>DART · SEC EDGAR</span>
-          <span>Excel · Google Sheets</span>
-          <span>브라우저 Python</span>
+        <div className="fade-up mt-8" style={{ animationDelay: "0.35s" }}>
+          <ProductRail active={activeProduct} onSelect={selectProduct} />
         </div>
       </div>
 
-      {/* 실제 제품 화면 뷰어. 아래 이름을 눌러 넘기고 자동 순환한다. */}
-      <div className="relative mx-auto w-full max-w-7xl px-4 pb-16 sm:px-6 md:px-8 md:pb-20">
+      <div className="relative mx-auto w-full max-w-7xl px-6 pt-10 pb-16 md:px-12 md:pt-12 md:pb-20 lg:px-16">
         <div className="fade-up" style={{ animationDelay: "0.45s" }}>
-          <Showcase />
+          <Showcase
+            active={active}
+            onActiveChange={setActive}
+            onRotate={rotate}
+          />
         </div>
       </div>
     </section>
