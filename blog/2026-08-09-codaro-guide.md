@@ -1,14 +1,14 @@
 ---
-title: Codaro 사용법: 첫 코드 실행부터 내 파일 다루기
+title: 설치 없이 Python 첫 코드를 실행하는 방법
 date: 2026-08-09
-modified: 2026-08-09
+modified: 2026-08-10
 author: eddmpython
 section: Python 학습과 자동화
-summary: Codaro를 처음 쓰는 사람을 위해 첫 레슨을 여는 방법, 코드를 실행하는 방법, 내 컴퓨터의 파일을 다루는 방법을 순서대로 설명합니다.
-readerQuestion: Python을 설치하지 않고 Codaro에서 첫 코드를 어떻게 실행하고, 나중에 다운로드한 CSV 파일을 어떻게 읽을까?
-readerTakeaway: 처음에는 Codaro Web에서 코드를 실행하고, 내 컴퓨터의 파일이 필요해질 때 Codaro Local을 사용하면 된다.
+summary: Python 설치와 환경 설정에 막히기 전에, 브라우저에서 코드를 실행하고 한 줄을 바꿔 결과를 확인하는 방법을 순서대로 설명합니다.
+readerQuestion: Python을 아직 설치하지 않았는데, 브라우저에서 첫 코드를 어떻게 실행하고 내 파일은 언제부터 다룰 수 있을까?
+readerTakeaway: 처음에는 브라우저에서 코드를 실행해 보고, 내 컴퓨터의 파일이 필요할 때 설치형으로 넘어가면 된다.
 readerLevel: beginner
-readerStartingPoint: Python과 Codaro를 처음 접하고 셀, .py, Local이라는 말을 아직 모른다.
+readerStartingPoint: Python을 배우려 하지만 설치, .py, Local 같은 말은 아직 낯설다. Codaro라는 이름도 처음 본다.
 ogImage: https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/75/75e8abd651ab9e1d1dd850e8e5c64c3bc1b396a2cf4517652ce075f476f9c6a3.webp
 ogImageAlt: 하나의 코드 종이가 설명대와 실행 장치와 검사 장치를 차례로 지나가는 어두운 작업대
 ogImageWidth: 1536
@@ -20,15 +20,18 @@ Python을 처음 배운다고 해보겠습니다. 강의에는 `print("안녕하
 읽었지만 어디에 입력하고 어떤 버튼을 눌러야 하는지는 잘 모르겠습니다. Python 설치 방법을 검색하면
 처음 보는 설정과 프로그램 이름이 한꺼번에 나옵니다.
 
-Codaro에서는 설치부터 하지 않아도 됩니다. 웹사이트에서 레슨을 열고, 준비된 코드를 실행하고, 결과를
-바로 확인할 수 있습니다. 이 글은 Codaro를 처음 보는 사람이 그대로 따라 할 수 있도록 설명합니다.
-먼저 브라우저에서 코드를 실행하고, 나중에 내 컴퓨터의 파일이 필요할 때 무엇을 해야 하는지 알아봅니다.
+그 전에 할 수 있는 일이 있습니다. 브라우저에서 레슨을 열고, 준비된 코드를 실행하고, 숫자 하나를
+바꿔 결과가 달라지는지만 보면 됩니다. 이 글에서 쓰는 도구는 Codaro입니다. Codaro는 Python 학습
+화면에서 설명, 코드, 실행, 결과 확인을 한곳에 모아 둔 도구입니다.
+
+아래 순서로 따라가면 됩니다. 먼저 설치 없이 첫 실행을 해보고, 나중에 내 컴퓨터의 파일이 필요할 때
+무엇을 설치하면 되는지 알아봅니다.
 
 ## 설치하지 않고 첫 레슨을 엽니다
 
 ![닫힌 설치 도구 상자 옆으로 브라우저 학습 책상까지 길이 열린 모습](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/a6/a6880c33189b23b51c6700d7c27bba8fbfc383e57c44b1d28d22c4e0bb6796c2.webp "Python 설치보다 먼저 브라우저에서 첫 레슨을 열어 볼 수 있다")
 
-[Codaro Web 학습](https://eddmpython.com/codaro/learn/)을 엽니다. 여기서 Web은 브라우저에서 사용하는
+[Codaro Web 학습](https://eddmpython.com/codaro/learn/)을 엽니다. Web은 브라우저에서 쓰는
 버전이라는 뜻입니다. Chrome이나 Edge에서 페이지를 열 수 있으면 시작할 수 있습니다.
 
 레슨 목록에서 처음 배울 주제를 고릅니다. 레슨을 열면 제목 아래에 이번에 만들 결과가 나옵니다.
@@ -110,7 +113,7 @@ sales = [("서울", 120), ("부산", 85), ("서울", 40)]
 
 저장된 파일은 Codaro에서만 쓰는 파일이 아닙니다. 다른 Python 편집기에서도 열 수 있습니다. 명령을
 입력하는 프로그램인 터미널에서는 `python sales.py`라고 입력해 실행할 수도 있습니다. 나중에
-Codaro를 사용하지 않더라도 작성한 코드는 그대로 남습니다.
+도구를 바꾸더라도 작성한 코드는 그대로 남습니다.
 
 ## 코드가 길어지면 여러 셀로 나눕니다
 
@@ -157,8 +160,8 @@ Codaro를 사용하지 않더라도 작성한 코드는 그대로 남습니다.
 레슨에서는 바로 열 수 없습니다.
 
 이럴 때 [Codaro Local](https://github.com/eddmpython/codaro/releases/latest)을 설치합니다. Local은
-내 컴퓨터에서 실행되는 Codaro입니다. Web에서 연습한 `.py` 파일을 열고, `sales.csv`를 읽는 코드를
-추가할 수 있습니다.
+내 컴퓨터에서 실행되는 Codaro입니다. 브라우저에서 연습한 `.py` 파일을 열고, `sales.csv`를 읽는
+코드를 추가할 수 있습니다.
 
 Local에서는 다음과 같은 일을 할 수 있습니다.
 
@@ -175,13 +178,13 @@ Local에서는 다음과 같은 일을 할 수 있습니다.
 
 ![브라우저 학습 책상과 파일 작업실로 가는 길이 나뉜 모습](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/8e/8ec901a50dc312e29204cff5ab8bbbbd7fab616590dfcc9982298e2e216f9e9e.webp "처음에는 브라우저에서 연습하고 실제 파일이 필요해질 때 Local을 설치한다")
 
-Python을 처음 배우는 단계라면 Codaro Web만 사용해도 됩니다. 설치할 프로그램과 저장할 폴더를 먼저
-정하지 않아도 됩니다. 레슨을 열고 코드를 실행한 뒤 숫자 하나를 바꿔 보는 데 집중하면 됩니다.
+Python을 처음 배우는 단계라면 브라우저 버전만 사용해도 됩니다. 설치할 프로그램과 저장할 폴더를
+먼저 정하지 않아도 됩니다. 레슨을 열고 코드를 실행한 뒤 숫자 하나를 바꿔 보는 데 집중하면 됩니다.
 
-내 컴퓨터의 CSV나 엑셀 파일을 읽어야 할 때 Codaro Local로 넘어갑니다. 매일 같은 코드를 실행하거나
-결과 파일을 자동으로 저장하고 싶을 때도 Local이 필요합니다. Web에서 작성한 `.py` 파일을 그대로
+내 컴퓨터의 CSV나 엑셀 파일을 읽어야 할 때 Local로 넘어갑니다. 매일 같은 코드를 실행하거나 결과
+파일을 자동으로 저장하고 싶을 때도 Local이 필요합니다. 브라우저에서 작성한 `.py` 파일을 그대로
 열 수 있으므로 처음부터 다시 작성할 필요는 없습니다.
 
-[첫 Web 레슨](https://eddmpython.com/codaro/learn/lesson/30days/day01_%ED%97%AC%EB%A1%9C%EC%9B%94%EB%93%9C)을
-열고 `실행` 버튼을 한 번 누릅니다. 결과가 나오면 숫자나 글자 하나를 바꾸고 다시 누릅니다. 이 두
-번의 실행이 끝난 뒤에 다음 레슨으로 넘어가면 됩니다.
+[첫 레슨 열기](https://eddmpython.com/codaro/learn/lesson/30days/day01_%ED%97%AC%EB%A1%9C%EC%9B%94%EB%93%9C)를
+누르고 `실행`을 한 번 누릅니다. 결과가 나오면 숫자나 글자 하나를 바꾸고 다시 누릅니다. 이 두 번의
+실행이 끝난 뒤에 다음 레슨으로 넘어가면 됩니다.

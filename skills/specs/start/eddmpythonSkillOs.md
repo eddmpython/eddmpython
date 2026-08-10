@@ -43,6 +43,7 @@ OAuth 를 여기에 만들지 않는다.
 | 지금 실제로 도는 절차 | `skills/specs/operation/` |
 | 바깥을 향한 소개 | 루트 `README.md` |
 | 글 쓰는 방법 | `blog/PIPELINE.md` |
+| 제품 마케팅 맥락 | `blog/product-marketing.md` |
 | 다른 프로젝트에 쓸 규칙 템플릿 | `agent-template/` |
 
 ## 이 저장소의 실패 방식

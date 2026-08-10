@@ -21,6 +21,9 @@ status: curated
 | [`operation.seoContract`](seoContract.md) | 검색 노출 계약 | 렌더 방식을 바꾸기 전에 |
 | [`operation.brandAssets`](brandAssets.md) | 심볼과 파비콘, og | 로고를 바꿀 때 |
 | [`operation.blogPublishing`](blogPublishing.md) | 글 발행 | 글을 올릴 때 |
+| [`operation.productMarketing`](productMarketing.md) | 제품 마케팅 맥락 | 포지셔닝·한 줄 정의가 필요할 때 |
+| [`operation.blogCopy`](blogCopy.md) | 블로그 제목과 카피 | 제목·summary가 약할 때 |
+| [`operation.contentStrategy`](contentStrategy.md) | 글 주제 전략 | 다음 글을 고를 때 |
 | [`operation.visualVerification`](visualVerification.md) | 시각 검증과 승인 | 화면을 바꾸고 배포하기 전에 |
 | [`operation.workspace`](workspace.md) | 산출물과 임시 파일 | 작업을 끝낼 때 |
 | [`operation.secrets`](secrets.md) | 비밀정보와 공개 경계 | 커밋과 공개 전에 |

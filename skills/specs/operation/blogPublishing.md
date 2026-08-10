@@ -42,7 +42,7 @@ blog/YYYY-MM-DD-slug.md
 
 | 필드 | 설명 |
 |---|---|
-| `title` | 질문이거나 주장. 명사 나열 금지 |
+| `title` | 질문이거나 주장. 명사 나열 금지. 인지도 없는 제품명을 앞에 두지 않음 (`blog/PIPELINE.md` 1.5절) |
 | `date` | 발행일 `YYYY-MM-DD` |
 | `modified` | 마지막 수정일 |
 | `author` | 글쓴이 |
@@ -110,8 +110,10 @@ cd site && npm run verify:media
 
 ## 글 하나 발행하는 순서
 
-1. 독자의 출발점과 첫 행동을 정한 뒤 `blog/YYYY-MM-DD-slug.md`를 쓰고 모든 H2의 이미지 자리를
-   함께 정한다. 규칙은 `blog/PIPELINE.md`
+1. 독자의 출발점과 첫 행동을 정하고, `blog/PIPELINE.md` 1.5절 유입 패키징 게이트를 통과한 뒤
+   `blog/YYYY-MM-DD-slug.md`를 쓰고 모든 H2의 이미지 자리를 함께 정한다. 카피 판단은
+   `operation.blogCopy`, 주제 선택은 `operation.contentStrategy`, 제품 맥락은
+   `blog/product-marketing.md`를 본다.
 2. 섹션별 이미지를 만들고 `blog/media/plan.json` 에 H2, 의미, 출처, 최종 프롬프트를 남긴다
 3. `publish_media.py` 로 Hugging Face 에 올리고 `catalog.json` 을 갱신한다
 4. `cd site && npm test` 로 frontmatter 와 타입을 확인한다

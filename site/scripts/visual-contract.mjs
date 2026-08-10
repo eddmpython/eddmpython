@@ -54,7 +54,7 @@ const ROUTE_RULES = [
     match: (path) => path === "/blog/2026-08-09-codaro-guide",
     id: "codaro-guide",
     checks: [
-      TEXT("article#content h1", "Codaro 사용법"),
+      TEXT("article#content h1", "설치 없이 Python 첫 코드를 실행하는 방법"),
       COUNT('aside[aria-label^="Codaro 실습 셀:"]', { exact: 1 }),
       VISIBLE('textarea[aria-label="Python 코드"]'),
       TEXT('aside[aria-label^="Codaro 실습 셀:"] button', "실행"),

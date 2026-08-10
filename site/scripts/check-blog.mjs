@@ -17,7 +17,7 @@ const requiredMeta = [
   "readerStartingPoint",
 ];
 const readerLevels = new Set(["beginner", "working", "advanced"]);
-const allowedDocs = new Set(["PIPELINE.md"]);
+const allowedDocs = new Set(["PIPELINE.md", "product-marketing.md"]);
 const mediaSuffixes = new Set([
   ".svg",
   ".webp",
