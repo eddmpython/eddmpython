@@ -20,7 +20,8 @@ export function ProductRail({ active, onSelect }: Props) {
                 onClick={() => onSelect(mark.key)}
                 aria-label={`${mark.name} 화면 보기`}
                 aria-pressed={on}
-                className="group flex items-center gap-1.5 rounded-full outline-none sm:gap-2"
+                data-product-key={mark.key}
+                className="group flex cursor-pointer items-center gap-1.5 rounded-full outline-none sm:gap-2"
               >
                 <span
                   className={`relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--eddm-carbon)_55%,black)] ring-2 transition-[box-shadow,opacity] duration-500 sm:h-10 sm:w-10 ${

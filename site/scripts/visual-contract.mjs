@@ -31,7 +31,25 @@ const ROUTE_RULES = [
       TEXT("main#content h1", "실제로 작동하는 자동화로"),
       TEXT("main#content", "다루는 것"),
       COUNT('img[src^="/brand/"]', { min: 4 }),
+      VISIBLE(
+        'a[data-hero-product-link][href="https://eddmpython.github.io/dartlab/terminal"]',
+      ),
       VISIBLE("#products"),
+    ],
+    captures: [
+      {
+        id: "hero-product-link",
+        selector: "a[data-hero-product-link]",
+      },
+    ],
+    interactions: [
+      {
+        id: "select-xlpod",
+        type: "click-until-text",
+        click: 'button[data-product-key="xlpod"]',
+        target: 'a[data-hero-product-link][href="https://xlpod.eddmpython.com/"]',
+        includes: "xlpod 열기",
+      },
     ],
   },
   {
