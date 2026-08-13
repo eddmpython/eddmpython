@@ -35,7 +35,8 @@ const ROUTE_RULES = [
         'a[data-hero-product-link][href="https://eddmpython.github.io/dartlab/terminal"]',
       ),
       VISIBLE("#products"),
-      TEXT("#data", "339 GB"),
+      TEXT("#data", "400 GB+"),
+      TEXT("#data", "7,870"),
       VISIBLE(
         '#data a[href="https://huggingface.co/datasets/eddmpython/dartlab-data"]',
       ),

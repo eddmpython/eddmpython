@@ -1,6 +1,6 @@
 # Product Marketing Context
 
-**Document version:** v2
+**Document version:** v3
 **Last updated:** 2026-08-14
 
 이 파일은 블로그·랜딩 카피가 공유하는 제품 맥락이다. 확인된 공개 표면만 적는다.
@@ -22,7 +22,7 @@
 |---|---|---|---|---|
 | Codaro | 브라우저에서 Python 레슨을 열고 고쳐 실행하는 학습 도구 | Python 설치와 Codaro 이름을 모를 수 있음 | 설치 전 첫 실행, 한 줄 수정 후 결과 확인, 이후 Local로 파일 작업 | 가입 필수, 완전 자동 취업 보장 |
 | xlpod | 스프레드시트와 Python을 한 작업 공간에서 연결하는 도구 | Excel 반복 작업은 알지만 xlpod는 처음일 수 있음 | 표 반복 줄이기, 셀과 코드 연결 | 계정 없는 영구 무료 확정 |
-| DartLab | 공시·재무를 Python과 화면으로 읽는 분석 도구 | 종목과 공시는 알지만 DartLab은 처음일 수 있음 | 기업 한 곳으로 열기, 공시 원문 확인, 339 GB 공개 데이터셋 받기 | 투자 수익 보장 |
+| DartLab | 공시·재무를 Python과 화면으로 읽는 분석 도구 | 종목과 공시는 알지만 DartLab은 처음일 수 있음 | 기업 한 곳으로 열기, 공시 원문 확인, 400 GB+ 공개 데이터셋 받기 | 투자 수익 보장 |
 | pyproc | 브라우저에서 Python을 돌리는 런타임 | 개발 용어에 익숙할 수 있음 | 페이지 안 실행 셀, 데모 | 모든 패키지 지원 단정 |
 
 ## Blog packaging defaults
@@ -36,10 +36,25 @@
 
 - 홈 제품 문구: `site/src/products.ts`
 - DartLab 데이터 사실: `https://huggingface.co/datasets/eddmpython/dartlab-data`
+- DartLab 파일 목록: `https://huggingface.co/api/datasets/eddmpython/dartlab-data`
 - 블로그 사실: 해당 제품 공개 URL과 직접 실행
 - 이미지·OG: `blog/media/` + Hugging Face 객체
 
+### DartLab 데이터 스냅샷
+
+2026-08-14에 Hugging Face 공개 API의 저장소 파일 목록을 직접 세었다. 데이터 종류마다
+회사 범위가 다르므로 이를 하나의 상장사 수로 표현하지 않는다.
+
+| 기준 | 실측값 | 공개 문구 |
+|---|---:|---|
+| Hugging Face 전체 파일 규모 | 457 GB | 400 GB+ |
+| `dart/panel/*.parquet` | 2,939개 | 한국 기업별 공시 패널 |
+| `edgar/panel/*.parquet` | 7,870개 | 미국 기업별 공시 패널 |
+| `edgar/financeStmt/*.parquet` | 6,442개 | 필요할 때만 별도 표기 |
+| `edgar/prices/company/*.parquet` | 4,122개 | 필요할 때만 별도 표기 |
+
 ## Changelog
 
+- v3 (2026-08-14): Hugging Face 소개문 대신 실제 파일 목록을 세어 DartLab 데이터 규모를 바로잡음.
 - v2 (2026-08-14): DartLab 공개 데이터셋을 제품 근거와 전환 경로에 추가.
 - v1 (2026-08-10): 블로그 유입 패키징 게이트와 함께 초기 맥락 작성. Codaro 브랜드 선행 제목 실패를 반영.

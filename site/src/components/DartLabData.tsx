@@ -1,10 +1,11 @@
 import { useReveal } from "../useReveal";
 import { SOCIAL } from "../social";
+import { DARTLAB_DATA_SNAPSHOT as DATA } from "../dartLabData";
 
 const STATS = [
-  { value: "339 GB", label: "공개 데이터 전체 규모" },
-  { value: "약 2,700사", label: "한국 상장사" },
-  { value: "약 1,000사", label: "미국 주요 상장사" },
+  { value: DATA.totalFileSize, label: "전체 파일 규모" },
+  { value: DATA.dartPanelFiles.toLocaleString(), label: "한국 기업별 공시 패널" },
+  { value: DATA.edgarPanelFiles.toLocaleString(), label: "미국 기업별 공시 패널" },
   { value: "매일", label: "증분 업데이트" },
 ] as const;
 
@@ -31,12 +32,13 @@ export function DartLabData() {
               >
                 분석의 바탕이 되는
                 <br />
-                339 GB 공시 데이터
+                {DATA.publicSizeLabel} 공시 데이터
               </h2>
               <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-ivory/65 md:text-base">
                 한국 DART와 미국 SEC EDGAR 공시를 Parquet으로 구조화해
-                공개합니다. 재무제표, 사업보고서 본문, 구조화 공시, 시세와
-                거시지표를 한 저장소에서 받고 매일 새 데이터로 이어갑니다.
+                공개합니다. 실제 파일 목록을 세면 기업별 공시 패널은 한국
+                2,939개, 미국 7,870개입니다. 재무제표와 시세는 제공 범위가
+                서로 달라 하나의 상장사 수로 합치지 않습니다.
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-4">
                 <a
@@ -48,7 +50,9 @@ export function DartLabData() {
                   Hugging Face 데이터셋 열기
                   <span aria-hidden="true">↗</span>
                 </a>
-                <span className="text-xs text-ivory/45">CC BY 4.0</span>
+                <span className="text-xs text-ivory/45">
+                  {DATA.checkedAt} 파일 기준 · CC BY 4.0
+                </span>
               </div>
             </div>
 

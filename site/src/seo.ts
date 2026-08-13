@@ -1,6 +1,7 @@
 import { PRODUCTS } from "./products";
 import { POSTS, type Post } from "./posts";
 import { SOCIAL } from "./social";
+import { DARTLAB_DATA_SNAPSHOT } from "./dartLabData";
 
 export const ORIGIN = "https://eddmpython.com";
 
@@ -140,7 +141,7 @@ export function homeMeta(): PageMeta {
     title,
     socialTitle: title,
     description:
-      "339 GB 공개 공시 데이터, Python 학습, 스프레드시트 자동화, 브라우저 Python 런타임. DartLab, Codaro, xlpod, pyproc을 만들고 바로 실행할 수 있게 연결합니다.",
+      `${DARTLAB_DATA_SNAPSHOT.publicSizeLabel} 공개 공시 데이터, Python 학습, 스프레드시트 자동화, 브라우저 Python 런타임. DartLab, Codaro, xlpod, pyproc을 만들고 바로 실행할 수 있게 연결합니다.`,
     type: "website",
     image: DEFAULT_IMAGE,
     imageAlt: "eddmpython 로고와 DartLab, Codaro, xlpod, pyproc 제품 이름",

@@ -35,11 +35,12 @@ blog/product-marketing.md
 
 ## 작성 순서
 
-1. `site/src/products.ts`, 제품 랜딩 URL, 확인된 README만 읽는다.
-2. 확인하지 못한 수치, 미검증 후기는 넣지 않는다.
-3. 스튜디오(eddmpython)와 제품(Codaro, xlpod, DartLab, pyproc)을 표로 구분한다.
-4. 각 제품에 한 줄 정의, 독자 출발점, Jobs to be done, 쓰지 말 말만 적는다.
-5. Changelog에 무엇을 왜 바꿨는지 한 줄 남긴다.
+1. `site/src/products.ts`, 제품 랜딩 URL, 확인된 README를 읽는다.
+2. 데이터셋 수치는 소개문을 다시 인용하지 않고 공개 API의 실제 파일 목록을 센다.
+3. 확인하지 못한 수치, 미검증 후기는 넣지 않는다.
+4. 스튜디오(eddmpython)와 제품(Codaro, xlpod, DartLab, pyproc)을 표로 구분한다.
+5. 각 제품에 한 줄 정의, 독자 출발점, Jobs to be done, 쓰지 말 말만 적는다.
+6. Changelog에 무엇을 왜 바꿨는지 한 줄 남긴다.
 
 ## 넣지 않는 것
 

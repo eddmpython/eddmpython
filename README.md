@@ -105,13 +105,13 @@
 
 ## DartLab을 받치는 대량 데이터
 
-[**eddmpython/dartlab-data**](https://huggingface.co/datasets/eddmpython/dartlab-data)는 한국 DART와 미국 SEC EDGAR 공시를 Parquet으로 구조화한 공개 데이터셋입니다. 재무제표, 사업보고서 본문, 구조화 공시, 시세와 거시지표를 한곳에서 받고 매일 새 데이터로 이어갑니다.
+[**eddmpython/dartlab-data**](https://huggingface.co/datasets/eddmpython/dartlab-data)는 한국 DART와 미국 SEC EDGAR 공시를 Parquet으로 구조화한 공개 데이터셋입니다. 실제 저장소 파일 목록을 세면 기업별 공시 패널은 한국 2,939개, 미국 7,870개입니다. 재무제표와 시세는 제공 범위가 서로 달라 하나의 상장사 수로 합치지 않습니다.
 
 <table>
   <tr>
-    <td align="center"><strong>339 GB</strong><br /><sub>공개 데이터 전체 규모</sub></td>
-    <td align="center"><strong>약 2,700사</strong><br /><sub>한국 상장사</sub></td>
-    <td align="center"><strong>약 1,000사</strong><br /><sub>미국 주요 상장사</sub></td>
+    <td align="center"><strong>457 GB</strong><br /><sub>전체 파일 규모</sub></td>
+    <td align="center"><strong>2,939개</strong><br /><sub>한국 기업별 공시 패널</sub></td>
+    <td align="center"><strong>7,870개</strong><br /><sub>미국 기업별 공시 패널</sub></td>
     <td align="center"><strong>매일</strong><br /><sub>증분 업데이트</sub></td>
   </tr>
 </table>
@@ -119,7 +119,7 @@
 <p align="center">
   <strong><a href="https://huggingface.co/datasets/eddmpython/dartlab-data">Hugging Face에서 DartLab 데이터 열기</a></strong>
   &nbsp;·&nbsp;
-  CC BY 4.0
+  2026.08.14 파일 기준 · CC BY 4.0
 </p>
 
 ## 두 줄로 시작하기
