@@ -75,8 +75,29 @@ function validDate(value) {
   return !Number.isNaN(parsed.valueOf()) && parsed.toISOString().slice(0, 10) === value;
 }
 
+function fencedRanges(body) {
+  // 코드 펜스 내부는 문서 구조가 아니다. 열림/닫힘 쌍의 [시작, 끝) 오프셋을 모은다.
+  const ranges = [];
+  let open = null;
+  for (const match of body.matchAll(/^```.*$/gm)) {
+    if (open === null) {
+      open = match.index;
+    } else {
+      ranges.push([open, match.index + match[0].length]);
+      open = null;
+    }
+  }
+  if (open !== null) ranges.push([open, body.length]);
+  return ranges;
+}
+
 function h2Sections(body) {
-  const headings = [...body.matchAll(/^##[ \t]+(.+?)\s*$/gm)];
+  // 본문 예시 코드블록 안의 ## 줄을 H2로 세지 않는다 (H1 검사의 bodyOutsideCode와 같은 원칙).
+  const ranges = fencedRanges(body);
+  const insideFence = (index) => ranges.some(([start, end]) => index >= start && index < end);
+  const headings = [...body.matchAll(/^##[ \t]+(.+?)\s*$/gm)].filter(
+    (heading) => !insideFence(heading.index),
+  );
   return headings.map((heading, index) => ({
     heading: heading[1].trim(),
     content: body.slice(
