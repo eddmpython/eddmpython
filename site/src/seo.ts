@@ -1,5 +1,6 @@
 import { PRODUCTS } from "./products";
 import { POSTS, type Post } from "./posts";
+import { SOCIAL } from "./social";
 
 export const ORIGIN = "https://eddmpython.com";
 
@@ -66,6 +67,24 @@ const BLOG = {
   publisher: { "@id": ORG_ID },
 };
 
+const DARTLAB_DATA = {
+  "@type": "Dataset",
+  "@id": `${SOCIAL.dartlabData}#dataset`,
+  name: "DartLab Data",
+  alternateName: "eddmpython/dartlab-data",
+  description:
+    "한국 DART와 미국 SEC EDGAR 공시, 재무제표, 사업보고서 본문, 시세와 거시지표를 Parquet으로 구조화한 공개 데이터셋입니다.",
+  url: SOCIAL.dartlabData,
+  license: "https://creativecommons.org/licenses/by/4.0/",
+  creator: { "@id": ORG_ID },
+  inLanguage: ["ko-KR", "en-US"],
+  distribution: {
+    "@type": "DataDownload",
+    contentUrl: SOCIAL.dartlabData,
+    encodingFormat: "application/vnd.apache.parquet",
+  },
+};
+
 const APPS = PRODUCTS.map((product, index) => ({
   "@type": "ListItem",
   position: index + 1,
@@ -121,7 +140,7 @@ export function homeMeta(): PageMeta {
     title,
     socialTitle: title,
     description:
-      "공시 데이터, Python 학습, 스프레드시트 자동화, 브라우저 Python 런타임. DartLab, Codaro, xlpod, pyproc 을 만듭니다. 설치 없이 브라우저에서 바로 실행해 볼 수 있습니다.",
+      "339 GB 공개 공시 데이터, Python 학습, 스프레드시트 자동화, 브라우저 Python 런타임. DartLab, Codaro, xlpod, pyproc을 만들고 바로 실행할 수 있게 연결합니다.",
     type: "website",
     image: DEFAULT_IMAGE,
     imageAlt: "eddmpython 로고와 DartLab, Codaro, xlpod, pyproc 제품 이름",
@@ -129,7 +148,7 @@ export function homeMeta(): PageMeta {
     imageWidth: 1200,
     imageHeight: 630,
     jsonLd: [
-      graph(ORG, SITE),
+      graph(ORG, SITE, DARTLAB_DATA),
       {
         "@context": "https://schema.org",
         "@type": "ItemList",

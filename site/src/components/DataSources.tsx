@@ -15,7 +15,7 @@ const SOURCES: Source[] = [
   { name: "SharePoint", note: "조직 문서함" },
   { name: "PyPI", note: "Python 패키지" },
   { name: "npm", note: "브라우저 런타임" },
-  { name: "Hugging Face", note: "데이터셋 배포" },
+  { name: "Hugging Face", note: "DartLab 데이터셋" },
 ];
 
 function SourceCard({ source, index }: { source: Source; index: number }) {
@@ -34,7 +34,7 @@ function SourceCard({ source, index }: { source: Source; index: number }) {
 
 export function DataSources() {
   return (
-    <section id="data" className="scroll-mt-16">
+    <section id="connections" className="scroll-mt-16">
       <div className="mx-auto w-full max-w-5xl px-6 py-16 md:py-24">
         <SectionHead
           title="쓰던 데이터와 파일 그대로"

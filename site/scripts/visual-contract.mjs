@@ -35,11 +35,25 @@ const ROUTE_RULES = [
         'a[data-hero-product-link][href="https://eddmpython.github.io/dartlab/terminal"]',
       ),
       VISIBLE("#products"),
+      TEXT("#data", "339 GB"),
+      VISIBLE(
+        '#data a[href="https://huggingface.co/datasets/eddmpython/dartlab-data"]',
+      ),
+      TEXT("#euddeum", "으뜸이"),
+      COUNT('#euddeum img[src^="/brand/euddeum-"]', { exact: 4 }),
     ],
     captures: [
       {
         id: "hero-product-link",
         selector: "a[data-hero-product-link]",
+      },
+      {
+        id: "dartlab-data",
+        selector: "#data article",
+      },
+      {
+        id: "euddeum",
+        selector: "#euddeum",
       },
     ],
     interactions: [

@@ -13,7 +13,8 @@ const CHANNELS = [
 const REGISTRIES = [
   { label: "PyPI · dartlab", href: "https://pypi.org/project/dartlab/" },
   { label: "npm · pyproc", href: "https://www.npmjs.com/package/pyproc" },
-  { label: "Hugging Face", href: "https://huggingface.co/eddmpython" },
+  { label: "DartLab 데이터", href: SOCIAL.dartlabData },
+  { label: "Hugging Face", href: SOCIAL.huggingFace },
 ];
 
 export function Footer() {

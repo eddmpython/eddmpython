@@ -1,5 +1,7 @@
 import { Hero } from "../components/Hero";
 import { Products } from "../components/Products";
+import { DartLabData } from "../components/DartLabData";
+import { Euddeum } from "../components/Euddeum";
 import { DataSources } from "../components/DataSources";
 import { Philosophy } from "../components/Philosophy";
 import { Faq } from "../components/Faq";
@@ -11,6 +13,8 @@ export function Home() {
       <main id="content">
         <Hero />
         <Products />
+        <DartLabData />
+        <Euddeum />
         <DataSources />
         <Philosophy />
         <Faq />

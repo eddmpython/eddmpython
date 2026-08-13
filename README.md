@@ -1,5 +1,13 @@
 <p align="center">
   <a href="https://eddmpython.com">
+    <img src="https://eddmpython.com/favicon.svg" width="96" height="96" alt="스스로를 물고 도는 eddmpython 뱀 심볼" />
+  </a>
+</p>
+
+<h1 align="center">eddmpython</h1>
+
+<p align="center">
+  <a href="https://eddmpython.com">
     <img src="./site/public/og.png" width="100%" alt="eddmpython, 복잡한 업무를 실제로 작동하는 자동화로" />
   </a>
 </p>
@@ -18,6 +26,37 @@
   &nbsp;·&nbsp;
   <a href="https://www.threads.com/@eddmpython">Threads</a>
 </p>
+
+## 안녕하세요, 으뜸이입니다
+
+으뜸이를 캐릭터화한 분홍 뱀입니다. 낯선 데이터와 도구를 조금 더 가깝게 설명하려고 GitHub, Threads, YouTube의 아바타와 콘텐츠에 다양한 포즈로 등장합니다.
+
+<p align="center">
+  <img src="./site/public/brand/euddeum-avatar.webp" width="180" alt="EDDM Python 이름표를 든 으뜸이 SNS 아바타" />
+</p>
+
+<table>
+  <tr>
+    <td width="33.33%" align="center" valign="top">
+      <a href="https://www.threads.com/@eddmpython">
+        <img src="./site/public/brand/euddeum-wave.webp" width="100%" alt="꼬리를 흔들며 인사하는 으뜸이" />
+      </a>
+      <br /><strong>반갑게 인사하고</strong><br /><sub>Threads</sub>
+    </td>
+    <td width="33.33%" align="center" valign="top">
+      <a href="https://www.youtube.com/@eddmpython">
+        <img src="./site/public/brand/euddeum-analyze.webp" width="100%" alt="돋보기로 데이터를 분석하는 으뜸이" />
+      </a>
+      <br /><strong>데이터를 들여다보고</strong><br /><sub>YouTube</sub>
+    </td>
+    <td width="33.33%" align="center" valign="top">
+      <a href="https://github.com/eddmpython">
+        <img src="./site/public/brand/euddeum-build.webp" width="100%" alt="노트북으로 제품을 만드는 으뜸이" />
+      </a>
+      <br /><strong>작동하는 것을 만들어요</strong><br /><sub>GitHub</sub>
+    </td>
+  </tr>
+</table>
 
 ## 지금 바로 써보는 제품
 
@@ -64,6 +103,25 @@
   </tr>
 </table>
 
+## DartLab을 받치는 대량 데이터
+
+[**eddmpython/dartlab-data**](https://huggingface.co/datasets/eddmpython/dartlab-data)는 한국 DART와 미국 SEC EDGAR 공시를 Parquet으로 구조화한 공개 데이터셋입니다. 재무제표, 사업보고서 본문, 구조화 공시, 시세와 거시지표를 한곳에서 받고 매일 새 데이터로 이어갑니다.
+
+<table>
+  <tr>
+    <td align="center"><strong>339 GB</strong><br /><sub>공개 데이터 전체 규모</sub></td>
+    <td align="center"><strong>약 2,700사</strong><br /><sub>한국 상장사</sub></td>
+    <td align="center"><strong>약 1,000사</strong><br /><sub>미국 주요 상장사</sub></td>
+    <td align="center"><strong>매일</strong><br /><sub>증분 업데이트</sub></td>
+  </tr>
+</table>
+
+<p align="center">
+  <strong><a href="https://huggingface.co/datasets/eddmpython/dartlab-data">Hugging Face에서 DartLab 데이터 열기</a></strong>
+  &nbsp;·&nbsp;
+  CC BY 4.0
+</p>
+
 ## 두 줄로 시작하기
 
 ```bash
@@ -98,6 +156,6 @@ AI 작업 환경 템플릿의 역할과 적용 순서는 [agent-template/README.
 
 ## 함께 보기
 
-[웹사이트](https://eddmpython.com) · [블로그](https://eddmpython.com/blog) · [Hugging Face](https://huggingface.co/eddmpython) · [Threads](https://www.threads.com/@eddmpython) · [YouTube](https://www.youtube.com/@eddmpython) · [이메일](mailto:eddmpython@gmail.com)
+[웹사이트](https://eddmpython.com) · [블로그](https://eddmpython.com/blog) · [DartLab 데이터](https://huggingface.co/datasets/eddmpython/dartlab-data) · [Hugging Face](https://huggingface.co/eddmpython) · [Threads](https://www.threads.com/@eddmpython) · [YouTube](https://www.youtube.com/@eddmpython) · [이메일](mailto:eddmpython@gmail.com)
 
 코드는 MIT 라이선스로 공개합니다. 브랜드 자산과 제품 스크린샷의 조건은 [LICENSE](LICENSE)를 확인해 주세요

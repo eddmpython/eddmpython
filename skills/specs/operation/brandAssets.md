@@ -34,6 +34,23 @@ status: observed
 `src/productMarks.ts` 가 가리킨다. 제품 사이트 공개 brand URL에서 가져온 것이며, 제품
 소스를 복제한 것이 아니다.
 
+## 으뜸이 캐릭터
+
+으뜸이는 eddmpython의 SNS 아바타에 쓰는 분홍 뱀 캐릭터다. 브랜드 심볼을 캐릭터로 다시
+그린 것이 아니라 사람 으뜸이를 캐릭터화한 별도 자산이다. 심볼을 대신하지 않으며 헤더,
+파비콘, 제품 마크에는 쓰지 않는다.
+
+| 파일 | 포즈 | 연결 채널 |
+|---|---|---|
+| `site/public/brand/euddeum-avatar.webp` | EDDM Python 이름표를 든 원본 아바타 | SNS 공통 |
+| `site/public/brand/euddeum-wave.webp` | 꼬리로 인사 | Threads |
+| `site/public/brand/euddeum-analyze.webp` | 돋보기로 데이터 분석 | YouTube |
+| `site/public/brand/euddeum-build.webp` | 노트북으로 제품 만들기 | GitHub |
+
+2026-08-14에 공개 GitHub 프로필 아바타를 정체성 기준으로 삼아 ImageGen으로 생성했다.
+분홍색은 이 캐릭터 이미지 픽셀 안에서만 허용한다. UI 배경, 테두리, 글자, 강조색과
+`--eddm-*` 토큰에는 확장하지 않는다.
+
 ## 심볼
 
 매듭을 이루며 스스로를 무는 뱀이다. Python 과 반복을 한 형태로 잡는다.
@@ -43,9 +60,9 @@ status: observed
 - 잉크 경계가 viewBox 에 꼭 맞는다. 여백은 쓰는 쪽이 정한다
 - 가로세로 1.13 으로 정사각에 가깝다. 앱 아이콘 마스크에 그대로 들어간다
 
-## 눈은 모래빛이다
+## 심볼 눈은 모래빛이다
 
-강행규칙이 핑크 계열을 금지한다. 실측으로 **48px 아래에서는 눈이 보이지 않으므로**
+심볼과 UI에는 핑크 계열을 쓰지 않는다. 실측으로 **48px 아래에서는 눈이 보이지 않으므로**
 작은 크기의 판독에는 영향이 없고, 큰 크기에서만 브랜드 색으로 읽힌다.
 
 ## 작은 크기에서 획을 깎지 않는다

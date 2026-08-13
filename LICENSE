@@ -26,9 +26,10 @@ Brand assets are not covered by the MIT License above.
 
 The eddmpython name, the logo mark and wordmark (including `site/public/favicon.svg`,
 `site/public/og.png`, and the SVG paths in `site/src/components/Logo.tsx`), and the
-product screenshots under `site/public/shots/` are excluded from the MIT grant. They
-are included so the site can be built and run as-is. They may not be used to identify
-a different product or organization, or in any way that implies endorsement by or
+Euddeum character assets under `site/public/brand/euddeum-*.webp`, and the product
+screenshots under `site/public/shots/` are excluded from the MIT grant. They are
+included so the site can be built and run as-is. They may not be used to identify a
+different product or organization, or in any way that implies endorsement by or
 affiliation with eddmpython.
 
 The screenshots additionally depict third-party content that eddmpython does not own:

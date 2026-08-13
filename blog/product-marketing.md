@@ -1,7 +1,7 @@
 # Product Marketing Context
 
-**Document version:** v1  
-**Last updated:** 2026-08-10
+**Document version:** v2
+**Last updated:** 2026-08-14
 
 이 파일은 블로그·랜딩 카피가 공유하는 제품 맥락이다. 확인된 공개 표면만 적는다.
 운영 절차는 `skills/specs/operation/productMarketing.md`를 본다.
@@ -22,7 +22,7 @@
 |---|---|---|---|---|
 | Codaro | 브라우저에서 Python 레슨을 열고 고쳐 실행하는 학습 도구 | Python 설치와 Codaro 이름을 모를 수 있음 | 설치 전 첫 실행, 한 줄 수정 후 결과 확인, 이후 Local로 파일 작업 | 가입 필수, 완전 자동 취업 보장 |
 | xlpod | 스프레드시트와 Python을 한 작업 공간에서 연결하는 도구 | Excel 반복 작업은 알지만 xlpod는 처음일 수 있음 | 표 반복 줄이기, 셀과 코드 연결 | 계정 없는 영구 무료 확정 |
-| DartLab | 공시·재무를 Python과 화면으로 읽는 분석 도구 | 종목과 공시는 알지만 DartLab은 처음일 수 있음 | 기업 한 곳으로 열기, 공시 원문 확인 | 투자 수익 보장 |
+| DartLab | 공시·재무를 Python과 화면으로 읽는 분석 도구 | 종목과 공시는 알지만 DartLab은 처음일 수 있음 | 기업 한 곳으로 열기, 공시 원문 확인, 339 GB 공개 데이터셋 받기 | 투자 수익 보장 |
 | pyproc | 브라우저에서 Python을 돌리는 런타임 | 개발 용어에 익숙할 수 있음 | 페이지 안 실행 셀, 데모 | 모든 패키지 지원 단정 |
 
 ## Blog packaging defaults
@@ -35,9 +35,11 @@
 ## Proof sources
 
 - 홈 제품 문구: `site/src/products.ts`
+- DartLab 데이터 사실: `https://huggingface.co/datasets/eddmpython/dartlab-data`
 - 블로그 사실: 해당 제품 공개 URL과 직접 실행
 - 이미지·OG: `blog/media/` + Hugging Face 객체
 
 ## Changelog
 
-- v1 (2026-08-10) — 블로그 유입 패키징 게이트와 함께 초기 맥락 작성. Codaro 브랜드 선행 제목 실패를 반영.
+- v2 (2026-08-14): DartLab 공개 데이터셋을 제품 근거와 전환 경로에 추가.
+- v1 (2026-08-10): 블로그 유입 패키징 게이트와 함께 초기 맥락 작성. Codaro 브랜드 선행 제목 실패를 반영.
