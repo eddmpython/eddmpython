@@ -29,7 +29,7 @@ const DOT = {
   "bg-dartlab": "#7da2e8",
   "bg-codaro": "#dfa14e",
   "bg-xlpod": "#57b98a",
-  "bg-pyproc": "#b48ddb",
+  "bg-pyproc": "#ff5a36",
 };
 
 const CANDIDATES = [
