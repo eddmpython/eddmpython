@@ -303,7 +303,6 @@ plan의 대체 텍스트와 실제 이미지의 너비, 높이, MIME을 frontmat
 
 ```bash
 python -m pip install -r blog/requirements.txt
-hf auth login
 ```
 
 HF 데이터셋을 처음 만들 때만 `--create-repo`를 붙인다.
@@ -322,8 +321,9 @@ python -X utf8 blog/scripts/publish_media.py --asset 20260808-example/hero --cre
 6. 교체 뒤 어떤 asset도 가리키지 않는 예전 객체 레코드를 catalog에서 정리한다.
 7. 성공한 로컬 작업본과 빈 staging 폴더를 삭제한다.
 
-업로드나 원격 확인이 실패하면 본문과 catalog를 바꾸지 않는다. `HF_TOKEN`을 쓸 때는 환경변수나
-Hugging Face 로컬 로그인 저장소에만 두고 Git, 문서, 로그에 값을 남기지 않는다.
+업로드나 원격 확인이 실패하면 본문과 catalog를 바꾸지 않는다. 발행 스크립트는 이미 설정된 셸
+환경변수를 먼저 쓰고, 없으면 eddmpython 루트 `.env`, 형제 DartLab `.env` 순서로 필요한 값을 읽는다.
+`HF_TOKEN`은 이 로컬 저장소에만 두고 Git, 문서, 로그에 값을 남기지 않는다.
 
 ## 7. 발행한다
 

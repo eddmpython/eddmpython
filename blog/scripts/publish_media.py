@@ -8,8 +8,12 @@ import json
 import os
 import re
 import struct
+import sys
 from copy import deepcopy
 from pathlib import Path
+
+sys.dont_write_bytecode = True
+from project_env import load_project_env
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -301,6 +305,7 @@ def updated_post(
 
 
 def resolve_token() -> str | None:
+    load_project_env()
     token = os.environ.get("HF_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN")
     if token:
         return token

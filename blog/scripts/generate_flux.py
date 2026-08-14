@@ -18,6 +18,9 @@ from pathlib import Path
 
 import requests
 
+sys.dont_write_bytecode = True
+from project_env import load_project_env
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PLAN_PATH = REPO_ROOT / "blog" / "media" / "plan.json"
 STAGING_ROOT = REPO_ROOT.parent / "eddmpython.out" / "blog-media"
@@ -55,15 +58,10 @@ def composePrompt(asset: dict[str, object]) -> str:
 
 
 def loadToken() -> str:
+    load_project_env()
     token = os.getenv("REPLICATE_API_TOKEN", "")
-    envPath = REPO_ROOT / ".env"
-    if not token and envPath.exists():
-        for line in envPath.read_text(encoding="utf-8").splitlines():
-            if line.startswith("REPLICATE_API_TOKEN="):
-                token = line.split("=", 1)[1].strip()
-                break
     if not token:
-        sys.exit("저장소 루트 .env에 REPLICATE_API_TOKEN이 필요하다.")
+        sys.exit("eddmpython 또는 DartLab .env에 REPLICATE_API_TOKEN이 필요하다.")
     return token
 
 
