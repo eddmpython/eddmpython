@@ -477,7 +477,8 @@
       "prerequisites": ["excel-automation"],
       "artifact": "열 별칭과 날짜 및 금액 정리 규칙이 있는 표준화 함수",
       "completionCheck": "기본 파일 세 개와 변형 파일 한 개의 행 수와 금액을 빠짐없이 합친다",
-      "status": "planned"
+      "postSlug": "excel-data-normalization",
+      "status": "published"
     },
     {
       "order": 22,
@@ -490,7 +491,8 @@
       "prerequisites": ["normalize-variant-excel"],
       "artifact": "정상 행과 확인필요 행을 나눈 데이터 품질 보고서",
       "completionCheck": "입력 모든 행이 정상 또는 확인필요 중 한곳에 있고 누락 건수가 0이다",
-      "status": "planned"
+      "postSlug": "pandas-missing-duplicates",
+      "status": "published"
     },
     {
       "order": 23,
@@ -503,7 +505,8 @@
       "prerequisites": ["excel-automation"],
       "artifact": "부서별 건수와 금액이 있는 groupby 요약표",
       "completionCheck": "부서별 금액 합계의 총합과 통합내역 정상 금액 합계의 차이가 0이다",
-      "status": "planned"
+      "postSlug": "pandas-groupby-summary",
+      "status": "published"
     },
     {
       "order": 24,
@@ -516,7 +519,8 @@
       "prerequisites": ["excel-automation", "groupby-summary"],
       "artifact": "네 시트에 열 너비와 숫자 형식 및 틀 고정이 적용된 결과 Excel",
       "completionCheck": "파일을 다시 열어 시트 이름과 값 및 서식이 유지되는지 확인한다",
-      "status": "planned"
+      "postSlug": "openpyxl-excel-output",
+      "status": "published"
     },
     {
       "order": 25,
