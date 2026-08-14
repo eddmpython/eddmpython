@@ -165,32 +165,87 @@ if (
   fail("blog/embeds/codaro-cells.json", "version 또는 examples 계약이 잘못됐습니다");
 }
 if (
-  curriculum.version !== 2 ||
+  curriculum.version !== 3 ||
   !validDate(curriculum.updated) ||
   !String(curriculum.title ?? "").trim() ||
   !String(curriculum.promise ?? "").trim() ||
+  !String(curriculum.audience ?? "").trim() ||
+  !String(curriculum.completionOutcome ?? "").trim() ||
+  !Array.isArray(curriculum.modules) ||
+  !curriculum.modules.length ||
+  !Array.isArray(curriculum.deliveryProfiles) ||
+  !curriculum.deliveryProfiles.length ||
   !Array.isArray(curriculum.stages) ||
   !curriculum.stages.length
 ) {
-  fail("blog/curriculum.json", "version, updated, title, promise 또는 stages 계약이 잘못됐습니다");
+  fail(
+    "blog/curriculum.json",
+    "version, 과정 설명, modules, deliveryProfiles 또는 stages 계약이 잘못됐습니다",
+  );
 }
 
+const curriculumId = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const moduleIds = new Set();
+let previousModuleOrder = 0;
+for (const module of curriculum.modules) {
+  const id = String(module?.id ?? "");
+  const order = Number(module?.order);
+  if (!curriculumId.test(id)) fail("blog/curriculum.json", `올바르지 않은 module id: ${id}`);
+  if (moduleIds.has(id)) fail("blog/curriculum.json", `module id가 중복됐습니다: ${id}`);
+  if (!Number.isInteger(order) || order !== previousModuleOrder + 1) {
+    fail("blog/curriculum.json", `module order가 1부터 빈 번호 없이 이어지지 않습니다: ${order}`);
+  }
+  if (!String(module.title ?? "").trim() || !String(module.outcome ?? "").trim()) {
+    fail("blog/curriculum.json", `${id}의 title 또는 outcome이 비었습니다`);
+  }
+  moduleIds.add(id);
+  previousModuleOrder = order;
+}
+
+const lessonTypes = new Set([
+  "orientation",
+  "concept",
+  "guided-practice",
+  "troubleshooting",
+  "project",
+  "assessment",
+  "transfer",
+  "reference",
+]);
 const curriculumIds = new Set();
 const curriculumOrders = new Set();
+const curriculumOrderById = new Map();
+const moduleStageCounts = new Map([...moduleIds].map((id) => [id, 0]));
 let previousCurriculumOrder = 0;
 for (const stage of curriculum.stages) {
   const id = String(stage?.id ?? "");
   const order = Number(stage?.order);
+  const moduleId = String(stage?.moduleId ?? "");
   const status = String(stage?.status ?? "");
-  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id)) {
+  if (!curriculumId.test(id)) {
     fail("blog/curriculum.json", `올바르지 않은 stage id: ${id}`);
   }
-  if (!Number.isInteger(order) || order <= previousCurriculumOrder || curriculumOrders.has(order)) {
-    fail("blog/curriculum.json", `stage order가 오름차순 정수로 이어지지 않습니다: ${order}`);
+  if (!Number.isInteger(order) || order !== previousCurriculumOrder + 1 || curriculumOrders.has(order)) {
+    fail("blog/curriculum.json", `stage order가 1부터 빈 번호 없이 이어지지 않습니다: ${order}`);
   }
   if (curriculumIds.has(id)) fail("blog/curriculum.json", `stage id가 중복됐습니다: ${id}`);
+  if (!moduleIds.has(moduleId)) fail("blog/curriculum.json", `${id}의 moduleId가 없습니다: ${moduleId}`);
   if (!String(stage.title ?? "").trim() || !String(stage.question ?? "").endsWith("?")) {
     fail("blog/curriculum.json", `${id}의 title 또는 question이 잘못됐습니다`);
+  }
+  if (!lessonTypes.has(String(stage.lessonType ?? ""))) {
+    fail("blog/curriculum.json", `${id}의 lessonType이 잘못됐습니다: ${stage.lessonType}`);
+  }
+  if (!Number.isInteger(stage.studyMinutes) || stage.studyMinutes < 5 || stage.studyMinutes > 120) {
+    fail("blog/curriculum.json", `${id}의 studyMinutes는 5분부터 120분 사이 정수여야 합니다`);
+  }
+  if (!Array.isArray(stage.prerequisites) || new Set(stage.prerequisites).size !== stage.prerequisites.length) {
+    fail("blog/curriculum.json", `${id}의 prerequisites가 배열이 아니거나 중복됐습니다`);
+  }
+  for (const prerequisite of stage.prerequisites) {
+    if (!curriculumIds.has(prerequisite)) {
+      fail("blog/curriculum.json", `${id}의 선수 단계는 자신보다 먼저 있어야 합니다: ${prerequisite}`);
+    }
   }
   if (!String(stage.artifact ?? "").trim() || !String(stage.completionCheck ?? "").trim()) {
     fail("blog/curriculum.json", `${id}의 artifact 또는 completionCheck가 비었습니다`);
@@ -203,7 +258,45 @@ for (const stage of curriculum.stages) {
   }
   curriculumIds.add(id);
   curriculumOrders.add(order);
+  curriculumOrderById.set(id, order);
+  moduleStageCounts.set(moduleId, moduleStageCounts.get(moduleId) + 1);
   previousCurriculumOrder = order;
+}
+for (const [moduleId, count] of moduleStageCounts) {
+  if (!count) fail("blog/curriculum.json", `${moduleId} module에 stage가 없습니다`);
+}
+
+const deliveryProfileIds = new Set();
+for (const profile of curriculum.deliveryProfiles) {
+  const id = String(profile?.id ?? "");
+  if (!curriculumId.test(id)) fail("blog/curriculum.json", `올바르지 않은 delivery profile id: ${id}`);
+  if (deliveryProfileIds.has(id)) fail("blog/curriculum.json", `delivery profile id가 중복됐습니다: ${id}`);
+  if (
+    !String(profile.title ?? "").trim() ||
+    !String(profile.description ?? "").trim() ||
+    !String(profile.outcome ?? "").trim()
+  ) {
+    fail("blog/curriculum.json", `${id}의 title, description 또는 outcome이 비었습니다`);
+  }
+  if (!Number.isInteger(profile.durationMinutes) || profile.durationMinutes < 30) {
+    fail("blog/curriculum.json", `${id}의 durationMinutes는 30분 이상 정수여야 합니다`);
+  }
+  if (!Array.isArray(profile.stageIds) || !profile.stageIds.length) {
+    fail("blog/curriculum.json", `${id}의 stageIds가 비었습니다`);
+  }
+  if (new Set(profile.stageIds).size !== profile.stageIds.length) {
+    fail("blog/curriculum.json", `${id}의 stageIds가 중복됐습니다`);
+  }
+  let previousProfileOrder = 0;
+  for (const stageId of profile.stageIds) {
+    const stageOrder = curriculumOrderById.get(stageId);
+    if (!stageOrder) fail("blog/curriculum.json", `${id}에 없는 stage가 있습니다: ${stageId}`);
+    if (stageOrder <= previousProfileOrder) {
+      fail("blog/curriculum.json", `${id}의 stageIds가 학습 순서와 다릅니다: ${stageId}`);
+    }
+    previousProfileOrder = stageOrder;
+  }
+  deliveryProfileIds.add(id);
 }
 for (const [id, example] of Object.entries(codaroEmbeds.examples)) {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id) || !example || typeof example !== "object") {
@@ -547,12 +640,27 @@ for (const file of posts) {
   }
 }
 
+const mappedPostSlugs = new Map();
 for (const stage of curriculum.stages) {
   if (stage.status === "published" && !slugs.has(stage.postSlug)) {
     fail("blog/curriculum.json", `${stage.id}의 발행 글을 찾지 못했습니다: ${stage.postSlug}`);
   }
+  if (stage.status === "published") {
+    if (mappedPostSlugs.has(stage.postSlug)) {
+      fail(
+        "blog/curriculum.json",
+        `${stage.postSlug}가 여러 stage에 연결됐습니다: ${mappedPostSlugs.get(stage.postSlug)}, ${stage.id}`,
+      );
+    }
+    mappedPostSlugs.set(stage.postSlug, stage.id);
+  }
   if (stage.status === "planned" && stage.postSlug && slugs.has(stage.postSlug)) {
     fail("blog/curriculum.json", `${stage.id}는 글이 있으므로 published로 바꿔야 합니다`);
+  }
+}
+for (const slug of slugs.keys()) {
+  if (!mappedPostSlugs.has(slug)) {
+    fail("blog/curriculum.json", `${slug} 글이 어떤 curriculum stage에도 연결되지 않았습니다`);
   }
 }
 

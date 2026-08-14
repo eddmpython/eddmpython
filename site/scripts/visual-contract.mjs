@@ -83,6 +83,11 @@ const ROUTE_RULES = [
       COUNT('section[aria-labelledby="curriculum-title"] ol > li', {
         exact: curriculum.stages.length,
       }),
+      COUNT('[data-curriculum-module]', { exact: curriculum.modules.length }),
+      COUNT('[data-curriculum-profile]', {
+        exact: curriculum.deliveryProfiles.length,
+      }),
+      TEXT('section[aria-labelledby="curriculum-title"]', `공개 ${curriculum.stages.filter((stage) => stage.status === "published").length} / 전체 ${curriculum.stages.length}`),
       COUNT('a[href^="/blog/"]', { min: 1 }),
     ],
   },

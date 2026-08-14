@@ -53,6 +53,9 @@ def composePrompt(asset: dict[str, object]) -> str:
             f"Relationship the image must explain: {asset['visualRelationship']}",
             "Do not replace the concrete subject with a generic workshop, road, gate, machine, or decorative metaphor.",
             "The image is rejected if a reader cannot connect it to this section without guessing.",
+            "Final rendering constraint. The article title, subtitle, claim, and subject above are context only. Never draw or copy them into the image.",
+            "Render only unlabeled geometric cards, spreadsheet grids, file shapes, arrows, color states, and check or stop icons.",
+            "No typography of any kind: no words, letters, numbers, code, labels, captions, headings, UI copy, pseudo-text, or watermark.",
         )
     )
 
