@@ -407,7 +407,8 @@
       "prerequisites": ["uv-environment"],
       "artifact": "input, output, src, tests와 실행 명령을 설명한 README.md",
       "completionCheck": "새 폴더에서 README의 명령만 따라 결과 파일을 다시 만든다",
-      "status": "planned"
+      "postSlug": "python-project-runbook",
+      "status": "published"
     },
     {
       "order": 17,
@@ -420,7 +421,8 @@
       "prerequisites": ["scripts-ide", "uv-environment"],
       "artifact": "다운로드, 권한, 확장, uv 오류별 복구 확인표",
       "completionCheck": "문제 상황 하나에서 대체 경로로 main.py 실행 결과를 만든다",
-      "status": "planned"
+      "postSlug": "windows-python-recovery",
+      "status": "published"
     },
     {
       "order": 18,
@@ -433,7 +435,8 @@
       "prerequisites": ["collections-data", "libraries-import"],
       "artifact": "Excel 셀과 DataFrame의 행, 열, 자료형을 연결한 표",
       "completionCheck": "다섯 행 Excel을 읽고 열 이름과 행 수 및 자료형을 출력한다",
-      "status": "planned"
+      "postSlug": "excel-dataframe-map",
+      "status": "published"
     },
     {
       "order": 19,
@@ -446,7 +449,8 @@
       "prerequisites": ["dataframe-excel-map"],
       "artifact": "파일 이름, 시트, 필수 열, 자료형, 빈값 허용 여부를 적은 입력 계약표",
       "completionCheck": "정상 파일은 통과하고 필수 열이 빠진 파일은 이름이 있는 오류로 중단한다",
-      "status": "planned"
+      "postSlug": "excel-input-contract",
+      "status": "published"
     },
     {
       "order": 20,

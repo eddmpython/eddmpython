@@ -677,6 +677,102 @@
       "path": "objects/sha256/9c/9ca88b95015b6c2284c1c80dca967dfe0d9997999ed508974f41571647242bee.png",
       "post": "020-python-functions",
       "sha256": "9ca88b95015b6c2284c1c80dca967dfe0d9997999ed508974f41571647242bee"
+    },
+    "021-python-project-runbook/fresh-folder-replay": {
+      "assetKey": "fresh-folder-replay",
+      "path": "objects/sha256/3f/3fc08ea17c9a5e77630362011f5049442ff3078c166f8e7ade8cc32c7728a23d.png",
+      "post": "021-python-project-runbook",
+      "sha256": "3fc08ea17c9a5e77630362011f5049442ff3078c166f8e7ade8cc32c7728a23d"
+    },
+    "021-python-project-runbook/project-files-contract": {
+      "assetKey": "project-files-contract",
+      "path": "objects/sha256/6a/6a2d36f4bfc21d6e06d629c893769de653aa9d621a430642915577c5e246f8da.png",
+      "post": "021-python-project-runbook",
+      "sha256": "6a2d36f4bfc21d6e06d629c893769de653aa9d621a430642915577c5e246f8da"
+    },
+    "021-python-project-runbook/project-folder-map": {
+      "assetKey": "project-folder-map",
+      "path": "objects/sha256/51/511d308bd81b6431348885ca2d494966ef961f52798c5ab50101fa286f7ad85f.png",
+      "post": "021-python-project-runbook",
+      "sha256": "511d308bd81b6431348885ca2d494966ef961f52798c5ab50101fa286f7ad85f"
+    },
+    "021-python-project-runbook/readme-command-path": {
+      "assetKey": "readme-command-path",
+      "path": "objects/sha256/be/be5d2974f686ef65e4dbc3efb458e9649c12a0a994789f12e7edee3cb7b376fa.png",
+      "post": "021-python-project-runbook",
+      "sha256": "be5d2974f686ef65e4dbc3efb458e9649c12a0a994789f12e7edee3cb7b376fa"
+    },
+    "022-windows-python-recovery/command-triage": {
+      "assetKey": "command-triage",
+      "path": "objects/sha256/1b/1b5edab6ea81daadcb376423054b4c77af98e0fe18840c491036896bc7625d86.png",
+      "post": "022-windows-python-recovery",
+      "sha256": "1b5edab6ea81daadcb376423054b4c77af98e0fe18840c491036896bc7625d86"
+    },
+    "022-windows-python-recovery/editor-terminal-fallback": {
+      "assetKey": "editor-terminal-fallback",
+      "path": "objects/sha256/67/679308d1d895d5b759fb29da77e9f025c345b00789f614ffbe4adc2c0496f468.png",
+      "post": "022-windows-python-recovery",
+      "sha256": "679308d1d895d5b759fb29da77e9f025c345b00789f614ffbe4adc2c0496f468"
+    },
+    "022-windows-python-recovery/python-manager-path": {
+      "assetKey": "python-manager-path",
+      "path": "objects/sha256/d4/d4528ca7fce1dcac4d81700d01184bbcaa23acd265edd4a903277fc123c840e9.png",
+      "post": "022-windows-python-recovery",
+      "sha256": "d4528ca7fce1dcac4d81700d01184bbcaa23acd265edd4a903277fc123c840e9"
+    },
+    "022-windows-python-recovery/uv-command-recovery": {
+      "assetKey": "uv-command-recovery",
+      "path": "objects/sha256/19/19c1506dd227553f6d2b400569a4d2eee5c41e3635722b87af5c053be76fbaa0.png",
+      "post": "022-windows-python-recovery",
+      "sha256": "19c1506dd227553f6d2b400569a4d2eee5c41e3635722b87af5c053be76fbaa0"
+    },
+    "023-excel-dataframe-map/dataframe-dtypes": {
+      "assetKey": "dataframe-dtypes",
+      "path": "objects/sha256/dc/dc7fc4cb85aea713ff43c2dbc40188ec3495aaf78bd0be5bf0df7c4c43b9cf05.png",
+      "post": "023-excel-dataframe-map",
+      "sha256": "dc7fc4cb85aea713ff43c2dbc40188ec3495aaf78bd0be5bf0df7c4c43b9cf05"
+    },
+    "023-excel-dataframe-map/loc-selection": {
+      "assetKey": "loc-selection",
+      "path": "objects/sha256/39/395a2dbb2dc845b92619ed0791b5e6c50aaf31b6485c37f093d36c06fb313ea4.png",
+      "post": "023-excel-dataframe-map",
+      "sha256": "395a2dbb2dc845b92619ed0791b5e6c50aaf31b6485c37f093d36c06fb313ea4"
+    },
+    "023-excel-dataframe-map/rows-columns-shape": {
+      "assetKey": "rows-columns-shape",
+      "path": "objects/sha256/9b/9b618344c542a1e5221a83f51d169d362b038c2b512e8c756fe43428311cbe07.png",
+      "post": "023-excel-dataframe-map",
+      "sha256": "9b618344c542a1e5221a83f51d169d362b038c2b512e8c756fe43428311cbe07"
+    },
+    "023-excel-dataframe-map/sheet-to-dataframe": {
+      "assetKey": "sheet-to-dataframe",
+      "path": "objects/sha256/49/497c48cf54ac124b1898d8c3c29a69dc7ae99f9d1e667c505c5afc3951206c13.png",
+      "post": "023-excel-dataframe-map",
+      "sha256": "497c48cf54ac124b1898d8c3c29a69dc7ae99f9d1e667c505c5afc3951206c13"
+    },
+    "024-excel-input-contract/contract-five-items": {
+      "assetKey": "contract-five-items",
+      "path": "objects/sha256/a1/a154773eb3746dcdc4d52ed3d84ab9475cec5cd29771c5bff2fca762cbe106bf.png",
+      "post": "024-excel-input-contract",
+      "sha256": "a154773eb3746dcdc4d52ed3d84ab9475cec5cd29771c5bff2fca762cbe106bf"
+    },
+    "024-excel-input-contract/file-sheet-columns": {
+      "assetKey": "file-sheet-columns",
+      "path": "objects/sha256/94/9472eda159666363665e858a5f347e5363ece27c3cf01a747291518268f9c9c3.png",
+      "post": "024-excel-input-contract",
+      "sha256": "9472eda159666363665e858a5f347e5363ece27c3cf01a747291518268f9c9c3"
+    },
+    "024-excel-input-contract/good-bad-fixtures": {
+      "assetKey": "good-bad-fixtures",
+      "path": "objects/sha256/1f/1f240a70942f0a8d9b8467bd1242c5ba03fada5cb84e8285a29f94b9388d86dc.png",
+      "post": "024-excel-input-contract",
+      "sha256": "1f240a70942f0a8d9b8467bd1242c5ba03fada5cb84e8285a29f94b9388d86dc"
+    },
+    "024-excel-input-contract/types-null-policy": {
+      "assetKey": "types-null-policy",
+      "path": "objects/sha256/09/0979bf850559ea1d9f585f2cfc6b526e29dd2aa15f02814dedf49ef3f9d99705.png",
+      "post": "024-excel-input-contract",
+      "sha256": "0979bf850559ea1d9f585f2cfc6b526e29dd2aa15f02814dedf49ef3f9d99705"
     }
   },
   "objectPrefix": "objects/sha256",
@@ -729,6 +825,13 @@
       "mime": "image/webp",
       "path": "objects/sha256/07/071089ce2fe07e4d1b6f83f9fc42f62290f5364be9f3b1d3a06c42de4af3268c.webp",
       "width": 1216
+    },
+    "0979bf850559ea1d9f585f2cfc6b526e29dd2aa15f02814dedf49ef3f9d99705": {
+      "bytes": 1267795,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/09/0979bf850559ea1d9f585f2cfc6b526e29dd2aa15f02814dedf49ef3f9d99705.png",
+      "width": 1536
     },
     "0a37d036af4841bee5d77ccb7fcf33304df9286c96c283e43179a39f18964f47": {
       "bytes": 1224853,
@@ -800,11 +903,32 @@
       "path": "objects/sha256/19/1980a71ffa02bb3e090a09aef86b0158ebf94560ef82b3892de6ff15a91a11e8.png",
       "width": 1536
     },
+    "19c1506dd227553f6d2b400569a4d2eee5c41e3635722b87af5c053be76fbaa0": {
+      "bytes": 1162261,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/19/19c1506dd227553f6d2b400569a4d2eee5c41e3635722b87af5c053be76fbaa0.png",
+      "width": 1536
+    },
+    "1b5edab6ea81daadcb376423054b4c77af98e0fe18840c491036896bc7625d86": {
+      "bytes": 1247365,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/1b/1b5edab6ea81daadcb376423054b4c77af98e0fe18840c491036896bc7625d86.png",
+      "width": 1536
+    },
     "1c47da7431bac5ef453cce4a198fdbece6262c83e4d519253f55375224e16857": {
       "bytes": 1655389,
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/1c/1c47da7431bac5ef453cce4a198fdbece6262c83e4d519253f55375224e16857.png",
+      "width": 1536
+    },
+    "1f240a70942f0a8d9b8467bd1242c5ba03fada5cb84e8285a29f94b9388d86dc": {
+      "bytes": 1241065,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/1f/1f240a70942f0a8d9b8467bd1242c5ba03fada5cb84e8285a29f94b9388d86dc.png",
       "width": 1536
     },
     "20938f5d4176075be84c0c7dc31f8baa9bb6c4761e20ec59e43fa565e6262a3f": {
@@ -863,6 +987,13 @@
       "path": "objects/sha256/38/38c135b7076e211c171f871e2da74620bb7031e96915160d9d47e487e8c08eba.png",
       "width": 1536
     },
+    "395a2dbb2dc845b92619ed0791b5e6c50aaf31b6485c37f093d36c06fb313ea4": {
+      "bytes": 1151944,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/39/395a2dbb2dc845b92619ed0791b5e6c50aaf31b6485c37f093d36c06fb313ea4.png",
+      "width": 1536
+    },
     "3a8bed10f6ab335da7770648fc35d30c8b1f8df78dcffcd8789cd8ded41d4637": {
       "bytes": 1326173,
       "height": 1024,
@@ -875,6 +1006,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/3f/3f7cdbee8b354ebf5ea304538f85bd5748a66163adf00f53aa3ce7dcd906cc7c.png",
+      "width": 1536
+    },
+    "3fc08ea17c9a5e77630362011f5049442ff3078c166f8e7ade8cc32c7728a23d": {
+      "bytes": 1643759,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/3f/3fc08ea17c9a5e77630362011f5049442ff3078c166f8e7ade8cc32c7728a23d.png",
       "width": 1536
     },
     "40eb8266fc1d9f19fa63823a08aa324e92423263d2afebd3a3addcca7fb2728e": {
@@ -903,6 +1041,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/44/4459d43388edbfd1104d368ff00251f944a394394b5cff0af16d208817ec7c8b.png",
+      "width": 1536
+    },
+    "497c48cf54ac124b1898d8c3c29a69dc7ae99f9d1e667c505c5afc3951206c13": {
+      "bytes": 1146214,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/49/497c48cf54ac124b1898d8c3c29a69dc7ae99f9d1e667c505c5afc3951206c13.png",
       "width": 1536
     },
     "4be7741c7a7728a278411ba98d67b471992b40ab160b1fa519ec72a062980505": {
@@ -938,6 +1083,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/50/503272478e0ca292ad1939ccb6d9f7fd01a50f94a794bd9a7fb03c2af95f2e34.png",
+      "width": 1536
+    },
+    "511d308bd81b6431348885ca2d494966ef961f52798c5ab50101fa286f7ad85f": {
+      "bytes": 1225103,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/51/511d308bd81b6431348885ca2d494966ef961f52798c5ab50101fa286f7ad85f.png",
       "width": 1536
     },
     "52be213d398cc25888464efd2728c5d37715737ba1a3181928afd7b03678bfad": {
@@ -989,6 +1141,13 @@
       "path": "objects/sha256/66/66dcdfb2a1462891e70b50e27b669fd8a5bda511db957d57558b2917fba6c0d3.png",
       "width": 1536
     },
+    "679308d1d895d5b759fb29da77e9f025c345b00789f614ffbe4adc2c0496f468": {
+      "bytes": 1190484,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/67/679308d1d895d5b759fb29da77e9f025c345b00789f614ffbe4adc2c0496f468.png",
+      "width": 1536
+    },
     "68070b3221c00ebcea5fbc31528312641bd9fc6fd5db65cb86c82debda3b6af0": {
       "bytes": 1095390,
       "height": 1024,
@@ -1008,6 +1167,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/68/68423d45eecf0ba4b25d6d6c4d362086adcec4439facb464efed4ddc1765d554.png",
+      "width": 1536
+    },
+    "6a2d36f4bfc21d6e06d629c893769de653aa9d621a430642915577c5e246f8da": {
+      "bytes": 1821937,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/6a/6a2d36f4bfc21d6e06d629c893769de653aa9d621a430642915577c5e246f8da.png",
       "width": 1536
     },
     "6d0137c63e4362b0ac8bdb08cea4188dc6e2af083f3523bef50639fa2af29948": {
@@ -1136,6 +1302,13 @@
       "path": "objects/sha256/93/938fedb10321e58d5fbefe95d78fee444df1a98900a05019879e9fba72db8a62.png",
       "width": 1536
     },
+    "9472eda159666363665e858a5f347e5363ece27c3cf01a747291518268f9c9c3": {
+      "bytes": 1228610,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/94/9472eda159666363665e858a5f347e5363ece27c3cf01a747291518268f9c9c3.png",
+      "width": 1536
+    },
     "96b7e5d091658f7b1c5c4b81e134e5d9dd13a81c4bf5c02bd5ff0b35e4026631": {
       "bytes": 1682439,
       "height": 1024,
@@ -1148,6 +1321,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/99/9975d4e61f78dbd4a10a366ddefdda40ae6ca408b68229ad5a02c06ba5e8fe7b.png",
+      "width": 1536
+    },
+    "9b618344c542a1e5221a83f51d169d362b038c2b512e8c756fe43428311cbe07": {
+      "bytes": 1158246,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/9b/9b618344c542a1e5221a83f51d169d362b038c2b512e8c756fe43428311cbe07.png",
       "width": 1536
     },
     "9ca88b95015b6c2284c1c80dca967dfe0d9997999ed508974f41571647242bee": {
@@ -1169,6 +1349,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/9f/9fd3cf3cb747f658132260b1a3eb8c4f68d6382f680b5c8e26a414f8e1207abf.png",
+      "width": 1536
+    },
+    "a154773eb3746dcdc4d52ed3d84ab9475cec5cd29771c5bff2fca762cbe106bf": {
+      "bytes": 1381264,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/a1/a154773eb3746dcdc4d52ed3d84ab9475cec5cd29771c5bff2fca762cbe106bf.png",
       "width": 1536
     },
     "a19328faa3bdfb1a2601c9eeea8fb5ee4400891bad8cf72fba48aa7029af44b2": {
@@ -1255,6 +1442,13 @@
       "path": "objects/sha256/ba/baee7b819d25f5cb8cc66e12aa26f0fd81098742de010fe986b0d2c4654d565d.png",
       "width": 1536
     },
+    "be5d2974f686ef65e4dbc3efb458e9649c12a0a994789f12e7edee3cb7b376fa": {
+      "bytes": 1311967,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/be/be5d2974f686ef65e4dbc3efb458e9649c12a0a994789f12e7edee3cb7b376fa.png",
+      "width": 1536
+    },
     "c36016f62e514f2294e40553962c4835e0b4dea742b1b005ed71999cd0364be4": {
       "bytes": 1168962,
       "height": 1024,
@@ -1325,6 +1519,13 @@
       "path": "objects/sha256/d2/d2af522c70117a776f8c3f58996d8dcdf40aa09af23b1e5b6178cce1e9ccd739.png",
       "width": 1536
     },
+    "d4528ca7fce1dcac4d81700d01184bbcaa23acd265edd4a903277fc123c840e9": {
+      "bytes": 1585869,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/d4/d4528ca7fce1dcac4d81700d01184bbcaa23acd265edd4a903277fc123c840e9.png",
+      "width": 1536
+    },
     "d5b06e7a8607b5dcac0e37110e269431c6746c5ada9967cfec1350a89b903c79": {
       "bytes": 1174853,
       "height": 1024,
@@ -1337,6 +1538,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/d6/d6c4e1814b17b45a77cd0ce1988316e052cb5c5ad66c68f0c88c027da9c948c4.png",
+      "width": 1536
+    },
+    "dc7fc4cb85aea713ff43c2dbc40188ec3495aaf78bd0be5bf0df7c4c43b9cf05": {
+      "bytes": 1257871,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/dc/dc7fc4cb85aea713ff43c2dbc40188ec3495aaf78bd0be5bf0df7c4c43b9cf05.png",
       "width": 1536
     },
     "e01047abda28146686397da5c80b7236a194c3035f1780c86c4ab260deda0da1": {
