@@ -20,6 +20,10 @@ status: curated
 `.agents/skills/blog-writing/SKILL.md`에 있고, 자세한 운영 계약은 아래 `operation.blogPublishing`과
 `operation.blogCopy`가 맡는다.
 
+사이트, 제품 카탈로그, SEO, 배포, 도메인, 자산, 공개 경계를 다루는 작업은 저장소 전용
+`$eddmpython-operations` 스킬을 사용한다. 파일은 `.agents/skills/eddmpython-operations/SKILL.md`에
+있고, 이 문서와 아래 운영 계약으로 작업을 연결하는 얇은 라우터다.
+
 ## 정보 3층
 
 같은 사실을 두 곳에 쓰지 않는다.

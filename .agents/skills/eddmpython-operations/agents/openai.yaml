@@ -1,0 +1,4 @@
+interface:
+  display_name: "eddmpython 운영"
+  short_description: "브랜드 사이트 작업을 현재 운영 정본과 배포 계약에 연결합니다"
+  default_prompt: "$eddmpython-operations를 사용해 eddmpython 저장소 작업을 현재 Skill OS, 검증, 시각 확인, 배포 경계에 맞게 끝까지 완료해 주세요"
