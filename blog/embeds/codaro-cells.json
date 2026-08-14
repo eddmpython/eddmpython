@@ -1,6 +1,13 @@
 {
   "version": 1,
   "examples": {
+    "python-bungeoppang-order": {
+      "title": "붕어빵 수량과 가격 계산하기",
+      "description": "팥 수량을 2에서 5로 바꾸고 실행해서 전체 개수와 가격이 함께 달라지는지 확인합니다.",
+      "code": "menu = {\"팥\": 2, \"슈크림\": 1}\nprice = 1000\n\ncount = sum(menu.values())\ntotal = count * price\n\nf\"붕어빵 {count}개, {total:,}원\"",
+      "hint": "가입 없이 브라우저 안에서 실행됩니다",
+      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
+    },
     "city-sales-ranking": {
       "title": "도시별 매출을 합쳐 1위 찾기",
       "description": "금액을 바꾸거나 도시를 추가한 뒤 실행해서 집계 결과가 어떻게 달라지는지 확인합니다.",

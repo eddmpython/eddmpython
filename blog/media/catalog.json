@@ -1,5 +1,47 @@
 {
   "assets": {
+    "20260807-what-is-python/first-python-run": {
+      "assetKey": "first-python-run",
+      "path": "objects/sha256/cf/cf44c96ef42b5d4a2bfc4ba0f535ea27bc7c6ea47a949f7adb8ac3824b07f7ce.png",
+      "post": "20260807-what-is-python",
+      "sha256": "cf44c96ef42b5d4a2bfc4ba0f535ea27bc7c6ea47a949f7adb8ac3824b07f7ce"
+    },
+    "20260807-what-is-python/language-choice": {
+      "assetKey": "language-choice",
+      "path": "objects/sha256/fd/fd8fb0b932556f47df327866909a22c7938004299dacd1ab3685012a283d599d.png",
+      "post": "20260807-what-is-python",
+      "sha256": "fd8fb0b932556f47df327866909a22c7938004299dacd1ab3685012a283d599d"
+    },
+    "20260807-what-is-python/python-ecosystem": {
+      "assetKey": "python-ecosystem",
+      "path": "objects/sha256/81/81cd5de4ef9665b0888447bc2f65e5f23d8803a11c74dac668f7e62c265ace38.png",
+      "post": "20260807-what-is-python",
+      "sha256": "81cd5de4ef9665b0888447bc2f65e5f23d8803a11c74dac668f7e62c265ace38"
+    },
+    "20260807-what-is-python/python-history": {
+      "assetKey": "python-history",
+      "path": "objects/sha256/05/0562282c694ca6b0cb09eac87a49afe0b1ef14ac2e5561bec4514a4c59812868.png",
+      "post": "20260807-what-is-python",
+      "sha256": "0562282c694ca6b0cb09eac87a49afe0b1ef14ac2e5561bec4514a4c59812868"
+    },
+    "20260807-what-is-python/python-is-instructions": {
+      "assetKey": "python-is-instructions",
+      "path": "objects/sha256/4d/4daa29d88dcd62be0f949b036f3dac33f43882a7a2b0433cfbab3fac66287904.png",
+      "post": "20260807-what-is-python",
+      "sha256": "4daa29d88dcd62be0f949b036f3dac33f43882a7a2b0433cfbab3fac66287904"
+    },
+    "20260807-what-is-python/python-popularity": {
+      "assetKey": "python-popularity",
+      "path": "objects/sha256/17/17a4246874337e2aadf9d07e34ca2586c5228e64067289e05733cb01173a3be5.png",
+      "post": "20260807-what-is-python",
+      "sha256": "17a4246874337e2aadf9d07e34ca2586c5228e64067289e05733cb01173a3be5"
+    },
+    "20260807-what-is-python/readable-syntax": {
+      "assetKey": "readable-syntax",
+      "path": "objects/sha256/c3/c36016f62e514f2294e40553962c4835e0b4dea742b1b005ed71999cd0364be4.png",
+      "post": "20260807-what-is-python",
+      "sha256": "c36016f62e514f2294e40553962c4835e0b4dea742b1b005ed71999cd0364be4"
+    },
     "20260808-ai-needs-an-environment/failure-guardrails": {
       "assetKey": "failure-guardrails",
       "path": "objects/sha256/c8/c855f7522a308f0192eb3ddf5751c409d1948b3836bcc4b94e60510c18b09389.png",
@@ -136,12 +178,26 @@
       "path": "objects/sha256/01/01dbd75b059ac447b91004ebb181a8f9ab752273c153c8badf6682420c2b6962.png",
       "width": 1536
     },
+    "0562282c694ca6b0cb09eac87a49afe0b1ef14ac2e5561bec4514a4c59812868": {
+      "bytes": 2417427,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/05/0562282c694ca6b0cb09eac87a49afe0b1ef14ac2e5561bec4514a4c59812868.png",
+      "width": 1536
+    },
     "071089ce2fe07e4d1b6f83f9fc42f62290f5364be9f3b1d3a06c42de4af3268c": {
       "bytes": 87540,
       "height": 832,
       "mime": "image/webp",
       "path": "objects/sha256/07/071089ce2fe07e4d1b6f83f9fc42f62290f5364be9f3b1d3a06c42de4af3268c.webp",
       "width": 1216
+    },
+    "17a4246874337e2aadf9d07e34ca2586c5228e64067289e05733cb01173a3be5": {
+      "bytes": 1368203,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/17/17a4246874337e2aadf9d07e34ca2586c5228e64067289e05733cb01173a3be5.png",
+      "width": 1536
     },
     "24797d52ca5755b466fecfaf06639bbcecf78b48cb29ba3aa405448d777eec52": {
       "bytes": 84876,
@@ -178,6 +234,13 @@
       "path": "objects/sha256/4b/4be7741c7a7728a278411ba98d67b471992b40ab160b1fa519ec72a062980505.webp",
       "width": 1216
     },
+    "4daa29d88dcd62be0f949b036f3dac33f43882a7a2b0433cfbab3fac66287904": {
+      "bytes": 1677947,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/4d/4daa29d88dcd62be0f949b036f3dac33f43882a7a2b0433cfbab3fac66287904.png",
+      "width": 1536
+    },
     "57878e78ff3bfffe9418885d4ce7906b0093ff41bcefb2ed901c184f03784e9d": {
       "bytes": 1296076,
       "height": 1024,
@@ -204,6 +267,13 @@
       "height": 1024,
       "mime": "image/webp",
       "path": "objects/sha256/75/75e8abd651ab9e1d1dd850e8e5c64c3bc1b396a2cf4517652ce075f476f9c6a3.webp",
+      "width": 1536
+    },
+    "81cd5de4ef9665b0888447bc2f65e5f23d8803a11c74dac668f7e62c265ace38": {
+      "bytes": 1276121,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/81/81cd5de4ef9665b0888447bc2f65e5f23d8803a11c74dac668f7e62c265ace38.png",
       "width": 1536
     },
     "8ec901a50dc312e29204cff5ab8bbbbd7fab616590dfcc9982298e2e216f9e9e": {
@@ -234,6 +304,13 @@
       "path": "objects/sha256/b2/b2639594672c77b1ce7fbe7e20e5caa70e374cca0565d6d81e2eaa9fd1fbccf2.png",
       "width": 1536
     },
+    "c36016f62e514f2294e40553962c4835e0b4dea742b1b005ed71999cd0364be4": {
+      "bytes": 1168962,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/c3/c36016f62e514f2294e40553962c4835e0b4dea742b1b005ed71999cd0364be4.png",
+      "width": 1536
+    },
     "c512dad5e83c99f310e9a837d80e5b751922f6f6d96f17fd7db307b09bd621b2": {
       "bytes": 307550,
       "height": 832,
@@ -255,6 +332,13 @@
       "path": "objects/sha256/ce/ce37d5158878f9fc652190955d9a41a353843856065191a3a7a79f0f9c7822d3.webp",
       "width": 1536
     },
+    "cf44c96ef42b5d4a2bfc4ba0f535ea27bc7c6ea47a949f7adb8ac3824b07f7ce": {
+      "bytes": 1527472,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/cf/cf44c96ef42b5d4a2bfc4ba0f535ea27bc7c6ea47a949f7adb8ac3824b07f7ce.png",
+      "width": 1536
+    },
     "eaa07b26b8e905d75983c14867797c73dc4534685797733cd268dad30890551c": {
       "bytes": 1156468,
       "height": 1024,
@@ -274,6 +358,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/f6/f6e0bae0f78582fbcea10bac547342bb2e725e8feb67e1971b1494cf5e6c43ca.png",
+      "width": 1536
+    },
+    "fd8fb0b932556f47df327866909a22c7938004299dacd1ab3685012a283d599d": {
+      "bytes": 1295194,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/fd/fd8fb0b932556f47df327866909a22c7938004299dacd1ab3685012a283d599d.png",
       "width": 1536
     }
   },
