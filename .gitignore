@@ -46,6 +46,7 @@ coverage/
 *.tsbuildinfo
 
 # Local data and generated exports
+/course/
 cache/
 .cache/
 data/

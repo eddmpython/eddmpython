@@ -1,6 +1,8 @@
 export type Post = {
   /** 파일 stem. media plan/catalog 키와 같다. */
   id: string;
+  /** 발행 파일의 고정 순번. 같은 날짜의 글도 이 값으로 나눈다. */
+  sequence: number;
   /** 공개 URL 경로. /blog/{slug} */
   slug: string;
   title: string;
@@ -18,7 +20,7 @@ export type Post = {
 };
 
 /* 글의 SSOT 는 저장소 루트 blog/ 다. 빌드 타임에 읽고 런타임 fetch 는 없다. */
-const files = import.meta.glob("../../blog/20??????-*.md", {
+const files = import.meta.glob("../../blog/???-*.md", {
   query: "?raw",
   import: "default",
   eager: true,
@@ -32,6 +34,7 @@ function parse(path: string, raw: string): Post {
   if (!match) {
     return {
       id,
+      sequence: Number(id.slice(0, 3)),
       slug: id,
       title: id,
       date: "",
@@ -53,6 +56,7 @@ function parse(path: string, raw: string): Post {
   }
   return {
     id,
+    sequence: Number(id.slice(0, 3)),
     slug,
     title: meta.title ?? id,
     date: meta.date ?? "",
@@ -71,7 +75,7 @@ function parse(path: string, raw: string): Post {
 
 export const POSTS: Post[] = Object.entries(files)
   .map(([path, raw]) => parse(path, raw))
-  .sort((a, b) => b.date.localeCompare(a.date) || b.slug.localeCompare(a.slug));
+  .sort((a, b) => b.date.localeCompare(a.date) || b.sequence - a.sequence);
 
 const slugs = new Set(POSTS.map((post) => post.slug));
 if (slugs.size !== POSTS.length) {

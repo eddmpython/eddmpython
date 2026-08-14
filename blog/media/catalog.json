@@ -1,214 +1,298 @@
 {
   "assets": {
-    "20260807-what-is-python/first-python-run": {
+    "001-what-is-python/first-python-run": {
       "assetKey": "first-python-run",
       "path": "objects/sha256/cf/cf44c96ef42b5d4a2bfc4ba0f535ea27bc7c6ea47a949f7adb8ac3824b07f7ce.png",
-      "post": "20260807-what-is-python",
+      "post": "001-what-is-python",
       "sha256": "cf44c96ef42b5d4a2bfc4ba0f535ea27bc7c6ea47a949f7adb8ac3824b07f7ce"
     },
-    "20260807-what-is-python/language-choice": {
+    "001-what-is-python/language-choice": {
       "assetKey": "language-choice",
       "path": "objects/sha256/fd/fd8fb0b932556f47df327866909a22c7938004299dacd1ab3685012a283d599d.png",
-      "post": "20260807-what-is-python",
+      "post": "001-what-is-python",
       "sha256": "fd8fb0b932556f47df327866909a22c7938004299dacd1ab3685012a283d599d"
     },
-    "20260807-what-is-python/python-ecosystem": {
+    "001-what-is-python/python-ecosystem": {
       "assetKey": "python-ecosystem",
       "path": "objects/sha256/81/81cd5de4ef9665b0888447bc2f65e5f23d8803a11c74dac668f7e62c265ace38.png",
-      "post": "20260807-what-is-python",
+      "post": "001-what-is-python",
       "sha256": "81cd5de4ef9665b0888447bc2f65e5f23d8803a11c74dac668f7e62c265ace38"
     },
-    "20260807-what-is-python/python-history": {
+    "001-what-is-python/python-history": {
       "assetKey": "python-history",
       "path": "objects/sha256/05/0562282c694ca6b0cb09eac87a49afe0b1ef14ac2e5561bec4514a4c59812868.png",
-      "post": "20260807-what-is-python",
+      "post": "001-what-is-python",
       "sha256": "0562282c694ca6b0cb09eac87a49afe0b1ef14ac2e5561bec4514a4c59812868"
     },
-    "20260807-what-is-python/python-is-instructions": {
+    "001-what-is-python/python-is-instructions": {
       "assetKey": "python-is-instructions",
       "path": "objects/sha256/4d/4daa29d88dcd62be0f949b036f3dac33f43882a7a2b0433cfbab3fac66287904.png",
-      "post": "20260807-what-is-python",
+      "post": "001-what-is-python",
       "sha256": "4daa29d88dcd62be0f949b036f3dac33f43882a7a2b0433cfbab3fac66287904"
     },
-    "20260807-what-is-python/python-popularity": {
+    "001-what-is-python/python-popularity": {
       "assetKey": "python-popularity",
       "path": "objects/sha256/17/17a4246874337e2aadf9d07e34ca2586c5228e64067289e05733cb01173a3be5.png",
-      "post": "20260807-what-is-python",
+      "post": "001-what-is-python",
       "sha256": "17a4246874337e2aadf9d07e34ca2586c5228e64067289e05733cb01173a3be5"
     },
-    "20260807-what-is-python/readable-syntax": {
+    "001-what-is-python/readable-syntax": {
       "assetKey": "readable-syntax",
       "path": "objects/sha256/c3/c36016f62e514f2294e40553962c4835e0b4dea742b1b005ed71999cd0364be4.png",
-      "post": "20260807-what-is-python",
+      "post": "001-what-is-python",
       "sha256": "c36016f62e514f2294e40553962c4835e0b4dea742b1b005ed71999cd0364be4"
     },
-    "20260808-codaro-guide/decision-boundary": {
+    "002-codaro-guide/decision-boundary": {
       "assetKey": "decision-boundary",
       "path": "objects/sha256/8e/8ec901a50dc312e29204cff5ab8bbbbd7fab616590dfcc9982298e2e216f9e9e.webp",
-      "post": "20260808-codaro-guide",
+      "post": "002-codaro-guide",
       "sha256": "8ec901a50dc312e29204cff5ab8bbbbd7fab616590dfcc9982298e2e216f9e9e"
     },
-    "20260808-codaro-guide/embedded-cell": {
+    "002-codaro-guide/embedded-cell": {
       "assetKey": "embedded-cell",
       "path": "objects/sha256/ef/ef8d12c5a20a452518c8d7d084d5811a6650ed0f678ccadead0d4ccd58b4cf75.webp",
-      "post": "20260808-codaro-guide",
+      "post": "002-codaro-guide",
       "sha256": "ef8d12c5a20a452518c8d7d084d5811a6650ed0f678ccadead0d4ccd58b4cf75"
     },
-    "20260808-codaro-guide/learning-loop": {
+    "002-codaro-guide/learning-loop": {
       "assetKey": "learning-loop",
       "path": "objects/sha256/75/75e8abd651ab9e1d1dd850e8e5c64c3bc1b396a2cf4517652ce075f476f9c6a3.webp",
-      "post": "20260808-codaro-guide",
+      "post": "002-codaro-guide",
       "sha256": "75e8abd651ab9e1d1dd850e8e5c64c3bc1b396a2cf4517652ce075f476f9c6a3"
     },
-    "20260808-codaro-guide/local-expansion": {
+    "002-codaro-guide/local-expansion": {
       "assetKey": "local-expansion",
       "path": "objects/sha256/ce/ce37d5158878f9fc652190955d9a41a353843856065191a3a7a79f0f9c7822d3.webp",
-      "post": "20260808-codaro-guide",
+      "post": "002-codaro-guide",
       "sha256": "ce37d5158878f9fc652190955d9a41a353843856065191a3a7a79f0f9c7822d3"
     },
-    "20260808-codaro-guide/percent-file": {
+    "002-codaro-guide/percent-file": {
       "assetKey": "percent-file",
       "path": "objects/sha256/37/3761a5cf6e8376ae9f47157e8e1f5c140ca5cf49a6b14d853cd1a469e1db7178.webp",
-      "post": "20260808-codaro-guide",
+      "post": "002-codaro-guide",
       "sha256": "3761a5cf6e8376ae9f47157e8e1f5c140ca5cf49a6b14d853cd1a469e1db7178"
     },
-    "20260808-codaro-guide/reactive-path": {
+    "002-codaro-guide/reactive-path": {
       "assetKey": "reactive-path",
       "path": "objects/sha256/6e/6ebdaedaa799739561dd8edcb3ff82d014ca58dca6652f81b2437f63c5f28aec.webp",
-      "post": "20260808-codaro-guide",
+      "post": "002-codaro-guide",
       "sha256": "6ebdaedaa799739561dd8edcb3ff82d014ca58dca6652f81b2437f63c5f28aec"
     },
-    "20260808-codaro-guide/validation-evidence": {
+    "002-codaro-guide/validation-evidence": {
       "assetKey": "validation-evidence",
       "path": "objects/sha256/30/3019906f6f342dee32f2258a63c3acbf539260fe75f811c5f2092deb546558b6.webp",
-      "post": "20260808-codaro-guide",
+      "post": "002-codaro-guide",
       "sha256": "3019906f6f342dee32f2258a63c3acbf539260fe75f811c5f2092deb546558b6"
     },
-    "20260808-codaro-guide/web-entry": {
+    "002-codaro-guide/web-entry": {
       "assetKey": "web-entry",
       "path": "objects/sha256/a6/a6880c33189b23b51c6700d7c27bba8fbfc383e57c44b1d28d22c4e0bb6796c2.webp",
-      "post": "20260808-codaro-guide",
+      "post": "002-codaro-guide",
       "sha256": "a6880c33189b23b51c6700d7c27bba8fbfc383e57c44b1d28d22c4e0bb6796c2"
     },
-    "20260809-what-is-terminal/command-parts": {
+    "003-what-is-terminal/command-parts": {
       "assetKey": "command-parts",
       "path": "objects/sha256/7e/7e15048ea5fcee3dbea1969c68007f4eac4a9e8d4e86fe9525fab631bc89cb04.png",
-      "post": "20260809-what-is-terminal",
+      "post": "003-what-is-terminal",
       "sha256": "7e15048ea5fcee3dbea1969c68007f4eac4a9e8d4e86fe9525fab631bc89cb04"
     },
-    "20260809-what-is-terminal/current-folder": {
+    "003-what-is-terminal/current-folder": {
       "assetKey": "current-folder",
       "path": "objects/sha256/0e/0e353d9d40bc8f2750d67ba8b3ab7cf430ef82a18df7ab9fbf1ad7023db408e8.png",
-      "post": "20260809-what-is-terminal",
+      "post": "003-what-is-terminal",
       "sha256": "0e353d9d40bc8f2750d67ba8b3ab7cf430ef82a18df7ab9fbf1ad7023db408e8"
     },
-    "20260809-what-is-terminal/repeatable-command": {
+    "003-what-is-terminal/repeatable-command": {
       "assetKey": "repeatable-command",
       "path": "objects/sha256/a4/a431c0d7044c79b5686b10ca429a2d3e888a3617af5f343b524b8b87fcefe305.png",
-      "post": "20260809-what-is-terminal",
+      "post": "003-what-is-terminal",
       "sha256": "a431c0d7044c79b5686b10ca429a2d3e888a3617af5f343b524b8b87fcefe305"
     },
-    "20260809-what-is-terminal/safe-first-session": {
+    "003-what-is-terminal/safe-first-session": {
       "assetKey": "safe-first-session",
       "path": "objects/sha256/99/9975d4e61f78dbd4a10a366ddefdda40ae6ca408b68229ad5a02c06ba5e8fe7b.png",
-      "post": "20260809-what-is-terminal",
+      "post": "003-what-is-terminal",
       "sha256": "9975d4e61f78dbd4a10a366ddefdda40ae6ca408b68229ad5a02c06ba5e8fe7b"
     },
-    "20260809-what-is-terminal/terminal-command-result": {
+    "003-what-is-terminal/terminal-command-result": {
       "assetKey": "terminal-command-result",
       "path": "objects/sha256/00/00ef3a45fcdf406ec713bb489fda02cfe38b5ac7bea2c4355ab4b19562da19b9.png",
-      "post": "20260809-what-is-terminal",
+      "post": "003-what-is-terminal",
       "sha256": "00ef3a45fcdf406ec713bb489fda02cfe38b5ac7bea2c4355ab4b19562da19b9"
     },
-    "20260809-what-is-terminal/terminal-history": {
+    "003-what-is-terminal/terminal-history": {
       "assetKey": "terminal-history",
       "path": "objects/sha256/9f/9fd3cf3cb747f658132260b1a3eb8c4f68d6382f680b5c8e26a414f8e1207abf.png",
-      "post": "20260809-what-is-terminal",
+      "post": "003-what-is-terminal",
       "sha256": "9fd3cf3cb747f658132260b1a3eb8c4f68d6382f680b5c8e26a414f8e1207abf"
     },
-    "20260809-what-is-terminal/terminal-shell-layers": {
+    "003-what-is-terminal/terminal-shell-layers": {
       "assetKey": "terminal-shell-layers",
       "path": "objects/sha256/43/43b320e07e066d1209829091bafd66e20fa3fecef2b65093c44e68043c469546.png",
-      "post": "20260809-what-is-terminal",
+      "post": "003-what-is-terminal",
       "sha256": "43b320e07e066d1209829091bafd66e20fa3fecef2b65093c44e68043c469546"
     },
-    "20260811-ai-needs-an-environment/failure-guardrails": {
+    "004-ai-needs-an-environment/failure-guardrails": {
       "assetKey": "failure-guardrails",
       "path": "objects/sha256/c8/c855f7522a308f0192eb3ddf5751c409d1948b3836bcc4b94e60510c18b09389.png",
-      "post": "20260811-ai-needs-an-environment",
+      "post": "004-ai-needs-an-environment",
       "sha256": "c855f7522a308f0192eb3ddf5751c409d1948b3836bcc4b94e60510c18b09389"
     },
-    "20260811-ai-needs-an-environment/five-questions": {
+    "004-ai-needs-an-environment/five-questions": {
       "assetKey": "five-questions",
       "path": "objects/sha256/3a/3a8bed10f6ab335da7770648fc35d30c8b1f8df78dcffcd8789cd8ded41d4637.png",
-      "post": "20260811-ai-needs-an-environment",
+      "post": "004-ai-needs-an-environment",
       "sha256": "3a8bed10f6ab335da7770648fc35d30c8b1f8df78dcffcd8789cd8ded41d4637"
     },
-    "20260811-ai-needs-an-environment/prompt-vs-environment": {
+    "004-ai-needs-an-environment/prompt-vs-environment": {
       "assetKey": "prompt-vs-environment",
       "path": "objects/sha256/ea/eaa07b26b8e905d75983c14867797c73dc4534685797733cd268dad30890551c.png",
-      "post": "20260811-ai-needs-an-environment",
+      "post": "004-ai-needs-an-environment",
       "sha256": "eaa07b26b8e905d75983c14867797c73dc4534685797733cd268dad30890551c"
     },
-    "20260811-ai-needs-an-environment/reopen-judgment": {
+    "004-ai-needs-an-environment/reopen-judgment": {
       "assetKey": "reopen-judgment",
       "path": "objects/sha256/57/57878e78ff3bfffe9418885d4ce7906b0093ff41bcefb2ed901c184f03784e9d.png",
-      "post": "20260811-ai-needs-an-environment",
+      "post": "004-ai-needs-an-environment",
       "sha256": "57878e78ff3bfffe9418885d4ce7906b0093ff41bcefb2ed901c184f03784e9d"
     },
-    "20260811-ai-needs-an-environment/small-start": {
+    "004-ai-needs-an-environment/small-start": {
       "assetKey": "small-start",
       "path": "objects/sha256/01/01dbd75b059ac447b91004ebb181a8f9ab752273c153c8badf6682420c2b6962.png",
-      "post": "20260811-ai-needs-an-environment",
+      "post": "004-ai-needs-an-environment",
       "sha256": "01dbd75b059ac447b91004ebb181a8f9ab752273c153c8badf6682420c2b6962"
     },
-    "20260811-ai-needs-an-environment/template-repair": {
+    "004-ai-needs-an-environment/template-repair": {
       "assetKey": "template-repair",
       "path": "objects/sha256/f6/f6e0bae0f78582fbcea10bac547342bb2e725e8feb67e1971b1494cf5e6c43ca.png",
-      "post": "20260811-ai-needs-an-environment",
+      "post": "004-ai-needs-an-environment",
       "sha256": "f6e0bae0f78582fbcea10bac547342bb2e725e8feb67e1971b1494cf5e6c43ca"
     },
-    "20260811-ai-needs-an-environment/workbench": {
+    "004-ai-needs-an-environment/workbench": {
       "assetKey": "workbench",
       "path": "objects/sha256/b2/b2639594672c77b1ce7fbe7e20e5caa70e374cca0565d6d81e2eaa9fd1fbccf2.png",
-      "post": "20260811-ai-needs-an-environment",
+      "post": "004-ai-needs-an-environment",
       "sha256": "b2639594672c77b1ce7fbe7e20e5caa70e374cca0565d6d81e2eaa9fd1fbccf2"
     },
-    "20260813-claude-code-agents/frosted-machine": {
+    "005-claude-code-agents/frosted-machine": {
       "assetKey": "frosted-machine",
       "path": "objects/sha256/07/071089ce2fe07e4d1b6f83f9fc42f62290f5364be9f3b1d3a06c42de4af3268c.webp",
-      "post": "20260813-claude-code-agents",
+      "post": "005-claude-code-agents",
       "sha256": "071089ce2fe07e4d1b6f83f9fc42f62290f5364be9f3b1d3a06c42de4af3268c"
     },
-    "20260813-claude-code-agents/manual-open": {
+    "005-claude-code-agents/manual-open": {
       "assetKey": "manual-open",
       "path": "objects/sha256/61/617abe2b2581ab754a2a98be4f6115f2ef018c621aab090f625574df9721fea6.webp",
-      "post": "20260813-claude-code-agents",
+      "post": "005-claude-code-agents",
       "sha256": "617abe2b2581ab754a2a98be4f6115f2ef018c621aab090f625574df9721fea6"
     },
-    "20260813-claude-code-agents/runaway-output": {
+    "005-claude-code-agents/runaway-output": {
       "assetKey": "runaway-output",
       "path": "objects/sha256/c5/c512dad5e83c99f310e9a837d80e5b751922f6f6d96f17fd7db307b09bd621b2.webp",
-      "post": "20260813-claude-code-agents",
+      "post": "005-claude-code-agents",
       "sha256": "c512dad5e83c99f310e9a837d80e5b751922f6f6d96f17fd7db307b09bd621b2"
     },
-    "20260813-claude-code-agents/single-writer": {
+    "005-claude-code-agents/single-writer": {
       "assetKey": "single-writer",
       "path": "objects/sha256/4b/4be7741c7a7728a278411ba98d67b471992b40ab160b1fa519ec72a062980505.webp",
-      "post": "20260813-claude-code-agents",
+      "post": "005-claude-code-agents",
       "sha256": "4be7741c7a7728a278411ba98d67b471992b40ab160b1fa519ec72a062980505"
     },
-    "20260813-claude-code-agents/three-checks": {
+    "005-claude-code-agents/three-checks": {
       "assetKey": "three-checks",
       "path": "objects/sha256/24/24797d52ca5755b466fecfaf06639bbcecf78b48cb29ba3aa405448d777eec52.webp",
-      "post": "20260813-claude-code-agents",
+      "post": "005-claude-code-agents",
       "sha256": "24797d52ca5755b466fecfaf06639bbcecf78b48cb29ba3aa405448d777eec52"
     },
-    "20260813-claude-code-agents/tool-wall": {
+    "005-claude-code-agents/tool-wall": {
       "assetKey": "tool-wall",
       "path": "objects/sha256/ad/add93db32ea5eecdc197a5956e6f8a3fc0097286679c670152ca4df561eecba1.webp",
-      "post": "20260813-claude-code-agents",
+      "post": "005-claude-code-agents",
       "sha256": "add93db32ea5eecdc197a5956e6f8a3fc0097286679c670152ca4df561eecba1"
+    },
+    "007-python-basic-syntax/condition-branch": {
+      "assetKey": "condition-branch",
+      "path": "objects/sha256/93/938fedb10321e58d5fbefe95d78fee444df1a98900a05019879e9fba72db8a62.png",
+      "post": "007-python-basic-syntax",
+      "sha256": "938fedb10321e58d5fbefe95d78fee444df1a98900a05019879e9fba72db8a62"
+    },
+    "007-python-basic-syntax/dictionary-column-map": {
+      "assetKey": "dictionary-column-map",
+      "path": "objects/sha256/88/88f1273c59fc9d28554f8b6c7eee6a07df1bd43c22990ceffbbb7774341f56fd.png",
+      "post": "007-python-basic-syntax",
+      "sha256": "88f1273c59fc9d28554f8b6c7eee6a07df1bd43c22990ceffbbb7774341f56fd"
+    },
+    "007-python-basic-syntax/function-reuse": {
+      "assetKey": "function-reuse",
+      "path": "objects/sha256/ba/ba22b13bfe117f620ed7cd2e3ddc8f671679e5e8212eed7c3eb3e71d1cf9ddfb.png",
+      "post": "007-python-basic-syntax",
+      "sha256": "ba22b13bfe117f620ed7cd2e3ddc8f671679e5e8212eed7c3eb3e71d1cf9ddfb"
+    },
+    "007-python-basic-syntax/list-amounts": {
+      "assetKey": "list-amounts",
+      "path": "objects/sha256/68/68070b3221c00ebcea5fbc31528312641bd9fc6fd5db65cb86c82debda3b6af0.png",
+      "post": "007-python-basic-syntax",
+      "sha256": "68070b3221c00ebcea5fbc31528312641bd9fc6fd5db65cb86c82debda3b6af0"
+    },
+    "007-python-basic-syntax/loop-each-amount": {
+      "assetKey": "loop-each-amount",
+      "path": "objects/sha256/74/741f080e209bb42b9f575de9f2d92b71c3c18e3928aa9f1bdfc1816cdaa901e9.png",
+      "post": "007-python-basic-syntax",
+      "sha256": "741f080e209bb42b9f575de9f2d92b71c3c18e3928aa9f1bdfc1816cdaa901e9"
+    },
+    "007-python-basic-syntax/syntax-learning-map": {
+      "assetKey": "syntax-learning-map",
+      "path": "objects/sha256/fc/fcfc19b3f647af1361c0935afb59d78f6277a113826f2b9cc06433cf2339b357.png",
+      "post": "007-python-basic-syntax",
+      "sha256": "fcfc19b3f647af1361c0935afb59d78f6277a113826f2b9cc06433cf2339b357"
+    },
+    "007-python-basic-syntax/syntax-together": {
+      "assetKey": "syntax-together",
+      "path": "objects/sha256/ea/ea47def546eefb8e3c5d3d3e0bdcf2cdb08390dd313c77cfb32396967961be3c.png",
+      "post": "007-python-basic-syntax",
+      "sha256": "ea47def546eefb8e3c5d3d3e0bdcf2cdb08390dd313c77cfb32396967961be3c"
+    },
+    "007-python-basic-syntax/variables-values": {
+      "assetKey": "variables-values",
+      "path": "objects/sha256/cd/cd7ce7ab554b1392b5ab7337770ab2d10d2dfb376a8c4ea4e0eedd197e16039e.png",
+      "post": "007-python-basic-syntax",
+      "sha256": "cd7ce7ab554b1392b5ab7337770ab2d10d2dfb376a8c4ea4e0eedd197e16039e"
+    },
+    "006-work-automation/automation-five-steps": {
+      "assetKey": "automation-five-steps",
+      "path": "objects/sha256/f5/f5fad4b2c39a012b33f50a82f27dfa5d7af71a070d2f0c693c95e83a7342f94b.png",
+      "post": "006-work-automation",
+      "sha256": "f5fad4b2c39a012b33f50a82f27dfa5d7af71a070d2f0c693c95e83a7342f94b"
+    },
+    "006-work-automation/automation-input": {
+      "assetKey": "automation-input",
+      "path": "objects/sha256/12/128ebb96e97c2ec884c5a22d8c374987238daf6a3f2c5c8161bcf522299b9260.png",
+      "post": "006-work-automation",
+      "sha256": "128ebb96e97c2ec884c5a22d8c374987238daf6a3f2c5c8161bcf522299b9260"
+    },
+    "006-work-automation/before-after-files": {
+      "assetKey": "before-after-files",
+      "path": "objects/sha256/20/20938f5d4176075be84c0c7dc31f8baa9bb6c4761e20ec59e43fa565e6262a3f.png",
+      "post": "006-work-automation",
+      "sha256": "20938f5d4176075be84c0c7dc31f8baa9bb6c4761e20ec59e43fa565e6262a3f"
+    },
+    "006-work-automation/fill-five-cards": {
+      "assetKey": "fill-five-cards",
+      "path": "objects/sha256/06/06582080fdce28fdc2354c382a155b908bc0a465a1850b32febcf11a9b4e6460.png",
+      "post": "006-work-automation",
+      "sha256": "06582080fdce28fdc2354c382a155b908bc0a465a1850b32febcf11a9b4e6460"
+    },
+    "006-work-automation/output-validation": {
+      "assetKey": "output-validation",
+      "path": "objects/sha256/9d/9d25d2a019f1d6cc4860c4376bcc0cc7e4c1202aca7d997f06ba4a7c61602bac.png",
+      "post": "006-work-automation",
+      "sha256": "9d25d2a019f1d6cc4860c4376bcc0cc7e4c1202aca7d997f06ba4a7c61602bac"
+    },
+    "006-work-automation/process-and-decision": {
+      "assetKey": "process-and-decision",
+      "path": "objects/sha256/27/2700f44fd59c735582e776678a745ff85d0070d7981dadb0a9ac8e8067295fa3.png",
+      "post": "006-work-automation",
+      "sha256": "2700f44fd59c735582e776678a745ff85d0070d7981dadb0a9ac8e8067295fa3"
     }
   },
   "objectPrefix": "objects/sha256",
@@ -234,6 +318,13 @@
       "path": "objects/sha256/05/0562282c694ca6b0cb09eac87a49afe0b1ef14ac2e5561bec4514a4c59812868.png",
       "width": 1536
     },
+    "06582080fdce28fdc2354c382a155b908bc0a465a1850b32febcf11a9b4e6460": {
+      "bytes": 1194734,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/06/06582080fdce28fdc2354c382a155b908bc0a465a1850b32febcf11a9b4e6460.png",
+      "width": 1536
+    },
     "071089ce2fe07e4d1b6f83f9fc42f62290f5364be9f3b1d3a06c42de4af3268c": {
       "bytes": 87540,
       "height": 832,
@@ -248,11 +339,25 @@
       "path": "objects/sha256/0e/0e353d9d40bc8f2750d67ba8b3ab7cf430ef82a18df7ab9fbf1ad7023db408e8.png",
       "width": 1536
     },
+    "128ebb96e97c2ec884c5a22d8c374987238daf6a3f2c5c8161bcf522299b9260": {
+      "bytes": 1162252,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/12/128ebb96e97c2ec884c5a22d8c374987238daf6a3f2c5c8161bcf522299b9260.png",
+      "width": 1536
+    },
     "17a4246874337e2aadf9d07e34ca2586c5228e64067289e05733cb01173a3be5": {
       "bytes": 1368203,
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/17/17a4246874337e2aadf9d07e34ca2586c5228e64067289e05733cb01173a3be5.png",
+      "width": 1536
+    },
+    "20938f5d4176075be84c0c7dc31f8baa9bb6c4761e20ec59e43fa565e6262a3f": {
+      "bytes": 1193407,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/20/20938f5d4176075be84c0c7dc31f8baa9bb6c4761e20ec59e43fa565e6262a3f.png",
       "width": 1536
     },
     "24797d52ca5755b466fecfaf06639bbcecf78b48cb29ba3aa405448d777eec52": {
@@ -261,6 +366,13 @@
       "mime": "image/webp",
       "path": "objects/sha256/24/24797d52ca5755b466fecfaf06639bbcecf78b48cb29ba3aa405448d777eec52.webp",
       "width": 1216
+    },
+    "2700f44fd59c735582e776678a745ff85d0070d7981dadb0a9ac8e8067295fa3": {
+      "bytes": 1231485,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/27/2700f44fd59c735582e776678a745ff85d0070d7981dadb0a9ac8e8067295fa3.png",
+      "width": 1536
     },
     "3019906f6f342dee32f2258a63c3acbf539260fe75f811c5f2092deb546558b6": {
       "bytes": 197196,
@@ -318,11 +430,25 @@
       "path": "objects/sha256/61/617abe2b2581ab754a2a98be4f6115f2ef018c621aab090f625574df9721fea6.webp",
       "width": 1216
     },
+    "68070b3221c00ebcea5fbc31528312641bd9fc6fd5db65cb86c82debda3b6af0": {
+      "bytes": 1095390,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/68/68070b3221c00ebcea5fbc31528312641bd9fc6fd5db65cb86c82debda3b6af0.png",
+      "width": 1536
+    },
     "6ebdaedaa799739561dd8edcb3ff82d014ca58dca6652f81b2437f63c5f28aec": {
       "bytes": 139814,
       "height": 1024,
       "mime": "image/webp",
       "path": "objects/sha256/6e/6ebdaedaa799739561dd8edcb3ff82d014ca58dca6652f81b2437f63c5f28aec.webp",
+      "width": 1536
+    },
+    "741f080e209bb42b9f575de9f2d92b71c3c18e3928aa9f1bdfc1816cdaa901e9": {
+      "bytes": 1199562,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/74/741f080e209bb42b9f575de9f2d92b71c3c18e3928aa9f1bdfc1816cdaa901e9.png",
       "width": 1536
     },
     "75e8abd651ab9e1d1dd850e8e5c64c3bc1b396a2cf4517652ce075f476f9c6a3": {
@@ -346,6 +472,13 @@
       "path": "objects/sha256/81/81cd5de4ef9665b0888447bc2f65e5f23d8803a11c74dac668f7e62c265ace38.png",
       "width": 1536
     },
+    "88f1273c59fc9d28554f8b6c7eee6a07df1bd43c22990ceffbbb7774341f56fd": {
+      "bytes": 1143384,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/88/88f1273c59fc9d28554f8b6c7eee6a07df1bd43c22990ceffbbb7774341f56fd.png",
+      "width": 1536
+    },
     "8ec901a50dc312e29204cff5ab8bbbbd7fab616590dfcc9982298e2e216f9e9e": {
       "bytes": 173590,
       "height": 1024,
@@ -353,11 +486,25 @@
       "path": "objects/sha256/8e/8ec901a50dc312e29204cff5ab8bbbbd7fab616590dfcc9982298e2e216f9e9e.webp",
       "width": 1536
     },
+    "938fedb10321e58d5fbefe95d78fee444df1a98900a05019879e9fba72db8a62": {
+      "bytes": 1202403,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/93/938fedb10321e58d5fbefe95d78fee444df1a98900a05019879e9fba72db8a62.png",
+      "width": 1536
+    },
     "9975d4e61f78dbd4a10a366ddefdda40ae6ca408b68229ad5a02c06ba5e8fe7b": {
       "bytes": 1185045,
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/99/9975d4e61f78dbd4a10a366ddefdda40ae6ca408b68229ad5a02c06ba5e8fe7b.png",
+      "width": 1536
+    },
+    "9d25d2a019f1d6cc4860c4376bcc0cc7e4c1202aca7d997f06ba4a7c61602bac": {
+      "bytes": 1276400,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/9d/9d25d2a019f1d6cc4860c4376bcc0cc7e4c1202aca7d997f06ba4a7c61602bac.png",
       "width": 1536
     },
     "9fd3cf3cb747f658132260b1a3eb8c4f68d6382f680b5c8e26a414f8e1207abf": {
@@ -395,6 +542,13 @@
       "path": "objects/sha256/b2/b2639594672c77b1ce7fbe7e20e5caa70e374cca0565d6d81e2eaa9fd1fbccf2.png",
       "width": 1536
     },
+    "ba22b13bfe117f620ed7cd2e3ddc8f671679e5e8212eed7c3eb3e71d1cf9ddfb": {
+      "bytes": 1220489,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/ba/ba22b13bfe117f620ed7cd2e3ddc8f671679e5e8212eed7c3eb3e71d1cf9ddfb.png",
+      "width": 1536
+    },
     "c36016f62e514f2294e40553962c4835e0b4dea742b1b005ed71999cd0364be4": {
       "bytes": 1168962,
       "height": 1024,
@@ -416,6 +570,13 @@
       "path": "objects/sha256/c8/c855f7522a308f0192eb3ddf5751c409d1948b3836bcc4b94e60510c18b09389.png",
       "width": 1536
     },
+    "cd7ce7ab554b1392b5ab7337770ab2d10d2dfb376a8c4ea4e0eedd197e16039e": {
+      "bytes": 1283993,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/cd/cd7ce7ab554b1392b5ab7337770ab2d10d2dfb376a8c4ea4e0eedd197e16039e.png",
+      "width": 1536
+    },
     "ce37d5158878f9fc652190955d9a41a353843856065191a3a7a79f0f9c7822d3": {
       "bytes": 159104,
       "height": 1024,
@@ -428,6 +589,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/cf/cf44c96ef42b5d4a2bfc4ba0f535ea27bc7c6ea47a949f7adb8ac3824b07f7ce.png",
+      "width": 1536
+    },
+    "ea47def546eefb8e3c5d3d3e0bdcf2cdb08390dd313c77cfb32396967961be3c": {
+      "bytes": 1618164,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/ea/ea47def546eefb8e3c5d3d3e0bdcf2cdb08390dd313c77cfb32396967961be3c.png",
       "width": 1536
     },
     "eaa07b26b8e905d75983c14867797c73dc4534685797733cd268dad30890551c": {
@@ -444,11 +612,25 @@
       "path": "objects/sha256/ef/ef8d12c5a20a452518c8d7d084d5811a6650ed0f678ccadead0d4ccd58b4cf75.webp",
       "width": 1536
     },
+    "f5fad4b2c39a012b33f50a82f27dfa5d7af71a070d2f0c693c95e83a7342f94b": {
+      "bytes": 1197949,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/f5/f5fad4b2c39a012b33f50a82f27dfa5d7af71a070d2f0c693c95e83a7342f94b.png",
+      "width": 1536
+    },
     "f6e0bae0f78582fbcea10bac547342bb2e725e8feb67e1971b1494cf5e6c43ca": {
       "bytes": 1206704,
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/f6/f6e0bae0f78582fbcea10bac547342bb2e725e8feb67e1971b1494cf5e6c43ca.png",
+      "width": 1536
+    },
+    "fcfc19b3f647af1361c0935afb59d78f6277a113826f2b9cc06433cf2339b357": {
+      "bytes": 1250107,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/fc/fcfc19b3f647af1361c0935afb59d78f6277a113826f2b9cc06433cf2339b357.png",
       "width": 1536
     },
     "fd8fb0b932556f47df327866909a22c7938004299dacd1ab3685012a283d599d": {

@@ -1,0 +1,127 @@
+{
+  "version": 1,
+  "updated": "2026-08-14",
+  "title": "Python과 AI 업무자동화",
+  "promise": "설치 없는 첫 실행부터 파일 자동화와 AI 변경 검증까지 같은 프로젝트를 조금씩 성장시킨다.",
+  "stages": [
+    {
+      "order": 1,
+      "id": "automation-result",
+      "title": "완성 결과와 자동화 5단계",
+      "question": "반복업무를 컴퓨터에 시키려면 일을 어떻게 나눠야 할까?",
+      "postSlug": "work-automation",
+      "status": "published"
+    },
+    {
+      "order": 2,
+      "id": "python-map",
+      "title": "Python이 중요한 이유와 전체 지도",
+      "question": "업무 규칙을 컴퓨터가 실행하게 만드는 Python은 어떤 언어일까?",
+      "postSlug": "what-is-python",
+      "status": "published"
+    },
+    {
+      "order": 3,
+      "id": "browser-first-run",
+      "title": "설치 없이 첫 코드 실행",
+      "question": "Python을 설치하기 전에 코드를 직접 실행할 수 있을까?",
+      "postSlug": "no-install",
+      "status": "published"
+    },
+    {
+      "order": 4,
+      "id": "python-basic-syntax",
+      "title": "영상과 실행 셀로 배우는 기초문법",
+      "question": "변수부터 함수까지 업무 예제로 직접 바꿔 볼 수 있을까?",
+      "postSlug": "python-basic-syntax",
+      "status": "published"
+    },
+    {
+      "order": 5,
+      "id": "execution-and-types",
+      "title": "실행 순서와 값의 자료형",
+      "question": "코드는 어떤 순서로 실행되고 문자와 숫자는 왜 다르게 다뤄질까?",
+      "status": "planned"
+    },
+    {
+      "order": 6,
+      "id": "terminal",
+      "title": "터미널과 첫 명령",
+      "question": "검은 창은 무엇이고 명령은 어디에서 실행될까?",
+      "postSlug": "what-is-terminal",
+      "status": "published"
+    },
+    {
+      "order": 7,
+      "id": "powershell-paths",
+      "title": "PowerShell과 파일 경로",
+      "question": "폴더와 확장자를 확인하고 Python 파일을 어떻게 실행할까?",
+      "status": "planned"
+    },
+    {
+      "order": 8,
+      "id": "read-errors",
+      "title": "오류 메시지 읽기",
+      "question": "NameError와 TypeError 및 FileNotFoundError는 무엇부터 알려 줄까?",
+      "status": "planned"
+    },
+    {
+      "order": 9,
+      "id": "libraries-import",
+      "title": "라이브러리와 import",
+      "question": "Excel 파일 기능을 직접 만들지 않고 어떻게 가져다 쓸까?",
+      "status": "planned"
+    },
+    {
+      "order": 10,
+      "id": "scripts-ide",
+      "title": "스크립트와 VS Code",
+      "question": "코드와 입력 파일을 한 프로젝트에서 어떻게 관리할까?",
+      "status": "planned"
+    },
+    {
+      "order": 11,
+      "id": "uv-environment",
+      "title": "uv와 프로젝트 실행환경",
+      "question": "다른 컴퓨터에서도 같은 라이브러리로 실행하려면 무엇이 필요할까?",
+      "status": "planned"
+    },
+    {
+      "order": 12,
+      "id": "excel-automation",
+      "title": "여러 Excel 파일 자동 취합",
+      "question": "폴더 속 Excel 파일을 하나의 결과 파일로 어떻게 만들까?",
+      "status": "planned"
+    },
+    {
+      "order": 13,
+      "id": "validation-errors",
+      "title": "숫자 검증과 재실행",
+      "question": "파일 생성과 숫자 검증 및 안전한 재실행을 어떻게 확인할까?",
+      "status": "planned"
+    },
+    {
+      "order": 14,
+      "id": "ai-environment",
+      "title": "AI가 읽을 프로젝트 환경",
+      "question": "링크 하나로 AI가 저장소 규칙과 실행 명령을 찾게 하려면?",
+      "postSlug": "ai-environment",
+      "status": "published"
+    },
+    {
+      "order": 15,
+      "id": "ai-change-control",
+      "title": "AI 변경과 Tests 통제",
+      "question": "AI가 바꾼 코드가 기존 기능을 망가뜨리지 않았는지 어떻게 확인할까?",
+      "postSlug": "claude-code-agents",
+      "status": "published"
+    },
+    {
+      "order": 16,
+      "id": "work-project",
+      "title": "내 업무 한 장 기획서",
+      "question": "실제 반복업무를 작은 자동화 프로젝트로 어떻게 바꿀까?",
+      "status": "planned"
+    }
+  ]
+}

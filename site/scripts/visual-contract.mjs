@@ -73,6 +73,8 @@ const ROUTE_RULES = [
     checks: [
       VISIBLE("main#content"),
       TEXT("main#content h1", "블로그"),
+      TEXT("#curriculum-title", "Python과 AI 업무자동화"),
+      COUNT('section[aria-labelledby="curriculum-title"] ol > li', { exact: 16 }),
       COUNT('a[href^="/blog/"]', { min: 1 }),
     ],
   },
@@ -82,11 +84,45 @@ const ROUTE_RULES = [
       VISIBLE("article#content"),
       COUNT("article#content h1", { exact: 1 }),
       COUNT("article#content h2", { min: 1 }),
+      COUNT('nav[aria-label="글 목차"]', { exact: 1 }),
       EQUAL_COUNT("article#content h2", "article#content img"),
       COUNT(
         'script[src^="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]',
         { exact: 1 },
       ),
+    ],
+  },
+  {
+    match: (path) => path === "/blog/python-basic-syntax",
+    id: "python-basic-syntax",
+    checks: [
+      TEXT("article#content h1", "Python 기초문법 6가지를 영상과 실행 셀로 배우는 방법"),
+      COUNT('button[aria-label="YouTube 영상 재생"]', { exact: 1 }),
+      COUNT('a[href="https://www.youtube.com/shorts/priwCYZJ8h4"]', { exact: 1 }),
+      COUNT('aside[aria-label^="Codaro 실습 셀:"]', { exact: 7 }),
+      VISIBLE('aside[aria-label="Codaro 실습 셀: 기준금액으로 거래 분류하기"] textarea'),
+    ],
+    captures: [
+      {
+        id: "shorts-and-first-cell",
+        selector: '[data-youtube-player="priwCYZJ8h4"]',
+      },
+      {
+        id: "condition-cell",
+        selector: 'aside[aria-label="Codaro 실습 셀: 기준금액으로 거래 분류하기"]',
+      },
+    ],
+    interactions: [
+      {
+        id: "run-condition-example",
+        type: "click-until-text",
+        click:
+          'aside[aria-label="Codaro 실습 셀: 기준금액으로 거래 분류하기"] button',
+        target:
+          'aside[aria-label="Codaro 실습 셀: 기준금액으로 거래 분류하기"] output',
+        includes: "100,000원: 확인필요",
+        timeoutMs: 120_000,
+      },
     ],
   },
   {

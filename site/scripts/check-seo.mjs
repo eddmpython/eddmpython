@@ -5,7 +5,7 @@ const origin = "https://eddmpython.com";
 const repoRoot = resolve(process.cwd(), "..");
 const blogRoot = resolve(repoRoot, "blog");
 const distRoot = resolve(repoRoot, "../eddmpython.out/site-dist");
-const postName = /^(20\d{6}-[a-z0-9]+(?:-[a-z0-9]+)*)\.md$/;
+const postName = /^(\d{3}-[a-z0-9]+(?:-[a-z0-9]+)*)\.md$/;
 const adsenseClient = "ca-pub-6438440376456212";
 const adsenseScript = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
 

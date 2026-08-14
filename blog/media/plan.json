@@ -1,11 +1,11 @@
 {
   "assets": {
-    "20260809-what-is-terminal/command-parts": {
+    "003-what-is-terminal/command-parts": {
       "alt": "프로그램 이름 조각과 옵션 조각이 실행기를 거쳐 버전 결과 카드로 바뀌는 모습",
       "assetKey": "command-parts",
       "narrativeUse": "python과 version 옵션이 서로 다른 명령 조각이며 함께 실행되어 버전 결과를 만든다는 점을 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260809-what-is-terminal",
+      "post": "003-what-is-terminal",
       "prompt": "Use case: infographic-diagram. Create a wide 3:2 technical editorial diagram explaining the parts of a command without readable text. Show two clearly separate input tokens: a larger program token and a smaller option token marked only by two simple dash-shaped notches. They join into one compact execution module, which produces a clean version-information card with a stepped three-segment indicator. The relationship must read as program plus option produces version result. Crisp flat interface shapes, dark charcoal background, ivory panels, muted blue connectors, restrained amber option accent, green verified result. No readable text, letters, numbers, real code, people, hands, robots, logos, brands, neon, decorative objects, watermarks, or clutter.",
       "role": "section",
       "sectionHeading": "명령은 이름과 옵션으로 읽습니다",
@@ -17,12 +17,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260809-what-is-terminal/current-folder": {
+    "003-what-is-terminal/current-folder": {
       "alt": "폴더 트리의 현재 위치 표시와 터미널에 나타난 같은 폴더의 파일 목록이 연결된 모습",
       "assetKey": "current-folder",
       "narrativeUse": "터미널의 현재 폴더가 파일 이름만 적은 명령이 읽는 출발 위치라는 점을 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260809-what-is-terminal",
+      "post": "003-what-is-terminal",
       "prompt": "Use case: infographic-diagram. Create a wide 3:2 technical editorial diagram about a terminal's current folder. On one side, show a concrete nested folder tree with exactly one folder highlighted by a muted amber location marker. On the other side, show a terminal result panel containing the same highlighted folder and its three immediate file cards. Connect the highlighted folder to the matching result panel with one clear blue line. Make it obvious that commands without a full path read from the selected current folder. Crisp flat shapes, dark charcoal background, ivory folders and cards, restrained green verification. No readable text, letters, numbers, code, people, robots, logos, brands, neon, decorative workshop metaphor, watermarks, or clutter.",
       "role": "section",
       "sectionHeading": "현재 폴더가 명령의 출발점입니다",
@@ -34,12 +34,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260809-what-is-terminal/repeatable-command": {
+    "003-what-is-terminal/repeatable-command": {
       "alt": "하나의 저장된 명령이 세 번 실행되어 같은 형식의 파일 목록 결과를 만드는 모습",
       "assetKey": "repeatable-command",
       "narrativeUse": "한 줄로 남긴 명령을 다시 실행하면 같은 조건과 형식의 결과를 반복해서 얻는다는 장점을 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260809-what-is-terminal",
+      "post": "003-what-is-terminal",
       "prompt": "Use case: infographic-diagram. Create a wide 3:2 technical editorial diagram of one saved command being run three times. Place one compact command strip at the start, then split one connector into three execution points that each produce an identically structured file-list card with three file rows and a green check. Small file details may differ, but the filtering shape and result layout must be the same. Make repeatability and recorded input immediately clear. Dark charcoal background, ivory result cards, muted blue connectors, restrained amber command strip. No readable text, letters, numbers, code, people, robots, logos, brands, neon, decorative machinery, watermarks, or clutter.",
       "role": "section",
       "sectionHeading": "명령은 같은 일을 다시 실행하게 합니다",
@@ -51,12 +51,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260809-what-is-terminal/safe-first-session": {
+    "003-what-is-terminal/safe-first-session": {
       "alt": "일반 권한 터미널의 네 입력 줄이 현재 경로와 파일 목록 및 Python 확인 결과로 이어진 모습",
       "assetKey": "safe-first-session",
       "narrativeUse": "처음 실행할 네 명령이 파일을 바꾸지 않고 위치, 목록, Python 경로와 버전만 확인한다는 점을 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260809-what-is-terminal",
+      "post": "003-what-is-terminal",
       "prompt": "Use case: productivity-visual. Create a wide 3:2 technical editorial first-session checklist inside a normal non-administrator terminal. Show exactly four stacked abstract input rows. Each row connects to one distinct read-only result: a highlighted folder path, a short file list, an executable-file card, and a compact version-information card. All four results have restrained green checks. Show an administrator shield outside the terminal in a clearly inactive gray state. Crisp dark charcoal interface, ivory cards, muted blue connections, one amber cursor. No readable text, letters, numbers, real code, deletion symbols, people, hands, robots, logos, brands, neon, decorative objects, watermarks, or clutter.",
       "role": "section",
       "sectionHeading": "네 줄만 실행하면 첫 사용이 끝납니다",
@@ -68,12 +68,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260809-what-is-terminal/terminal-command-result": {
+    "003-what-is-terminal/terminal-command-result": {
       "alt": "키보드에서 입력한 명령이 PowerShell을 거쳐 폴더 경로 결과로 돌아오는 터미널 동작",
       "assetKey": "terminal-command-result",
       "narrativeUse": "터미널이 글자 명령을 받아 연결된 셸에 보내고 그 결과를 같은 창에 보여 주는 기본 동작을 설명한다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260809-what-is-terminal",
+      "post": "003-what-is-terminal",
       "prompt": "Use case: infographic-diagram. Create a wide 3:2 technical editorial diagram explaining a terminal as an input and output window. Show one practical terminal window with a single abstract command row and bright cursor at the top. A clear downward path passes through a compact shell-processing layer, then returns to the same window as a folder-path result made from three nested folder icons. The sequence must read as typed command, shell processing, visible result. Crisp flat interface shapes, dark charcoal background, ivory text blocks without glyphs, muted blue arrows, one restrained amber cursor, green result check. No readable text, letters, numbers, real code, people, hands, robots, logos, brands, neon, decorative workshop objects, watermarks, or clutter.",
       "role": "section",
       "sectionHeading": "터미널이란 무엇인가: 명령을 적는 창입니다",
@@ -85,12 +85,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260809-what-is-terminal/terminal-history": {
+    "003-what-is-terminal/terminal-history": {
       "alt": "종이에 출력하는 초기 전신 단말기와 CRT 화면 단말기 및 현대 터미널 앱이 차례로 이어진 모습",
       "assetKey": "terminal-history",
       "narrativeUse": "별도 물리 장치였던 터미널의 입력과 출력 기능이 오늘날 소프트웨어 창으로 옮겨 온 역사를 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260809-what-is-terminal",
+      "post": "003-what-is-terminal",
       "prompt": "Use case: historical-scene. Create a wide 3:2 historically grounded editorial progression of terminal hardware becoming software. Show three connected stages from left to right: an early electromechanical teletype with keyboard and paper output connected by a cable; a later dedicated CRT terminal with keyboard and glowing monochrome screen; and a modern laptop displaying a simple terminal application window. Keep each stage visibly distinct and connected by one thin timeline line. Tactile graphite, black metal, ivory paper, warm gray casing, restrained amber screen glow, dark charcoal backdrop. No dates, readable text, letters, numbers, code, people, logos, brands, neon, fantasy objects, watermarks, or clutter.",
       "role": "section",
       "sectionHeading": "터미널은 원래 책상 위 장치였습니다",
@@ -102,12 +102,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260809-what-is-terminal/terminal-shell-layers": {
+    "003-what-is-terminal/terminal-shell-layers": {
       "alt": "Windows Terminal 창 안의 여러 셸이 각각 Python과 Git 같은 프로그램을 실행하는 층별 구조",
       "assetKey": "terminal-shell-layers",
       "narrativeUse": "터미널, 셸, 명령줄 프로그램이 서로 다른 층이면서 입력과 결과로 연결된다는 차이를 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260809-what-is-terminal",
+      "post": "003-what-is-terminal",
       "prompt": "Use case: infographic-diagram. Create a wide 3:2 technical editorial cutaway showing three distinct layers. The outer layer is one graphical terminal window with three visible tabs. Inside, each tab contains a different shell-processing card with a unique neutral pattern. Beneath the shell cards, arrows lead to separate command-line program cards represented by a script file, a branching version-control graph, and a Linux-style package cube. Results travel back upward to the terminal window. Make host window, shell interpreters, and external programs unmistakably separate. Dark charcoal background, ivory cards, muted blue paths, restrained amber highlights and green result checks. No readable text, letters, numbers, real code, logos, brands, people, robots, neon, decorative metaphors, watermarks, or clutter.",
       "role": "section",
       "sectionHeading": "PowerShell은 터미널 안에서 일합니다",
@@ -119,12 +119,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260807-what-is-python/first-python-run": {
+    "001-what-is-python/first-python-run": {
       "alt": "브라우저 코드 입력칸의 붕어빵 수량이 실행 버튼을 거쳐 새 영수증 결과로 바뀌는 모습",
       "assetKey": "first-python-run",
       "narrativeUse": "팥 수량을 바꾸고 다시 실행하면 전체 개수와 가격이 함께 달라지는 첫 실습을 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260807-what-is-python",
+      "post": "001-what-is-python",
       "prompt": "Use case: infographic-diagram. Create a wide 3:2 technical editorial diagram of a beginner changing one quantity in a browser code cell and running it again. Show a practical browser code panel on the left with one highlighted numeric token, a large triangular run control in the center, and two receipt-shaped result cards on the right. The first receipt has three small fish-shaped pastry icons and three coin marks. The second has six pastry icons and six coin marks, making the changed result obvious without text. Crisp flat interface shapes, dark charcoal background, ivory panels, muted blue connectors, restrained amber highlights and green success checks. No readable text, letters, code, people, hands, robots, logos, brands, neon, decorative workshop objects, unrelated food, watermarks, or clutter.",
       "role": "section",
       "sectionHeading": "브라우저에서 첫 코드를 실행합니다",
@@ -136,12 +136,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260807-what-is-python/language-choice": {
+    "001-what-is-python/language-choice": {
       "alt": "브라우저, 모바일 앱, 고성능 엔진, 네트워크 서버, 데이터와 AI 작업이 알맞은 언어 경로로 나뉜 모습",
       "assetKey": "language-choice",
       "narrativeUse": "Python이 모든 문제의 답이 아니며 실행 장소와 성능 조건에 따라 다른 언어가 더 적합함을 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260807-what-is-python",
+      "post": "001-what-is-python",
       "prompt": "Use case: infographic-diagram. Create a wide 3:2 technical editorial decision diagram comparing programming language fit by task without naming languages. Arrange five clear task cards in one row: a web browser interface, a mobile phone app, a high-performance engine with a speed gauge, a network server rack, and a data table connected to an AI model. Beneath them, show distinct code-file paths leading to the appropriate task cards, with the data and AI path visibly connected to a simple indented script file. Make task-to-tool fit immediately readable. Crisp flat shapes, dark charcoal background, ivory cards, muted blue paths, restrained amber and green accents. No text, letters, code, people, robots, logos, brands, snakes, neon, decorative metaphors, watermarks, or clutter.",
       "role": "section",
       "sectionHeading": "다른 언어가 더 좋은 일도 있습니다",
@@ -153,12 +153,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260807-what-is-python/python-ecosystem": {
+    "001-what-is-python/python-ecosystem": {
       "alt": "하나의 Python 파일이 표 계산, 웹 요청, 자동화 시계, AI 모델 결과에 각각 연결된 모습",
       "assetKey": "python-ecosystem",
       "narrativeUse": "Python 문법 하나가 라이브러리를 통해 데이터, 웹, 자동화, AI 작업을 연결하는 생태계를 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260807-what-is-python",
+      "post": "001-what-is-python",
       "prompt": "Use case: infographic-diagram. Create a wide 3:2 technical editorial hub-and-spoke diagram about one Python script connecting specialized libraries. In the center, show one clean indented script-file card. Four separate arrows lead to four concrete outputs: a spreadsheet with a summarized column, a web API response window, a clock triggering a completed file task, and an AI model node producing a checked result. Each output must be distinct and practical. Crisp flat interface shapes, dark charcoal background, ivory cards, muted blue connectors, restrained amber details and green success checks, generous spacing. No text, letters, code, people, robots, logos, brands, snakes, neon, decorative workshop objects, watermarks, or clutter.",
       "role": "section",
       "sectionHeading": "라이브러리가 작은 코드를 크게 만듭니다",
@@ -170,12 +170,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260807-what-is-python/python-history": {
+    "001-what-is-python/python-history": {
       "alt": "1989년 겨울 달력에서 시작한 코드가 1991년 공개와 2008년 Python 3 문서로 이어지는 연표",
       "assetKey": "python-history",
       "narrativeUse": "1989년 개인 프로젝트가 1991년 공개와 2008년 큰 개편을 지나 오늘의 Python으로 이어진 역사를 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260807-what-is-python",
+      "post": "001-what-is-python",
       "prompt": "Use case: historical-scene. Create a wide 3:2 tactile editorial timeline of Python's early history without portraits or logos. Show four connected stages from left to right: an Amsterdam winter calendar beside a small home computer and handwritten interpreter notes; an early 1990s dial-up terminal sending a software package to a public network; a growing open-source contribution board with many patch cards; and a clean modernized language document replacing an older stack of papers. The dates are explained outside the image, so use no readable numbers or words. Style is restrained tactile editorial illustration with graphite, ivory paper, dark metal, one muted amber winter light, and thin blue timeline connections. No snakes, people, faces, readable text, logos, brands, neon, fantasy scenery, watermarks, or clutter.",
       "role": "section",
       "sectionHeading": "1989년 크리스마스에 시작됐습니다",
@@ -187,12 +187,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260807-what-is-python/python-is-instructions": {
+    "001-what-is-python/python-is-instructions": {
       "alt": "짧은 Python 명령이 붕어빵 주문 영수증 결과로 바뀌는 실행 흐름",
       "assetKey": "python-is-instructions",
       "narrativeUse": "사람이 수량과 가격을 코드로 적으면 Python이 계산해 눈에 보이는 결과를 만든다는 정의를 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260807-what-is-python",
+      "post": "001-what-is-python",
       "prompt": "Use case: infographic-diagram. Create a wide 3:2 technical editorial diagram explaining Python as instructions that a computer executes. On the left, show a short, clean indented script card with three quantity tokens and one multiplication symbol but no readable code. In the center, show a compact execution indicator. On the right, show a receipt card with exactly three small fish-shaped pastry icons and three equal coin marks, plus a green success check. Make the input, calculation, result sequence obvious. Crisp flat interface shapes, dark charcoal background, ivory cards, muted blue arrows, restrained amber pastry accents and green verification. No readable text, letters, people, hands, robots, logos, brands, snakes, neon, decorative workshop objects, watermarks, or clutter.",
       "role": "section",
       "sectionHeading": "파이썬이란 무엇인가: 컴퓨터에게 일을 적는 언어입니다",
@@ -204,12 +204,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260807-what-is-python/python-popularity": {
+    "001-what-is-python/python-popularity": {
       "alt": "수많은 코드 저장소와 개발자 응답이 Python의 AI 및 데이터 작업으로 모이는 통계 장면",
       "assetKey": "python-popularity",
       "narrativeUse": "서로 다른 조사 방법인 저장소 활동과 개발자 설문이 Python의 AI 및 데이터 강점을 함께 가리키는 모습을 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260807-what-is-python",
+      "post": "001-what-is-python",
       "prompt": "Use case: productivity-visual. Create a wide 3:2 technical editorial evidence diagram about programming-language popularity measured from two different sources. On the left, show a dense field of repository cards feeding into a ranked contribution chart. On the right, show many anonymous survey response cards feeding into a rising adoption chart. Both sides converge toward a center panel that combines a data table and an AI model node, without claiming a universal number-one rank. Use unlabeled bars and proportions only because exact figures are explained in the article text. Crisp flat data visualization, dark charcoal background, ivory panels, muted blue data paths, restrained amber emphasis and green checks. No readable text, letters, numbers, people, logos, brands, snakes, neon, trophy, crown, watermarks, or clutter.",
       "role": "section",
       "sectionHeading": "인기는 서로 다른 숫자에서 보입니다",
@@ -221,12 +221,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260807-what-is-python/readable-syntax": {
+    "001-what-is-python/readable-syntax": {
       "alt": "같은 가격 합계를 계산하는 짧고 정돈된 코드와 기호가 많은 코드가 나란히 놓인 비교",
       "assetKey": "readable-syntax",
       "narrativeUse": "Python의 들여쓰기와 적은 기호가 같은 계산 순서를 더 짧고 일정한 모양으로 보여 주는 차이를 설명한다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260807-what-is-python",
+      "post": "001-what-is-python",
       "prompt": "Use case: infographic-diagram. Create a wide 3:2 technical editorial comparison of two code layouts performing the same price-filtering and sum task. On the left, show a compact code card with four short rows, clear consistent indentation, and very few punctuation marks. On the right, show a wider code card with nested brackets, braces, arrows, and semicolon-shaped marks. Both feed into identical total-result cards with green checks, so the difference is readability and visual density rather than correctness. Use abstract code strokes only, no readable text or real code. Crisp flat layout, dark charcoal background, ivory cards, muted blue connectors, restrained amber highlights. No letters, numbers, people, robots, logos, brands, snakes, neon, superiority trophy, watermarks, or clutter.",
       "role": "section",
       "sectionHeading": "읽기 쉬운 문법이 사람을 모았습니다",
@@ -238,12 +238,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260811-ai-needs-an-environment/failure-guardrails": {
+    "004-ai-needs-an-environment/failure-guardrails": {
       "alt": "CLAUDE.md의 명령표에서 설치, 개발, 테스트, 빌드 명령이 각각 터미널 실행 결과로 이어지는 화면",
       "assetKey": "failure-guardrails",
       "narrativeUse": "CLAUDE.md에 철학 대신 복사 가능한 명령과 실행 위치를 적어야 한다는 절의 실제 구성을 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260811-ai-needs-an-environment",
+      "post": "004-ai-needs-an-environment",
       "prompt": "Use case: infographic-diagram. Create a wide 3:2 technical editorial diagram for a Korean article about writing executable repository commands in CLAUDE.md. Show a large code-editor panel titled exactly 'CLAUDE.md' on the left with a clean four-row table. The only row labels are 'Install', 'Dev', 'Test', and 'Build'. The Test row contains the exact short command 'tests/run.py preflight'. On the right, four small terminal result panels connect to the four rows with thin arrows, each showing a clear green success check. Use crisp flat interface shapes, dark charcoal background, ivory panels, muted blue connectors, and restrained green success accents. Every element must explain the command table and its execution result. No decorative workshop metaphor. Keep all visible text limited to the exact labels listed. Avoid people, robots, brains, random code, logos, brands, neon, 3D tools, unrelated objects, tiny unreadable paragraphs, watermarks, and visual clutter.",
       "role": "section",
       "sectionHeading": "CLAUDE.md에 실제 명령을 씁니다",
@@ -255,12 +255,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260811-ai-needs-an-environment/five-questions": {
+    "004-ai-needs-an-environment/five-questions": {
       "alt": "DartLab, Codaro, xlpod, pyproc, ClipScout가 각자의 실행 명령과 완료 증거로 연결된 비교표",
       "assetKey": "five-questions",
       "narrativeUse": "AI가 언어 이름으로 추측하지 않고 각 프로젝트의 설정과 실행 결과에서 다른 게이트를 찾는 이유를 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260811-ai-needs-an-environment",
+      "post": "004-ai-needs-an-environment",
       "prompt": "Use case: infographic-diagram. Create a wide 3:2 comparison diagram for a Korean technical blog. Show exactly five horizontal repository cards with these exact names and capitalization: 'DartLab', 'Codaro', 'xlpod', 'pyproc', 'ClipScout'. Each card has three compact visual columns: runtime, gate, evidence. DartLab and Codaro show a Python file icon and terminal check. xlpod shows a web spreadsheet window and browser check. pyproc shows an npm package box and browser runtime check. ClipScout shows a Rust gear, React window, and desktop app check. Use only the five project names as text. Communicate differences through clear icons and arrows. Crisp flat technical editorial style, dark charcoal background, ivory cards, muted blue lines, restrained green checks. No decorative metaphor. Avoid people, robots, brains, random code, logos, brand marks, neon, 3D workshop objects, extra cards, misspelled project names, tiny paragraphs, watermarks, and clutter.",
       "role": "section",
       "sectionHeading": "AI는 저장소에서 정답을 찾습니다",
@@ -272,12 +272,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260811-ai-needs-an-environment/prompt-vs-environment": {
+    "004-ai-needs-an-environment/prompt-vs-environment": {
       "alt": "하나의 블로그 URL을 받은 AI가 현재 저장소를 조사해 AGENTS.md와 CLAUDE.md 및 검증 결과를 만드는 흐름",
       "assetKey": "prompt-vs-environment",
       "narrativeUse": "사용자가 URL 하나를 전달하면 AI가 저장소를 조사하고 환경 문서와 검증 결과를 만드는 전체 입력과 출력을 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260811-ai-needs-an-environment",
+      "post": "004-ai-needs-an-environment",
       "prompt": "Use case: infographic-diagram. Create a wide 3:2 technical editorial workflow for a Korean article about giving one blog URL to an AI coding agent so it can configure the current repository. On the left, show one clean browser address card containing only a chain-link icon. A single arrow leads to a central coding-agent window inspecting a visible repository file tree, package settings, and CI configuration. Two arrows then lead to a pair of document cards and one terminal result card with restrained green success checks. The sequence must read immediately as URL input, repository inspection, environment documents, verification result. Crisp flat interface shapes, dark charcoal background, ivory cards, muted blue connectors, restrained green accents, generous spacing. No readable text, letters, code, people, robots, brains, logos, brands, neon, decorative workshop objects, unrelated files, watermarks, or clutter.",
       "role": "section",
       "sectionHeading": "이 링크만 AI에게 전달합니다",
@@ -289,12 +289,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260811-ai-needs-an-environment/reopen-judgment": {
+    "004-ai-needs-an-environment/reopen-judgment": {
       "alt": "공개 AI 코딩 환경 템플릿의 일곱 필수 칸이 실제 프로젝트 값으로 채워지는 체크리스트",
       "assetKey": "reopen-judgment",
       "narrativeUse": "공개 템플릿을 처음 적용할 때 제품 경계부터 권한까지 일곱 칸을 순서대로 채우는 행동을 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260811-ai-needs-an-environment",
+      "post": "004-ai-needs-an-environment",
       "prompt": "Use case: infographic-diagram. Create a wide 3:2 closing checklist for a technical blog about setting up an AI coding repository template. Show exactly seven large checklist rows with a checked box and these exact short English labels: 'Boundary', 'Runtime', 'Commands', 'Docs', 'Artifacts', 'Evidence', 'Authority'. On the left, show two small file cards titled exactly 'AGENTS.md' and 'CLAUDE.md'. Thin arrows connect the file cards to the seven completed rows. Crisp flat technical editorial design, dark charcoal background, ivory cards, muted blue connectors, restrained green check marks, generous spacing, text large enough to read at thumbnail size. No decorative metaphors. Avoid people, robots, brains, random code, logos, brand marks, neon, 3D workshop objects, extra checklist rows, misspelled labels, tiny paragraphs, watermarks, and clutter.",
       "role": "section",
       "sectionHeading": "일곱 칸이 채워졌는지 확인합니다",
@@ -306,12 +306,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260811-ai-needs-an-environment/small-start": {
+    "004-ai-needs-an-environment/small-start": {
       "alt": "테스트 명령이 보고서 파일과 브라우저 화면 및 완료 체크로 이어지는 검증 흐름",
       "assetKey": "small-start",
       "narrativeUse": "명령 종료만 보지 않고 보고서, 실제 화면, 프로세스 정리까지 확인해야 완료라는 흐름을 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260811-ai-needs-an-environment",
+      "post": "004-ai-needs-an-environment",
       "prompt": "Use case: infographic-diagram. Create an exact 3:2 technical editorial diagram with four equal cards in a 2 by 2 snake order. Top left is Command, top right is Report, bottom right is Browser, and bottom left is Cleanup. Draw exactly three blue arrows: Command to Report, Report down to Browser, Browser left to Cleanup. Command contains an unlabeled terminal prompt icon. Report contains a generic JSON document icon. Browser contains a generic application window. Cleanup contains two closed-process window icons. Each card has one restrained green check. The only visible text is Command, Report, Browser, and Cleanup. Keep all cards fully visible with wide margins. Crisp flat interface shapes, dark charcoal background, ivory cards, muted blue arrows, restrained green accents. Avoid code, numbers, dates, URLs, ports, filenames, extra labels, people, robots, logos, brands, watermarks, and clutter.",
       "role": "section",
       "sectionHeading": "작은 검사로 환경 구성을 확인합니다",
@@ -323,12 +323,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260811-ai-needs-an-environment/template-repair": {
+    "004-ai-needs-an-environment/template-repair": {
       "alt": "짧은 CLAUDE.md에서 테스트, 배포, 아키텍처 문서 세 갈래로 연결되는 문서 지도",
       "assetKey": "template-repair",
       "narrativeUse": "루트 규칙은 짧게 유지하고 상세 테스트, 배포, 아키텍처 계약은 별도 정본으로 연결하는 구조를 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260811-ai-needs-an-environment",
+      "post": "004-ai-needs-an-environment",
       "prompt": "Use case: infographic-diagram. Create a wide 3:2 repository documentation map for a Korean technical blog. At the top center, show a compact file card titled exactly 'CLAUDE.md'. From it, three clean arrows lead downward to three larger document cards titled exactly 'testing.md', 'deploy.md', and 'architecture.md'. Add a tiny 'AGENTS.md' card above CLAUDE.md with one arrow pointing down, showing it is only the entry. The hierarchy and one-way references must be immediately clear. Crisp flat technical editorial design, dark charcoal background, ivory file cards, muted blue arrows, subtle green accents, generous spacing. Avoid people, robots, brains, random code, logos, brand marks, neon, 3D workshop objects, duplicate documents, extra text, tiny paragraphs, watermarks, and clutter.",
       "role": "section",
       "sectionHeading": "긴 절차는 정본 문서로 연결합니다",
@@ -340,12 +340,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260811-ai-needs-an-environment/workbench": {
+    "004-ai-needs-an-environment/workbench": {
       "alt": "AGENTS.md 파일이 한 방향 화살표로 CLAUDE.md 정본과 프로젝트 문서에 연결된 구조도",
       "assetKey": "workbench",
       "narrativeUse": "AGENTS.md는 짧은 입구이고 CLAUDE.md 한 곳만 공통 규칙의 정본이라는 구조를 그대로 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260811-ai-needs-an-environment",
+      "post": "004-ai-needs-an-environment",
       "prompt": "Use case: infographic-diagram. Create a wide 3:2 technical editorial diagram explaining a single source of truth for repository agent rules. On the left, one small file card titled exactly 'AGENTS.md'. A single bold arrow points to one larger central file card titled exactly 'CLAUDE.md' with a small crown-like source-of-truth marker, but no words other than the filename. From CLAUDE.md, two thin arrows point to a 'docs/' folder and a 'tests/' folder on the right. Make the one-way hierarchy unambiguous and keep AGENTS.md visibly smaller than CLAUDE.md. Crisp flat diagram, dark charcoal background, ivory cards, muted blue arrows, restrained green verification accents. Avoid people, robots, brains, random code, logos, brand marks, neon, 3D workshop scenes, two competing central files, extra text, watermarks, and clutter.",
       "role": "section",
       "sectionHeading": "AGENTS.md는 입구만 맡습니다",
@@ -357,12 +357,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260808-codaro-guide/decision-boundary": {
+    "002-codaro-guide/decision-boundary": {
       "alt": "브라우저 학습 책상과 파일 작업실로 가는 길이 나뉜 모습",
       "assetKey": "decision-boundary",
       "narrativeUse": "독자가 지금 필요한 실행 범위에 따라 Web, Local, 다른 도구를 선택해야 한다는 결론을 공간으로 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260808-codaro-guide",
+      "post": "002-codaro-guide",
       "prompt": "Use case: stylized-concept. Asset type: wide closing section illustration for a Korean technical blog. Primary request: depict a calm decision point where one compact path leads to a lightweight browser learning desk and another path leads to a larger local workshop with file cabinets, package cases, and a scheduling mechanism. A third neutral path leaves the scene, suggesting that another tool can be the right choice. Style and medium: tactile monochrome editorial 3D illustration with graphite, matte black metal, warm gray stone, ivory paper, and one muted amber indicator. Composition: wide 3:2 landscape, balanced fork, three clearly different destinations, generous negative space. Lighting and mood: quiet, exact, non-promotional. Constraints: communicate tool choice by capability without labels. Avoid: words, letters, numbers, code, logos, brands, watermarks, people, robots, brains, flat vector graphics, neon, saturated blue or purple, glossy science fiction interfaces, clutter.",
       "role": "section",
       "sectionHeading": "처음에는 Web만 써도 충분합니다",
@@ -374,12 +374,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260808-codaro-guide/embedded-cell": {
+    "002-codaro-guide/embedded-cell": {
       "alt": "글 가운데의 코드 입력칸이 아래쪽 실행 장치와 연결된 모습",
       "assetKey": "embedded-cell",
       "narrativeUse": "설명과 실행이 다른 페이지로 끊기지 않고 한 읽기 흐름 안에서 연결된다는 점을 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260808-codaro-guide",
+      "post": "002-codaro-guide",
       "prompt": "Use case: stylized-concept. Asset type: wide section illustration for a Korean technical blog. Primary request: show an editorial article surface with one tactile editable cell embedded in its center, physically connected to a compact browser-side execution chamber below. Small movable data tokens enter the cell and a changed result object returns beside it. Style and medium: sophisticated tactile monochrome 3D editorial illustration, graphite paper, blackened metal, smoked glass, matte controls. Composition: wide 3:2 landscape, centered embedded cell, clear input and output relationship, no fake interface details. Lighting and mood: focused low-key studio light, approachable and precise. Color palette: charcoal, graphite, warm gray, ivory, one muted sand accent. Constraints: the meaning must read without labels. Avoid: readable text, letters, numbers, code, logos, brands, watermarks, people, hands, robots, brains, flat infographics, neon, saturated colors, science fiction UI, clutter.",
       "role": "section",
       "sectionHeading": "아래 코드를 지금 실행해 봅니다",
@@ -391,12 +391,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260808-codaro-guide/learning-loop": {
+    "002-codaro-guide/learning-loop": {
       "alt": "하나의 코드 종이가 설명대와 실행 장치와 검사 장치를 차례로 지나가는 어두운 작업대",
       "assetKey": "learning-loop",
       "narrativeUse": "읽기, 수정, 실행, 검증, 재사용이 한 작업 흐름이라는 글의 중심 생각과 OG 장면을 맡는다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260808-codaro-guide",
+      "post": "002-codaro-guide",
       "prompt": "Use case: stylized-concept. Asset type: hero and section illustration for a detailed Korean Codaro guide. Primary request: depict one Python learning cell moving through a continuous physical workflow of reading, editing, execution, evidence checking, and finally becoming a reusable automation module. Each stage is a distinct station on one connected workbench, with the verified module returning to the start as a calm loop. Style and medium: premium tactile monochrome editorial 3D illustration with graphite, matte black steel, frosted glass, ivory paper, and one restrained muted amber signal. Composition: wide 3:2 landscape, readable left-to-right loop, strong central focus, generous breathing room, clear at thumbnail size. Lighting and mood: low-key studio light, serious but inviting. Constraints: communicate the process without labels. Avoid: words, letters, numbers, code, logos, brands, watermarks, people, robots, brains, chat bubbles, flat vector diagrams, neon, saturated colors, blue or purple glow, fake product UI, clutter.",
       "role": "section",
       "sectionHeading": "첫 화면에서는 세 가지만 하면 됩니다",
@@ -408,12 +408,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260808-codaro-guide/local-expansion": {
+    "002-codaro-guide/local-expansion": {
       "alt": "작은 브라우저 책상이 파일 서랍과 예약 장치가 있는 큰 작업실로 연결된 모습",
       "assetKey": "local-expansion",
       "narrativeUse": "Web의 같은 문서가 Local에서 파일, 패키지, 일정, 자동화 권한을 얻는 확장 관계를 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260808-codaro-guide",
+      "post": "002-codaro-guide",
       "prompt": "Use case: stylized-concept. Asset type: wide section illustration for a Korean technical blog. Primary request: show a compact browser learning workbench extending through one continuous cable and document rail into a larger local workshop. The larger side contains physical file drawers, sealed package cases, a precise clockwork scheduler, and a guarded automation machine. The original learning cell remains visibly the same object across both sides. Style and medium: tactile monochrome editorial 3D illustration using graphite, matte black metal, smoked glass, warm gray stone, ivory paper, and one muted amber status light. Composition: wide 3:2 landscape, compact Web area on one side, expanded Local area on the other, clear continuity. Lighting and mood: controlled, trustworthy, practical. Avoid: words, letters, numbers, code, logos, brands, watermarks, people, robots, brains, flat vector diagrams, neon, saturated colors, fake UI, clutter.",
       "role": "section",
       "sectionHeading": "내 컴퓨터의 파일을 쓸 때는 Local을 엽니다",
@@ -425,12 +425,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260808-codaro-guide/percent-file": {
+    "002-codaro-guide/percent-file": {
       "alt": "여러 칸으로 나뉜 긴 종이가 끊어지지 않은 파일 한 장으로 이어지는 모습",
       "assetKey": "percent-file",
       "narrativeUse": "셀 경계가 있어도 저장 결과는 하나의 읽을 수 있고 실행 가능한 Python 파일이라는 점을 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260808-codaro-guide",
+      "post": "002-codaro-guide",
       "prompt": "Use case: stylized-concept. Asset type: wide section illustration for a Korean technical blog. Primary request: depict one long continuous ivory paper document passing across a dark worktable. Precise shallow dividers segment it into several cells, yet the paper remains unbroken and exits as one complete executable file object. A simple file press and versioned archive tray reinforce durability without any labels. Style and medium: tactile monochrome editorial 3D illustration, realistic paper fibers, graphite guides, matte black metal, warm gray stone. Composition: wide 3:2 landscape, long horizontal document, clearly visible cell boundaries and continuous whole, ample space. Lighting and mood: quiet craft, exact, archival. Color palette: charcoal, graphite, ivory, warm gray, one very muted sand accent. Avoid: words, letters, numbers, code, logos, brands, watermarks, people, robots, brains, flat infographic style, neon, saturated colors, glowing UI, clutter.",
       "role": "section",
       "sectionHeading": "작성한 코드는 .py 파일로 저장됩니다",
@@ -442,12 +442,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260808-codaro-guide/reactive-path": {
+    "002-codaro-guide/reactive-path": {
       "alt": "서로 연결된 코드 블록 가운데 필요한 두 블록에만 불이 들어온 모습",
       "assetKey": "reactive-path",
       "narrativeUse": "한 셀의 변경이 의존하는 하위 셀에만 전달되고 오류 지점에서 멈추는 리액티브 실행을 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260808-codaro-guide",
+      "post": "002-codaro-guide",
       "prompt": "Use case: stylized-concept. Asset type: wide section illustration for a Korean technical blog. Primary request: create a physical dependency network of five distinct cell modules on a dark workbench. One upstream input module changes, sending a restrained amber pulse only through two connected downstream modules while unrelated modules remain still. Include one precise safety gate that can stop propagation before a final module. Style and medium: tactile monochrome editorial 3D illustration with machined graphite blocks, matte black rails, smoked glass, and ivory inserts. Composition: wide 3:2 landscape, clear dependency direction through spatial depth, no arrows or labels, low clutter. Lighting and mood: precise engineering, calm, credible. Color palette: charcoal, graphite, warm gray, ivory, one muted amber pulse. Avoid: words, letters, numbers, code, logos, brands, watermarks, people, robots, brains, flat flowcharts, neon, saturated blue or purple, science fiction UI.",
       "role": "section",
       "sectionHeading": "코드가 길어지면 여러 셀로 나눕니다",
@@ -459,12 +459,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260808-codaro-guide/validation-evidence": {
+    "002-codaro-guide/validation-evidence": {
       "alt": "실행 장치에서 나온 결과물이 여러 검사 장치를 차례로 지나는 모습",
       "assetKey": "validation-evidence",
       "narrativeUse": "오류 없는 실행과 목표를 만족한 강검증이 다른 단계이며 결과가 증거로 남는다는 점을 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260808-codaro-guide",
+      "post": "002-codaro-guide",
       "prompt": "Use case: stylized-concept. Asset type: wide section illustration for a Korean technical blog. Primary request: show a result object leaving a simple execution chamber, then passing through several precise physical gauges that test shape, value, and behavior before it can enter a durable evidence ledger. A plausible but incorrect object is calmly diverted into a repair tray. Style and medium: tactile monochrome editorial 3D illustration with graphite, dark steel, frosted glass, ivory paper ledger, and one muted sand acceptance marker. Composition: wide 3:2 landscape, clear sequence from execution to validation to evidence, strong object readability. Lighting and mood: rigorous, calm, educational. Constraints: no text is needed. Avoid: words, letters, numbers, code, checkmark icons, logos, brands, watermarks, people, robots, brains, flat infographic cards, neon, saturated colors, futuristic UI, clutter.",
       "role": "section",
       "sectionHeading": "실행 결과가 맞는지도 확인합니다",
@@ -476,12 +476,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260808-codaro-guide/web-entry": {
+    "002-codaro-guide/web-entry": {
       "alt": "닫힌 설치 도구 상자 옆으로 브라우저 학습 책상까지 길이 열린 모습",
       "assetKey": "web-entry",
       "narrativeUse": "설치 준비를 먼저 하지 않고 브라우저에서 곧바로 읽기와 실행을 시작한다는 진입 경험을 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260808-codaro-guide",
+      "post": "002-codaro-guide",
       "prompt": "Use case: stylized-concept. Asset type: wide section illustration for a Korean technical blog. Primary request: depict an immediate open passage from a simple browser-like frame into a ready Python learning workbench. Off to the side, a heavy stack of installation boxes and setup tools remains untouched behind a closed gate, showing that setup is not required for the first lesson. Style and medium: premium tactile monochrome editorial 3D illustration with graphite, blackened metal, frosted glass, warm gray stone, ivory paper, one muted amber welcome light. Composition: wide 3:2 landscape, open direct route as the focus, unused setup barrier secondary, generous negative space. Lighting and mood: inviting, calm, exact. Avoid: readable text, letters, numbers, code, logos, brands, watermarks, people, hands, robots, brains, flat vector graphics, neon, saturated colors, fake screens, science fiction UI, clutter.",
       "role": "section",
       "sectionHeading": "설치하지 않고 첫 레슨을 엽니다",
@@ -493,12 +493,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260813-claude-code-agents/frosted-machine": {
+    "005-claude-code-agents/frosted-machine": {
       "alt": "불투명 유리 뒤에서 실루엣으로만 보이는 기계와 유리 앞 선반에 놓인 완성된 부품",
       "assetKey": "frosted-machine",
       "narrativeUse": "결과물은 받지만 작동 과정은 볼 수 없는 유리벽 구조를 보여 줘서 반쪽이라는 체감의 실체를 시각화한다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260813-claude-code-agents",
+      "post": "005-claude-code-agents",
       "prompt": "Use case: stylized-concept. Asset type: wide section illustration for a Korean technical blog. Primary request: the entire background is one heavily frosted, milky translucent glass wall that fills the frame edge to edge. Behind the frosted glass, everything is soft and unreadable: only one dark blurred smudge suggests a compact machine shape, with no sharp detail whatsoever visible through the glass. In the near foreground, on a narrow dark wooden ledge in front of the glass, a short row of finished, finely polished small metal parts stands in crisp sharp focus, strongly contrasting with the blur behind. The image must communicate receiving perfect results while the working process stays completely hidden behind frosted glass. The scene is unmanned and contains no living thing. Style and medium: tactile monochrome editorial 3D still life with realistic frosted glass, blackened steel, wood, and paper textures. Composition: wide 3:2 landscape, extreme depth contrast between sharp foreground parts and fully blurred background. Lighting and mood: low-key studio light, calm, serious, exact. Color palette: charcoal, graphite, black, warm gray, ivory, with at most one very muted sand accent. Constraints: meaning must be readable without labels. Avoid: words, letters, numbers, code, logos, brands, watermarks, people, hands, human figures, human silhouettes, mannequins, robots, plants, clear transparent glass, sharp machinery detail behind the glass, neon, saturated blue or purple, saturated yellow, glossy science fiction interfaces, visual clutter.",
       "role": "section",
       "sectionHeading": "Fable 5가 반쪽으로 느껴지는 이유",
@@ -510,12 +510,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260813-claude-code-agents/manual-open": {
+    "005-claude-code-agents/manual-open": {
       "alt": "제도용 책상 위에 펼쳐진 두꺼운 기술 설명서와 그 위에 놓인 돋보기",
       "assetKey": "manual-open",
       "narrativeUse": "당황스러운 행동의 원인이 이미 인쇄되어 있었다는 절의 주장, 즉 문서를 먼저 읽으면 절반은 풀린다는 것을 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260813-claude-code-agents",
+      "post": "005-claude-code-agents",
       "prompt": "Use case: stylized-concept. Asset type: wide section illustration for a Korean technical blog. Primary request: a drafting table under a single warm desk lamp, several tightly rolled blueprint tubes stacked at one side, and one large unrolled paper sheet held flat by small weights, showing only faint simple geometric line diagrams of a machine drawn in thin graphite lines. A large brass magnifying glass rests on the sheet. Every paper surface is otherwise completely plain and blank: absolutely no typography, no letterforms, no handwriting, no paragraphs, no pinned notes on the wall. The image must communicate that the answer was drawn there all along, waiting to be read. Style and medium: tactile monochrome editorial 3D illustration with realistic graphite, blackened steel, frosted glass, and paper textures. Composition: wide 3:2 landscape, one readable focal scene, strong depth, generous negative space. Lighting and mood: low-key studio light, calm, serious, exact. Color palette: charcoal, graphite, black, warm gray, ivory, with at most one very muted sand accent. Constraints: meaning must be readable without labels. Avoid: words, letters, numbers, code, logos, brands, watermarks, people, hands, human silhouettes, robots, brains, flat vector graphics, infographic panels, neon, saturated blue or purple, saturated yellow, plants, glossy science fiction interfaces, visual clutter.",
       "role": "section",
       "sectionHeading": "Opus 5의 이상함은 공식 문서에 이미 적혀 있다",
@@ -527,12 +527,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260813-claude-code-agents/runaway-output": {
+    "005-claude-code-agents/runaway-output": {
       "alt": "작은 설계 도면 하나가 과잉 생산된 똑같은 부품 더미에 묻혀 있는 작업대",
       "assetKey": "runaway-output",
       "narrativeUse": "요청한 것보다 훨씬 많은 산출물이 쏟아지는 과잉 생산 장면으로 삽질 증상 네 가지를 한눈에 요약한다. OG 대표 이미지로도 쓴다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260813-claude-code-agents",
+      "post": "005-claude-code-agents",
       "prompt": "Use case: stylized-concept. Asset type: wide section illustration for a Korean technical blog. Primary request: a single small precise paper blueprint pinned flat at the center of a dark workbench, almost buried under an avalanche of dozens of identical carved wooden machine components that spill over the table edge onto the floor. The overproduction visibly dwarfs the original plan. The image must communicate a machine that produced far more than what was asked. Style and medium: tactile monochrome editorial 3D illustration with realistic graphite, blackened steel, frosted glass, and paper textures. Composition: wide 3:2 landscape, one readable focal scene, strong depth, generous negative space. Lighting and mood: low-key studio light, calm, serious, exact. Color palette: charcoal, graphite, black, warm gray, ivory, with at most one very muted sand accent. Constraints: meaning must be readable without labels. Avoid: words, letters, numbers, code, logos, brands, watermarks, people, hands, robots, brains, flat vector graphics, infographic panels, neon, saturated blue or purple, glossy science fiction interfaces, visual clutter.",
       "role": "section",
       "sectionHeading": "최신 모델로 바꿨는데 결과물이 나빠졌다",
@@ -544,12 +544,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260813-claude-code-agents/single-writer": {
+    "005-claude-code-agents/single-writer": {
       "alt": "조각 작업대는 하나뿐이고 양쪽 선반에서 재료 수레들이 그 작업대로 모여드는 공방",
       "assetKey": "single-writer",
       "narrativeUse": "쓰기는 한 자리에서만 일어나고 읽기와 재료 나르기는 여러 경로로 병렬이라는 새 구조의 원칙을 장면 하나로 요약한다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260813-claude-code-agents",
+      "post": "005-claude-code-agents",
       "prompt": "Use case: stylized-concept. Asset type: wide section illustration for a Korean technical blog. Primary request: a workshop with exactly one central carving workbench where a single chisel rests in the only tool slot beside fresh wood shavings on an unfinished piece, while several small rail carts loaded with stacked document trays travel along tracks from tall archive shelves on both sides toward that one bench. Only one carving station exists in the whole room. The image must communicate many carriers feeding one single writer. Style and medium: tactile monochrome editorial 3D illustration with realistic graphite, blackened steel, frosted glass, and paper textures. Composition: wide 3:2 landscape, one readable focal scene, strong depth, generous negative space. Lighting and mood: low-key studio light, calm, serious, exact. Color palette: charcoal, graphite, black, warm gray, ivory, with at most one very muted sand accent. Constraints: meaning must be readable without labels. Avoid: words, letters, numbers, code, logos, brands, watermarks, people, hands, robots, brains, flat vector graphics, infographic panels, neon, saturated blue or purple, glossy science fiction interfaces, visual clutter.",
       "role": "section",
       "sectionHeading": "진짜 범인은 모델이 아니라 에이전트 구조였다",
@@ -561,12 +561,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260813-claude-code-agents/three-checks": {
+    "005-claude-code-agents/three-checks": {
       "alt": "어두운 작업대 위에 나란히 선 검사 게이지 세 개와 첫 게이지에 물린 부품",
       "assetKey": "three-checks",
       "narrativeUse": "독자가 자기 세팅을 세 가지 항목으로 점검한다는 마지막 행동 절을 준비시킨다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260813-claude-code-agents",
+      "post": "005-claude-code-agents",
       "prompt": "Use case: stylized-concept. Asset type: wide section illustration for a Korean technical blog. Primary request: three brass inspection gauges standing in a neat row on a dark workbench, the first gauge actively clamping a small wooden component while the other two wait empty, a jeweler's loupe resting beside them. The image must communicate three quick, concrete checks applied one by one to your own work. Style and medium: tactile monochrome editorial 3D illustration with realistic graphite, blackened steel, frosted glass, and paper textures. Composition: wide 3:2 landscape, one readable focal scene, strong depth, generous negative space. Lighting and mood: low-key studio light, calm, serious, exact. Color palette: charcoal, graphite, black, warm gray, ivory, with at most one very muted sand accent. Constraints: meaning must be readable without labels. Avoid: words, letters, numbers, code, logos, brands, watermarks, people, hands, robots, brains, flat vector graphics, infographic panels, neon, saturated blue or purple, glossy science fiction interfaces, visual clutter.",
       "role": "section",
       "sectionHeading": "오늘 내 세팅에서 확인할 것",
@@ -578,12 +578,12 @@
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"
     },
-    "20260813-claude-code-agents/tool-wall": {
+    "005-claude-code-agents/tool-wall": {
       "alt": "빈틈없이 정리되어 들고 갈 준비가 된 공구함 하나가 어두운 작업대 위에 놓인 장면",
       "assetKey": "tool-wall",
       "narrativeUse": "검증된 설정 일습을 그대로 들고 가서 자기 작업대에 놓는다는 절의 목적, 즉 복붙 가능한 설정 제공을 시각화한다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "20260813-claude-code-agents",
+      "post": "005-claude-code-agents",
       "prompt": "Use case: stylized-concept. Asset type: wide section illustration for a Korean technical blog. Primary request: a single sturdy open wooden toolbox standing on a dark empty workbench under one warm narrow beam of light. The toolbox is fully and neatly packed with dark steel hand tools arranged in exact slots, its wooden carry handle upright, ready to be lifted and carried away. Beside it lies only a folded ivory cloth. The bench and background are otherwise completely bare dark charcoal. The image must communicate taking one proven, complete, organized setup home exactly as it is. Style and medium: tactile monochrome editorial 3D still life with realistic graphite, blackened steel, frosted glass, wood, and paper textures. Composition: wide 3:2 landscape, one readable focal object, strong depth, generous negative space. Lighting and mood: low-key studio light, calm, serious, exact. Color palette: charcoal, graphite, black, warm gray, ivory, with at most one very muted sand accent. Constraints: meaning must be readable without labels; empty of any living thing. Avoid: words, letters, numbers, code, logos, brands, watermarks, people, hands, human figures, human silhouettes, mannequins, robots, plants, flowers, pencils, cups, flat vector graphics, infographic panels, neon, saturated blue or purple, saturated yellow, glossy science fiction interfaces, visual clutter.",
       "role": "section",
       "sectionHeading": "바로 복사해 쓰는 에이전트 설정",
@@ -591,6 +591,244 @@
       "contentAnchor": "Claude Code 기준으로 파일 두 개면 됩니다.",
       "visualSubject": "settings.json 파일과 메인 에이전트 Markdown 파일의 설정 코드",
       "visualRelationship": "전역 한도는 settings.json에 두고 위임과 검증 규칙은 에이전트 파일에 둔다",
+      "sourceKind": "imagegen",
+      "sourcePolicy": "auto",
+      "visualProfile": "dark-editorial-v1"
+    },
+    "007-python-basic-syntax/condition-branch": {
+      "alt": "지출금액 카드가 기준금액 비교 지점을 지나 정상과 확인필요 두 결과 카드 중 하나로 이동하는 모습",
+      "assetKey": "condition-branch",
+      "narrativeUse": "하나의 금액이 비교 결과에 따라 두 출력 중 하나로 이동해 조건문의 선택을 보여 준다.",
+      "placement": "H3 부제 바로 뒤",
+      "post": "007-python-basic-syntax",
+      "prompt": "Use case: infographic-diagram. Create a clean wide 3:2 editorial diagram in a refined grayscale Zinc 50 to 950 palette. Show one concrete expense amount card entering one comparison gate beside a separate threshold card, then exactly two possible result cards branching to the right. Make one path active with a restrained muted green check and the other inactive. Crisp flat shapes, thin borders, generous spacing, dark charcoal background, warm gray and ivory cards. The relationship must read as one comparison choosing exactly one of two results. No readable text, letters, numbers, code, people, hands, robots, logos, brands, neon, saturated colors, watermarks, or decorative clutter.",
+      "role": "section",
+      "sectionHeading": "조건문은 기준에 따라 결과를 나눕니다",
+      "sectionSubtitle": "금액이 기준 이상이면 확인필요로 표시하고 그렇지 않으면 정상으로 표시합니다",
+      "contentAnchor": "조건문은 비교 결과에 따라 실행할 줄을 나눕니다.",
+      "visualSubject": "지출금액 카드와 기준금액 비교 화면 및 정상과 확인필요 결과 카드",
+      "visualRelationship": "금액과 기준을 비교한 결과가 참인지 거짓인지에 따라 결과 카드 하나가 선택된다",
+      "sourceKind": "imagegen",
+      "sourcePolicy": "auto",
+      "visualProfile": "dark-editorial-v1"
+    },
+    "007-python-basic-syntax/dictionary-column-map": {
+      "alt": "사용일 조직 사용금액 세 원본 열 카드가 일자 부서 금액 세 표준 열 카드와 한 쌍씩 연결된 변환표",
+      "assetKey": "dictionary-column-map",
+      "narrativeUse": "세 개의 원본 열 이름이 세 개의 표준 열 이름과 한 쌍씩 대응해 딕셔너리의 키와 값을 설명한다.",
+      "placement": "H3 부제 바로 뒤",
+      "post": "007-python-basic-syntax",
+      "prompt": "Use case: infographic-diagram. Create a clean wide 3:2 grayscale technical editorial diagram showing exactly three source column cards on the left and exactly three standard column cards on the right. Connect each left card to one matching right card with thin lines, forming three unmistakable key-value pairs. Use abstract column-header glyphs only, no readable text. Refined Zinc 50 to 950 palette, dark charcoal background, ivory cards, muted gray connectors, one restrained blue-gray highlight. Thin borders and generous spacing. No readable text, letters, numbers, code, people, robots, logos, brands, neon, saturated colors, watermarks, or clutter.",
+      "role": "section",
+      "sectionHeading": "딕셔너리는 이름 변환표를 만듭니다",
+      "sectionSubtitle": "서로 다른 Excel 열 이름을 표준 열 이름과 한 쌍으로 연결합니다",
+      "contentAnchor": "딕셔너리는 키와 값을 한 쌍으로 저장합니다.",
+      "visualSubject": "원본 Excel 열 카드와 표준 열 카드가 짝으로 연결된 변환표",
+      "visualRelationship": "원본 열 이름 하나를 찾으면 연결된 표준 열 이름 하나가 결과로 나온다",
+      "sourceKind": "imagegen",
+      "sourcePolicy": "auto",
+      "visualProfile": "dark-editorial-v1"
+    },
+    "007-python-basic-syntax/function-reuse": {
+      "alt": "금액 입력 세 개가 classify_expense 함수 카드 하나를 차례로 지나 정상과 확인필요 결과로 돌아오는 모습",
+      "assetKey": "function-reuse",
+      "narrativeUse": "함수 카드 하나가 서로 다른 금액 입력 세 개에 같은 규칙을 적용하고 결과를 돌려주는 모습을 보여 준다.",
+      "placement": "H3 부제 바로 뒤",
+      "post": "007-python-basic-syntax",
+      "prompt": "Use case: infographic-diagram. Create a clean wide 3:2 grayscale editorial diagram with exactly three distinct expense amount cards entering the same single reusable function module one after another. Show three returned result cards, with two neutral outcomes and one restrained muted amber review outcome. The shared module must visibly stay the same while only inputs and returned results differ. Refined Zinc grayscale, dark charcoal background, ivory cards, thin connectors, generous spacing. Use abstract symbols only. No readable text, letters, numbers, code, people, hands, robots, logos, brands, neon, saturated colors, watermarks, or clutter.",
+      "role": "section",
+      "sectionHeading": "함수는 같은 규칙을 다시 사용합니다",
+      "sectionSubtitle": "금액을 받아 분류 결과를 돌려주는 규칙에 이름을 붙여 세 번 실행합니다",
+      "contentAnchor": "함수는 여러 줄의 규칙에 이름을 붙인 코드 묶음입니다.",
+      "visualSubject": "서로 다른 금액 입력 카드와 하나의 분류 함수 카드 및 반환 결과 카드",
+      "visualRelationship": "같은 함수가 세 입력을 차례로 받아 같은 규칙으로 세 결과를 돌려준다",
+      "sourceKind": "imagegen",
+      "sourcePolicy": "auto",
+      "visualProfile": "dark-editorial-v1"
+    },
+    "007-python-basic-syntax/list-amounts": {
+      "alt": "서로 다른 지출 금액 카드 세 장이 하나의 대괄호 목록 안으로 들어가 건수와 합계 결과로 이어지는 모습",
+      "assetKey": "list-amounts",
+      "narrativeUse": "개별 금액 세 개가 한 목록으로 묶이고 목록 전체에서 건수와 합계가 계산되는 관계를 보여 준다.",
+      "placement": "H3 부제 바로 뒤",
+      "post": "007-python-basic-syntax",
+      "prompt": "Use case: infographic-diagram. Create a clean wide 3:2 grayscale technical diagram. Show exactly three individual expense value cards entering one large bracket-shaped list container. From that one container, draw two outputs: a compact three-item count indicator and one combined total bar. Use abstract marks only, no digits. Refined Zinc 50 to 950 palette, dark charcoal background, ivory cards, muted blue-gray connectors, thin borders, generous spacing. The image must clearly show many values becoming one list and two calculations reading that list. No readable text, letters, numbers, code, people, robots, logos, brands, neon, saturated colors, watermarks, or clutter.",
+      "role": "section",
+      "sectionHeading": "리스트는 여러 금액을 한 번에 묶습니다",
+      "sectionSubtitle": "대괄호 안에 거래 금액을 넣고 건수와 합계를 한 번에 계산합니다",
+      "contentAnchor": "리스트는 여러 값을 순서대로 담는 묶음입니다.",
+      "visualSubject": "지출 금액 카드 세 개와 하나의 리스트 및 건수와 합계 결과",
+      "visualRelationship": "개별 금액이 한 리스트에 모이고 같은 리스트에서 개수와 합계가 계산된다",
+      "sourceKind": "imagegen",
+      "sourcePolicy": "auto",
+      "visualProfile": "dark-editorial-v1"
+    },
+    "007-python-basic-syntax/loop-each-amount": {
+      "alt": "금액 목록의 세 카드가 같은 비교 장치를 차례로 통과해 세 줄의 분류 결과로 쌓이는 모습",
+      "assetKey": "loop-each-amount",
+      "narrativeUse": "목록의 모든 항목이 같은 처리 장치를 순서대로 통과해 반복문의 동작을 보여 준다.",
+      "placement": "H3 부제 바로 뒤",
+      "post": "007-python-basic-syntax",
+      "prompt": "Use case: infographic-diagram. Create a clean wide 3:2 grayscale workflow showing one ordered list container with exactly three expense cards. A loop arrow carries each card through the same single comparison module, then stacks exactly three result rows on the right in matching order. Refined Zinc 50 to 950 palette, dark charcoal background, ivory panels, muted blue-gray loop arrow, restrained green and amber status dots, thin borders, generous spacing. Use abstract marks only. No readable text, letters, numbers, code, people, robots, logos, brands, neon, saturated colors, watermarks, or clutter.",
+      "role": "section",
+      "sectionHeading": "반복문은 같은 판단을 여러 번 합니다",
+      "sectionSubtitle": "리스트의 금액을 앞에서부터 하나씩 꺼내 같은 조건으로 분류합니다",
+      "contentAnchor": "반복문은 여러 값에 같은 일을 적용합니다.",
+      "visualSubject": "금액 리스트와 반복 화살표 및 같은 비교 장치와 순서대로 쌓인 결과 목록",
+      "visualRelationship": "리스트의 각 금액이 순서대로 같은 비교 장치를 통과하고 결과 한 줄씩을 만든다",
+      "sourceKind": "imagegen",
+      "sourcePolicy": "auto",
+      "visualProfile": "dark-editorial-v1"
+    },
+    "007-python-basic-syntax/syntax-learning-map": {
+      "alt": "짧은 세로 영상의 여섯 문법 카드가 각각 실행 가능한 코드 셀과 지출내역 결과로 연결된 학습 지도",
+      "assetKey": "syntax-learning-map",
+      "narrativeUse": "짧은 영상은 전체 지도를 제공하고 여섯 실행 셀은 각 개념을 실제 결과와 연결한다는 학습 순서를 보여 준다.",
+      "placement": "H3 부제 바로 뒤",
+      "post": "007-python-basic-syntax",
+      "prompt": "Use case: infographic-diagram. Create a clean wide 3:2 grayscale learning map. On the left show one vertical video frame containing exactly six simple unlabeled concept tiles. Connect those six tiles to exactly six compact editable code-cell panels across the center and right, each ending in a tiny concrete expense-result card. The relationship must read as quick overview first, then hands-on cells. Refined Zinc 50 to 950 palette, dark charcoal background, ivory panels, muted gray connectors, one restrained green run indicator per cell, thin borders and generous spacing. No readable text, letters, numbers, code, people, hands, robots, logos, brands, neon, saturated colors, watermarks, or clutter.",
+      "role": "section",
+      "sectionHeading": "Python 기초문법 지도를 영상으로 봅니다",
+      "sectionSubtitle": "1분 영상에서 여섯 개념의 이름만 찾고 바로 첫 실행 셀로 이동합니다",
+      "contentAnchor": "아래 영상은 `파이썬 필수 기초 1분이면 충분합니다`라는 짧은 전체 지도입니다.",
+      "visualSubject": "세로형 기초문법 영상 화면과 여섯 개념 카드 및 실행 가능한 코드 셀",
+      "visualRelationship": "영상에서 본 여섯 개념이 각각 바로 실행하는 셀과 결과로 이어진다",
+      "sourceKind": "imagegen",
+      "sourcePolicy": "auto",
+      "visualProfile": "dark-editorial-v1"
+    },
+    "007-python-basic-syntax/syntax-together": {
+      "alt": "변수 리스트 딕셔너리 조건 반복 함수 여섯 카드가 하나의 지출내역 결과와 합계로 합쳐지는 모습",
+      "assetKey": "syntax-together",
+      "narrativeUse": "앞에서 따로 실행한 여섯 개념이 하나의 작은 지출내역 처리 결과를 만든다는 결론을 보여 준다.",
+      "placement": "H3 부제 바로 뒤",
+      "post": "007-python-basic-syntax",
+      "prompt": "Use case: infographic-diagram. Create a clean wide 3:2 grayscale integration diagram. Show exactly six distinct small concept modules feeding one central expense-record processing panel. The panel outputs one compact result list and one total gauge. Use unique abstract symbols for storage, list, mapping, branch, loop, and reusable function without letters or code. Refined Zinc 50 to 950 palette, dark charcoal background, ivory cards, muted blue-gray connectors, restrained green verified output, thin borders, generous spacing. No readable text, letters, numbers, real code, people, robots, logos, brands, neon, saturated colors, watermarks, or clutter.",
+      "role": "section",
+      "sectionHeading": "여섯 개념을 한 셀에서 연결합니다",
+      "sectionSubtitle": "부서별 거래 목록을 읽어 금액을 분류하고 전체 합계와 결과 목록을 만듭니다",
+      "contentAnchor": "마지막 셀에는 지금까지 실행한 여섯 개념이 함께 들어 있습니다.",
+      "visualSubject": "변수 리스트 딕셔너리 조건 반복 함수 모듈과 지출내역 결과 목록 및 합계",
+      "visualRelationship": "여섯 문법 모듈이 같은 거래 목록을 처리해 분류 결과와 전체 합계를 만든다",
+      "sourceKind": "imagegen",
+      "sourcePolicy": "auto",
+      "visualProfile": "dark-editorial-v1"
+    },
+    "007-python-basic-syntax/variables-values": {
+      "alt": "영업팀과 지출금액 및 기준금액 카드가 department amount amount_limit 세 저장칸에 각각 연결된 모습",
+      "assetKey": "variables-values",
+      "narrativeUse": "업무값 세 개가 각각 이름이 있는 저장칸에 들어가 변수와 값의 관계를 보여 준다.",
+      "placement": "H3 부제 바로 뒤",
+      "post": "007-python-basic-syntax",
+      "prompt": "Use case: infographic-diagram. Create a clean wide 3:2 grayscale technical editorial diagram showing exactly three concrete business value cards on the left: a department token, an expense amount token, and a threshold token. Each connects one-to-one into exactly three distinct labeled-looking but fully abstract storage slots on the right. Use different simple icons only and absolutely no readable labels. Refined Zinc 50 to 950 palette, dark charcoal background, ivory cards, muted blue-gray connectors, thin borders and generous spacing. No readable text, letters, numbers, code, people, robots, logos, brands, neon, saturated colors, watermarks, or clutter.",
+      "role": "section",
+      "sectionHeading": "변수는 바꿀 값에 이름을 붙입니다",
+      "sectionSubtitle": "부서와 금액 및 기준값을 서로 다른 이름에 저장하고 결과를 확인합니다",
+      "contentAnchor": "변수는 값을 담아 두는 이름입니다.",
+      "visualSubject": "부서와 지출금액 및 기준금액 카드와 각각의 변수 저장칸을 보여 주는 결과 화면",
+      "visualRelationship": "서로 다른 업무값 세 개가 서로 다른 이름의 저장칸에 하나씩 들어간다",
+      "sourceKind": "imagegen",
+      "sourcePolicy": "auto",
+      "visualProfile": "dark-editorial-v1"
+    },
+    "006-work-automation/automation-five-steps": {
+      "alt": "부서별 Excel 파일 세 개가 처리와 판단을 지나 결과 통합문서와 숫자 검증표로 이어지는 자동화 다섯 단계",
+      "assetKey": "automation-five-steps",
+      "narrativeUse": "입력부터 검증까지 다섯 단계를 한 장에 보여 주며 글 전체의 대표 이미지로 쓴다.",
+      "placement": "H3 부제 바로 뒤",
+      "post": "006-work-automation",
+      "prompt": "Use case: infographic-diagram. Create a clean wide 3:2 grayscale editorial workflow with exactly five sequential stages. Begin with exactly three spreadsheet file cards, continue through one processing module and one decision gate, then one multi-sheet result workbook, and finish with a verification card containing matched count and amount gauges. The five-stage sequence must be unmistakable without labels. Refined Zinc 50 to 950 palette, dark charcoal background, ivory cards, muted blue-gray connectors, restrained green checks only at verification, thin borders and generous spacing. No readable text, letters, numbers, code, people, robots, logos, brands, neon, saturated colors, watermarks, or clutter.",
+      "role": "section",
+      "sectionHeading": "업무자동화란 무엇인가: 다섯 칸입니다",
+      "sectionSubtitle": "사람이 하던 반복업무를 입력부터 검증까지 정해진 순서로 다시 실행합니다",
+      "contentAnchor": "업무자동화는 컴퓨터가 알아서 회사를 이해하는 일이 아닙니다.",
+      "visualSubject": "부서별 Excel 입력 파일과 처리 및 판단 단계와 결과 파일 및 숫자 검증표",
+      "visualRelationship": "원본 파일이 처리와 판단을 지나 결과 파일이 되고 마지막 숫자 검증에서 맞는지 확인된다",
+      "sourceKind": "imagegen",
+      "sourcePolicy": "auto",
+      "visualProfile": "dark-editorial-v1"
+    },
+    "006-work-automation/automation-input": {
+      "alt": "input 폴더 안의 Excel 세 파일과 각 파일의 일자 부서 항목 금액 비고 다섯 열이 한 입력 명세 카드로 연결된 모습",
+      "assetKey": "automation-input",
+      "narrativeUse": "입력은 막연한 Excel이 아니라 폴더, 파일 수, 열 구조까지 정해야 한다는 점을 보여 준다.",
+      "placement": "H3 부제 바로 뒤",
+      "post": "006-work-automation",
+      "prompt": "Use case: infographic-diagram. Create a clean wide 3:2 grayscale technical diagram. Show one input folder containing exactly three spreadsheet file cards. Each file opens into the same simple five-column grid, and all three grids connect to one compact input specification card. Use five unlabeled column bars only. Refined Zinc 50 to 950 palette, dark charcoal background, ivory folder and cards, muted blue-gray connectors, thin borders, generous spacing. No readable text, letters, numbers, code, people, robots, logos, brands, neon, saturated colors, watermarks, or clutter.",
+      "role": "section",
+      "sectionHeading": "입력은 컴퓨터가 받을 자료입니다",
+      "sectionSubtitle": "파일 이름과 시트 및 열을 적으면 컴퓨터가 어디에서 무엇을 읽을지 정해집니다",
+      "contentAnchor": "입력은 업무를 시작할 때 컴퓨터가 받는 자료입니다.",
+      "visualSubject": "input 폴더와 Excel 파일 세 개 및 다섯 열 표와 입력 명세 카드",
+      "visualRelationship": "폴더 안 파일의 공통 열 구조가 하나의 구체적인 입력 명세로 정리된다",
+      "sourceKind": "imagegen",
+      "sourcePolicy": "auto",
+      "visualProfile": "dark-editorial-v1"
+    },
+    "006-work-automation/before-after-files": {
+      "alt": "서로 다른 부서의 원본 Excel 세 개와 통합내역 및 부서별요약과 확인필요 시트를 가진 결과 파일 하나의 비교",
+      "assetKey": "before-after-files",
+      "narrativeUse": "자동화 전의 원본 세 파일과 자동화 후의 시트 네 개 결과 파일을 직접 비교한다.",
+      "placement": "H3 부제 바로 뒤",
+      "post": "006-work-automation",
+      "prompt": "Use case: infographic-diagram. Create a clean wide 3:2 grayscale editorial comparison. On the left show exactly three separate spreadsheet file cards with slightly different simple row patterns. On the right show exactly one result workbook opened to reveal exactly four organized sheet tabs represented only by distinct abstract grid thumbnails. Connect left to right with one restrained arrow. Refined Zinc 50 to 950 palette, dark charcoal background, ivory cards, thin borders, generous spacing, one muted green completion check. No readable text, letters, numbers, code, people, robots, logos, brands, neon, saturated colors, watermarks, or clutter.",
+      "role": "section",
+      "sectionHeading": "완성된 결과부터 비교합니다",
+      "sectionSubtitle": "원본 세 개와 결과 파일 하나를 먼저 보면 자동화할 이유가 바로 보입니다",
+      "contentAnchor": "자동화를 설계할 때는 완성 화면을 먼저 그리는 편이 쉽습니다.",
+      "visualSubject": "부서별 원본 Excel 세 개와 네 개 시트가 있는 결과 Excel 파일 하나",
+      "visualRelationship": "따로 열던 원본 세 개가 자동화 뒤 확인하기 쉬운 결과 파일 하나로 바뀐다",
+      "sourceKind": "imagegen",
+      "sourcePolicy": "auto",
+      "visualProfile": "dark-editorial-v1"
+    },
+    "006-work-automation/fill-five-cards": {
+      "alt": "비어 있는 입력 처리 판단 출력 검증 다섯 카드가 지출내역 업무의 파일명과 조건 및 숫자로 채워지는 모습",
+      "assetKey": "fill-five-cards",
+      "narrativeUse": "독자가 자기 업무를 다섯 칸에 적는 마지막 행동을 빈 카드가 채워지는 장면으로 보여 준다.",
+      "placement": "H3 부제 바로 뒤",
+      "post": "006-work-automation",
+      "prompt": "Use case: productivity-visual. Create a clean wide 3:2 grayscale editorial worksheet with exactly five sequential empty cards across the top and the same five cards filled with concrete abstract file, steps, branch, workbook, and matched-gauge symbols across the bottom. Use arrows showing completion from empty to filled. Refined Zinc 50 to 950 palette, dark charcoal background, ivory cards, muted blue-gray connectors, restrained green checks at the completed row, thin borders and generous spacing. No readable text, letters, numbers, code, people, hands, robots, logos, brands, neon, saturated colors, watermarks, or clutter.",
+      "role": "section",
+      "sectionHeading": "내 업무 하나를 다섯 칸에 적습니다",
+      "sectionSubtitle": "오늘 반복한 업무의 실제 파일과 규칙 및 확인 숫자를 한 줄씩 채웁니다",
+      "contentAnchor": "지금 자동화할 업무 하나를 고릅니다.",
+      "visualSubject": "입력 처리 판단 출력 검증의 빈 카드와 파일 및 규칙 및 검증 숫자로 채운 카드",
+      "visualRelationship": "빈 다섯 카드가 실제 업무의 파일과 규칙과 검증 정보로 하나씩 채워진다",
+      "sourceKind": "imagegen",
+      "sourcePolicy": "auto",
+      "visualProfile": "dark-editorial-v1"
+    },
+    "006-work-automation/output-validation": {
+      "alt": "결과 Excel 파일 옆에서 입력과 출력의 파일 수 행 수 금액 합계를 서로 맞춰 보는 검증 카드",
+      "assetKey": "output-validation",
+      "narrativeUse": "결과 파일 생성과 숫자 검증이 다른 완료 조건이라는 점을 보여 준다.",
+      "placement": "H3 부제 바로 뒤",
+      "post": "006-work-automation",
+      "prompt": "Use case: infographic-diagram. Create a clean wide 3:2 grayscale verification diagram. Show one completed multi-sheet workbook on the left. On the right show exactly three paired input-output gauges for file count, row count, and amount total, each pair balanced and ending with a restrained green check. Add a small protected source-file symbol below. Refined Zinc 50 to 950 palette, dark charcoal background, ivory cards, muted gray and blue-gray lines, thin borders, generous spacing. Use abstract gauge marks only. No readable text, letters, numbers, code, people, robots, logos, brands, neon, saturated colors, watermarks, or clutter.",
+      "role": "section",
+      "sectionHeading": "출력은 파일이고 검증은 숫자입니다",
+      "sectionSubtitle": "결과 파일이 생긴 뒤 입력과 출력의 건수와 금액이 같은지 확인합니다",
+      "contentAnchor": "출력은 자동화가 만든 실제 파일입니다.",
+      "visualSubject": "결과 Excel 통합문서와 입력 및 출력의 파일 수와 행 수와 금액 검증 카드",
+      "visualRelationship": "결과 파일이 생성된 뒤 입력과 출력의 세 숫자 쌍이 같고 원본이 보호됐는지 확인된다",
+      "sourceKind": "imagegen",
+      "sourcePolicy": "auto",
+      "visualProfile": "dark-editorial-v1"
+    },
+    "006-work-automation/process-and-decision": {
+      "alt": "Excel 행들이 열 정리와 표 합치기 처리 단계를 지난 뒤 정상과 확인필요 두 갈래로 나뉘는 모습",
+      "assetKey": "process-and-decision",
+      "narrativeUse": "자료를 바꾸는 처리와 조건에 따라 결과를 나누는 판단이 다른 단계임을 보여 준다.",
+      "placement": "H3 부제 바로 뒤",
+      "post": "006-work-automation",
+      "prompt": "Use case: infographic-diagram. Create a clean wide 3:2 grayscale workflow. On the left show spreadsheet rows entering two sequential processing modules: one aligns columns and one combines tables. After processing, send the rows through one clear decision gate that splits them into exactly two result stacks, one neutral and one restrained amber review stack. Refined Zinc 50 to 950 palette, dark charcoal background, ivory cards, muted blue-gray connectors, thin borders and generous spacing. No readable text, letters, numbers, code, people, robots, logos, brands, neon, saturated colors, watermarks, or clutter.",
+      "role": "section",
+      "sectionHeading": "처리와 판단은 사람이 정한 규칙입니다",
+      "sectionSubtitle": "파일을 합치는 순서와 확인이 필요한 행을 나누는 조건을 따로 적습니다",
+      "contentAnchor": "처리는 자료의 모양을 바꾸는 순서입니다.",
+      "visualSubject": "Excel 행과 열 정리 및 표 합치기 처리 단계와 정상 및 확인필요 판단 결과",
+      "visualRelationship": "행이 처리 단계에서 같은 표로 합쳐진 뒤 판단 조건에 따라 두 결과로 나뉜다",
       "sourceKind": "imagegen",
       "sourcePolicy": "auto",
       "visualProfile": "dark-editorial-v1"

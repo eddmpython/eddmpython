@@ -1,6 +1,7 @@
 import { POSTS, formatDate } from "../posts";
 import { Nav } from "../components/Nav";
 import { Footer } from "../components/Footer";
+import { BlogCurriculum } from "../components/BlogCurriculum";
 
 export function Blog() {
   return (
@@ -12,7 +13,10 @@ export function Blog() {
           만들면서 알게 된 것들을 적어 둡니다.
         </p>
 
-        <ul className="mt-12 border-t border-white/10">
+        <BlogCurriculum />
+
+        <h2 className="mt-14 text-xl font-medium tracking-tight md:text-2xl">최근 글</h2>
+        <ul className="mt-5 border-t border-white/10">
           {POSTS.map((p) => (
             <li key={p.slug} className="border-b border-white/10">
               <a

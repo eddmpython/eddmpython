@@ -1,5 +1,9 @@
 # 블로그 한 편 양식
 
+파일명은 `NNN-kebab.md`로 쓴다. `NNN`은 발행할 때 한 번 부여하는 세 자리 고정 순번이며,
+실제 발행일과 학습 순서를 뜻하지 않는다. 날짜는 frontmatter에, 학습 순서는
+`blog/curriculum.json`에 둔다.
+
 ## Frontmatter
 
 ```yaml

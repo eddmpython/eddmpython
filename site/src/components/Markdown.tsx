@@ -1,10 +1,8 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { CodaroCellEmbed } from "./CodaroCellEmbed";
 
-const YOUTUBE =
-  /^https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=([\w-]{6,})|youtu\.be\/([\w-]{6,}))/;
 const THREADS = /^https?:\/\/(?:www\.)?threads\.(?:net|com)\/@[\w.]+\/post\/[\w-]+/;
 const IMAGE = /\.(png|jpe?g|gif|webp|avif|svg)(\?.*)?$/i;
 const CODARO_CELL =
@@ -46,20 +44,166 @@ function onlyImage(node: unknown): { src: string; alt: string; title: string } |
   };
 }
 
-function YouTube({ id }: { id: string }) {
+type YouTubeVideo = { id: string; vertical: boolean };
+
+function parseYouTube(url: string): YouTubeVideo | null {
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.replace(/^www\./, "");
+    if (host === "youtu.be") {
+      const id = parsed.pathname.split("/").filter(Boolean)[0];
+      return id && /^[\w-]{6,}$/.test(id) ? { id, vertical: false } : null;
+    }
+    if (host !== "youtube.com") return null;
+    if (parsed.pathname === "/watch") {
+      const id = parsed.searchParams.get("v");
+      return id && /^[\w-]{6,}$/.test(id) ? { id, vertical: false } : null;
+    }
+    const matched = parsed.pathname.match(/^\/(shorts|embed)\/([\w-]{6,})/);
+    return matched ? { id: matched[2], vertical: matched[1] === "shorts" } : null;
+  } catch {
+    return null;
+  }
+}
+
+function YouTube({ id, vertical }: YouTubeVideo) {
+  const [playing, setPlaying] = useState(false);
+  const watchUrl = `https://www.youtube.com/shorts/${id}`;
   return (
-    <span className="my-7 block overflow-hidden rounded-xl border border-white/10">
-      <span className="block aspect-video">
-        <iframe
-          src={`https://www.youtube-nocookie.com/embed/${id}`}
-          title="YouTube"
-          loading="lazy"
-          allow="accelerometer; clipboard-write; encrypted-media; picture-in-picture"
-          allowFullScreen
-          className="h-full w-full border-0"
-        />
+    <span
+      data-youtube-player={id}
+      className={`my-7 block overflow-hidden rounded-xl border border-white/10 ${
+        vertical ? "mx-auto max-w-sm" : ""
+      }`}
+    >
+      <span className={`block ${vertical ? "aspect-[9/16]" : "aspect-video"}`}>
+        {playing ? (
+          <iframe
+            src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1&rel=0`}
+            title="YouTube 영상"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            referrerPolicy="strict-origin-when-cross-origin"
+            className="h-full w-full border-0"
+          />
+        ) : (
+          <button
+            type="button"
+            aria-label="YouTube 영상 재생"
+            onClick={() => setPlaying(true)}
+            className="group flex h-full w-full items-center justify-center bg-cover bg-center"
+            style={{ backgroundImage: `url(https://i.ytimg.com/vi/${id}/maxresdefault.jpg)` }}
+          >
+            <span className="flex size-16 items-center justify-center rounded-full border border-white/25 bg-black/75 shadow-xl transition-transform group-hover:scale-105">
+              <span className="ml-1 block h-0 w-0 border-y-[10px] border-y-transparent border-l-[16px] border-l-white" />
+            </span>
+          </button>
+        )}
+      </span>
+      <span className="flex items-center justify-between gap-4 border-t border-white/8 bg-white/[0.02] px-4 py-3 text-sm text-ivory/52">
+        <span>파이썬 필수 기초 1분 영상</span>
+        <a
+          href={watchUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="shrink-0 text-ivory/72 underline decoration-white/20 underline-offset-4 hover:decoration-white/55"
+        >
+          YouTube에서 열기
+        </a>
       </span>
     </span>
+  );
+}
+
+type ArticleHeading = { id: string; text: string };
+
+function headingText(markdown: string): string {
+  return markdown
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/[`*_~]/g, "")
+    .trim();
+}
+
+function headingBase(text: string): string {
+  return (
+    text
+      .normalize("NFKC")
+      .toLocaleLowerCase("ko")
+      .replace(/[^0-9a-z가-힣]+/gu, "-")
+      .replace(/^-+|-+$/g, "") || "section"
+  );
+}
+
+function articleHeadings(markdown: string): ArticleHeading[] {
+  const counts = new Map<string, number>();
+  const headings: ArticleHeading[] = [];
+  let fenced = false;
+
+  for (const line of markdown.split(/\r?\n/)) {
+    if (/^```/.test(line)) {
+      fenced = !fenced;
+      continue;
+    }
+    if (fenced) continue;
+    const match = line.match(/^##[ \t]+([^#].*?)\s*$/);
+    if (!match) continue;
+    const text = headingText(match[1]);
+    const base = headingBase(text);
+    const count = (counts.get(base) ?? 0) + 1;
+    counts.set(base, count);
+    headings.push({ id: count === 1 ? base : `${base}-${count}`, text });
+  }
+  return headings;
+}
+
+function ArticleToc({ headings }: { headings: ArticleHeading[] }) {
+  const [activeId, setActiveId] = useState(headings[0]?.id ?? "");
+
+  useEffect(() => {
+    setActiveId(headings[0]?.id ?? "");
+    const elements = headings
+      .map((heading) => document.getElementById(heading.id))
+      .filter((element): element is HTMLElement => Boolean(element));
+    if (!elements.length || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+        if (visible?.target.id) setActiveId(visible.target.id);
+      },
+      { rootMargin: "-12% 0px -72% 0px", threshold: [0, 1] },
+    );
+    elements.forEach((element) => observer.observe(element));
+    return () => observer.disconnect();
+  }, [headings]);
+
+  if (headings.length < 2) return null;
+  return (
+    <nav
+      aria-label="글 목차"
+      className="fixed top-32 left-[calc(50%+26rem)] hidden max-h-[calc(100vh-10rem)] w-52 overflow-y-auto xl:block"
+    >
+      <p className="font-mono text-[11px] tracking-[0.14em] text-ivory/38 uppercase">
+        이 글의 순서
+      </p>
+      <ol className="mt-4 space-y-3 border-l border-white/10 pl-4">
+        {headings.map((heading) => (
+          <li key={heading.id}>
+            <a
+              href={`#${heading.id}`}
+              aria-current={activeId === heading.id ? "location" : undefined}
+              className={`block text-[13px] leading-relaxed transition-colors ${
+                activeId === heading.id ? "text-ivory" : "text-ivory/42 hover:text-ivory/72"
+              }`}
+            >
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
   );
 }
 
@@ -114,8 +258,12 @@ function Threads({ url }: { url: string }) {
 
 /** 단독 URL 문단을 임베드로 바꾼다. 그 외에는 표준 마크다운. */
 export function Markdown({ children }: { children: string }) {
+  const headings = useMemo(() => articleHeadings(children), [children]);
+  let h2Index = 0;
   return (
-    <ReactMarkdown
+    <>
+      <ArticleToc headings={headings} />
+      <ReactMarkdown
       remarkPlugins={[remarkGfm]}
       components={{
         p({ children: kids, node }) {
@@ -144,8 +292,8 @@ export function Markdown({ children }: { children: string }) {
             if (codaroCell) {
               return <CodaroCellEmbed exampleId={codaroCell[1]} />;
             }
-            const yt = url.match(YOUTUBE);
-            if (yt) return <YouTube id={yt[1] ?? yt[2]} />;
+            const youtube = parseYouTube(url);
+            if (youtube) return <YouTube {...youtube} />;
             if (THREADS.test(url)) return <Threads url={url} />;
             if (IMAGE.test(url)) {
               return (
@@ -157,11 +305,17 @@ export function Markdown({ children }: { children: string }) {
           }
           return <p className="my-5 leading-[1.85] text-ivory/75">{kids}</p>;
         },
-        h2: ({ children: k }) => (
-          <h2 className="mt-12 mb-2 text-xl font-medium tracking-tight md:text-2xl">
-            {k}
-          </h2>
-        ),
+        h2: ({ children: k }) => {
+          const heading = headings[h2Index++];
+          return (
+            <h2
+              id={heading?.id}
+              className="mt-12 mb-2 scroll-mt-24 text-xl font-medium tracking-tight md:text-2xl"
+            >
+              {k}
+            </h2>
+          );
+        },
         h3: ({ children: k }) => (
           <h3 className="mt-0 mb-5 text-[15px] leading-relaxed font-normal text-ivory/55 md:text-base">
             {k}
@@ -225,8 +379,9 @@ export function Markdown({ children }: { children: string }) {
           <td className="border-b border-white/8 px-3 py-2 text-ivory/70">{k}</td>
         ),
       }}
-    >
-      {children}
-    </ReactMarkdown>
+      >
+        {children}
+      </ReactMarkdown>
+    </>
   );
 }

@@ -20,7 +20,7 @@ status: curated
 ## 먼저 읽을 것
 
 - `blog/product-marketing.md`
-- 최근 발행 글 `blog/20*.md`
+- 최근 발행 글 `blog/[0-9][0-9][0-9]-*.md`
 - 지금 확인된 제품 변경, 실패, 화면
 
 ## 주제를 고르는 순서

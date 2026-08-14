@@ -11,7 +11,8 @@ import {
 
 const blogDir = resolve(process.cwd(), "../blog");
 const codaroEmbedsPath = resolve(blogDir, "embeds/codaro-cells.json");
-const postName = /^(20\d{6})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$/;
+const curriculumPath = resolve(blogDir, "curriculum.json");
+const postName = /^(\d{3})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$/;
 const requiredMeta = [
   "title",
   "slug",
@@ -44,7 +45,7 @@ const mediaSuffixes = new Set([
   ".tif",
   ".tiff",
 ]);
-const assetId = /^(20\d{6}-[a-z0-9]+(?:-[a-z0-9]+)*)\/([a-z0-9]+(?:-[a-z0-9]+)*)$/;
+const assetId = /^(\d{3}-[a-z0-9]+(?:-[a-z0-9]+)*)\/([a-z0-9]+(?:-[a-z0-9]+)*)$/;
 const sha256 = /^[0-9a-f]{64}$/;
 const mimeBySuffix = new Map([
   [".webp", "image/webp"],
@@ -136,6 +137,7 @@ if (localMedia.length) {
 const plan = await loadJson(resolve(blogDir, "media/plan.json"), "blog/media/plan.json");
 const catalog = await loadJson(resolve(blogDir, "media/catalog.json"), "blog/media/catalog.json");
 const codaroEmbeds = await loadJson(codaroEmbedsPath, "blog/embeds/codaro-cells.json");
+const curriculum = await loadJson(curriculumPath, "blog/curriculum.json");
 if (
   plan.version !== 2 ||
   plan.promptContract !== "section-grounded-v2" ||
@@ -161,6 +163,44 @@ if (
   typeof codaroEmbeds.examples !== "object"
 ) {
   fail("blog/embeds/codaro-cells.json", "version 또는 examples 계약이 잘못됐습니다");
+}
+if (
+  curriculum.version !== 1 ||
+  !validDate(curriculum.updated) ||
+  !String(curriculum.title ?? "").trim() ||
+  !String(curriculum.promise ?? "").trim() ||
+  !Array.isArray(curriculum.stages) ||
+  !curriculum.stages.length
+) {
+  fail("blog/curriculum.json", "version, updated, title, promise 또는 stages 계약이 잘못됐습니다");
+}
+
+const curriculumIds = new Set();
+const curriculumOrders = new Set();
+let previousCurriculumOrder = 0;
+for (const stage of curriculum.stages) {
+  const id = String(stage?.id ?? "");
+  const order = Number(stage?.order);
+  const status = String(stage?.status ?? "");
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id)) {
+    fail("blog/curriculum.json", `올바르지 않은 stage id: ${id}`);
+  }
+  if (!Number.isInteger(order) || order <= previousCurriculumOrder || curriculumOrders.has(order)) {
+    fail("blog/curriculum.json", `stage order가 오름차순 정수로 이어지지 않습니다: ${order}`);
+  }
+  if (curriculumIds.has(id)) fail("blog/curriculum.json", `stage id가 중복됐습니다: ${id}`);
+  if (!String(stage.title ?? "").trim() || !String(stage.question ?? "").endsWith("?")) {
+    fail("blog/curriculum.json", `${id}의 title 또는 question이 잘못됐습니다`);
+  }
+  if (!["published", "planned"].includes(status)) {
+    fail("blog/curriculum.json", `${id}의 status는 published 또는 planned여야 합니다`);
+  }
+  if (status === "published" && !String(stage.postSlug ?? "").trim()) {
+    fail("blog/curriculum.json", `${id}의 published 단계에 postSlug가 없습니다`);
+  }
+  curriculumIds.add(id);
+  curriculumOrders.add(order);
+  previousCurriculumOrder = order;
 }
 for (const [id, example] of Object.entries(codaroEmbeds.examples)) {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id) || !example || typeof example !== "object") {
@@ -292,6 +332,12 @@ if (unknown.length) {
 
 const posts = markdown.filter((name) => postName.test(name)).sort();
 if (!posts.length) fail("blog", "발행 글이 한 편도 없습니다");
+for (const [index, file] of posts.entries()) {
+  const sequence = Number(file.match(postName)[1]);
+  if (sequence !== index + 1) {
+    fail(file, `파일 순번은 001부터 빈 번호 없이 이어져야 합니다: ${sequence}`);
+  }
+}
 
 const titles = new Map();
 const slugs = new Map();
@@ -300,16 +346,12 @@ const referencedCodaroEmbeds = new Set();
 for (const file of posts) {
   const raw = await readFile(resolve(blogDir, file), "utf8");
   const { meta, body } = parseFrontmatter(file, raw);
-  const fileDate = file.match(postName)[1];
   const postId = file.replace(/\.md$/, "");
   const slug = meta.get("slug");
 
   if (!validDate(meta.get("date"))) fail(file, "date가 유효한 YYYY-MM-DD 형식이 아닙니다");
   if (!validDate(meta.get("modified"))) {
     fail(file, "modified가 유효한 YYYY-MM-DD 형식이 아닙니다");
-  }
-  if (meta.get("date").replaceAll("-", "") !== fileDate) {
-    fail(file, "파일명의 YYYYMMDD와 date가 다릅니다");
   }
   if (meta.get("modified") < meta.get("date")) {
     fail(file, "modified가 최초 발행일보다 빠릅니다");
@@ -499,6 +541,15 @@ for (const file of posts) {
       }
     }
     referencedMedia.add(ref);
+  }
+}
+
+for (const stage of curriculum.stages) {
+  if (stage.status === "published" && !slugs.has(stage.postSlug)) {
+    fail("blog/curriculum.json", `${stage.id}의 발행 글을 찾지 못했습니다: ${stage.postSlug}`);
+  }
+  if (stage.status === "planned" && stage.postSlug && slugs.has(stage.postSlug)) {
+    fail("blog/curriculum.json", `${stage.id}는 글이 있으므로 published로 바꿔야 합니다`);
   }
 }
 
