@@ -1,7 +1,7 @@
 ---
 title: 설치 없이 Python 첫 코드를 실행하는 방법
 slug: no-install
-date: 2026-08-09
+date: 2026-08-08
 modified: 2026-08-10
 author: eddmpython
 section: Python 학습과 자동화

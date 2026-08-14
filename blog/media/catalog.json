@@ -42,94 +42,94 @@
       "post": "20260807-what-is-python",
       "sha256": "c36016f62e514f2294e40553962c4835e0b4dea742b1b005ed71999cd0364be4"
     },
-    "20260808-ai-needs-an-environment/failure-guardrails": {
+    "20260811-ai-needs-an-environment/failure-guardrails": {
       "assetKey": "failure-guardrails",
       "path": "objects/sha256/c8/c855f7522a308f0192eb3ddf5751c409d1948b3836bcc4b94e60510c18b09389.png",
-      "post": "20260808-ai-needs-an-environment",
+      "post": "20260811-ai-needs-an-environment",
       "sha256": "c855f7522a308f0192eb3ddf5751c409d1948b3836bcc4b94e60510c18b09389"
     },
-    "20260808-ai-needs-an-environment/five-questions": {
+    "20260811-ai-needs-an-environment/five-questions": {
       "assetKey": "five-questions",
       "path": "objects/sha256/3a/3a8bed10f6ab335da7770648fc35d30c8b1f8df78dcffcd8789cd8ded41d4637.png",
-      "post": "20260808-ai-needs-an-environment",
+      "post": "20260811-ai-needs-an-environment",
       "sha256": "3a8bed10f6ab335da7770648fc35d30c8b1f8df78dcffcd8789cd8ded41d4637"
     },
-    "20260808-ai-needs-an-environment/prompt-vs-environment": {
+    "20260811-ai-needs-an-environment/prompt-vs-environment": {
       "assetKey": "prompt-vs-environment",
       "path": "objects/sha256/ea/eaa07b26b8e905d75983c14867797c73dc4534685797733cd268dad30890551c.png",
-      "post": "20260808-ai-needs-an-environment",
+      "post": "20260811-ai-needs-an-environment",
       "sha256": "eaa07b26b8e905d75983c14867797c73dc4534685797733cd268dad30890551c"
     },
-    "20260808-ai-needs-an-environment/reopen-judgment": {
+    "20260811-ai-needs-an-environment/reopen-judgment": {
       "assetKey": "reopen-judgment",
       "path": "objects/sha256/57/57878e78ff3bfffe9418885d4ce7906b0093ff41bcefb2ed901c184f03784e9d.png",
-      "post": "20260808-ai-needs-an-environment",
+      "post": "20260811-ai-needs-an-environment",
       "sha256": "57878e78ff3bfffe9418885d4ce7906b0093ff41bcefb2ed901c184f03784e9d"
     },
-    "20260808-ai-needs-an-environment/small-start": {
+    "20260811-ai-needs-an-environment/small-start": {
       "assetKey": "small-start",
       "path": "objects/sha256/01/01dbd75b059ac447b91004ebb181a8f9ab752273c153c8badf6682420c2b6962.png",
-      "post": "20260808-ai-needs-an-environment",
+      "post": "20260811-ai-needs-an-environment",
       "sha256": "01dbd75b059ac447b91004ebb181a8f9ab752273c153c8badf6682420c2b6962"
     },
-    "20260808-ai-needs-an-environment/template-repair": {
+    "20260811-ai-needs-an-environment/template-repair": {
       "assetKey": "template-repair",
       "path": "objects/sha256/f6/f6e0bae0f78582fbcea10bac547342bb2e725e8feb67e1971b1494cf5e6c43ca.png",
-      "post": "20260808-ai-needs-an-environment",
+      "post": "20260811-ai-needs-an-environment",
       "sha256": "f6e0bae0f78582fbcea10bac547342bb2e725e8feb67e1971b1494cf5e6c43ca"
     },
-    "20260808-ai-needs-an-environment/workbench": {
+    "20260811-ai-needs-an-environment/workbench": {
       "assetKey": "workbench",
       "path": "objects/sha256/b2/b2639594672c77b1ce7fbe7e20e5caa70e374cca0565d6d81e2eaa9fd1fbccf2.png",
-      "post": "20260808-ai-needs-an-environment",
+      "post": "20260811-ai-needs-an-environment",
       "sha256": "b2639594672c77b1ce7fbe7e20e5caa70e374cca0565d6d81e2eaa9fd1fbccf2"
     },
-    "20260809-codaro-guide/decision-boundary": {
+    "20260808-codaro-guide/decision-boundary": {
       "assetKey": "decision-boundary",
       "path": "objects/sha256/8e/8ec901a50dc312e29204cff5ab8bbbbd7fab616590dfcc9982298e2e216f9e9e.webp",
-      "post": "20260809-codaro-guide",
+      "post": "20260808-codaro-guide",
       "sha256": "8ec901a50dc312e29204cff5ab8bbbbd7fab616590dfcc9982298e2e216f9e9e"
     },
-    "20260809-codaro-guide/embedded-cell": {
+    "20260808-codaro-guide/embedded-cell": {
       "assetKey": "embedded-cell",
       "path": "objects/sha256/ef/ef8d12c5a20a452518c8d7d084d5811a6650ed0f678ccadead0d4ccd58b4cf75.webp",
-      "post": "20260809-codaro-guide",
+      "post": "20260808-codaro-guide",
       "sha256": "ef8d12c5a20a452518c8d7d084d5811a6650ed0f678ccadead0d4ccd58b4cf75"
     },
-    "20260809-codaro-guide/learning-loop": {
+    "20260808-codaro-guide/learning-loop": {
       "assetKey": "learning-loop",
       "path": "objects/sha256/75/75e8abd651ab9e1d1dd850e8e5c64c3bc1b396a2cf4517652ce075f476f9c6a3.webp",
-      "post": "20260809-codaro-guide",
+      "post": "20260808-codaro-guide",
       "sha256": "75e8abd651ab9e1d1dd850e8e5c64c3bc1b396a2cf4517652ce075f476f9c6a3"
     },
-    "20260809-codaro-guide/local-expansion": {
+    "20260808-codaro-guide/local-expansion": {
       "assetKey": "local-expansion",
       "path": "objects/sha256/ce/ce37d5158878f9fc652190955d9a41a353843856065191a3a7a79f0f9c7822d3.webp",
-      "post": "20260809-codaro-guide",
+      "post": "20260808-codaro-guide",
       "sha256": "ce37d5158878f9fc652190955d9a41a353843856065191a3a7a79f0f9c7822d3"
     },
-    "20260809-codaro-guide/percent-file": {
+    "20260808-codaro-guide/percent-file": {
       "assetKey": "percent-file",
       "path": "objects/sha256/37/3761a5cf6e8376ae9f47157e8e1f5c140ca5cf49a6b14d853cd1a469e1db7178.webp",
-      "post": "20260809-codaro-guide",
+      "post": "20260808-codaro-guide",
       "sha256": "3761a5cf6e8376ae9f47157e8e1f5c140ca5cf49a6b14d853cd1a469e1db7178"
     },
-    "20260809-codaro-guide/reactive-path": {
+    "20260808-codaro-guide/reactive-path": {
       "assetKey": "reactive-path",
       "path": "objects/sha256/6e/6ebdaedaa799739561dd8edcb3ff82d014ca58dca6652f81b2437f63c5f28aec.webp",
-      "post": "20260809-codaro-guide",
+      "post": "20260808-codaro-guide",
       "sha256": "6ebdaedaa799739561dd8edcb3ff82d014ca58dca6652f81b2437f63c5f28aec"
     },
-    "20260809-codaro-guide/validation-evidence": {
+    "20260808-codaro-guide/validation-evidence": {
       "assetKey": "validation-evidence",
       "path": "objects/sha256/30/3019906f6f342dee32f2258a63c3acbf539260fe75f811c5f2092deb546558b6.webp",
-      "post": "20260809-codaro-guide",
+      "post": "20260808-codaro-guide",
       "sha256": "3019906f6f342dee32f2258a63c3acbf539260fe75f811c5f2092deb546558b6"
     },
-    "20260809-codaro-guide/web-entry": {
+    "20260808-codaro-guide/web-entry": {
       "assetKey": "web-entry",
       "path": "objects/sha256/a6/a6880c33189b23b51c6700d7c27bba8fbfc383e57c44b1d28d22c4e0bb6796c2.webp",
-      "post": "20260809-codaro-guide",
+      "post": "20260808-codaro-guide",
       "sha256": "a6880c33189b23b51c6700d7c27bba8fbfc383e57c44b1d28d22c4e0bb6796c2"
     },
     "20260813-claude-code-agents/frosted-machine": {

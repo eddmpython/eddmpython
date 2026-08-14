@@ -1,7 +1,7 @@
 ---
 title: AI에게 링크 하나만 보내 코딩 환경을 구성하는 방법
 slug: ai-environment
-date: 2026-08-08
+date: 2026-08-11
 modified: 2026-08-14
 author: eddmpython
 section: AI 작업 환경
