@@ -6,6 +6,8 @@ const repoRoot = resolve(process.cwd(), "..");
 const blogRoot = resolve(repoRoot, "blog");
 const distRoot = resolve(repoRoot, "../eddmpython.out/site-dist");
 const postName = /^(20\d{6}-[a-z0-9]+(?:-[a-z0-9]+)*)\.md$/;
+const adsenseClient = "ca-pub-6438440376456212";
+const adsenseScript = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
 
 function fail(scope, message) {
   throw new Error(`${scope}: ${message}`);
@@ -169,6 +171,11 @@ if (
 
 const blogHtml = await pageHtml("/blog");
 const blogStructured = jsonLd(blogHtml, "/blog");
+for (const [path, html] of [["/", await pageHtml("/")], ["/blog", blogHtml]]) {
+  if (html.includes(adsenseScript) || html.includes(adsenseClient)) {
+    fail(path, "글 상세 밖에 AdSense 코드가 있습니다");
+  }
+}
 if (nodesOfType(blogStructured, "Blog").length !== 1) fail("/blog", "Blog 정의가 없습니다");
 if (nodesOfType(blogStructured, "BreadcrumbList").length !== 1) {
   fail("/blog", "탐색 경로 구조화 데이터가 없습니다");
@@ -178,6 +185,12 @@ for (const { file, slug, path } of postRoutes) {
   const raw = await readFile(resolve(blogRoot, file), "utf8");
   const frontmatter = parseFrontmatter(file, raw);
   const html = await pageHtml(path);
+  const adScripts = [...html.matchAll(/<script async src="([^"]+)" crossorigin="anonymous"><\/script>/g)]
+    .map((match) => match[1])
+    .filter((src) => src.startsWith(adsenseScript));
+  if (adScripts.length !== 1 || new URL(adScripts[0]).searchParams.get("client") !== adsenseClient) {
+    fail(file, "승인된 AdSense 코드가 글 상세 head에 한 번 들어 있지 않습니다");
+  }
   const card = checkShared(html, path);
   const article = nodesOfType(card.structured, "BlogPosting");
   const images = nodesOfType(card.structured, "ImageObject");
@@ -244,6 +257,11 @@ if ((rss.match(/<item>/g) ?? []).length !== postFiles.length) {
 const robots = await readFile(resolve(distRoot, "robots.txt"), "utf8");
 if (!robots.includes(`Sitemap: ${origin}/sitemap.xml`)) {
   fail("robots.txt", "sitemap 위치가 없습니다");
+}
+
+const ads = await readFile(resolve(distRoot, "ads.txt"), "utf8");
+if (ads.trim() !== "google.com, pub-6438440376456212, DIRECT, f08c47fec0942fa0") {
+  fail("ads.txt", "승인된 Google 판매자 선언과 다릅니다");
 }
 
 console.log(`seo check: ${pages.length} pages, ${postFiles.length} article`);

@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { Logo } from "./Logo";
 import { PRODUCTS } from "../products";
 import { SOCIAL } from "../social";
@@ -71,12 +70,12 @@ export function Footer() {
           <h3 className="text-sm font-medium text-ivory/55">채널</h3>
           <ul className="mt-4 space-y-2.5 text-sm">
             <li>
-              <Link
-                to="/blog"
+              <a
+                href="/blog"
                 className="text-ivory/70 transition-colors hover:text-ivory"
               >
                 블로그
-              </Link>
+              </a>
             </li>
             {REGISTRIES.map((c) => (
               <li key={c.label}>

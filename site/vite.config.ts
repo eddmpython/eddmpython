@@ -11,6 +11,8 @@ import { faviconSvg } from "./src/brand";
 const OUT_DIR = "../../eddmpython.out/site-dist";
 const SSR_DIR = "../../eddmpython.out/site-ssr";
 const ORIGIN = "https://eddmpython.com";
+const ADSENSE_CLIENT = "ca-pub-6438440376456212";
+const ADSENSE_SCRIPT = `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}" crossorigin="anonymous"></script>`;
 
 const escape = (s: string) =>
   s
@@ -130,6 +132,7 @@ function prerender(): Plugin {
       for (const meta of pages) {
         const body = mod.render(meta.path);
         sizes.push(body.length);
+        const adsense = meta.type === "article" ? ADSENSE_SCRIPT : "";
         const ld = meta.jsonLd
           .map(
             (o) =>
@@ -218,7 +221,7 @@ function prerender(): Plugin {
             /<link rel="canonical" href="[\s\S]*?"\s*\/>/,
             `<link rel="canonical" href="${ORIGIN}${meta.path}" />`,
           )
-          .replace("</head>", `${article}${ld}</head>`)
+          .replace("</head>", `${article}${ld}${adsense}</head>`)
           .replace('<div id="root"></div>', `<div id="root">${body}</div>`);
 
         const dirPath =

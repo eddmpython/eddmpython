@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { findPost, formatDate } from "../posts";
 import { Markdown } from "../components/Markdown";
 import { Nav } from "../components/Nav";
@@ -24,12 +24,12 @@ export function Post() {
           <h1 className="text-2xl font-medium tracking-tight">
             글을 찾을 수 없습니다
           </h1>
-          <Link
-            to="/blog"
+          <a
+            href="/blog"
             className="mt-6 inline-block text-ivory/70 transition-colors hover:text-ivory"
           >
             블로그 목록으로
-          </Link>
+          </a>
         </div>
         <div className="mt-24">
           <Footer />
@@ -57,12 +57,12 @@ export function Post() {
           <Markdown>{post.body}</Markdown>
         </div>
         <div className="mt-16 border-t border-white/10 pt-7">
-          <Link
-            to="/blog"
+          <a
+            href="/blog"
             className="text-sm text-ivory/60 transition-colors hover:text-ivory"
           >
             블로그 목록으로
-          </Link>
+          </a>
         </div>
       </article>
       <div className="mt-24">

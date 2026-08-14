@@ -3,7 +3,7 @@ import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { chromium } from "playwright";
+import { PyProcControlClient } from "pyproc/control";
 import { preview } from "vite";
 import { VISUAL_VIEWPORTS, visualContractFor } from "./visual-contract.mjs";
 
@@ -14,6 +14,7 @@ const OUTPUT_ROOT = resolve(SITE_ROOT, "../../eddmpython.out");
 const DIST_ROOT = join(OUTPUT_ROOT, "site-dist");
 const VISUAL_ROOT = join(OUTPUT_ROOT, "visual");
 const APPROVAL_PATH = join(VISUAL_ROOT, "approval.json");
+const ENGINE_INDEX = "https://cdn.jsdelivr.net/pyodide/v314.0.2/full/";
 
 function assertOutputBoundary(path) {
   const rel = relative(OUTPUT_ROOT, resolve(path));
@@ -60,41 +61,6 @@ function pathsFromSitemap(xml) {
   return [...new Set(paths)];
 }
 
-async function launchChromium() {
-  const requested = process.env.BROWSER_PATH?.trim();
-  if (requested) {
-    if (!existsSync(requested)) throw new Error(`BROWSER_PATH가 없습니다: ${requested}`);
-    return {
-      browser: await chromium.launch({ headless: true, executablePath: requested }),
-      browserName: requested,
-    };
-  }
-
-  const attempts = [];
-  for (const channel of ["msedge", "chrome"]) {
-    try {
-      return {
-        browser: await chromium.launch({ headless: true, channel }),
-        browserName: channel,
-      };
-    } catch (error) {
-      attempts.push(`${channel}: ${error instanceof Error ? error.message.split("\n")[0] : String(error)}`);
-    }
-  }
-
-  const bundled = chromium.executablePath();
-  if (existsSync(bundled)) {
-    return {
-      browser: await chromium.launch({ headless: true }),
-      browserName: "playwright-chromium",
-    };
-  }
-
-  throw new Error(
-    `Chromium 계열 브라우저를 시작하지 못했습니다. BROWSER_PATH를 지정하거나 npx playwright install chromium을 실행합니다\n${attempts.join("\n")}`,
-  );
-}
-
 async function openPreview(baseUrl) {
   if (baseUrl) return { baseUrl: baseUrl.replace(/\/$/, ""), close: async () => {} };
 
@@ -120,154 +86,223 @@ async function openPreview(baseUrl) {
   };
 }
 
-async function runDeclaredCheck(page, check) {
-  if (check.type === "visible") {
-    const visible = await page.locator(check.selector).first().isVisible();
-    if (!visible) throw new Error(`보이지 않는 요소: ${check.selector}`);
-    return;
-  }
-  if (check.type === "count") {
-    const count = await page.locator(check.selector).count();
-    if (check.exact !== undefined && count !== check.exact) {
-      throw new Error(`${check.selector} 개수 ${count}, 기대 ${check.exact}`);
-    }
-    if (check.min !== undefined && count < check.min) {
-      throw new Error(`${check.selector} 개수 ${count}, 최소 ${check.min}`);
-    }
-    return;
-  }
-  if (check.type === "text") {
-    const text = await page.locator(check.selector).allTextContents();
-    if (!text.some((value) => value.includes(check.includes))) {
-      throw new Error(`${check.selector}에서 텍스트를 찾지 못했습니다: ${check.includes}`);
-    }
-    return;
-  }
-  if (check.type === "equal-count") {
-    const [left, right] = await Promise.all([
-      page.locator(check.left).count(),
-      page.locator(check.right).count(),
-    ]);
-    if (left !== right) throw new Error(`${check.left} ${left}개와 ${check.right} ${right}개가 다릅니다`);
-    return;
-  }
-  throw new Error(`지원하지 않는 시각 검증 규칙: ${check.type}`);
+function errorText(error) {
+  return error instanceof Error ? error.message : String(error);
 }
 
-async function runInteraction(page, interaction) {
+async function createVisualClient(baseUrl, viewport, runDir) {
+  const executable = process.env.BROWSER_PATH?.trim();
+  if (executable && !existsSync(executable)) throw new Error(`BROWSER_PATH가 없습니다: ${executable}`);
+  const manifestPath = join(runDir, `pyproc-control.${viewport.id}.json`);
+  const manifest = {
+    schemaVersion: 1,
+    engine: { indexURL: ENGINE_INDEX },
+    timeoutMs: 180000,
+    browser: {
+      enabled: true,
+      provider: "nativeCdp",
+      allowedOrigins: [new URL(baseUrl).origin],
+      maxRisk: "externalEffect",
+      actions: ["snapshot", "screenshot", "waitFor", "hydrateLazy", "navigate", "click"],
+      methods: ["Runtime.evaluate"],
+      viewport: {
+        width: viewport.width,
+        height: viewport.height,
+        deviceScaleFactor: 1,
+        mobile: viewport.isMobile,
+        touch: viewport.hasTouch,
+      },
+      ...(executable ? { executable } : {}),
+      externalEffects: "acknowledged",
+      purpose: "eddmpython 데스크톱과 모바일 시각 검증",
+      artifacts: {
+        maxArtifactBytes: 33554432,
+        maxTotalBytes: 134217728,
+        maxArtifacts: 64,
+        inlineMaxBytes: 4194304,
+        ttlMs: 900000,
+      },
+    },
+  };
+  await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+  const preflight = await PyProcControlClient.check(manifestPath, {
+    cwd: SITE_ROOT,
+    timeoutMs: 30000,
+  });
+  if (preflight.ok !== true) throw new Error(`pyproc-control preflight 실패: ${JSON.stringify(preflight)}`);
+  const client = await PyProcControlClient.start(manifestPath, {
+    cwd: SITE_ROOT,
+    startupTimeoutMs: 180000,
+    shutdownTimeoutMs: 30000,
+  });
+  return { client, manifestPath };
+}
+
+async function evaluate(client, sessionRef, expression, { awaitPromise = false } = {}) {
+  const response = await client.command(
+    sessionRef,
+    "Runtime.evaluate",
+    { expression, awaitPromise, returnByValue: true },
+    { expectedRisk: "externalEffect", timeoutMs: 180000 },
+  );
+  const result = response.output?.result;
+  if (result?.exceptionDetails) {
+    throw new Error(result.exceptionDetails.exception?.description ?? result.exceptionDetails.text ?? "브라우저 평가 실패");
+  }
+  return result?.result?.value;
+}
+
+async function preparePage(client, sessionRef) {
+  return evaluate(
+    client,
+    sessionRef,
+    `(async () => {
+      const until = async (test, timeoutMs) => {
+        const started = Date.now();
+        while (!test()) {
+          if (Date.now() - started > timeoutMs) throw new Error("페이지 준비 시간 초과");
+          await new Promise((resolveWait) => setTimeout(resolveWait, 50));
+        }
+      };
+      await until(() => document.readyState === "complete", 30000);
+      for (const image of document.images) {
+        const style = getComputedStyle(image);
+        const relevant = image.getAttribute("aria-hidden") !== "true"
+          && style.display !== "none" && style.visibility !== "hidden" && Number(style.opacity) > 0;
+        if (relevant) image.loading = "eager";
+      }
+      await until(() => Array.from(document.images).every((image) => {
+        const style = getComputedStyle(image);
+        const relevant = image.getAttribute("aria-hidden") !== "true"
+          && style.display !== "none" && style.visibility !== "hidden" && Number(style.opacity) > 0;
+        return !relevant || image.complete;
+      }), 30000);
+      await Promise.allSettled(Array.from(document.images).map((image) => image.decode()));
+      if (document.fonts) await document.fonts.ready;
+      const style = document.createElement("style");
+      style.dataset.visualVerification = "true";
+      style.textContent = "*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important;scroll-behavior:auto!important}";
+      document.head.appendChild(style);
+      return true;
+    })()`,
+    { awaitPromise: true },
+  );
+}
+
+async function inspectPage(client, sessionRef, checks) {
+  return evaluate(
+    client,
+    sessionRef,
+    `(() => {
+      const checks = ${JSON.stringify(checks)};
+      const errors = [];
+      const visible = (element) => {
+        if (!element) return false;
+        const style = getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
+        return style.display !== "none" && style.visibility !== "hidden"
+          && Number(style.opacity) > 0 && rect.width > 0 && rect.height > 0;
+      };
+      for (const check of checks) {
+        try {
+          if (check.type === "visible") {
+            if (!visible(document.querySelector(check.selector))) errors.push("보이지 않는 요소: " + check.selector);
+          } else if (check.type === "count") {
+            const count = document.querySelectorAll(check.selector).length;
+            if (check.exact !== undefined && count !== check.exact) errors.push(check.selector + " 개수 " + count + ", 기대 " + check.exact);
+            if (check.min !== undefined && count < check.min) errors.push(check.selector + " 개수 " + count + ", 최소 " + check.min);
+          } else if (check.type === "text") {
+            const found = Array.from(document.querySelectorAll(check.selector)).some((item) => item.textContent.includes(check.includes));
+            if (!found) errors.push(check.selector + "에서 텍스트를 찾지 못했습니다: " + check.includes);
+          } else if (check.type === "equal-count") {
+            const left = document.querySelectorAll(check.left).length;
+            const right = document.querySelectorAll(check.right).length;
+            if (left !== right) errors.push(check.left + " " + left + "개와 " + check.right + " " + right + "개가 다릅니다");
+          } else {
+            errors.push("지원하지 않는 시각 검증 규칙: " + check.type);
+          }
+        } catch (error) {
+          errors.push(error instanceof Error ? error.message : String(error));
+        }
+      }
+      const root = document.documentElement;
+      const relevantImages = Array.from(document.images).filter((image) => {
+        const style = getComputedStyle(image);
+        return image.getAttribute("aria-hidden") !== "true" && style.display !== "none"
+          && style.visibility !== "hidden" && Number(style.opacity) > 0;
+      });
+      return {
+        errors,
+        metrics: {
+          title: document.title,
+          viewportWidth: innerWidth,
+          viewportHeight: innerHeight,
+          scrollWidth: Math.max(root.scrollWidth, document.body.scrollWidth),
+          scrollHeight: Math.max(root.scrollHeight, document.body.scrollHeight),
+          imageCount: document.images.length,
+          renderedImageCount: relevantImages.length,
+          brokenImages: relevantImages.filter((image) => image.naturalWidth === 0 || image.naturalHeight === 0)
+            .map((image) => image.currentSrc || image.src).slice(0, 10),
+        },
+      };
+    })()`,
+  );
+}
+
+async function runInteraction(client, sessionRef, interaction) {
   if (interaction.type !== "click-until-text") {
     throw new Error(`지원하지 않는 상호작용 검증: ${interaction.type}`);
   }
-  await page.locator(interaction.click).first().click();
-  await page.waitForFunction(
-    ({ selector, includes }) => document.querySelector(selector)?.textContent?.includes(includes),
-    { selector: interaction.target, includes: interaction.includes },
-    { timeout: interaction.timeoutMs ?? 30_000 },
+  await client.act(
+    sessionRef,
+    [{ kind: "click", selector: interaction.click, expectedRisk: "externalEffect" }],
+    { timeoutMs: interaction.timeoutMs ?? 30000 },
+  );
+  await evaluate(
+    client,
+    sessionRef,
+    `(async () => {
+      const selector = ${JSON.stringify(interaction.target)};
+      const includes = ${JSON.stringify(interaction.includes)};
+      const started = Date.now();
+      while (!document.querySelector(selector)?.textContent?.includes(includes)) {
+        if (Date.now() - started > ${interaction.timeoutMs ?? 30000}) throw new Error("기대 문장 대기 시간 초과: " + includes);
+        await new Promise((resolveWait) => setTimeout(resolveWait, 100));
+      }
+      return true;
+    })()`,
+    { awaitPromise: true },
   );
 }
 
-async function waitForStablePage(page) {
-  await page.waitForLoadState("domcontentloaded");
-  await page.waitForFunction(() => document.readyState === "complete");
-  await page.evaluate(() => {
-    for (const image of document.images) {
-      const style = getComputedStyle(image);
-      const relevant =
-        image.getAttribute("aria-hidden") !== "true" &&
-        style.display !== "none" &&
-        style.visibility !== "hidden" &&
-        Number(style.opacity) > 0;
-      if (relevant) image.loading = "eager";
-    }
-  });
-  await page.waitForFunction(
-    () =>
-      Array.from(document.images).every((image) => {
-        const style = getComputedStyle(image);
-        const relevant =
-          image.getAttribute("aria-hidden") !== "true" &&
-          style.display !== "none" &&
-          style.visibility !== "hidden" &&
-          Number(style.opacity) > 0;
-        return !relevant || image.complete;
-      }),
-    null,
-    { timeout: 30_000 },
+async function saveScreenshot(client, sessionRef, path, options) {
+  const captured = await client.act(
+    sessionRef,
+    [{ kind: "screenshot", format: "jpeg", expectedRisk: "read", ...options }],
+    { timeoutMs: 60000 },
   );
-  await page.evaluate(async () => {
-    const relevant = Array.from(document.images).filter((image) => {
-      const style = getComputedStyle(image);
-      return (
-        image.getAttribute("aria-hidden") !== "true" &&
-        style.display !== "none" &&
-        style.visibility !== "hidden" &&
-        Number(style.opacity) > 0
-      );
-    });
-    await Promise.allSettled(relevant.map((image) => image.decode()));
-  });
-  await page.evaluate(async () => {
-    if (document.fonts) await document.fonts.ready;
-  });
-  await page.addStyleTag({
-    content:
-      "*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important;scroll-behavior:auto!important}",
-  });
+  const image = captured.attachments.find((item) => item.mimeType === "image/jpeg");
+  if (!image) throw new Error(`screenshot attachment가 없습니다: ${path}`);
+  await writeFile(path, image.bytes);
+  const artifactRef = captured.output?.actions?.[0]?.result?.artifactRef;
+  if (artifactRef) await client.deleteArtifact(artifactRef, { timeoutMs: 10000 });
 }
 
-async function primeFullPagePaint(page) {
-  await page.evaluate(async () => {
-    const step = Math.max(400, Math.floor(window.innerHeight * 0.8));
-    const height = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
-    for (let top = 0; top < height; top += step) {
-      window.scrollTo(0, top);
-      await new Promise((resolveFrame) => requestAnimationFrame(() => requestAnimationFrame(resolveFrame)));
+function diagnosticErrors(startup, observation) {
+  const errors = [];
+  const payload = observation?.result ?? observation ?? {};
+  for (const event of [...(startup?.console ?? []), ...(payload.console ?? [])]) {
+    if ([event.type, event.level].some((value) => value === "error")) {
+      errors.push(`console: ${(event.args ?? [event.text ?? "오류"]).join(" ")}`);
     }
-    window.scrollTo(0, 0);
-    await new Promise((resolveFrame) => requestAnimationFrame(() => requestAnimationFrame(resolveFrame)));
-  });
-}
-
-async function returnToPageTop(page) {
-  await page.evaluate(async () => {
-    window.scrollTo(0, 0);
-    await new Promise((resolveFrame) =>
-      requestAnimationFrame(() => requestAnimationFrame(resolveFrame)),
-    );
-  });
-}
-
-async function inspectPage(page) {
-  return page.evaluate(() => {
-    const root = document.documentElement;
-    const relevantImages = Array.from(document.images).filter((image) => {
-      const style = getComputedStyle(image);
-      return (
-        image.getAttribute("aria-hidden") !== "true" &&
-        style.display !== "none" &&
-        style.visibility !== "hidden" &&
-        Number(style.opacity) > 0
-      );
-    });
-    const brokenImages = relevantImages
-      .filter((image) => image.naturalWidth === 0 || image.naturalHeight === 0)
-      .map((image) => image.currentSrc || image.src)
-      .slice(0, 10);
-    return {
-      title: document.title,
-      viewportWidth: window.innerWidth,
-      viewportHeight: window.innerHeight,
-      scrollWidth: Math.max(root.scrollWidth, document.body.scrollWidth),
-      scrollHeight: Math.max(root.scrollHeight, document.body.scrollHeight),
-      imageCount: document.images.length,
-      renderedImageCount: relevantImages.length,
-      brokenImages,
-    };
-  });
-}
-
-function errorText(error) {
-  return error instanceof Error ? error.message : String(error);
+  }
+  for (const event of [...(startup?.network ?? []), ...(payload.network ?? [])]) {
+    const failed = event.failed === true || /fail|error/i.test(event.phase ?? "");
+    if (failed && ["document", "stylesheet", "script", "image", "font"].includes((event.resourceType ?? "").toLowerCase())) {
+      errors.push(`${event.resourceType}: ${event.url ?? "알 수 없는 요청"}`);
+    }
+  }
+  return errors;
 }
 
 export async function captureVisualEvidence({ baseUrl, routeFilters = [] } = {}) {
@@ -289,115 +324,89 @@ export async function captureVisualEvidence({ baseUrl, routeFilters = [] } = {})
   assertOutputBoundary(runDir);
   await mkdir(runDir, { recursive: true });
 
-  const { browser, browserName } = await launchChromium();
-  let previewServer;
-  try {
-    previewServer = await openPreview(baseUrl);
-  } catch (error) {
-    await browser.close();
-    throw error;
-  }
+  const previewServer = await openPreview(baseUrl);
   const results = [];
+  let browserName = "pyproc-control";
 
   try {
-    for (const contract of selected) {
-      for (const viewport of VISUAL_VIEWPORTS) {
-        const startedAt = Date.now();
-        const errors = [];
-        const requestFailures = [];
-        const screenshotFiles = [];
-        const context = await browser.newContext({
-          viewport: { width: viewport.width, height: viewport.height },
-          screen: { width: viewport.width, height: viewport.height },
-          deviceScaleFactor: 1,
-          isMobile: viewport.isMobile,
-          hasTouch: viewport.hasTouch,
-          locale: "ko-KR",
-          timezoneId: "Asia/Seoul",
-          colorScheme: "dark",
-          reducedMotion: "reduce",
-          serviceWorkers: "block",
-        });
-        const page = await context.newPage();
-        page.on("pageerror", (error) => errors.push(`pageerror: ${errorText(error)}`));
-        page.on("console", (message) => {
-          if (message.type() === "error") errors.push(`console: ${message.text()}`);
-        });
-        page.on("requestfailed", (request) => {
-          if (["document", "stylesheet", "script", "image", "font"].includes(request.resourceType())) {
-            requestFailures.push(`${request.resourceType()}: ${request.url()}`);
-          }
-        });
-
-        let metrics = null;
-        try {
+    for (const viewport of VISUAL_VIEWPORTS) {
+      const { client, manifestPath } = await createVisualClient(previewServer.baseUrl, viewport, runDir);
+      try {
+        const space = await client.inspectSpace({ timeoutMs: 30000 });
+        browserName = space.output?.browser?.product ?? space.output?.browser?.name ?? browserName;
+        for (const contract of selected) {
+          const startedAt = Date.now();
+          const errors = [];
+          const screenshotFiles = [];
+          let metrics = null;
+          let opened = null;
+          let sessionRef = null;
+          try {
           const previewPath = contract.path === "/" ? "/" : `${contract.path}/`;
-          const response = await page.goto(`${previewServer.baseUrl}${previewPath}`, {
-            waitUntil: "domcontentloaded",
-            timeout: 30_000,
+          opened = await client.openTarget(`${previewServer.baseUrl}${previewPath}`, {
+            expectedRisk: "externalEffect",
+            waitUntil: "load",
+            timeoutMs: 30000,
           });
-          if (!response?.ok()) errors.push(`HTTP 상태 ${response?.status() ?? "없음"}`);
-          await waitForStablePage(page);
-          await primeFullPagePaint(page);
-          metrics = await inspectPage(page);
+          const attached = await client.attachSession(opened.output.targetRef, { timeoutMs: 30000 });
+          sessionRef = attached.output;
+          await preparePage(client, sessionRef);
+          const inspected = await inspectPage(client, sessionRef, contract.checks);
+          metrics = inspected.metrics;
+          errors.push(...inspected.errors);
           if (metrics.scrollWidth > metrics.viewportWidth + 1) {
             errors.push(`가로 넘침 ${metrics.scrollWidth}px, 뷰포트 ${metrics.viewportWidth}px`);
           }
           if (metrics.brokenImages.length) {
             errors.push(`깨진 이미지 ${metrics.brokenImages.join(", ")}`);
           }
-          for (const check of contract.checks) {
-            try {
-              await runDeclaredCheck(page, check);
-            } catch (error) {
-              errors.push(errorText(error));
-            }
-          }
           for (const interaction of contract.interactions) {
             try {
-              await runInteraction(page, interaction);
+              await runInteraction(client, sessionRef, interaction);
             } catch (error) {
               errors.push(`${interaction.id}: ${errorText(error)}`);
             }
           }
-        } catch (error) {
-          errors.push(errorText(error));
-        }
+          const observed = await client.observe(
+            sessionRef,
+            { expectedRisk: "read", maxNodes: 64, includeConsole: true, includeNetwork: true, maxEvents: 100 },
+            { timeoutMs: 30000 },
+          );
+          errors.push(...diagnosticErrors(opened.output.startup, observed.output));
 
-        if (requestFailures.length) errors.push(...requestFailures);
-        try {
-          await returnToPageTop(page);
+          await evaluate(
+            client,
+            sessionRef,
+            `(async () => { scrollTo(0, 0); await new Promise((resolveFrame) => requestAnimationFrame(() => requestAnimationFrame(resolveFrame))); return true; })()`,
+            { awaitPromise: true },
+          );
           const topFile = `${contract.id}.${viewport.id}.top.jpg`;
-          await page.screenshot({
-            path: join(runDir, topFile),
-            type: "jpeg",
-            quality: 88,
-            fullPage: false,
-            animations: "disabled",
-            caret: "hide",
-          });
+          await saveScreenshot(client, sessionRef, join(runDir, topFile), { quality: 88 });
           screenshotFiles.push({ kind: "top", file: topFile });
 
+          await client.act(
+            sessionRef,
+            [{ kind: "hydrateLazy", maxScrolls: 100, settleMs: 50, timeoutMs: 30000, expectedRisk: "externalEffect" }],
+            { timeoutMs: 60000 },
+          );
           const fullFile = `${contract.id}.${viewport.id}.full.jpg`;
-          await page.screenshot({
-            path: join(runDir, fullFile),
-            type: "jpeg",
-            quality: 84,
-            fullPage: true,
-            animations: "disabled",
-            caret: "hide",
-          });
+          await saveScreenshot(client, sessionRef, join(runDir, fullFile), { quality: 84, fullPage: true });
           screenshotFiles.push({ kind: "full", file: fullFile });
 
           for (const capture of contract.captures) {
             const focusFile = `${contract.id}.${viewport.id}.${capture.id}.jpg`;
-            await page.locator(capture.selector).first().screenshot({
-              path: join(runDir, focusFile),
-              type: "jpeg",
-              quality: 90,
-              animations: "disabled",
-              caret: "hide",
-            });
+            const clip = await evaluate(
+              client,
+              sessionRef,
+              `(() => {
+                const element = document.querySelector(${JSON.stringify(capture.selector)});
+                if (!element) throw new Error("캡처 요소가 없습니다: " + ${JSON.stringify(capture.selector)});
+                const rect = element.getBoundingClientRect();
+                return { x: Math.max(0, rect.left + scrollX), y: Math.max(0, rect.top + scrollY),
+                  width: rect.width, height: rect.height, scale: 1 };
+              })()`,
+            );
+            await saveScreenshot(client, sessionRef, join(runDir, focusFile), { quality: 90, clip });
             screenshotFiles.push({
               kind: "focus",
               id: capture.id,
@@ -405,27 +414,37 @@ export async function captureVisualEvidence({ baseUrl, routeFilters = [] } = {})
               file: focusFile,
             });
           }
-        } catch (error) {
-          errors.push(`스크린샷 실패: ${errorText(error)}`);
-        }
-        await context.close();
+          } catch (error) {
+            errors.push(errorText(error));
+          } finally {
+            if (sessionRef) {
+              try {
+                await client.detachSession(sessionRef, { timeoutMs: 30000 });
+              } catch (error) {
+                errors.push(`브라우저 session 정리 실패: ${errorText(error)}`);
+              }
+            }
+          }
 
-        results.push({
-          routeId: contract.id,
-          path: contract.path,
-          viewport: viewport.id,
-          width: viewport.width,
-          height: viewport.height,
-          screenshots: screenshotFiles,
-          status: errors.length ? "failed" : "passed",
-          durationMs: Date.now() - startedAt,
-          metrics,
-          errors,
-        });
+          results.push({
+            routeId: contract.id,
+            path: contract.path,
+            viewport: viewport.id,
+            width: viewport.width,
+            height: viewport.height,
+            screenshots: screenshotFiles,
+            status: errors.length ? "failed" : "passed",
+            durationMs: Date.now() - startedAt,
+            metrics,
+            errors,
+            pyprocManifest: relative(runDir, manifestPath).replace(/\\/g, "/"),
+          });
+        }
+      } finally {
+        await client.close();
       }
     }
   } finally {
-    await browser.close();
     await previewServer.close();
   }
 

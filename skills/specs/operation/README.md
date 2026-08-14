@@ -19,6 +19,7 @@ status: curated
 | [`operation.domains`](domains.md) | 호스트네임과 DNS | 도메인을 건드리기 전에 |
 | [`operation.productProxy`](productProxy.md) | 제품 문서 하위 경로 | 제품 문서 주소를 다룰 때 |
 | [`operation.seoContract`](seoContract.md) | 검색 노출 계약 | 렌더 방식을 바꾸기 전에 |
+| [`operation.adsense`](adsense.md) | 블로그 AdSense 광고 | 광고 코드와 정책을 다룰 때 |
 | [`operation.brandAssets`](brandAssets.md) | 심볼과 파비콘, og | 로고를 바꿀 때 |
 | [`operation.blogPublishing`](blogPublishing.md) | 글 발행 | 글을 올릴 때 |
 | [`operation.productMarketing`](productMarketing.md) | 제품 마케팅 맥락 | 포지셔닝·한 줄 정의가 필요할 때 |

@@ -6,7 +6,7 @@ purpose: 프로덕션 빌드를 데스크톱과 모바일 폭으로 렌더하고
 whenToUse:
   - 화면을 바꿨다
   - 모바일 레이아웃 확인
-  - Playwright 스크린샷
+  - pyproc-control 스크린샷
   - 시각 검증 승인
   - deploy가 시각 승인에서 막힌다
 verify:
@@ -21,7 +21,7 @@ status: observed
 
 빌드 통과와 화면 확인은 다른 증거다. 시각 검증은 아래 두 층으로 나눈다.
 
-1. Playwright가 프로덕션 빌드를 실제 Chromium 계열 브라우저로 렌더한다
+1. 저장소에 고정한 `pyproc-control`이 프로덕션 빌드를 실제 Chromium 계열 브라우저로 렌더한다
 2. 사람이나 화면을 볼 수 있는 에이전트가 데스크톱과 모바일 스크린샷을 확인하고 그 실행을 승인한다
 
 자동 검사는 가로 넘침, 깨진 이미지, 브라우저 오류, 필수 요소와 글의 H2별 이미지 수를 잡는다. 하지만
@@ -57,6 +57,7 @@ npm run verify:visual
 - 같은 페이지를 390 x 844로 렌더한 모바일 전체 화면
 - 각 페이지의 첫 뷰포트와 계약에서 지정한 상호작용 표면의 확대 화면
 - 브라우저 오류, 이미지 상태, 가로 넘침, DOM 계약 결과를 담은 `visual-report.json`
+- 정확한 출처, 허용 동작, 화면 폭을 선언한 `pyproc-control.<viewport>.json`
 
 명령 출력의 run id를 확인하고 모든 화면을 실제로 본 다음 승인한다.
 
@@ -84,9 +85,10 @@ URL이 바뀌어 빌드 결과가 달라지면 `npm run check:visual`이 실패�
 
 ## 브라우저 선택
 
-Playwright는 설치된 Microsoft Edge, Google Chrome, Playwright Chromium 순서로 브라우저를 찾는다.
-별도 실행 파일을 써야 하면 `BROWSER_PATH`에 절대 경로를 지정한다. 기본 브라우저 프로필과 쿠키는
-사용하지 않고 검증 전용 임시 컨텍스트를 쓴다.
+검증기는 저장소에 정확히 고정한 `pyproc` 패키지의 공개 `pyproc/control` API로 같은 패키지의
+`pyproc-control` 프로세스를 시작한다. 별도 실행 파일을 써야 하면 `BROWSER_PATH`에 절대 경로를
+지정한다. 허용 출처와 동작은 실행마다 저장소 밖 manifest에 선언하고 기본 브라우저 프로필과 쿠키는
+사용하지 않는다.
 
 ## 되돌리기
 

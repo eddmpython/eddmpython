@@ -57,10 +57,31 @@ const CSP = [
   "worker-src 'self' blob:",
 ].join("; ");
 
-function withHeaders(res: Response, isHtml: boolean): Response {
+// AdSense는 광고 공급 도메인이 바뀔 수 있어 고정 출처 목록을 지원하지 않는다.
+// 자동 광고 코드가 있는 글 상세 응답만 HTTPS 하위 리소스를 허용하고 나머지는 기존 CSP를 유지한다.
+const ADSENSE_CSP = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'none'",
+  "form-action 'self'",
+  "img-src 'self' data: https:",
+  "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com",
+  "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https:",
+  "connect-src 'self' https:",
+  "frame-src https:",
+  "worker-src 'self' blob:",
+].join("; ");
+
+function isAdSenseArticle(pathname: string): boolean {
+  return /^\/blog\/[^/]+$/.test(pathname);
+}
+
+function withHeaders(res: Response, isHtml: boolean, adsense = false): Response {
   const headers = new Headers(res.headers);
   for (const [k, v] of Object.entries(SECURITY_HEADERS)) headers.set(k, v);
-  if (isHtml) headers.set("content-security-policy", CSP);
+  if (isHtml) headers.set("content-security-policy", adsense ? ADSENSE_CSP : CSP);
   return new Response(res.body, {
     status: res.status,
     statusText: res.statusText,
@@ -131,7 +152,8 @@ export default {
     const asset = await env.ASSETS.fetch(request);
     if (asset.status !== 404) {
       const type = asset.headers.get("content-type") ?? "";
-      return withHeaders(asset, type.includes("text/html"));
+      const isHtml = type.includes("text/html");
+      return withHeaders(asset, isHtml, isHtml && isAdSenseArticle(pathname));
     }
 
     const wantsHtml =

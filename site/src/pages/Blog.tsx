@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { POSTS, formatDate } from "../posts";
 import { Nav } from "../components/Nav";
 import { Footer } from "../components/Footer";
@@ -16,8 +15,8 @@ export function Blog() {
         <ul className="mt-12 border-t border-white/10">
           {POSTS.map((p) => (
             <li key={p.slug} className="border-b border-white/10">
-              <Link
-                to={`/blog/${p.slug}`}
+              <a
+                href={`/blog/${p.slug}`}
                 className="group block py-7 transition-colors"
               >
                 <time dateTime={p.date} className="font-mono text-xs text-ivory/40">
@@ -31,7 +30,7 @@ export function Blog() {
                     {p.summary}
                   </p>
                 )}
-              </Link>
+              </a>
             </li>
           ))}
         </ul>

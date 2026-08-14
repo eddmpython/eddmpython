@@ -83,6 +83,10 @@ const ROUTE_RULES = [
       COUNT("article#content h1", { exact: 1 }),
       COUNT("article#content h2", { min: 1 }),
       EQUAL_COUNT("article#content h2", "article#content img"),
+      COUNT(
+        'script[src^="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]',
+        { exact: 1 },
+      ),
     ],
   },
   {

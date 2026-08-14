@@ -50,6 +50,7 @@ dartlab 은 `engines` 와 `recipes` 를 더 두지만 이 저장소에는 그 �
 | [`operation.domains`](specs/operation/domains.md) | 호스트네임이 어느 워커에 붙어 있나. 무엇을 지우면 안 되나 |
 | [`operation.productProxy`](specs/operation/productProxy.md) | 제품 문서를 apex 하위 경로로 넘기는 구조 |
 | [`operation.seoContract`](specs/operation/seoContract.md) | 프리렌더, 구조화 데이터, sitemap, RSS 가 지켜야 할 계약 |
+| [`operation.adsense`](specs/operation/adsense.md) | 글 상세 광고 코드, CSP, ads.txt 계약 |
 | [`operation.brandAssets`](specs/operation/brandAssets.md) | 심볼 정본과 파비콘, og 이미지 생성 |
 | [`operation.blogPublishing`](specs/operation/blogPublishing.md) | 글을 어디에 두고 무엇이 자동으로 만들어지나 |
 | [`operation.productMarketing`](specs/operation/productMarketing.md) | 제품 마케팅 맥락 문서 유지 |
