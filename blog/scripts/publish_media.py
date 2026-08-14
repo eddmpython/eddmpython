@@ -54,7 +54,11 @@ def plan_entry(plan: dict[str, object], asset_id: str) -> dict[str, object]:
     match = ASSET_ID_RE.fullmatch(asset_id)
     if not match:
         raise ValueError("asset id는 <post id>/<영문 kebab-case 키> 형식이어야 함")
-    if plan.get("version") != 1 or not isinstance(plan.get("assets"), dict):
+    if (
+        plan.get("version") != 2
+        or plan.get("promptContract") != "section-grounded-v2"
+        or not isinstance(plan.get("assets"), dict)
+    ):
         raise ValueError("blog/media/plan.json 계약 위반")
     entry = plan["assets"].get(asset_id)
     if not isinstance(entry, dict):
@@ -69,6 +73,10 @@ def plan_entry(plan: dict[str, object], asset_id: str) -> dict[str, object]:
         "narrativeUse",
         "sourcePolicy",
         "sourceKind",
+        "sectionSubtitle",
+        "contentAnchor",
+        "visualSubject",
+        "visualRelationship",
     )
     missing = [key for key in required if not str(entry.get(key) or "").strip()]
     if missing:
@@ -82,13 +90,25 @@ def plan_entry(plan: dict[str, object], asset_id: str) -> dict[str, object]:
         raise ValueError(f"지원하지 않는 이미지 role: {asset_id}: {role}")
     if role == "section" and not str(entry.get("sectionHeading") or "").strip():
         raise ValueError(f"section 이미지 계획에는 sectionHeading이 필요함: {asset_id}")
-    if entry["visualProfile"] != "dark-editorial-v1":
-        raise ValueError(f"visualProfile은 dark-editorial-v1이어야 함: {asset_id}")
+    if role == "section" and entry.get("placement") != "H3 부제 바로 뒤":
+        raise ValueError(f"section 이미지 placement는 H3 부제 바로 뒤여야 함: {asset_id}")
     source_kind = str(entry["sourceKind"])
-    if source_kind not in {"imagegen", "official", "licensed"}:
+    if source_kind not in {"imagegen", "screenshot", "official", "licensed"}:
         raise ValueError(f"지원하지 않는 sourceKind: {asset_id}: {source_kind}")
+    expected_profile = {
+        "imagegen": "dark-editorial-v1",
+        "screenshot": "product-screen-v1",
+        "official": "source-original-v1",
+        "licensed": "source-original-v1",
+    }[source_kind]
+    if entry["visualProfile"] != expected_profile:
+        raise ValueError(f"visualProfile은 {expected_profile}이어야 함: {asset_id}")
     if source_kind == "imagegen" and not str(entry.get("prompt") or "").strip():
         raise ValueError(f"ImageGen 계획에는 prompt가 필요함: {asset_id}")
+    if source_kind == "screenshot":
+        for key in ("sourceUrl", "captureState"):
+            if not str(entry.get(key) or "").strip():
+                raise ValueError(f"screenshot 계획에는 {key}가 필요함: {asset_id}")
     if source_kind in {"official", "licensed"}:
         for key in ("sourceUrl", "credit"):
             if not str(entry.get(key) or "").strip():
@@ -293,7 +313,13 @@ def resolve_token() -> str | None:
     return get_token()
 
 
-def publish(asset_id: str, explicit_file: str | None, dry_run: bool, create_repo: bool) -> str:
+def publish(
+    asset_id: str,
+    explicit_file: str | None,
+    dry_run: bool,
+    create_repo: bool,
+    reviewed: bool,
+) -> str:
     plan = load_json(PLAN_PATH)
     entry = plan_entry(plan, asset_id)
     post = str(entry["post"])
@@ -304,6 +330,10 @@ def publish(asset_id: str, explicit_file: str | None, dry_run: bool, create_repo
 
     local_path = staging_path(post, key, explicit_file)
     validate_magic(local_path)
+    if not dry_run and not reviewed:
+        raise ValueError(
+            "--reviewed가 필요함: 최종 이미지를 visualSubject와 visualRelationship에 맞춰 직접 확인"
+        )
     metadata = image_metadata(local_path)
     suffix = canonical_suffix(local_path)
     sha256 = hashlib.sha256(local_path.read_bytes()).hexdigest()
@@ -434,6 +464,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--file", help="저장소 밖 staging 이미지 경로")
     parser.add_argument("--dry-run", action="store_true", help="업로드와 파일 수정 없이 계약만 확인")
     parser.add_argument("--create-repo", action="store_true", help="HF 데이터셋이 없으면 공개 저장소 생성")
+    parser.add_argument(
+        "--reviewed",
+        action="store_true",
+        help="최종 이미지가 sectionHeading, visualSubject, visualRelationship과 맞는지 직접 확인함",
+    )
     return parser.parse_args()
 
 
@@ -443,7 +478,7 @@ def main() -> None:
         if args.verify:
             verify_remote()
         else:
-            publish(args.asset, args.file, args.dry_run, args.create_repo)
+            publish(args.asset, args.file, args.dry_run, args.create_repo, args.reviewed)
     except (OSError, RuntimeError, ValueError) as exc:
         raise SystemExit(f"블로그 미디어 발행 실패: {exc}") from exc
 

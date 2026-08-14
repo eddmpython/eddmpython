@@ -57,6 +57,8 @@ frontmatter `date`는 `YYYY-MM-DD`로 쓴다. 공개 경로는 frontmatter `slug
 | `readerTakeaway` | 독자가 들고 나가는 한 문장 |
 | `readerLevel` | `beginner`, `working`, `advanced` 중 하나 |
 | `readerStartingPoint` | 독자가 이미 아는 것과 아직 모르는 것을 적은 문장 |
+| `primaryKeyword` | 제목, summary, 도입에서 함께 답할 두 단어 이상의 검색어 |
+| `searchIntent` | `explanation`, `how-to`, `troubleshooting`, `comparison` 중 하나 |
 | `ogImage` | 공유 이미지 URL. Hugging Face 콘텐츠 주소 객체 |
 | `ogImageAlt` | 이미지 설명 |
 | `ogImageWidth` / `ogImageHeight` / `ogImageType` | 이미지 규격 |
@@ -85,16 +87,20 @@ frontmatter `date`는 `YYYY-MM-DD`로 쓴다. 공개 경로는 frontmatter `slug
 기계 검사는 자연스러운 말투를 완전히 판정하지 못하므로 새 글과 전체 교정에는 `$blog-writing` 스킬을
 함께 사용한다.
 
-## 섹션은 제목, 이미지, 설명으로 읽힌다
+## 섹션은 제목, 부제, 이미지, 설명으로 읽힌다
 
 모든 H2는 아래 순서를 지킨다.
 
 1. 독자의 다음 궁금증을 여는 H2
-2. H2 바로 뒤의 고유한 섹션 이미지와 캡션
-3. 이미지를 실제 사례와 판단으로 연결하는 설명
+2. 이 절에서 얻을 결과를 쉬운 말로 적은 H3 한 줄 부제
+3. 고유한 섹션 이미지와 캡션
+4. 코드와 목록보다 먼저 나오는 쉬운 서술형 설명
+5. 선택 사항인 코드, 실제 예시, 설명 목록이나 표
 
-섹션 이미지는 `blog/media/plan.json`에서 `role: section`, 실제 H2와 같은 `sectionHeading`,
-`visualProfile: dark-editorial-v1`을 가진다. 다른 H2의 이미지를 재사용하지 않는다. 이미지는 차콜과
+섹션 이미지는 `blog/media/plan.json`에서 `role: section`, 실제 H2와 H3에 맞는 `sectionHeading`,
+`sectionSubtitle`, 본문 원문 `contentAnchor`, 실제 피사체 `visualSubject`, 설명할 관계
+`visualRelationship`, `visualProfile: dark-editorial-v1`을 가진다. 다른 H2의 이미지를 재사용하지
+않는다. 이미지는 차콜과
 그레이 중심의 낮은 채도로 만들고 글자, 숫자, 코드, 로고를 바이트 안에 굽지 않는다. 제목과 캡션은
 HTML로 렌더해야 모바일, 검색, 접근성 표면에서 같은 문장을 유지할 수 있다.
 
@@ -124,8 +130,10 @@ cd site && npm run verify:media
    `blog/YYYYMMDD-slug.md`를 쓰고 모든 H2의 이미지 자리를 함께 정한다. 카피 판단은
    `operation.blogCopy`, 주제 선택은 `operation.contentStrategy`, 제품 맥락은
    `blog/product-marketing.md`를 본다.
-2. 섹션별 이미지를 만들고 `blog/media/plan.json` 에 H2, 의미, 출처, 최종 프롬프트를 남긴다
-3. `publish_media.py` 로 Hugging Face 에 올리고 `catalog.json` 을 갱신한다
+2. 섹션별 쉬운 설명을 먼저 쓴 뒤 `blog/media/plan.json`에 H2, H3, 본문 원문, 피사체, 관계, 출처,
+   장면 프롬프트를 남긴다
+3. 실제 픽셀을 본문과 대조하고 `publish_media.py --reviewed`로 Hugging Face에 올린 뒤
+   `catalog.json`을 갱신한다
 4. `cd site && npm test` 로 문장 품질 표본, frontmatter 와 타입을 확인한다
 5. `npm run verify:media` 로 원격 객체를 확인한다
 6. `npm run verify:visual`로 모든 페이지의 데스크톱과 모바일 화면을 만들고 실제로 확인한다

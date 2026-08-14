@@ -33,6 +33,8 @@ status: curated
 - 질문이거나 주장이다. 명사 나열 금지 (`blogPublishing` frontmatter 계약).
 - 제품 이름보다 독자가 검색할 문제나 결과가 앞에 온다.
 - 브랜드를 지워도 의미가 남는지 확인한다.
+- `primaryKeyword`의 주요 단어를 모두 넣고 `searchIntent`에 맞는 후크를 쓴다.
+- 제목은 15자 이상 60자 이하로 쓰고 summary와 도입 두 문단이 같은 약속에 답하게 한다.
 - 예:
   - 나쁨: `Codaro 사용법: 첫 코드 실행부터 내 파일 다루기`
   - 좋음: `설치 없이 Python 첫 코드를 실행하는 방법`
@@ -63,8 +65,8 @@ status: curated
 
 본문을 새로 쓰거나 전체 교정할 때는 저장소용 `$blog-writing` 스킬을 사용한다. 스킬의 정본은
 `.agents/skills/blog-writing/SKILL.md`이며 `blog/PIPELINE.md` 4절의 규칙을 실제 집필 순서로 적용한다.
-`cd site && npm run test:blog-style`로 검사 규칙 표본을 먼저 확인하고 `npm run check:blog`로 실제 글을
-검사한다.
+`cd site && npm run test:blog-style`과 `npm run test:blog-package`로 검사 규칙 표본을 먼저 확인하고
+`npm run check:blog`로 실제 글을 검사한다.
 
 ## 편집 순서
 

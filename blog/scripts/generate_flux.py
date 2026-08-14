@@ -1,4 +1,4 @@
-"""plan.json의 imagegen 자산을 Replicate FLUX 1.1 Pro로 생성해 저장소 밖 검수 경로에 놓는다.
+"""plan.json의 섹션 근거와 imagegen 장면을 합쳐 FLUX 1.1 Pro로 생성한다.
 
 사용: python -X utf8 blog/scripts/generate_flux.py <post-id> [--only key1,key2] [--force]
 - 계약: blog/PIPELINE.md 5절. 프롬프트·의미의 정본은 blog/media/plan.json이다.
@@ -24,6 +24,34 @@ STAGING_ROOT = REPO_ROOT.parent / "eddmpython.out" / "blog-media"
 API = "https://api.replicate.com/v1/predictions"
 MODEL = "black-forest-labs/flux-1.1-pro"
 GEN_INTERVAL_SEC = 12
+
+
+def composePrompt(asset: dict[str, object]) -> str:
+    """본문 주장과 실제 피사체를 자유 장면 지시보다 높은 우선순위로 붙인다."""
+    required = (
+        "sectionHeading",
+        "sectionSubtitle",
+        "contentAnchor",
+        "visualSubject",
+        "visualRelationship",
+        "prompt",
+    )
+    missing = [key for key in required if not str(asset.get(key) or "").strip()]
+    if missing:
+        raise ValueError(f"섹션 기반 이미지 필드가 비었다: {', '.join(missing)}")
+    return "\n".join(
+        (
+            str(asset["prompt"]).strip(),
+            "Mandatory semantic grounding. If an earlier scene instruction conflicts, this block wins.",
+            f"Article section title: {asset['sectionHeading']}",
+            f"Section subtitle: {asset['sectionSubtitle']}",
+            f"Exact article claim: {asset['contentAnchor']}",
+            f"Concrete subject that must be visibly recognizable: {asset['visualSubject']}",
+            f"Relationship the image must explain: {asset['visualRelationship']}",
+            "Do not replace the concrete subject with a generic workshop, road, gate, machine, or decorative metaphor.",
+            "The image is rejected if a reader cannot connect it to this section without guessing.",
+        )
+    )
 
 
 def loadToken() -> str:
@@ -79,6 +107,8 @@ def main() -> None:
     args = parser.parse_args()
 
     plan = json.loads(PLAN_PATH.read_text(encoding="utf-8"))
+    if plan.get("version") != 2 or plan.get("promptContract") != "section-grounded-v2":
+        sys.exit("plan.json의 section-grounded-v2 계약이 필요하다.")
     assets = plan.get("assets", {})
     onlyKeys = {k.strip() for k in args.only.split(",") if k.strip()}
     targets = [
@@ -101,10 +131,7 @@ def main() -> None:
         if dest.exists() and not args.force:
             print(f"skip {key}: 이미 있음")
             continue
-        prompt = asset.get("prompt", "")
-        if not prompt:
-            print(f"skip {key}: plan에 prompt가 없다")
-            continue
+        prompt = composePrompt(asset)
         print(f"generate {key} ...")
         pid = create(headers, prompt)
         url = poll(headers, pid)

@@ -39,6 +39,8 @@ readerQuestion: 이 글이 끝까지 답할 질문은 무엇인가?
 readerTakeaway: 독자가 글을 덮고 기억할 한 문장
 readerLevel: beginner, working, advanced 중 하나
 readerStartingPoint: 독자가 이미 아는 것과 아직 모르는 것
+primaryKeyword: 제목과 summary와 도입에 함께 쓸 두 단어 이상의 검색어
+searchIntent: explanation, how-to, troubleshooting, comparison 중 하나
 ogImage: 선택. 발행 전에는 media://asset-key, 발행 뒤에는 HF 객체 URL
 ogImageAlt: ogImage가 있으면 필수. plan의 alt와 같은 설명
 ogImageWidth: ogImage가 있으면 필수. 원본 픽셀 너비
@@ -133,9 +135,11 @@ frontmatter와 본문을 함께 고친다. `modified`는 빌드한 날이 아니
 H2만 읽어도 이 순서가 보여야 한다. `핵심 구조`, `실행 환경`, `확장 가능한 흐름`처럼
 내용을 열어 봐야 뜻을 알 수 있는 H2는 쓰지 않는다.
 
-각 H2는 `제목 -> 이미지 -> 캡션 -> 쉬운 설명 -> 실제 예` 순서로 둔다. 이미지는 H2 바로 뒤에
-두고 다른 H2와 같은 이미지를 다시 쓰지 않는다. 앞 절에서 열지 않은 기능이나 용어를 다음 절이
-당연히 아는 것처럼 시작하면 순서를 바꾼다.
+각 H2는 `제목 -> 한 줄 부제 -> 이미지와 캡션 -> 쉬운 서술형 설명 -> 선택 보조자료` 순서로 둔다.
+부제는 이 절에서 알게 될 결과를 15자 이상 80자 이하로 적는다. 이미지 다음에는 코드나 목록보다
+60자 이상의 일반 문단을 먼저 둔다. 보조자료는 없어도 되며, 넣는다면 실행 코드, 입력과 결과가 있는
+예시, 설명용 목록이나 표만 쓴다. 다른 H2와 같은 이미지를 다시 쓰지 않는다. 앞 절에서 열지 않은
+기능이나 용어를 다음 절이 당연히 아는 것처럼 시작하면 순서를 바꾼다.
 
 ## 4. 쉬운 말로 쓰고 여섯 번 검토한다
 
@@ -208,31 +212,37 @@ Web Run 링크에서 사용할 수 있다고 정확히 쓴다.
 이미지는 글을 꾸미기 위해 넣지 않는다. 설명만으로 공간, 장면, 물성, 전후 차이를 따라가기 어려울 때
 사용한다. 각 이미지는 어느 문단 뒤에서 무엇을 이해시키는지 먼저 정한다.
 
-이미지 의미의 정본은 `blog/media/plan.json`이다. 키는 `<post id>/<assetKey>`이고 아래 필드를
-가진다. post id는 파일 stem이며 공개 URL slug와 다를 수 있다.
+이미지 의미의 정본은 `blog/media/plan.json`이다. plan은 `version: 2`,
+`promptContract: section-grounded-v2`를 쓴다. 키는 `<post id>/<assetKey>`이고 아래 필드를 가진다.
+post id는 파일 stem이며 공개 URL slug와 다를 수 있다.
 
 ```json
 {
-  "2026-08-08-example/hero": {
-    "post": "2026-08-08-example",
+  "20260808-example/hero": {
+    "post": "20260808-example",
     "assetKey": "hero",
     "role": "section",
     "sectionHeading": "이 이미지가 바로 뒤따르는 H2 원문",
+    "sectionSubtitle": "본문 H3와 같은 한 줄 부제",
+    "contentAnchor": "이미지가 설명할 본문의 실제 문장",
+    "visualSubject": "화면, 파일, 코드, 명령, 결과처럼 눈으로 확인할 대상",
+    "visualRelationship": "대상의 전후, 원인과 결과, 순서",
     "visualProfile": "dark-editorial-v1",
     "alt": "이미지를 보지 못해도 내용을 이해할 수 있는 설명",
-    "placement": "H2 제목 바로 뒤",
+    "placement": "H3 부제 바로 뒤",
     "narrativeUse": "독자가 글의 문제 장면을 한눈에 이해한다",
     "sourcePolicy": "auto",
     "sourceKind": "imagegen",
-    "prompt": "최종 생성에 사용한 프롬프트"
+    "prompt": "구도, 재질, 조명처럼 의미를 바꾸지 않는 장면 지시"
   }
 }
 ```
 
 `role`은 공유 대표 이미지 `hero`, 각 H2의 첫 이미지 `section`, 추가 설명 이미지 `support` 중
-하나다. 모든 H2에는 고유한 `section` 이미지가 하나 필요하고 `sectionHeading`은 H2 원문과 정확히
-같아야 한다. 대표 이미지가 특정 H2의 의미 장면과 맞으면 `section` 이미지 하나를 OG에도 함께 써도
-된다.
+하나다. 모든 H2에는 고유한 `section` 이미지가 하나 필요하다. `sectionHeading`과
+`sectionSubtitle`은 본문 H2와 H3 원문과 정확히 같아야 한다. `contentAnchor`도 해당 절의 설명에
+실제로 있는 문장이어야 한다. 대표 이미지가 특정 H2의 의미 장면과 맞으면 `section` 이미지 하나를
+OG에도 함께 써도 된다.
 
 ### 다크 에디토리얼 이미지 계약
 
@@ -251,14 +261,21 @@ DartLab 카드뉴스에서 가져오는 핵심은 이미지에 문장을 구워 
 검색과 접근성 도구도 제목과 캡션을 읽을 수 있다. 이것이 카드뉴스의 읽힘을 블로그에 맞게 옮기는
 부분이다.
 
-실제 제품, 인물, 행사, 장소처럼 모양이 사실과 맞아야 하는 이미지는 공식 자료나 사용 가능한
-라이선스 이미지를 쓴다. 이때 `sourceKind`는 `official` 또는 `licensed`이고 `sourceUrl`, `credit`,
-`licensed` 이미지에는 `license`를 함께 기록한다.
+실제 제품 화면은 `sourceKind: screenshot`, `visualProfile: product-screen-v1`으로 두고 원본
+`sourceUrl`과 재현할 `captureState`를 적는다.
+인물, 행사, 장소처럼 모양이 사실과 맞아야 하는 이미지는 공식 자료나 사용 가능한 라이선스 이미지를
+쓴다. 이때 `sourceKind`는 `official` 또는 `licensed`, `visualProfile`은 `source-original-v1`이고
+`sourceUrl`, `credit`, `licensed` 이미지에는 `license`를 함께 기록한다.
 
-개념 장면, 분위기, 아직 사진으로 존재하지 않는 설명용 장면은 Codex의 기본 `image_gen` 도구로
-만들 수 있다. 생성 전 plan에 피사체, 배치, 독해 역할, 대체 텍스트, 최종 프롬프트를 먼저 적는다.
-생성본은 눈으로 확인하고 가짜 공식 로고, 가짜 제품 화면, 읽을 수 없는 글자, 사실과 다른 장치를
-찾는다. 한 번에 여러 요소를 고치지 않고 가장 큰 결함 하나씩 다시 생성한다.
+개념 장면, 전후 차이, 아직 사진으로 존재하지 않는 설명용 장면은 Codex의 기본 `image_gen` 도구로
+만들 수 있다. 제품 화면, 코드 내용, 실제 문서 모양이 중요하면 생성 이미지로 흉내 내지 않고 확인된
+화면이나 공식 자료를 쓴다. 생성 전 해당 절의 서술 문단을 먼저 쓴 뒤 plan에 `contentAnchor`,
+`visualSubject`, `visualRelationship`을 적는다. `generate_flux.py`는 이 값을 자유 장면 프롬프트보다
+높은 우선순위로 붙인다.
+
+생성본은 실제 픽셀을 눈으로 확인한다. `visualSubject`가 보이는지, `visualRelationship`을 캡션 없이도
+읽을 수 있는지, 다른 H2 이미지와 바꿨을 때 바로 어색한지 본다. 공방, 길, 문, 기계 같은 범용 비유가
+본문의 실제 파일, 화면, 결과를 밀어내면 다시 만든다. 통과한 파일만 `--reviewed`로 발행한다.
 
 ImageGen 결과는 기본 생성 경로에만 남겨 두지 않는다. 최종 선택본을 다음 저장소 밖 경로로 옮긴다.
 
@@ -292,7 +309,7 @@ hf auth login
 HF 데이터셋을 처음 만들 때만 `--create-repo`를 붙인다.
 
 ```bash
-python -X utf8 blog/scripts/publish_media.py --asset 2026-08-08-example/hero --create-repo
+python -X utf8 blog/scripts/publish_media.py --asset 20260808-example/hero --create-repo --reviewed
 ```
 
 이후에는 `--create-repo` 없이 같은 명령을 쓴다. 스크립트는 다음 순서를 바꾸지 않는다.
@@ -314,6 +331,7 @@ Hugging Face 로컬 로그인 저장소에만 두고 Git, 문서, 로그에 값�
 
 ```bash
 npm run test:blog-style
+npm run test:blog-package
 npm run check:blog
 npm run verify:media
 npm test
@@ -323,11 +341,12 @@ npm run approve:visual -- --run=<run-id>
 npm run deploy
 ```
 
-`test:blog-style`은 쉬운 문장과 추상적인 문장 표본으로 글쓰기 검사 자체를 확인한다. `check:blog`는
-파일명, frontmatter, 날짜, 질문과 답, 최소 본문 구조, 미완성 표식, 금지 문자와 빈 관용구를 검사한다.
-추상어만 이어지는 문단과 실제 예가 없는 H2도 막는다. 모든 H2 바로 뒤에 고유한 섹션 이미지와 캡션이
-있는지, 이미지 뒤 설명이 충분한지,
-`sectionHeading`이 실제 제목과 같은지도 검사한다. 이어 plan, catalog, 본문 HF URL, 대체 텍스트,
+`test:blog-style`은 쉬운 문장과 추상적인 문장 표본으로 문장 검사를 확인한다. `test:blog-package`는
+검색 후크, H2와 H3 부제, 이미지, 첫 서술 문단, 본문에 붙은 이미지 브리프 표본을 확인한다.
+`check:blog`는 파일명, frontmatter, 검색 의도, 핵심어, 질문과 답, 미완성 표식, 금지 문자와 빈
+관용구를 검사한다. 추상어만 이어지는 문단과 실제 예가 없는 H2도 막는다. 모든 H2가 제목, 부제,
+고유 이미지와 캡션, 쉬운 설명 순서인지, `sectionHeading`, `sectionSubtitle`, `contentAnchor`가 실제
+본문과 같은지도 검사한다. 이어 plan, catalog, 본문 HF URL, 대체 텍스트,
 SHA-256 경로의 정합을 확인하고 `blog/` 아래 로컬 이미지 파일을 차단한다. 기계 검사는 글맛과
 이미지의 사실 적합성을 판정하지 않는다. `verify:visual`은 sitemap의 모든 페이지를 데스크톱과 모바일
 폭으로 렌더하고 가로 넘침, 깨진 이미지, 브라우저 오류, H2와 이미지 수를 검사한다. 저장소 밖에 생성된

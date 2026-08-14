@@ -158,12 +158,14 @@ export function Markdown({ children }: { children: string }) {
           return <p className="my-5 leading-[1.85] text-ivory/75">{kids}</p>;
         },
         h2: ({ children: k }) => (
-          <h2 className="mt-12 mb-4 text-xl font-medium tracking-tight md:text-2xl">
+          <h2 className="mt-12 mb-2 text-xl font-medium tracking-tight md:text-2xl">
             {k}
           </h2>
         ),
         h3: ({ children: k }) => (
-          <h3 className="mt-9 mb-3 text-lg font-medium tracking-tight">{k}</h3>
+          <h3 className="mt-0 mb-5 text-[15px] leading-relaxed font-normal text-ivory/55 md:text-base">
+            {k}
+          </h3>
         ),
         ul: ({ children: k }) => (
           <ul className="my-5 space-y-2 pl-5 text-ivory/75 [&>li]:list-disc">{k}</ul>

@@ -1,15 +1,17 @@
 ---
-title: 같은 AI가 저장소마다 다르게 일하는 이유
+title: AI가 저장소 규칙에 따라 다르게 일하는 이유
 slug: ai-environment
 date: 2026-08-08
 modified: 2026-08-14
 author: eddmpython
 section: AI 작업 환경
-summary: AI가 테스트 명령을 틀리거나 수정 범위를 넘는 문제는 긴 프롬프트만으로 해결되지 않습니다. AGENTS.md와 CLAUDE.md에 반복 규칙과 검증 명령을 나눠 적는 방법을 설명합니다.
+summary: AI가 저장소의 테스트 명령을 틀리거나 수정 범위를 넘는 문제는 긴 프롬프트만으로 해결되지 않습니다. AGENTS.md와 CLAUDE.md에 반복 규칙과 검증 명령을 나눠 적는 방법을 설명합니다.
 readerQuestion: 같은 AI가 저장소에 따라 테스트 명령과 수정 범위를 다르게 고르는 이유는 무엇일까?
 readerTakeaway: 프롬프트에는 이번 요청을 적고, CLAUDE.md에는 모든 세션이 반복해서 지킬 수정 범위와 테스트 명령을 적는다.
 readerLevel: working
 readerStartingPoint: Git 저장소에서 AI 코딩 도구를 써 봤지만 AGENTS.md와 CLAUDE.md의 역할은 정리해 본 적이 없다.
+primaryKeyword: AI 저장소 규칙
+searchIntent: explanation
 ogImage: https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/11/118381f89feb8d2c84d2fd6f4d6e7da52bf0c1bbb63e3f29f695dbcdb7daaf73.webp
 ogImageAlt: 서로 다른 두 진입 경로가 하나의 정돈된 작업 환경으로 합쳐지는 모습
 ogImageWidth: 1536
@@ -26,6 +28,8 @@ ogImageType: image/webp
 `CLAUDE.md` 한곳에 적습니다.
 
 ## 반복 규칙은 프롬프트가 아니라 파일에 적습니다
+
+### 이번 요청은 프롬프트에, 다음 요청에도 쓸 명령은 CLAUDE.md에 남깁니다
 
 ![한 번 쓰고 사라지는 요청 메모와 반복 작업을 지탱하는 고정 작업 환경의 대비](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/71/710fb217b5ff64f54d8932e7111cd5669319d6393295c96dc7b46c4f77775761.webp "프롬프트에는 이번 요청을 쓰고 저장소 문서에는 반복해서 지킬 규칙을 남깁니다")
 
@@ -44,6 +48,8 @@ ogImageType: image/webp
 이번 요청만 필요한 내용은 프롬프트에 쓰고, 다음 요청에도 필요한 내용은 규칙 파일에 한 번만 씁니다.
 
 ## 저장소에 다섯 가지 답을 적습니다
+
+### AI가 작업을 끝내려면 제품 범위부터 완료 증거까지 다섯 답이 필요합니다
 
 ![하나의 저장소 작업대를 둘러싼 다섯 개의 서로 다른 확인 지점](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/c6/c6c68286dca4b9ce7ce538938c782bb5b8670c032a4b946e0e0ddf978733463f.webp "제품 범위, 읽을 곳, 실행 명령, 완료 증거, 수정 권한을 저장소가 답해야 합니다")
 
@@ -66,6 +72,8 @@ Python 버전과 운영체제만 적어서는 부족합니다. AI가 파일을 �
 적습니다.
 
 ## AGENTS.md는 CLAUDE.md 한곳을 가리킵니다
+
+### 진입 파일은 둘이어도 실제 규칙은 한 파일에서만 관리합니다
 
 ![서로 다른 두 진입 경로가 하나의 정돈된 작업 환경으로 합쳐지는 모습](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/11/118381f89feb8d2c84d2fd6f4d6e7da52bf0c1bbb63e3f29f695dbcdb7daaf73.webp "AGENTS.md는 CLAUDE.md를 읽게 하고 실제 규칙은 CLAUDE.md 한곳에 둡니다")
 
@@ -97,6 +105,8 @@ Python 버전과 운영체제만 적어서는 부족합니다. AI가 파일을 �
 
 ## 실패한 지점을 다음 규칙으로 바꿉니다
 
+### 실패 로그에서 멈춘 위치와 다음 확인 순서를 한 줄 규칙으로 바꿉니다
+
 ![깨진 작업 경로에서 확인 지점과 안전 난간이 만들어지는 모습](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/0d/0d17c5f74d34115c4fc9dd372b260b896faaeee1cafde0810c648b1d4cc94465.webp "실패한 검사 위치와 다시 확인할 순서를 다음 작업의 규칙으로 남깁니다")
 
 처음부터 완벽한 규칙집을 만들 수는 없습니다. 일반적인 모범 사례를 모아 붙이면 문서는 금방
@@ -120,6 +130,8 @@ Python 버전과 운영체제만 적어서는 부족합니다. AI가 파일을 �
 반대로 "최선을 다한다", "안전하게 작업한다" 같은 문장은 옳지만 행동을 바꾸지 못합니다.
 
 ## 템플릿 규칙 세 곳을 고쳤습니다
+
+### 기존 변경, 작업 권한, 실행 환경을 실제 행동이 보이도록 고쳤습니다
 
 ![헐거운 작업 틀이 세 개의 정밀한 보강 부품으로 단단해지는 과정](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/8d/8d7e756072345c3fde690e01bf3573c8cd1a59b99f88d991be2817837845b8d5.webp "템플릿에서 기존 변경, 권한, 실행 환경 규칙을 세 곳 고쳤습니다")
 
@@ -148,9 +160,12 @@ Python 버전과 운영체제만 적어서는 부족합니다. AI가 파일을 �
 
 ## 작은 저장소는 네 줄부터 적습니다
 
+### 소유 범위, 실행 명령, 진입 파일, 실제 실패 하나면 시작할 수 있습니다
+
 ![네 개의 기본 도구만 갖춘 작고 단단한 저장소 작업대](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/2f/2fbb1e26b069ae904ed8e058a3071a37e7c3dc9440b87bc7445b060bc11e1217.webp "작은 저장소는 소유 범위, 명령, 진입 파일, 실제 실패 하나부터 적습니다")
 
 환경을 만든다고 100줄짜리 규칙부터 쓸 필요는 없습니다. 오히려 처음에는 아래 네 가지면 충분합니다.
+각 항목을 한 줄씩 적으면 작은 저장소도 바로 첫 작업을 맡길 수 있습니다.
 
 1. 이 저장소가 소유하는 것과 소유하지 않는 것을 한 문단으로 씁니다.
 2. 설치, 테스트, 빌드 명령을 복사해서 실행할 수 있게 둡니다.
@@ -169,9 +184,12 @@ Python 버전과 운영체제만 적어서는 부족합니다. AI가 파일을 �
 
 ## 문서와 실제 명령이 다르면 문서를 고칩니다
 
+### 테스트가 실패하면 제품보다 명령, 종료 시점, 산출물 경로를 먼저 봅니다
+
 ![안전한 기본 경로 옆에서 새로운 증거에 따라 다시 열리는 판단의 갈림길](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/74/742afbe9dcc6fa1b3572d7c705e355ce3c64e25d877bd728a81f120318b1fbb0.webp "문서의 명령이 실패하면 패키지 설정, 프로세스 종료, 산출물 경로를 다시 확인합니다")
 
 규칙 파일도 코드가 바뀌면 낡을 수 있습니다. 문서와 실제 실행 결과가 다르면 다음 순서로 확인합니다.
+낡은 명령을 그대로 반복하지 말고 지금 보이는 실패 지점부터 찾습니다.
 
 만약 테스트 명령이 문서에는 맞지만 실제로 실패한다면, 제품 결함이라고 바로 결론 내리지 않습니다.
 명령이 현재 패키지 설정과 이어지는지, 프로세스가 끝났는지, 산출물 경로가 바뀌지 않았는지를 먼저

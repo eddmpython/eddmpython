@@ -7,6 +7,7 @@
     "dev": "vite",
     "check:blog": "node scripts/check-blog.mjs",
     "test:blog-style": "node scripts/test-blog-style.mjs",
+    "test:blog-package": "node scripts/test-blog-package.mjs",
     "check:skills": "node scripts/check-skills.mjs",
     "verify:media": "python -X utf8 ../blog/scripts/publish_media.py --verify",
     "verify:seo": "node scripts/check-seo.mjs",
@@ -16,7 +17,7 @@
     "build": "npm run test && vite build && npm run verify:seo",
     "og": "node --experimental-strip-types scripts/og.mjs",
     "preview": "vite preview",
-    "test": "npm run test:blog-style && npm run check:blog && npm run check:skills && tsc --noEmit",
+    "test": "npm run test:blog-style && npm run test:blog-package && npm run check:blog && npm run check:skills && tsc --noEmit",
     "deploy": "npm run build && npm run check:visual && wrangler deploy"
   },
   "dependencies": {

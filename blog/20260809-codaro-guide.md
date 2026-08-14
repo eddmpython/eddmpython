@@ -10,6 +10,8 @@ readerQuestion: Python을 아직 설치하지 않았는데, 브라우저에서 �
 readerTakeaway: 처음에는 브라우저에서 코드를 실행해 보고, 내 컴퓨터의 파일이 필요할 때 설치형으로 넘어가면 된다.
 readerLevel: beginner
 readerStartingPoint: Python을 배우려 하지만 설치, .py, Local 같은 말은 아직 낯설다. Codaro라는 이름도 처음 본다.
+primaryKeyword: Python 코드 실행
+searchIntent: how-to
 ogImage: https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/75/75e8abd651ab9e1d1dd850e8e5c64c3bc1b396a2cf4517652ce075f476f9c6a3.webp
 ogImageAlt: 하나의 코드 종이가 설명대와 실행 장치와 검사 장치를 차례로 지나가는 어두운 작업대
 ogImageWidth: 1536
@@ -30,6 +32,8 @@ Python을 처음 배운다고 해보겠습니다. 강의에는 `print("안녕하
 
 ## 설치하지 않고 첫 레슨을 엽니다
 
+### 브라우저 레슨을 열고 실행 버튼을 눌러 결과 칸이 바뀌는지 봅니다
+
 ![닫힌 설치 도구 상자 옆으로 브라우저 학습 책상까지 길이 열린 모습](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/a6/a6880c33189b23b51c6700d7c27bba8fbfc383e57c44b1d28d22c4e0bb6796c2.webp "Python 설치보다 먼저 브라우저에서 첫 레슨을 열어 볼 수 있다")
 
 [Codaro Web 학습](https://eddmpython.com/codaro/learn/)을 엽니다. Web은 브라우저에서 쓰는
@@ -47,6 +51,8 @@ Python을 처음 배운다고 해보겠습니다. 강의에는 `print("안녕하
 열 수 있는 표 파일이고, Local은 뒤에서 설명할 설치형 버전입니다.
 
 ## 첫 화면에서는 세 가지만 하면 됩니다
+
+### 준비된 코드를 실행하고 값 하나를 바꿔 다시 실행하면 첫 화면은 충분합니다
 
 ![하나의 코드 종이가 설명대와 실행 장치와 검사 장치를 차례로 지나가는 어두운 작업대](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/75/75e8abd651ab9e1d1dd850e8e5c64c3bc1b396a2cf4517652ce075f476f9c6a3.webp "설명을 읽고 코드를 실행한 뒤 숫자 하나를 바꿔 다시 실행하면 된다")
 
@@ -67,6 +73,8 @@ Python을 처음 배운다고 해보겠습니다. 강의에는 `print("안녕하
 됩니다. 오류가 나오더라도 망가진 것이 아닙니다. 방금 바꾼 줄을 원래대로 돌리고 다시 실행하면 됩니다.
 
 ## 아래 코드를 지금 실행해 봅니다
+
+### 서울 매출 숫자 하나를 바꿔 합계와 1위가 달라지는지 직접 확인합니다
 
 ![글 가운데의 코드 입력칸이 아래쪽 실행 장치와 연결된 모습](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/ef/ef8d12c5a20a452518c8d7d084d5811a6650ed0f678ccadead0d4ccd58b4cf75.webp "서울의 두 번째 매출을 바꾸고 실행하면 합계와 1위가 바로 달라진다")
 
@@ -90,6 +98,8 @@ https://eddmpython.com/codaro/run/?example=city-sales-ranking
 Codaro Web의 전체 학습 화면으로 이동합니다.
 
 ## 작성한 코드는 .py 파일로 저장됩니다
+
+### 화면의 여러 셀은 저장할 때 주석으로 나뉜 Python 파일 한 장이 됩니다
 
 ![여러 칸으로 나뉜 긴 종이가 끊어지지 않은 파일 한 장으로 이어지는 모습](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/37/3761a5cf6e8376ae9f47157e8e1f5c140ca5cf49a6b14d853cd1a469e1db7178.webp "화면에서는 여러 칸으로 보이지만 저장할 때는 Python 파일 하나가 된다")
 
@@ -118,6 +128,8 @@ sales = [("서울", 120), ("부산", 85), ("서울", 40)]
 
 ## 코드가 길어지면 여러 셀로 나눕니다
 
+### 앞 셀의 값을 바꾸면 그 값을 쓰는 다음 셀만 순서대로 다시 실행됩니다
+
 ![서로 연결된 코드 블록 가운데 필요한 두 블록에만 불이 들어온 모습](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/6e/6ebdaedaa799739561dd8edcb3ff82d014ca58dca6652f81b2437f63c5f28aec.webp "매출을 바꾸면 합계와 순위를 계산하는 셀이 차례로 다시 실행된다")
 
 코드가 길어지면 한 칸에 모두 넣기보다 하는 일에 따라 나누는 편이 읽기 쉽습니다. 첫 번째 셀에는
@@ -136,6 +148,8 @@ sales = [("서울", 120), ("부산", 85), ("서울", 40)]
 
 ## 실행 결과가 맞는지도 확인합니다
 
+### 오류 없이 끝났는지와 문제의 답이 맞는지를 서로 다른 결과로 확인합니다
+
 ![실행 장치에서 나온 결과물이 여러 검사 장치를 차례로 지나는 모습](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/30/3019906f6f342dee32f2258a63c3acbf539260fe75f811c5f2092deb546558b6.webp "오류가 없다는 것과 문제의 답이 맞다는 것은 서로 다른 확인이다")
 
 코드가 멈추지 않고 끝났다고 해서 답이 맞는 것은 아닙니다. 도시별 매출을 더하는 문제에서 빈 결과를
@@ -153,6 +167,8 @@ sales = [("서울", 120), ("부산", 85), ("서울", 40)]
 첫 단계이고, 숫자를 바꿔도 올바른 답이 나오는지 확인하는 것이 다음 단계입니다.
 
 ## 내 컴퓨터의 파일을 쓸 때는 Local을 엽니다
+
+### 다운로드 폴더의 CSV를 읽을 때 브라우저 버전에서 설치형으로 넘어갑니다
 
 ![작은 브라우저 책상이 파일 서랍과 예약 장치가 있는 큰 작업실로 연결된 모습](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/ce/ce37d5158878f9fc652190955d9a41a353843856065191a3a7a79f0f9c7822d3.webp "다운로드 폴더의 CSV를 읽어야 할 때 브라우저 버전에서 Local로 넘어간다")
 
@@ -176,6 +192,8 @@ Local에서는 다음과 같은 일을 할 수 있습니다.
 시작하는 편이 이해하기 쉽습니다.
 
 ## 처음에는 Web만 써도 충분합니다
+
+### 연습은 Web에서, 내 파일과 반복 실행이 필요해질 때 Local에서 이어갑니다
 
 ![브라우저 학습 책상과 파일 작업실로 가는 길이 나뉜 모습](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/8e/8ec901a50dc312e29204cff5ab8bbbbd7fab616590dfcc9982298e2e216f9e9e.webp "처음에는 브라우저에서 연습하고 실제 파일이 필요해질 때 Local을 설치한다")
 

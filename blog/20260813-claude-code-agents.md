@@ -1,15 +1,17 @@
 ---
-title: Opus 5는 이상하고 Fable 5는 반쪽짜리다? Anthropic 최신 모델과 싸우다 알게 된 것
+title: Claude Code 에이전트가 최신 모델에서 일을 망치는 이유
 slug: claude-code-agents
 date: 2026-08-13
-modified: 2026-08-13
+modified: 2026-08-14
 author: eddmpython
 section: AI 작업 환경
-summary: 최신 클로드 모델로 바꾼 뒤 에이전트가 오히려 서툴러졌다면 모델 탓은 절반입니다. 공식 문서에 예고된 행동 변화와 에이전트 구조 문제를 가르고, 바로 복사해 쓰는 Claude Code 설정을 담았습니다.
+summary: Claude Code 에이전트가 최신 모델로 바뀐 뒤 일을 더 벌인다면 모델 탓은 절반입니다. 공식 문서의 행동 변화와 설정 문제를 나눠 보고, 바로 복사할 파일 두 개를 설명합니다.
 readerQuestion: Claude Opus 5와 Fable 5로 바꾼 뒤 에이전트가 삽질하는 원인은 모델인가 내 설정인가, 그리고 무엇을 고치면 되나?
 readerTakeaway: 최신 모델의 이상 행동 절반은 문서에 예고된 변화이고 나머지 절반은 쓰기를 여러 에이전트에 쪼갠 구조가 만든다. 쓰기는 하나의 손에 두고 읽기와 검증만 병렬로 위임한다.
 readerLevel: working
 readerStartingPoint: Claude Code로 서브에이전트를 띄워 봤지만 어떤 작업을 어떤 모델에 맡길지, 검증을 누구에게 시킬지는 설계해 본 적이 없다.
+primaryKeyword: Claude Code 에이전트
+searchIntent: troubleshooting
 ogImage: https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/c5/c512dad5e83c99f310e9a837d80e5b751922f6f6d96f17fd7db307b09bd621b2.webp
 ogImageAlt: 작은 설계 도면 하나가 과잉 생산된 똑같은 부품 더미에 묻혀 있는 작업대
 ogImageWidth: 1216
@@ -27,6 +29,8 @@ ogImageType: image/webp
 
 ## 최신 모델로 바꿨는데 결과물이 나빠졌다
 
+### 작은 수정 하나를 맡겼는데 주변 코드와 긴 보고서까지 함께 바뀌었습니다
+
 ![작은 설계 도면 하나가 과잉 생산된 똑같은 부품 더미에 묻혀 있는 작업대](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/c5/c512dad5e83c99f310e9a837d80e5b751922f6f6d96f17fd7db307b09bd621b2.webp "요청은 도면 한 장인데 산출물이 작업대를 덮으면, 문제는 성실함이 아니라 방향입니다")
 
 이 장면이 제가 겪은 상황과 정확히 같습니다. 요청한 작업은 작고 분명했는데, 돌아온 결과물은
@@ -42,6 +46,8 @@ ogImageType: image/webp
 결론이 자연스럽습니다. 그런데 원인을 찾으러 가 보니 절반은 이미 인쇄되어 있었습니다.
 
 ## Opus 5의 이상함은 공식 문서에 이미 적혀 있다
+
+### 긴 출력, 자체 검증, 범위 확장은 마이그레이션 가이드에 적힌 변화입니다
 
 ![제도용 책상 위에 펼쳐진 두꺼운 기술 설명서와 그 위에 놓인 돋보기](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/61/617abe2b2581ab754a2a98be4f6115f2ef018c621aab090f625574df9721fea6.webp "당황스러운 행동의 목록은 비밀이 아니었습니다. 마이그레이션 가이드에 교정 문구까지 함께 있습니다")
 
@@ -69,6 +75,8 @@ Anthropic이 공개한 [모델 마이그레이션 가이드](https://platform.cl
 
 ## Fable 5가 반쪽으로 느껴지는 이유
 
+### 원문 추론은 숨겨지고 생각 깊이는 자동이라 사용자가 직접 조절할 수 없습니다
+
 ![불투명 유리 뒤에서 실루엣으로만 보이는 기계와 유리 앞 선반에 놓인 완성된 부품](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/07/071089ce2fe07e4d1b6f83f9fc42f62290f5364be9f3b1d3a06c42de4af3268c.webp "결과물 선반은 앞에 있는데 작동은 유리 뒤에 있습니다. 반쪽이라는 체감의 실체는 이 유리벽입니다")
 
 Fable 5는 Anthropic의 최상위 모델입니다. 그런데 써 보면 "반쪽짜리"라는 말이 나오는 지점들이
@@ -88,6 +96,8 @@ Fable 5는 Anthropic의 최상위 모델입니다. 그런데 써 보면 "반쪽�
 문제였고, 그 "자리 배치"가 바로 다음 절의 주제입니다.
 
 ## 진짜 범인은 모델이 아니라 에이전트 구조였다
+
+### 여러 Opus 에이전트가 같은 코드를 쓰면서 수정 범위와 판단이 충돌했습니다
 
 ![조각 작업대는 하나뿐이고 양쪽 선반에서 재료 수레들이 그 작업대로 모여드는 공방](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/4b/4be7741c7a7728a278411ba98d67b471992b40ab160b1fa519ec72a062980505.webp "재료를 나르는 수레는 여러 대여도 조각칼은 한 자리에만 있습니다. 코드를 쓰는 손이 이래야 합니다")
 
@@ -116,6 +126,8 @@ Fable 5는 Anthropic의 최상위 모델입니다. 그런데 써 보면 "반쪽�
 모르는 검증에만 씁니다. 이 원칙을 파일로 박은 것이 다음 절입니다.
 
 ## 바로 복사해 쓰는 에이전트 설정
+
+### settings.json과 메인 에이전트 파일에 위임 범위와 검증 순서를 나눠 적습니다
 
 ![빈틈없이 정리되어 들고 갈 준비가 된 공구함 하나가 어두운 작업대 위에 놓인 장면](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/ad/add93db32ea5eecdc197a5956e6f8a3fc0097286679c670152ca4df561eecba1.webp "짜인 공구함을 통째로 들고 가면 됩니다. 이 절이 그 공구함입니다")
 
@@ -200,9 +212,12 @@ opus를 쓸 때는 프롬프트에 명시한다: 요청 범위만 수행, 시키
 
 ## 오늘 내 세팅에서 확인할 것
 
+### 쓰는 에이전트 수, 검증자의 컨텍스트, 구모델용 문구를 차례로 확인합니다
+
 ![어두운 작업대 위에 나란히 선 검사 게이지 세 개와 첫 게이지에 물린 부품](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/24/24797d52ca5755b466fecfaf06639bbcecf78b48cb29ba3aa405448d777eec52.webp "게이지 세 개를 차례로 물려 보는 것으로 충분합니다. 통과 못 한 것 하나만 오늘 고칩니다")
 
-글을 덮기 전에 자기 세팅을 세 가지만 확인하면 됩니다.
+글을 덮기 전에 자기 세팅을 세 가지만 확인하면 됩니다. 확인 대상은 코드를 쓰는 에이전트 수,
+검증자의 컨텍스트, 프롬프트에 남은 구모델용 문구입니다.
 
 1. 코드를 쓰는 손이 몇 개인가. 구현이 서브에이전트로 나가고 있다면 그 작업에 판단이 섞여
    있는지 봅니다. 섞여 있으면 메인 루프로 가져옵니다.

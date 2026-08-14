@@ -51,6 +51,11 @@ status: observed
 경로별 메타, 구조화 데이터, sitemap, RSS 가 **전부 `src/seo.ts` 하나에서 나온다.**
 한 페이지의 제목을 고치려고 여러 파일을 만지지 않는다.
 
+블로그 글은 `primaryKeyword`와 `searchIntent`를 frontmatter에 함께 둔다. 제목, summary, 도입 두
+문단은 핵심 검색어의 주요 단어를 빠뜨리지 않고 같은 문제나 결과에 답한다. explanation 제목은 이유나
+질문, how-to 제목은 방법이나 순서, troubleshooting 제목은 문제나 해결, comparison 제목은 차이나
+선택이 보여야 한다. `site/scripts/blog-package.mjs`와 `check:blog`가 이 약속을 검사한다.
+
 ## 구조화 데이터
 
 | 페이지 | 담는 것 |

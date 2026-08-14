@@ -38,6 +38,7 @@ npm run dev
 |---|---|
 | `npm run dev` | 개발 서버 |
 | `npm run check:blog` | 글 파일과 frontmatter 검사 |
+| `npm run test:blog-package` | SEO 제목, 섹션 구성, 이미지 브리프 표본 검사 |
 | `npm run check:skills` | 운영 문서 frontmatter 와 링크 검사 |
 | `npm run verify:media` | catalog 에 등록한 원격 이미지 확인 |
 | `npm run verify:seo` | 빌드된 HTML, JSON-LD, sitemap, RSS 계약 확인 |

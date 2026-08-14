@@ -1,6 +1,13 @@
 import { readdir, readFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 import { lintBlogStyle } from "./blog-style.mjs";
+import {
+  h2Sections,
+  lintImageBrief,
+  lintSectionPackages,
+  lintSeoPackage,
+  parseSectionPackage,
+} from "./blog-package.mjs";
 
 const blogDir = resolve(process.cwd(), "../blog");
 const codaroEmbedsPath = resolve(blogDir, "embeds/codaro-cells.json");
@@ -17,6 +24,8 @@ const requiredMeta = [
   "readerTakeaway",
   "readerLevel",
   "readerStartingPoint",
+  "primaryKeyword",
+  "searchIntent",
 ];
 const readerLevels = new Set(["beginner", "working", "advanced"]);
 const allowedDocs = new Set(["PIPELINE.md", "product-marketing.md"]);
@@ -44,8 +53,6 @@ const mimeBySuffix = new Map([
   [".gif", "image/gif"],
 ]);
 const imageRef = /!\[([^\]]*)\]\(\s*<?([^\s)>]+)>?(?:\s+["'][^"']*["'])?\s*\)/g;
-const leadSectionImage =
-  /^!\[([^\]]+)\]\(\s*<?([^\s)>]+)>?\s+["']([^"']+)["']\s*\)\s*(?:\r?\n|$)/;
 const codaroEmbedRef =
   /^https:\/\/eddmpython\.com\/codaro\/run\/\?example=([a-z0-9]+(?:-[a-z0-9]+)*)\s*$/gm;
 
@@ -74,38 +81,6 @@ function parseFrontmatter(file, raw) {
 function validDate(value) {
   const parsed = new Date(`${value}T00:00:00Z`);
   return !Number.isNaN(parsed.valueOf()) && parsed.toISOString().slice(0, 10) === value;
-}
-
-function fencedRanges(body) {
-  // 코드 펜스 내부는 문서 구조가 아니다. 열림/닫힘 쌍의 [시작, 끝) 오프셋을 모은다.
-  const ranges = [];
-  let open = null;
-  for (const match of body.matchAll(/^```.*$/gm)) {
-    if (open === null) {
-      open = match.index;
-    } else {
-      ranges.push([open, match.index + match[0].length]);
-      open = null;
-    }
-  }
-  if (open !== null) ranges.push([open, body.length]);
-  return ranges;
-}
-
-function h2Sections(body) {
-  // 본문 예시 코드블록 안의 ## 줄을 H2로 세지 않는다 (H1 검사의 bodyOutsideCode와 같은 원칙).
-  const ranges = fencedRanges(body);
-  const insideFence = (index) => ranges.some(([start, end]) => index >= start && index < end);
-  const headings = [...body.matchAll(/^##[ \t]+(.+?)\s*$/gm)].filter(
-    (heading) => !insideFence(heading.index),
-  );
-  return headings.map((heading, index) => ({
-    heading: heading[1].trim(),
-    content: body.slice(
-      heading.index + heading[0].length,
-      headings[index + 1]?.index ?? body.length,
-    ).trimStart(),
-  }));
 }
 
 function proseParagraphs(body) {
@@ -161,8 +136,13 @@ if (localMedia.length) {
 const plan = await loadJson(resolve(blogDir, "media/plan.json"), "blog/media/plan.json");
 const catalog = await loadJson(resolve(blogDir, "media/catalog.json"), "blog/media/catalog.json");
 const codaroEmbeds = await loadJson(codaroEmbedsPath, "blog/embeds/codaro-cells.json");
-if (plan.version !== 1 || !plan.assets || typeof plan.assets !== "object") {
-  fail("blog/media/plan.json", "version 또는 assets 계약이 잘못됐습니다");
+if (
+  plan.version !== 2 ||
+  plan.promptContract !== "section-grounded-v2" ||
+  !plan.assets ||
+  typeof plan.assets !== "object"
+) {
+  fail("blog/media/plan.json", "version, promptContract 또는 assets 계약이 잘못됐습니다");
 }
 if (
   catalog.version !== 1 ||
@@ -217,6 +197,9 @@ for (const [id, entry] of Object.entries(plan.assets)) {
   if (entry.post !== match[1] || entry.assetKey !== match[2]) {
     fail("blog/media/plan.json", `${id}의 post 또는 assetKey가 id와 다릅니다`);
   }
+  if (entry.role === "section" && entry.placement !== "H3 부제 바로 뒤") {
+    fail("blog/media/plan.json", `${id}의 placement는 H3 부제 바로 뒤여야 합니다`);
+  }
   if (entry.sourcePolicy !== "auto") fail("blog/media/plan.json", `${id}의 sourcePolicy는 auto여야 합니다`);
   if (!["hero", "section", "support"].includes(entry.role)) {
     fail("blog/media/plan.json", `${id}의 role을 지원하지 않습니다`);
@@ -224,14 +207,25 @@ for (const [id, entry] of Object.entries(plan.assets)) {
   if (entry.role === "section" && !String(entry.sectionHeading ?? "").trim()) {
     fail("blog/media/plan.json", `${id}의 sectionHeading이 비었습니다`);
   }
-  if (entry.visualProfile !== "dark-editorial-v1") {
-    fail("blog/media/plan.json", `${id}의 visualProfile은 dark-editorial-v1이어야 합니다`);
-  }
-  if (!["imagegen", "official", "licensed"].includes(entry.sourceKind)) {
+  if (!["imagegen", "screenshot", "official", "licensed"].includes(entry.sourceKind)) {
     fail("blog/media/plan.json", `${id}의 sourceKind를 지원하지 않습니다`);
+  }
+  const expectedProfile =
+    entry.sourceKind === "imagegen"
+      ? "dark-editorial-v1"
+      : entry.sourceKind === "screenshot"
+        ? "product-screen-v1"
+        : "source-original-v1";
+  if (entry.visualProfile !== expectedProfile) {
+    fail("blog/media/plan.json", `${id}의 visualProfile은 ${expectedProfile}이어야 합니다`);
   }
   if (entry.sourceKind === "imagegen" && !String(entry.prompt ?? "").trim()) {
     fail("blog/media/plan.json", `${id}의 ImageGen prompt가 비었습니다`);
+  }
+  if (entry.sourceKind === "screenshot") {
+    if (!String(entry.sourceUrl ?? "").trim() || !String(entry.captureState ?? "").trim()) {
+      fail("blog/media/plan.json", `${id}의 screenshot sourceUrl 또는 captureState가 비었습니다`);
+    }
   }
   if (["official", "licensed"].includes(entry.sourceKind)) {
     if (!String(entry.sourceUrl ?? "").trim() || !String(entry.credit ?? "").trim()) {
@@ -366,6 +360,19 @@ for (const file of posts) {
   }
   if (/\b(?:TODO|TBD)\b/.test(raw)) fail(file, "미완성 표식이 남았습니다");
 
+  const packageIssues = [
+    ...lintSeoPackage(Object.fromEntries(meta), body, sections),
+    ...lintSectionPackages(sections),
+  ];
+  if (packageIssues.length) {
+    fail(
+      file,
+      `글 패키지 검사 실패 ${packageIssues.length}건\n${packageIssues
+        .map((issue) => `  - ${issue.location}: ${issue.message} (${issue.excerpt})`)
+        .join("\n")}`,
+    );
+  }
+
   const styleIssues = lintBlogStyle({
     fields: {
       summary: meta.get("summary"),
@@ -417,11 +424,9 @@ for (const file of posts) {
 
   const sectionAssets = new Set();
   for (const section of sections) {
-    const lead = section.content.match(leadSectionImage);
-    if (!lead) {
-      fail(file, `H2 바로 뒤에 대체 텍스트와 캡션이 있는 섹션 이미지가 필요합니다: ${section.heading}`);
-    }
-    const [, alt, url, caption] = lead;
+    const parsed = parseSectionPackage(section);
+    if (!parsed) fail(file, `섹션 패키지를 읽을 수 없습니다: ${section.heading}`);
+    const { alt, url, caption } = parsed;
     if (!caption.trim()) fail(file, `섹션 이미지 캡션이 비었습니다: ${section.heading}`);
     const id = assetIdByPostUrl.get(`${postId}|${url}`);
     if (!id) fail(file, `섹션 이미지가 catalog.json의 글 매핑에 없습니다: ${section.heading}`);
@@ -432,11 +437,19 @@ for (const file of posts) {
     if (alt.trim() !== entry.alt) {
       fail(file, `섹션 이미지 대체 텍스트가 plan.json과 다릅니다: ${section.heading}`);
     }
+    const briefIssues = lintImageBrief(entry, section, parsed);
+    if (briefIssues.length) {
+      fail(
+        file,
+        `섹션 이미지 관련성 검사 실패 ${briefIssues.length}건: ${section.heading}\n${briefIssues
+          .map((issue) => `  - ${issue.message} (${issue.excerpt})`)
+          .join("\n")}`,
+      );
+    }
     if (sectionAssets.has(id)) fail(file, `서로 다른 H2가 같은 섹션 이미지를 재사용합니다: ${id}`);
     sectionAssets.add(id);
 
-    const prose = section.content
-      .slice(lead[0].length)
+    const prose = parsed.remainder
       .replace(/```[\s\S]*?```/g, " ")
       .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
       .replace(/<[^>]+>/g, " ")
