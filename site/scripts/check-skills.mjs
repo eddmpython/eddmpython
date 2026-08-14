@@ -1,5 +1,5 @@
 /**
- * skills/specs/**\/*.md 의 frontmatter 와 링크를 검사한다.
+ * skills/specs/**\/*.md 와 .agents/skills 의 frontmatter 와 링크를 검사한다.
  *
  * 이 저장소의 실제 실패 방식은 문서가 실물보다 낡는 것이다. 규격을 기계로 잡아
  * 최소한 id, 경로, 링크가 어긋나는 것은 막는다. 내용의 진실성은 검사하지 못한다.
@@ -12,6 +12,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, "..", "..");
 const SKILLS = join(REPO, "skills");
 const SPECS = join(SKILLS, "specs");
+const AGENT_SKILLS = join(REPO, ".agents", "skills");
 
 const REQUIRED = ["id", "title", "category", "purpose", "whenToUse"];
 const CATEGORIES = new Set(["start", "operation"]);
@@ -116,10 +117,79 @@ for (const file of files) {
   }
 }
 
+const agentSkillDirs = existsSync(AGENT_SKILLS)
+  ? readdirSync(AGENT_SKILLS, { withFileTypes: true }).filter((entry) => entry.isDirectory())
+  : [];
+if (!agentSkillDirs.length) errors.push(".agents/skills: 저장소 스킬이 없다");
+
+for (const entry of agentSkillDirs) {
+  const dir = join(AGENT_SKILLS, entry.name);
+  const skillFile = join(dir, "SKILL.md");
+  const rel = relative(REPO, skillFile).replace(/\\/g, "/");
+  if (!existsSync(skillFile)) {
+    errors.push(`${rel}: SKILL.md 가 없다`);
+    continue;
+  }
+
+  const text = readFileSync(skillFile, "utf8");
+  for (const { re, why } of BANNED) {
+    if (re.test(text)) errors.push(`${rel}: ${why}`);
+  }
+  const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
+  if (!match) {
+    errors.push(`${rel}: frontmatter 가 없다`);
+    continue;
+  }
+
+  const metadata = new Map();
+  for (const line of match[1].split(/\r?\n/)) {
+    const field = line.match(/^([a-z][a-z0-9_-]*):\s*(.+)$/);
+    if (!field) {
+      errors.push(`${rel}: frontmatter 줄을 읽을 수 없다 (${line})`);
+      continue;
+    }
+    if (metadata.has(field[1])) errors.push(`${rel}: frontmatter ${field[1]} 중복`);
+    metadata.set(field[1], field[2].trim());
+  }
+
+  const keys = [...metadata.keys()];
+  if (keys.length !== 2 || !metadata.has("name") || !metadata.has("description")) {
+    errors.push(`${rel}: frontmatter 는 name 과 description 만 가져야 한다`);
+  }
+  if (metadata.get("name") !== entry.name) {
+    errors.push(`${rel}: name 이 폴더 이름 ${entry.name} 과 다르다`);
+  }
+  if (/\bTODO\b/.test(text)) errors.push(`${rel}: TODO 가 남아 있다`);
+
+  const openaiYaml = join(dir, "agents", "openai.yaml");
+  if (!existsSync(openaiYaml)) {
+    errors.push(`${rel}: agents/openai.yaml 이 없다`);
+  } else {
+    const yaml = readFileSync(openaiYaml, "utf8");
+    if (!yaml.includes(`$${entry.name}`)) {
+      errors.push(`${rel}: agents/openai.yaml 기본 요청에 $${entry.name} 이 없다`);
+    }
+    for (const { re, why } of BANNED) {
+      if (re.test(yaml)) errors.push(`${relative(REPO, openaiYaml).replace(/\\/g, "/")}: ${why}`);
+    }
+  }
+
+  const body = text.slice(match[0].length);
+  for (const [, target] of body.matchAll(/\]\(([^)]+)\)/g)) {
+    if (/^(https?:|mailto:|#)/.test(target)) continue;
+    const clean = target.split("#")[0];
+    if (clean && !existsSync(resolve(dir, clean))) {
+      errors.push(`${rel}: 깨진 링크 ${target}`);
+    }
+  }
+}
+
 if (errors.length) {
   console.error(`skills 검사 실패 ${errors.length} 건`);
   for (const e of errors) console.error("  " + e);
   process.exit(1);
 }
 
-console.log(`skills ok: ${files.length} 문서, id ${seen.size} 개`);
+console.log(
+  `skills ok: ${files.length} 운영 문서, id ${seen.size} 개, agent skill ${agentSkillDirs.length} 개`,
+);

@@ -73,7 +73,7 @@ def poll(headers: dict[str, str], pid: str, timeout: int = 240) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("post", help="post id (파일 stem, 예: 2026-08-13-claude-code-agents)")
+    parser.add_argument("post", help="post id (파일 stem, 예: 20260813-claude-code-agents)")
     parser.add_argument("--only", default="", help="쉼표로 나눈 assetKey 목록만 생성")
     parser.add_argument("--force", action="store_true", help="이미 있는 파일도 다시 생성")
     args = parser.parse_args()

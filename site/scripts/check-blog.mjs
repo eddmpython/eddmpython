@@ -1,9 +1,10 @@
 import { readdir, readFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
+import { lintBlogStyle } from "./blog-style.mjs";
 
 const blogDir = resolve(process.cwd(), "../blog");
 const codaroEmbedsPath = resolve(blogDir, "embeds/codaro-cells.json");
-const postName = /^(\d{4}-\d{2}-\d{2})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$/;
+const postName = /^(20\d{6})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$/;
 const requiredMeta = [
   "title",
   "slug",
@@ -34,7 +35,7 @@ const mediaSuffixes = new Set([
   ".tif",
   ".tiff",
 ]);
-const assetId = /^(20\d{2}-\d{2}-\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*)\/([a-z0-9]+(?:-[a-z0-9]+)*)$/;
+const assetId = /^(20\d{6}-[a-z0-9]+(?:-[a-z0-9]+)*)\/([a-z0-9]+(?:-[a-z0-9]+)*)$/;
 const sha256 = /^[0-9a-f]{64}$/;
 const mimeBySuffix = new Map([
   [".webp", "image/webp"],
@@ -313,7 +314,9 @@ for (const file of posts) {
   if (!validDate(meta.get("modified"))) {
     fail(file, "modified가 유효한 YYYY-MM-DD 형식이 아닙니다");
   }
-  if (meta.get("date") !== fileDate) fail(file, "파일명 날짜와 date가 다릅니다");
+  if (meta.get("date").replaceAll("-", "") !== fileDate) {
+    fail(file, "파일명의 YYYYMMDD와 date가 다릅니다");
+  }
   if (meta.get("modified") < meta.get("date")) {
     fail(file, "modified가 최초 발행일보다 빠릅니다");
   }
@@ -358,7 +361,27 @@ for (const file of posts) {
   if (sections.length < 3) fail(file, "독자 흐름을 나누는 H2가 3개보다 적습니다");
   if ((body.match(/^```/gm) ?? []).length % 2 !== 0) fail(file, "코드 펜스가 닫히지 않았습니다");
   if (/[\u2013\u2014]/u.test(raw)) fail(file, "em dash 또는 en dash가 있습니다");
+  if (/(?:세요|십시오|ㅂ시다|해라|하자)\.(?=\s|$)/u.test(raw)) {
+    fail(file, "명령형 또는 권유형 문장 뒤에 마침표가 있습니다");
+  }
   if (/\b(?:TODO|TBD)\b/.test(raw)) fail(file, "미완성 표식이 남았습니다");
+
+  const styleIssues = lintBlogStyle({
+    fields: {
+      summary: meta.get("summary"),
+      readerTakeaway: meta.get("readerTakeaway"),
+    },
+    body,
+    sections,
+  });
+  if (styleIssues.length) {
+    fail(
+      file,
+      `문장 품질 검사 실패 ${styleIssues.length}건\n${styleIssues
+        .map((issue) => `  - ${issue.location}: ${issue.message} (${issue.excerpt})`)
+        .join("\n")}`,
+    );
+  }
 
   if (meta.get("readerLevel") === "beginner") {
     for (const section of sections) {

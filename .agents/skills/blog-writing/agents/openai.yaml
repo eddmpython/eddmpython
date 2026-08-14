@@ -1,0 +1,4 @@
+interface:
+  display_name: "블로그 쉽게 쓰기"
+  short_description: "추상어를 걷어 내고 쉬운 한국어 블로그 글을 씁니다"
+  default_prompt: "$blog-writing을 사용해 eddmpython 블로그 글을 쉽고 구체적인 한국어로 쓰거나 고쳐 주세요"

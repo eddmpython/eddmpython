@@ -27,7 +27,7 @@ IMAGE_MIME = {
     ".gif": "image/gif",
 }
 ASSET_ID_RE = re.compile(
-    r"(?P<post>20\d{2}-\d{2}-\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*)/"
+    r"(?P<post>20\d{6}-[a-z0-9]+(?:-[a-z0-9]+)*)/"
     r"(?P<key>[a-z0-9]+(?:-[a-z0-9]+)*)"
 )
 SHA256_RE = re.compile(r"[0-9a-f]{64}")

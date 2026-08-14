@@ -19,6 +19,10 @@ secrets/
 .claude/
 .codex/
 .agents/
+!.agents/
+.agents/*
+!.agents/skills/
+!.agents/skills/**
 .cursor/
 .idea/
 .vscode/

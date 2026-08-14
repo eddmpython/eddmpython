@@ -22,11 +22,12 @@ status: observed
 ## 정본은 한 곳이다
 
 ```
-blog/YYYY-MM-DD-kebab.md
+blog/YYYYMMDD-kebab.md
 ```
 
-여기가 글의 정본이다. 파일명의 날짜+kebab은 post id(정렬·미디어 키)다. 공개 경로는
-frontmatter `slug`다. 사이트는 빌드 타임에 이 폴더를 읽는다 (`site/src/posts.ts` 의
+여기가 글의 정본이다. 파일명 앞의 8자리 날짜+kebab은 post id(정렬·미디어 키)다.
+frontmatter `date`는 `YYYY-MM-DD`로 쓴다. 공개 경로는 frontmatter `slug`다. 사이트는 빌드 타임에 이
+폴더를 읽는다 (`site/src/posts.ts` 의
 `import.meta.glob`). 런타임 fetch 도 CMS 도 없다.
 
 파일 하나를 넣으면 빌드가 함께 만든다.
@@ -47,7 +48,7 @@ frontmatter `slug`다. 사이트는 빌드 타임에 이 폴더를 읽는다 (`s
 |---|---|
 | `title` | 질문이거나 주장. 명사 나열 금지. 인지도 없는 제품명을 앞에 두지 않음 (`blog/PIPELINE.md` 1.5절) |
 | `slug` | 공개 URL `/blog/{slug}`. 짧은 소문자 kebab, 날짜 금지. 예: `no-install` |
-| `date` | 발행일 `YYYY-MM-DD` (파일명 날짜와 같음) |
+| `date` | 발행일 `YYYY-MM-DD` (파일명의 `YYYYMMDD`와 같은 날짜) |
 | `modified` | 마지막 수정일 |
 | `author` | 글쓴이 |
 | `section` | 글의 갈래 |
@@ -78,6 +79,11 @@ frontmatter `slug`다. 사이트는 빌드 타임에 이 폴더를 읽는다 (`s
 
 길이 검사는 `site/scripts/check-blog.mjs`가 맡는다. 용어 설명과 문단 사이의 순서는 사람이
 데스크톱과 모바일 화면을 읽으면서 확인한다.
+
+같은 검사는 내용 없는 관용구, 추상어만 이어지는 문단, 실제 예가 없는 H2도 막는다. 검사 규칙은
+`site/scripts/blog-style.mjs`, 오탐과 누락을 막는 표본은 `site/scripts/test-blog-style.mjs`에 있다.
+기계 검사는 자연스러운 말투를 완전히 판정하지 못하므로 새 글과 전체 교정에는 `$blog-writing` 스킬을
+함께 사용한다.
 
 ## 섹션은 제목, 이미지, 설명으로 읽힌다
 
@@ -115,12 +121,12 @@ cd site && npm run verify:media
 ## 글 하나 발행하는 순서
 
 1. 독자의 출발점과 첫 행동을 정하고, `blog/PIPELINE.md` 1.5절 유입 패키징 게이트를 통과한 뒤
-   `blog/YYYY-MM-DD-slug.md`를 쓰고 모든 H2의 이미지 자리를 함께 정한다. 카피 판단은
+   `blog/YYYYMMDD-slug.md`를 쓰고 모든 H2의 이미지 자리를 함께 정한다. 카피 판단은
    `operation.blogCopy`, 주제 선택은 `operation.contentStrategy`, 제품 맥락은
    `blog/product-marketing.md`를 본다.
 2. 섹션별 이미지를 만들고 `blog/media/plan.json` 에 H2, 의미, 출처, 최종 프롬프트를 남긴다
 3. `publish_media.py` 로 Hugging Face 에 올리고 `catalog.json` 을 갱신한다
-4. `cd site && npm test` 로 frontmatter 와 타입을 확인한다
+4. `cd site && npm test` 로 문장 품질 표본, frontmatter 와 타입을 확인한다
 5. `npm run verify:media` 로 원격 객체를 확인한다
 6. `npm run verify:visual`로 모든 페이지의 데스크톱과 모바일 화면을 만들고 실제로 확인한다
 7. `npm run approve:visual -- --run=<run-id>`로 확인한 빌드를 승인한다

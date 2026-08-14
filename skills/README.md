@@ -16,6 +16,10 @@ status: curated
 
 지금 실제로 도는 구조와 절차의 정본이다. 여기 없는 절차는 아직 없는 것이다.
 
+블로그를 쓰거나 고칠 때는 저장소 전용 `$blog-writing` 스킬을 사용한다. 파일은
+`.agents/skills/blog-writing/SKILL.md`에 있고, 자세한 운영 계약은 아래 `operation.blogPublishing`과
+`operation.blogCopy`가 맡는다.
+
 ## 정보 3층
 
 같은 사실을 두 곳에 쓰지 않는다.

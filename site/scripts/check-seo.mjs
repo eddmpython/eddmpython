@@ -5,7 +5,7 @@ const origin = "https://eddmpython.com";
 const repoRoot = resolve(process.cwd(), "..");
 const blogRoot = resolve(repoRoot, "blog");
 const distRoot = resolve(repoRoot, "../eddmpython.out/site-dist");
-const postName = /^(20\d{2}-\d{2}-\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*)\.md$/;
+const postName = /^(20\d{6}-[a-z0-9]+(?:-[a-z0-9]+)*)\.md$/;
 
 function fail(scope, message) {
   throw new Error(`${scope}: ${message}`);
