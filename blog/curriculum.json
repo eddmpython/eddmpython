@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "updated": "2026-08-14",
   "title": "Python과 AI 업무자동화",
   "promise": "설치 없는 첫 실행부터 파일 자동화와 AI 변경 검증까지 같은 프로젝트를 조금씩 성장시킨다.",
@@ -9,6 +9,8 @@
       "id": "automation-result",
       "title": "완성 결과와 자동화 5단계",
       "question": "반복업무를 컴퓨터에 시키려면 일을 어떻게 나눠야 할까?",
+      "artifact": "입력, 처리, 판단, 출력, 검증을 채운 업무자동화 다섯 칸",
+      "completionCheck": "각 칸에 실제 파일과 처리 규칙 및 맞아야 할 숫자가 적혀 있다",
       "postSlug": "work-automation",
       "status": "published"
     },
@@ -17,6 +19,8 @@
       "id": "python-map",
       "title": "Python이 중요한 이유와 전체 지도",
       "question": "업무 규칙을 컴퓨터가 실행하게 만드는 Python은 어떤 언어일까?",
+      "artifact": "Python의 쓰임과 선택 기준을 적은 언어 지도",
+      "completionCheck": "Python이 잘 맞는 일과 다른 언어가 더 나은 일을 실제 예로 구분한다",
       "postSlug": "what-is-python",
       "status": "published"
     },
@@ -25,6 +29,8 @@
       "id": "browser-first-run",
       "title": "설치 없이 첫 코드 실행",
       "question": "Python을 설치하기 전에 코드를 직접 실행할 수 있을까?",
+      "artifact": "브라우저에서 값을 바꿔 실행한 Python 결과",
+      "completionCheck": "코드의 값 하나를 바꾸고 실행 결과가 함께 달라지는지 설명한다",
       "postSlug": "no-install",
       "status": "published"
     },
@@ -33,6 +39,8 @@
       "id": "python-basic-syntax",
       "title": "영상과 실행 셀로 배우는 기초문법",
       "question": "변수부터 함수까지 업무 예제로 직접 바꿔 볼 수 있을까?",
+      "artifact": "변수부터 함수까지 값을 바꿔 실행한 Codaro 셀 일곱 개",
+      "completionCheck": "기준금액이나 거래 값을 바꾸기 전에 결과를 예측하고 실행값과 비교한다",
       "postSlug": "python-basic-syntax",
       "status": "published"
     },
@@ -41,13 +49,18 @@
       "id": "execution-and-types",
       "title": "실행 순서와 값의 자료형",
       "question": "코드는 어떤 순서로 실행되고 문자와 숫자는 왜 다르게 다뤄질까?",
-      "status": "planned"
+      "artifact": "실행 순서와 문자 및 숫자 결과를 비교한 코드 기록",
+      "completionCheck": "줄 순서를 바꾸면 생기는 오류와 문자 덧셈 및 숫자 덧셈의 차이를 설명한다",
+      "postSlug": "python-types",
+      "status": "published"
     },
     {
       "order": 6,
       "id": "terminal",
       "title": "터미널과 첫 명령",
       "question": "검은 창은 무엇이고 명령은 어디에서 실행될까?",
+      "artifact": "PowerShell에 입력한 현재 폴더와 Python 확인 결과",
+      "completionCheck": "터미널과 PowerShell 및 Python의 역할을 구분하고 네 확인 명령을 실행한다",
       "postSlug": "what-is-terminal",
       "status": "published"
     },
@@ -56,55 +69,78 @@
       "id": "powershell-paths",
       "title": "PowerShell과 파일 경로",
       "question": "폴더와 확장자를 확인하고 Python 파일을 어떻게 실행할까?",
-      "status": "planned"
+      "artifact": "input, output, src 폴더와 실행 결과가 있는 연습 프로젝트",
+      "completionCheck": "현재 위치에서 src 안의 Python 파일을 경로로 지정해 실행한다",
+      "postSlug": "powershell-paths",
+      "status": "published"
     },
     {
       "order": 8,
       "id": "read-errors",
       "title": "오류 메시지 읽기",
       "question": "NameError와 TypeError 및 FileNotFoundError는 무엇부터 알려 줄까?",
-      "status": "planned"
+      "artifact": "세 오류의 마지막 줄과 원인 및 수정 내용을 적은 오류 기록",
+      "completionCheck": "오류 이름과 파일 및 줄 번호를 찾고 한 가지 원인만 고쳐 다시 실행한다",
+      "postSlug": "python-errors",
+      "status": "published"
     },
     {
       "order": 9,
       "id": "libraries-import",
       "title": "라이브러리와 import",
       "question": "Excel 파일 기능을 직접 만들지 않고 어떻게 가져다 쓸까?",
-      "status": "planned"
+      "artifact": "pathlib, pandas, openpyxl의 역할표와 import 실행 결과",
+      "completionCheck": "폴더 찾기와 표 처리 및 Excel 저장을 어느 라이브러리에 맡길지 구분한다",
+      "postSlug": "python-import",
+      "status": "published"
     },
     {
       "order": 10,
       "id": "scripts-ide",
       "title": "스크립트와 VS Code",
       "question": "코드와 입력 파일을 한 프로젝트에서 어떻게 관리할까?",
-      "status": "planned"
+      "artifact": "프로젝트 폴더에서 저장하고 실행한 src/main.py 파일",
+      "completionCheck": "Explorer에서 파일을 찾고 터미널에서 같은 스크립트를 다시 실행한다",
+      "postSlug": "vscode-python",
+      "status": "published"
     },
     {
       "order": 11,
       "id": "uv-environment",
       "title": "uv와 프로젝트 실행환경",
       "question": "다른 컴퓨터에서도 같은 라이브러리로 실행하려면 무엇이 필요할까?",
-      "status": "planned"
+      "artifact": "pyproject.toml, uv.lock, .venv가 준비된 실행 프로젝트",
+      "completionCheck": "uv sync 뒤 uv run으로 스크립트를 실행하고 프로젝트 전용 환경을 확인한다",
+      "postSlug": "uv-python",
+      "status": "published"
     },
     {
       "order": 12,
       "id": "excel-automation",
       "title": "여러 Excel 파일 자동 취합",
       "question": "폴더 속 Excel 파일을 하나의 결과 파일로 어떻게 만들까?",
-      "status": "planned"
+      "artifact": "통합내역, 부서별요약, 확인필요, 검증결과 시트가 있는 expense_result.xlsx",
+      "completionCheck": "input의 Excel 세 개를 읽어 output에 결과 파일과 네 시트를 만든다",
+      "postSlug": "python-excel-merge",
+      "status": "published"
     },
     {
       "order": 13,
       "id": "validation-errors",
       "title": "숫자 검증과 재실행",
       "question": "파일 생성과 숫자 검증 및 안전한 재실행을 어떻게 확인할까?",
-      "status": "planned"
+      "artifact": "건수와 금액 차이 0 및 원본 보호와 재실행 결과를 담은 검증표",
+      "completionCheck": "같은 입력으로 두 번 실행해도 행이 늘지 않고 모든 검증값이 PASS다",
+      "postSlug": "excel-automation-validation",
+      "status": "published"
     },
     {
       "order": 14,
       "id": "ai-environment",
       "title": "AI가 읽을 프로젝트 환경",
       "question": "링크 하나로 AI가 저장소 규칙과 실행 명령을 찾게 하려면?",
+      "artifact": "실행과 테스트 및 수정 금지 경로가 적힌 프로젝트 지침 문서",
+      "completionCheck": "새 AI 대화가 저장소에서 실제 명령을 찾아 문서화하고 작은 검사를 통과한다",
       "postSlug": "ai-environment",
       "status": "published"
     },
@@ -113,6 +149,8 @@
       "id": "ai-change-control",
       "title": "AI 변경과 Tests 통제",
       "question": "AI가 바꾼 코드가 기존 기능을 망가뜨리지 않았는지 어떻게 확인할까?",
+      "artifact": "Tests PASS 결과와 사람이 승인한 변경 파일 및 diff 기록",
+      "completionCheck": "변경 전 기준선과 Tests 및 diff를 확인하고 잘못된 변경을 되돌릴 수 있다",
       "postSlug": "claude-code-agents",
       "status": "published"
     },
@@ -121,7 +159,10 @@
       "id": "work-project",
       "title": "내 업무 한 장 기획서",
       "question": "실제 반복업무를 작은 자동화 프로젝트로 어떻게 바꿀까?",
-      "status": "planned"
+      "artifact": "입력과 규칙 및 예외와 출력과 검증을 담은 내 업무 한 장 기획서",
+      "completionCheck": "실제 자료 대신 5행에서 20행의 합성 샘플로 첫 실험을 시작할 수 있다",
+      "postSlug": "work-automation-plan",
+      "status": "published"
     }
   ]
 }

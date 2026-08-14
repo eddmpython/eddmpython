@@ -9,6 +9,12 @@ const EMPTY_PHRASES = [
   { pattern: /(?:새로운 가능성|가치를 제공|시너지를)/u, label: "내용 없는 홍보 표현" },
 ];
 
+const SERIAL_PHRASES = [
+  { pattern: /(?:지난|이전)\s*편/u, label: "지난편 또는 이전편" },
+  { pattern: /다음\s*편/u, label: "다음편" },
+  { pattern: /(?:이전|다음)\s*글/u, label: "이전 글 또는 다음 글" },
+];
+
 const ABSTRACT_TERMS = [
   "환경",
   "구조",
@@ -81,11 +87,18 @@ function hasConcreteAnchor(text) {
 }
 
 function phraseIssues(location, text) {
-  return EMPTY_PHRASES.filter(({ pattern }) => pattern.test(text)).map(({ label }) => ({
-    location,
-    message: `빈 관용구를 실제 동작으로 바꿉니다: ${label}`,
-    excerpt: excerpt(text),
-  }));
+  return [
+    ...EMPTY_PHRASES.filter(({ pattern }) => pattern.test(text)).map(({ label }) => ({
+      location,
+      message: `빈 관용구를 실제 동작으로 바꿉니다: ${label}`,
+      excerpt: excerpt(text),
+    })),
+    ...SERIAL_PHRASES.filter(({ pattern }) => pattern.test(text)).map(({ label }) => ({
+      location,
+      message: `한 편만 읽어도 끝나는 글로 씁니다: ${label}`,
+      excerpt: excerpt(text),
+    })),
+  ];
 }
 
 export function lintBlogStyle({ fields = {}, body, sections = [] }) {

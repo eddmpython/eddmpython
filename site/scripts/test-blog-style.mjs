@@ -42,4 +42,9 @@ const codeExample = lintBlogStyle({
 });
 assert.deepEqual(codeExample, []);
 
-console.log("blog style fixtures: 6 cases");
+const serialLink = lintBlogStyle({
+  body: "다음 글에서는 파일 경로를 설명합니다.",
+});
+assert.ok(serialLink.some((issue) => issue.message.includes("한 편만 읽어도")));
+
+console.log("blog style fixtures: 7 cases");

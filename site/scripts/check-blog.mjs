@@ -92,7 +92,7 @@ function proseParagraphs(body) {
     .filter(
       (block) =>
         block &&
-        !/^(?:#{1,6}\s|!\[|(?:\d+\.|[-*+])\s|>|https?:\/\/)/.test(block) &&
+        !/^(?:#{1,6}\s|!\[|(?:\d+\.|[-*+])\s|>|\||https?:\/\/)/.test(block) &&
         !block.split("|").every((part) => /^:?-+:?$/.test(part.trim())),
     )
     .map((block) =>
@@ -165,7 +165,7 @@ if (
   fail("blog/embeds/codaro-cells.json", "version 또는 examples 계약이 잘못됐습니다");
 }
 if (
-  curriculum.version !== 1 ||
+  curriculum.version !== 2 ||
   !validDate(curriculum.updated) ||
   !String(curriculum.title ?? "").trim() ||
   !String(curriculum.promise ?? "").trim() ||
@@ -191,6 +191,9 @@ for (const stage of curriculum.stages) {
   if (curriculumIds.has(id)) fail("blog/curriculum.json", `stage id가 중복됐습니다: ${id}`);
   if (!String(stage.title ?? "").trim() || !String(stage.question ?? "").endsWith("?")) {
     fail("blog/curriculum.json", `${id}의 title 또는 question이 잘못됐습니다`);
+  }
+  if (!String(stage.artifact ?? "").trim() || !String(stage.completionCheck ?? "").trim()) {
+    fail("blog/curriculum.json", `${id}의 artifact 또는 completionCheck가 비었습니다`);
   }
   if (!["published", "planned"].includes(status)) {
     fail("blog/curriculum.json", `${id}의 status는 published 또는 planned여야 합니다`);

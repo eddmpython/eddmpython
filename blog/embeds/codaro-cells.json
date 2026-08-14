@@ -63,6 +63,27 @@
       "code": "column_map = {\"조직\": \"부서\", \"사용금액\": \"금액\"}\nrecords = [\n    {\"조직\": \"영업팀\", \"사용금액\": 50000},\n    {\"조직\": \"관리팀\", \"사용금액\": 120000},\n    {\"조직\": \"영업팀\", \"사용금액\": 80000},\n]\namount_limit = 100000\n\ndef classify_expense(amount):\n    return \"확인필요\" if amount >= amount_limit else \"정상\"\n\nresults = []\nfor record in records:\n    results.append({\n        column_map[\"조직\"]: record[\"조직\"],\n        column_map[\"사용금액\"]: record[\"사용금액\"],\n        \"결과\": classify_expense(record[\"사용금액\"]),\n    })\n\ntotal = sum(record[\"사용금액\"] for record in records)\nf\"합계 {total:,}원\\n{results}\"",
       "hint": "120000을 90000으로 바꾸고 확인필요 항목이 사라지는지 봅니다",
       "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
+    },
+    "expense-execution-order": {
+      "title": "금액을 저장한 순서대로 계산하기",
+      "description": "금액과 배송비를 먼저 저장한 뒤 합계를 계산해 각 줄의 결과가 아래 줄에서 사용되는지 확인합니다.",
+      "code": "amount = 120000\nfee = 30000\ntotal = amount + fee\n\nf\"합계 {total:,}원\"",
+      "hint": "amount나 fee를 바꾸고 마지막 합계를 다시 확인합니다",
+      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
+    },
+    "expense-number-text": {
+      "title": "숫자 덧셈과 문자 덧셈 비교하기",
+      "description": "따옴표가 없는 금액과 따옴표가 있는 금액을 각각 더해 자료형에 따라 결과가 달라지는지 확인합니다.",
+      "code": "number_total = 120000 + 30000\ntext_total = \"120000\" + \"30000\"\n\nf\"숫자 덧셈: {number_total}\\n문자 덧셈: {text_total}\"",
+      "hint": "각 값에서 따옴표를 넣거나 빼고 결과를 비교합니다",
+      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
+    },
+    "expense-amount-conversion": {
+      "title": "문자 금액을 계산 가능한 숫자로 바꾸기",
+      "description": "쉼표와 원 글자를 지우고 int로 바꾼 뒤 배송비를 더해 숫자 합계를 확인합니다.",
+      "code": "raw_amount = \"120,000원\"\ncleaned = raw_amount.replace(\",\", \"\").replace(\"원\", \"\")\namount = int(cleaned)\nfee = 30000\ntotal = amount + fee\n\nf\"원문 {raw_amount} -> 합계 {total:,}원\"",
+      "hint": "120,000원을 85,000원으로 바꾸고 합계가 115,000원이 되는지 봅니다",
+      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
     }
   }
 }

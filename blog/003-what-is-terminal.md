@@ -182,7 +182,7 @@ python --version
 ```
 
 `Get-Command python`은 `python`이라고 입력했을 때 실제로 실행할 파일을 찾습니다. 성공하면
-`python.exe`의 위치가 보입니다. 실패하면 다음 글에서 설치와 명령 경로를 확인할 이유가 생긴 것입니다.
+`python.exe`의 위치가 보입니다. 실패하면 Python 설치 여부와 명령 경로 등록 상태를 확인합니다.
 
 #### 참고 자료
 
@@ -222,4 +222,4 @@ python --version
 연습으로 안전합니다.
 
 터미널 창, PowerShell 셸, Python 프로그램을 구분하고 현재 폴더까지 확인했다면 준비가 끝났습니다.
-다음에는 PowerShell로 폴더를 이동하고 Python 파일을 직접 실행할 수 있습니다.
+이제 `Get-Location`과 `Get-Command python`을 다시 실행해 현재 위치와 실행할 프로그램을 직접 확인합니다.
