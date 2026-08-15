@@ -33,8 +33,8 @@ CI, 현재 문서, 실제 실행 결과에서 복사합니다.
 사용하고, Claude Code는 `CLAUDE.md`를 프로젝트 메모리로 불러옵니다. 다른 도구는 탐색 규칙이나
 설정이 다를 수 있습니다.
 
-- [OpenAI Codex의 AGENTS.md 안내](https://openai.com/index/introducing-codex/)
-- [Anthropic Claude Code의 CLAUDE.md 안내](https://docs.anthropic.com/en/docs/claude-code/memory)
+- [OpenAI Codex의 AGENTS.md 안내](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
+- [Anthropic Claude Code의 CLAUDE.md 안내](https://code.claude.com/docs/en/memory)
 
 한 파일만 두면 다른 이름을 찾는 도구가 프로젝트 규칙을 모르고 시작할 수 있습니다. 그래서 두
 진입 파일을 두되 규칙 본문은 한 파일에만 둡니다.
