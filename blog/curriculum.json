@@ -547,7 +547,8 @@
       "prerequisites": ["validation-errors"],
       "artifact": "정상, 경계, 변형, 재실행, 원본 보호를 검사하는 pytest 파일",
       "completionCheck": "의도적 오류에서는 Test가 실패하고 수정 뒤 모든 Test가 PASS다",
-      "status": "planned"
+      "postSlug": "pytest-excel-automation",
+      "status": "published"
     },
     {
       "order": 27,
@@ -560,7 +561,8 @@
       "prerequisites": ["validation-errors"],
       "artifact": "변경 전 PASS 결과와 사람, Python, AI 역할표",
       "completionCheck": "AI 연결 전에 같은 명령으로 기준 결과를 만들고 사람의 승인 항목을 표시한다",
-      "status": "planned"
+      "postSlug": "ai-coding-baseline",
+      "status": "published"
     },
     {
       "order": 28,
@@ -587,7 +589,8 @@
       "prerequisites": ["ai-environment"],
       "artifact": "진입점, 입력, 출력, 검증, 위험 파일을 적은 읽기 전용 분석 결과",
       "completionCheck": "변경 파일이 0개인 상태에서 AI 설명과 실제 프로젝트 파일을 대조한다",
-      "status": "planned"
+      "postSlug": "ai-code-analysis",
+      "status": "published"
     },
     {
       "order": 30,
@@ -600,7 +603,8 @@
       "prerequisites": ["ai-readonly-analysis"],
       "artifact": "목적, 입력, 출력, 규칙, 예외, 검증, 제약, 완료조건을 채운 작업명세",
       "completionCheck": "AI 수정계획에 변경 파일과 위험 및 실행할 Tests가 모두 적혀 있다",
-      "status": "planned"
+      "postSlug": "ai-work-spec",
+      "status": "published"
     },
     {
       "order": 31,
