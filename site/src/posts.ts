@@ -1,8 +1,12 @@
+import curriculum from "../../blog/curriculum.json";
+
 export type Post = {
   /** 파일 stem. media plan/catalog 키와 같다. */
   id: string;
   /** 발행 파일의 고정 순번. 같은 날짜의 글도 이 값으로 나눈다. */
   sequence: number;
+  /** 블로그 목록과 강의가 함께 사용하는 학습 순서. */
+  learningOrder: number;
   /** 공개 URL 경로. /blog/{slug} */
   slug: string;
   title: string;
@@ -27,6 +31,11 @@ const files = import.meta.glob("../../blog/???-*.md", {
 }) as Record<string, string>;
 
 const slugPattern = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
+const learningOrderBySlug = new Map(
+  curriculum.stages
+    .filter((stage) => stage.status === "published" && stage.postSlug)
+    .map((stage) => [stage.postSlug, stage.order]),
+);
 
 function parse(path: string, raw: string): Post {
   const id = path.replace(/^.*\//, "").replace(/\.md$/, "");
@@ -35,6 +44,7 @@ function parse(path: string, raw: string): Post {
     return {
       id,
       sequence: Number(id.slice(0, 3)),
+      learningOrder: Number.MAX_SAFE_INTEGER,
       slug: id,
       title: id,
       date: "",
@@ -57,6 +67,7 @@ function parse(path: string, raw: string): Post {
   return {
     id,
     sequence: Number(id.slice(0, 3)),
+    learningOrder: learningOrderBySlug.get(slug) ?? Number.MAX_SAFE_INTEGER,
     slug,
     title: meta.title ?? id,
     date: meta.date ?? "",
@@ -75,7 +86,7 @@ function parse(path: string, raw: string): Post {
 
 export const POSTS: Post[] = Object.entries(files)
   .map(([path, raw]) => parse(path, raw))
-  .sort((a, b) => b.date.localeCompare(a.date) || b.sequence - a.sequence);
+  .sort((a, b) => a.learningOrder - b.learningOrder || a.sequence - b.sequence);
 
 const slugs = new Set(POSTS.map((post) => post.slug));
 if (slugs.size !== POSTS.length) {
@@ -84,9 +95,4 @@ if (slugs.size !== POSTS.length) {
 
 export function findPost(slug: string): Post | undefined {
   return POSTS.find((p) => p.slug === slug);
-}
-
-export function formatDate(iso: string): string {
-  const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  return m ? `${m[1]}. ${m[2]}. ${m[3]}` : iso;
 }

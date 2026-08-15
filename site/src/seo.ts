@@ -180,7 +180,7 @@ export function blogMeta(): PageMeta {
     title: "블로그 · eddmpython",
     socialTitle: "eddmpython 블로그",
     description:
-      "제품을 만들면서 확인한 실패, 결정, 작업 방식을 독자가 다시 쓸 수 있는 판단 기준으로 설명합니다.",
+      "Python 기초부터 Excel 자동화, AI 협업, 결과 검증까지 40개 글을 학습 순서로 모았습니다.",
     type: "website",
     modified: latestModified,
     image: DEFAULT_IMAGE,
@@ -199,7 +199,7 @@ export function blogMeta(): PageMeta {
           url,
           name: "eddmpython 블로그",
           description:
-            "제품을 만들면서 확인한 실패, 결정, 작업 방식을 독자가 다시 쓸 수 있는 판단 기준으로 설명합니다.",
+            "Python 기초부터 Excel 자동화, AI 협업, 결과 검증까지 40개 글을 학습 순서로 모았습니다.",
           inLanguage: "ko-KR",
           isPartOf: { "@id": SITE_ID },
           breadcrumb: { "@id": breadcrumbId },

@@ -79,16 +79,17 @@ const ROUTE_RULES = [
     checks: [
       VISIBLE("main#content"),
       TEXT("main#content h1", "블로그"),
-      TEXT("#curriculum-title", "Python과 AI 업무자동화"),
-      COUNT('section[aria-labelledby="curriculum-title"] ol > li', {
+      COUNT("main#content h1", { exact: 1 }),
+      COUNT("main#content time", { exact: 0 }),
+      COUNT("[data-blog-list] > li", {
         exact: curriculum.stages.length,
       }),
-      COUNT('[data-curriculum-module]', { exact: curriculum.modules.length }),
-      COUNT('[data-curriculum-profile]', {
-        exact: curriculum.deliveryProfiles.length,
+      COUNT("[data-blog-order]", { exact: curriculum.stages.length }),
+      TEXT("[data-blog-list] > li:first-child [data-blog-order]", "01"),
+      TEXT("[data-blog-list] > li:last-child [data-blog-order]", "40"),
+      COUNT('main#content a[href^="/blog/"]', {
+        exact: curriculum.stages.length,
       }),
-      TEXT('section[aria-labelledby="curriculum-title"]', `공개 ${curriculum.stages.filter((stage) => stage.status === "published").length} / 전체 ${curriculum.stages.length}`),
-      COUNT('a[href^="/blog/"]', { min: 1 }),
     ],
   },
   {

@@ -31,9 +31,9 @@ blog/NNN-kebab.md
 폴더를 읽는다 (`site/src/posts.ts` 의
 `import.meta.glob`). 런타임 fetch 도 CMS 도 없다.
 
-파일 순번은 발행 뒤 바꾸지 않는다. 같은 날 여러 글은 순번만 다르고 `date`는 같을 수 있다. 날짜가
-같으면 큰 순번을 최신 글 목록에서 먼저 보여 준다. 강의 학습 순서는 파일 순번이 아니라
-`blog/curriculum.json`의 `order`로 관리한다.
+파일 순번은 발행 뒤 바꾸지 않는다. 같은 날 여러 글은 순번만 다르고 `date`는 같을 수 있다. `date`는
+구조화 데이터와 RSS의 발행 기록에만 쓰며 블로그 화면에 표시하거나 목록 정렬에 쓰지 않는다. `/blog`
+목록과 강의 학습 순서는 `blog/curriculum.json`의 `order`로 관리한다.
 
 파일 하나를 넣으면 빌드가 함께 만든다.
 

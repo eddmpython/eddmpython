@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { findPost, formatDate } from "../posts";
+import { findPost } from "../posts";
 import { Markdown } from "../components/Markdown";
 import { Nav } from "../components/Nav";
 import { Footer } from "../components/Footer";
@@ -42,10 +42,7 @@ export function Post() {
     <div className="min-h-screen">
       <article id="content" className="mx-auto w-full max-w-3xl px-6 pt-10 md:pt-20">
         <Nav />
-        <time dateTime={post.date} className="font-mono text-xs text-ivory/40">
-          {formatDate(post.date)}
-        </time>
-        <h1 className="mt-3 text-3xl leading-tight font-medium tracking-tight md:text-4xl">
+        <h1 className="text-3xl leading-tight font-medium tracking-tight md:text-4xl">
           {post.title}
         </h1>
         <p className="mt-4 text-sm text-ivory/45">
