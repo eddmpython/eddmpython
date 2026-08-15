@@ -687,7 +687,8 @@
       "prerequisites": ["ai-work-spec"],
       "artifact": "민감정보가 없는 5행에서 20행의 합성 파일과 공유 가능 여부표",
       "completionCheck": "실명과 계좌 및 내부 경로와 토큰 없이 같은 예외와 검증값을 재현한다",
-      "status": "planned"
+      "postSlug": "synthetic-data-security",
+      "status": "published"
     },
     {
       "order": 37,
@@ -714,7 +715,8 @@
       "prerequisites": ["ai-variant-excel", "ai-change-control", "work-project"],
       "artifact": "환경 실행, 업무 구조화, AI 지시, 결과 검증, 변경 통제 수행평가표",
       "completionCheck": "100점 중 80점 이상이고 결과 검증 영역에서 필수 점수를 통과한다",
-      "status": "planned"
+      "postSlug": "performance-assessment",
+      "status": "published"
     },
     {
       "order": 39,
@@ -727,7 +729,8 @@
       "prerequisites": ["project-layout-runbook", "validation-errors", "ai-change-control"],
       "artifact": "설치, 입력, 실행, 결과, 검증, 오류복구가 있는 운영 인수인계서",
       "completionCheck": "처음 보는 사람이 문서만 따라 합성 입력의 결과와 PASS 검증표를 만든다",
-      "status": "planned"
+      "postSlug": "handoff-runbook",
+      "status": "published"
     },
     {
       "order": 40,
@@ -740,7 +743,8 @@
       "prerequisites": ["work-project", "performance-assessment", "handoff-runbook"],
       "artifact": "재실행, 직접 수정, AI 확장, 동료 실행을 적은 4주 계획표",
       "completionCheck": "각 주의 실행 날짜와 결과물 및 검증 방법과 도움 요청 기준이 적혀 있다",
-      "status": "planned"
+      "postSlug": "thirty-day-plan",
+      "status": "published"
     }
   ]
 }
