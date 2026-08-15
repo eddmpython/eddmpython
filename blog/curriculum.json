@@ -617,7 +617,8 @@
       "prerequisites": ["normalize-variant-excel", "ai-work-spec"],
       "artifact": "기본 파일 세 개와 변형 파일 한 개를 처리하는 확장 프로젝트",
       "completionCheck": "기존 Test와 변형 파일 Test가 모두 PASS하고 숫자 차이가 0이다",
-      "status": "planned"
+      "postSlug": "ai-variant-excel",
+      "status": "published"
     },
     {
       "order": 32,
@@ -630,7 +631,8 @@
       "prerequisites": ["conditions-boundaries", "ai-work-spec"],
       "artifact": "고액거래와 취소거래 규칙 및 새 시트가 추가된 결과 Excel",
       "completionCheck": "99,999원과 100,000원 및 음수 경계 Test와 기존 Test가 모두 PASS다",
-      "status": "planned"
+      "postSlug": "ai-boundary-change",
+      "status": "published"
     },
     {
       "order": 33,
@@ -643,7 +645,8 @@
       "prerequisites": ["pytest-automation", "ai-boundary-change"],
       "artifact": "Tests PASS 결과와 승인한 파일만 남은 diff 검토표",
       "completionCheck": "의도적으로 잘못 바꾼 파일 하나를 복구하고 다시 모든 Test를 통과한다",
-      "status": "planned"
+      "postSlug": "ai-change-control",
+      "status": "published"
     },
     {
       "order": 34,
@@ -656,7 +659,8 @@
       "prerequisites": ["read-errors", "ai-readonly-analysis"],
       "artifact": "실행 명령, Traceback, 기대와 실제, 입력과 변경 파일이 있는 오류보고",
       "completionCheck": "새 대화에서도 같은 명령과 합성 입력으로 오류를 재현하고 최소 수정으로 해결한다",
-      "status": "planned"
+      "postSlug": "structured-error-report",
+      "status": "published"
     },
     {
       "order": 35,
