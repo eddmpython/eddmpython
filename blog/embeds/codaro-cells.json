@@ -80,8 +80,8 @@
     },
     "expense-amount-conversion": {
       "title": "문자 금액을 계산 가능한 숫자로 바꾸기",
-      "description": "쉼표와 원 글자를 지우고 int로 바꾼 뒤 배송비를 더해 숫자 합계를 확인합니다.",
-      "code": "raw_amount = \"120,000원\"\ncleaned = raw_amount.replace(\",\", \"\").replace(\"원\", \"\")\namount = int(cleaned)\nfee = 30000\ntotal = amount + fee\n\nf\"원문 {raw_amount} -> 합계 {total:,}원\"",
+      "description": "앞뒤 공백과 쉼표 및 마지막 원 표시를 정리하고 빈칸을 거부한 뒤 배송비를 더해 숫자 합계를 확인합니다.",
+      "code": "def parse_won(raw):\n    if isinstance(raw, bool):\n        raise TypeError(\"참거짓은 금액이 아님\")\n    if isinstance(raw, int):\n        return raw\n    if not isinstance(raw, str):\n        raise TypeError(\"문자열이나 정수가 아님\")\n\n    cleaned = raw.strip().replace(\",\", \"\")\n    if cleaned.endswith(\"원\"):\n        cleaned = cleaned[:-1].strip()\n    if cleaned == \"\":\n        raise ValueError(\"빈 금액\")\n\n    try:\n        return int(cleaned)\n    except ValueError as error:\n        raise ValueError(\"숫자가 아닌 금액\") from error\n\nraw_amount = \"120,000원\"\namount = parse_won(raw_amount)\nfee = 30000\ntotal = amount + fee\n\nf\"원문 {raw_amount} -> 합계 {total:,}원\"",
       "hint": "120,000원을 85,000원으로 바꾸고 합계가 115,000원이 되는지 봅니다",
       "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
     }
