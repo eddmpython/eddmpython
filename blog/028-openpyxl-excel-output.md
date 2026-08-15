@@ -1,8 +1,6 @@
 ---
 title: openpyxl Excel 서식 자동화 방법: 네 시트 결과 파일 완성하기
 slug: openpyxl-excel-output
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: Excel 업무자동화
 summary: openpyxl Excel 서식 자동화로 통합내역과 부서요약 및 확인필요와 실행정보 시트를 만듭니다. 틀 고정과 필터 및 표시 형식을 적용하고 다시 열어 검증합니다.

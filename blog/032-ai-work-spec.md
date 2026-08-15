@@ -1,8 +1,6 @@
 ---
 title: AI 작업지시서 작성 방법: 추측을 막는 8가지 항목
 slug: ai-work-spec
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: AI 작업 환경
 summary: AI 작업지시서 작성 방법을 목적과 입력부터 검증과 완료조건까지 8가지 항목으로 설명합니다. 변형 Excel 대응 예시와 수정 전 계획 검사를 제공합니다.

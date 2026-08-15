@@ -1,8 +1,6 @@
 ---
 title: AI Excel 조건 추가 방법: 10만원 경계와 취소 거래를 놓치지 않는 법
 slug: ai-boundary-change
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: AI 작업 환경
 summary: AI로 Excel 조건을 추가할 때 10만원 이상과 취소 거래의 경계를 먼저 표로 정하고 결과 시트와 테스트까지 안전하게 확장하는 방법을 설명합니다.

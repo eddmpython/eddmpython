@@ -1,8 +1,6 @@
 ---
 title: Excel 데이터 정리 방법: 다른 열 이름과 금액 형식 합치기
 slug: excel-data-normalization
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: Excel 업무자동화
 summary: Excel 데이터 정리 방법을 열 이름 변환과 금액 문자열 및 부서와 날짜 통일로 익힙니다. 원본 열을 남기고 변경과 실패 건수를 확인합니다.

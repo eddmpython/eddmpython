@@ -57,27 +57,23 @@ slug는 바꾸지 않는다. 각 stage의 `artifact`에는 독자가 남길 파�
 ## 발행 파일 계약
 
 발행 글은 `blog/NNN-kebab.md` 한 파일이다. `NNN`은 `001`부터 빈 번호 없이 증가하는 발행 순번이다.
-한 번 발행한 순번은 날짜나 커리큘럼 순서가 바뀌어도 고치지 않는다. 파일 stem 전체는 미디어 키용
-**post id**다. 새 글은 현재 가장 큰 순번에 1을 더해 만든다. frontmatter `date`는 실제 발행일을
-`YYYY-MM-DD`로 유지한다. 공개 URL은 frontmatter `slug`만 쓴다 (`/blog/{slug}`). 날짜와 순번을
-URL에 넣지 않는다.
+한 번 발행한 순번은 커리큘럼 순서가 바뀌어도 고치지 않는다. 파일 stem 전체는 미디어 키용
+**post id**다. 새 글은 현재 가장 큰 순번에 1을 더해 만든다. 공개 URL은 frontmatter `slug`만 쓴다
+(`/blog/{slug}`). 날짜는 저장하거나 정렬에 사용하지 않는다.
 
-파일 순번, 발행일, 학습 순서는 서로 다른 정보다.
+순서는 두 가지뿐이다.
 
-- 파일 순번: 저장소에서 글을 구분하는 고정 발행 번호
-- `date`: 독자에게 보이는 실제 발행일
-- `curriculum.json`의 `order`: 처음 읽는 사람이 따라갈 학습 순서
+- 파일 순번: 저장소와 미디어에서 글을 구분하는 고정 번호
+- `curriculum.json`의 `order`: `/blog`와 강의에서 사용하는 학습 순서
 
-같은 날 글을 여러 편 발행하면 각 글은 서로 다른 다음 순번을 받고 `date`만 같게 쓴다. `date`는
-구조화 데이터와 RSS에 쓰는 발행 기록이며 화면에 표시하거나 목록 정렬에 쓰지 않는다.
+새 글은 다음 파일 순번을 받고, 독자가 보는 위치는 `curriculum.json`의 `order`로 정한다. 발행일과
+수정일은 frontmatter, 구조화 데이터, sitemap, RSS에 넣지 않는다.
 대문자 영문 운영 문서와 `product-marketing.md`는 사이트 글 목록에서 제외한다.
 
 ```yaml
 ---
 title: 독자가 읽을 제목
 slug: 공개-경로-kebab
-date: YYYY-MM-DD
-modified: 마지막으로 본문을 의미 있게 고친 YYYY-MM-DD
 author: 화면과 구조화 데이터에 함께 표시할 작성자
 section: 글을 분류하는 한 개의 상위 주제
 summary: 목록과 검색 결과에서 글을 열 이유를 설명하는 문장
@@ -119,8 +115,7 @@ ogImageType: ogImage가 있으면 필수. image/png 같은 MIME
 독자가 모르는 말을 적는다. 글을 다 쓴 뒤에는 이 출발점을 넘어서는 설명이 빠지지 않았는지 확인한다.
 
 `readerQuestion`과 `readerTakeaway`는 본문이 옆길로 새는지 확인할 때 쓴다. 답이 바뀌면
-frontmatter와 본문을 함께 고친다. `modified`는 빌드한 날이 아니라 본문이나 대표 이미지의 뜻이
-실제로 달라진 날만 올린다.
+frontmatter와 본문을 함께 고친다.
 
 ## 1. 읽는 사람을 먼저 정한다
 

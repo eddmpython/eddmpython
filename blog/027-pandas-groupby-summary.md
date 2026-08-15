@@ -1,8 +1,6 @@
 ---
 title: pandas groupby 사용법: 부서별 건수와 금액 집계 방법
 slug: pandas-groupby-summary
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: Excel 업무자동화
 summary: pandas groupby 사용법을 부서별 거래건수와 금액합계 및 평균금액 계산으로 익힙니다. 정렬과 비율을 더하고 원본 합계와 차이 0을 검증합니다.

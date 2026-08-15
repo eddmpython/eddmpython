@@ -1,8 +1,6 @@
 ---
 title: Python Excel 파일 합치기: 3개를 4개 시트로 만드는 방법
 slug: python-excel-merge
-date: 2026-08-14
-modified: 2026-08-14
 author: eddmpython
 section: Excel 업무자동화
 summary: Python Excel 파일 합치기를 부서별 지출내역 3개로 실습합니다. pandas로 행을 모으고 요약과 확인필요를 계산해 4개 시트로 저장합니다.

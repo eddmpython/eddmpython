@@ -1,8 +1,6 @@
 ---
 title: Python for문 사용법: 거래 여러 건을 빠짐없이 처리하는 방법
 slug: python-for-loop
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: Python 기초
 summary: Python for문 사용법을 거래 다섯 건과 Excel 파일 세 개로 익힙니다. 합계를 누적하고 순번을 남기며 입력과 출력 건수 및 식별자를 확인합니다.

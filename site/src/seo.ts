@@ -12,8 +12,6 @@ export type PageMeta = {
   socialTitle: string;
   description: string;
   type: "website" | "article";
-  published?: string;
-  modified?: string;
   author?: string;
   section?: string;
   image: string;
@@ -164,14 +162,11 @@ export function blogMeta(): PageMeta {
   const path = "/blog";
   const url = `${ORIGIN}${path}`;
   const breadcrumbId = `${url}#breadcrumb`;
-  const latestModified = POSTS.map((post) => post.modified).sort().at(-1);
   const blogPosts = POSTS.map((post) => ({
     "@type": "BlogPosting",
     "@id": `${ORIGIN}/blog/${post.slug}#article`,
     headline: post.title,
     url: `${ORIGIN}/blog/${post.slug}`,
-    datePublished: post.date,
-    dateModified: post.modified,
     author: { "@id": ORG_ID },
   }));
 
@@ -182,7 +177,6 @@ export function blogMeta(): PageMeta {
     description:
       "Python 기초부터 Excel 자동화, AI 협업, 결과 검증까지 40개 글을 학습 순서로 모았습니다.",
     type: "website",
-    modified: latestModified,
     image: DEFAULT_IMAGE,
     imageAlt: "eddmpython 블로그",
     imageType: "image/png",
@@ -227,8 +221,6 @@ export function postMeta(post: Post): PageMeta {
     socialTitle: post.title,
     description: post.summary,
     type: "article",
-    published: post.date,
-    modified: post.modified,
     author: post.author,
     section: post.section,
     image: post.ogImage ?? DEFAULT_IMAGE,
@@ -253,8 +245,6 @@ export function postMeta(post: Post): PageMeta {
           breadcrumb: { "@id": breadcrumbId },
           primaryImageOfPage: { "@id": image["@id"] },
           mainEntity: { "@id": articleId },
-          datePublished: post.date,
-          dateModified: post.modified,
         },
         {
           "@type": "BlogPosting",
@@ -264,8 +254,6 @@ export function postMeta(post: Post): PageMeta {
           description: post.summary,
           mainEntityOfPage: { "@id": url },
           isPartOf: { "@id": BLOG_ID },
-          datePublished: post.date,
-          dateModified: post.modified,
           inLanguage: "ko-KR",
           articleSection: post.section,
           image: { "@id": image["@id"] },

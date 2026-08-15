@@ -1,8 +1,6 @@
 ---
 title: PowerShell 파일 경로: 폴더 이동부터 Python 실행까지
 slug: powershell-paths
-date: 2026-08-14
-modified: 2026-08-14
 author: eddmpython
 section: 터미널과 로컬 실행
 summary: PowerShell 파일 경로를 현재 위치부터 확인합니다. 상대 경로와 절대 경로 및 공백을 구분하고 연습 폴더에서 Python 파일을 직접 실행합니다.

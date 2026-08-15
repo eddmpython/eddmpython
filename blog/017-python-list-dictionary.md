@@ -1,8 +1,6 @@
 ---
 title: Python 리스트와 딕셔너리 차이: 거래 데이터를 어떻게 묶을까
 slug: python-list-dictionary
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: Python 기초
 summary: Python 리스트 딕셔너리 차이를 거래 데이터로 익힙니다. 여러 금액은 순서대로 담고 거래 한 건은 열 이름으로 찾으며 누락 값도 안전하게 처리합니다.

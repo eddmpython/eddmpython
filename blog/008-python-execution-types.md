@@ -1,8 +1,6 @@
 ---
 title: Python 실행 순서와 자료형: 문자와 숫자가 다른 이유
 slug: python-types
-date: 2026-08-14
-modified: 2026-08-14
 author: eddmpython
 section: Python 기초와 실행
 summary: Python 실행 순서와 자료형을 지출 금액 코드로 설명합니다. 줄 순서와 함수 호출 시점을 확인하고 문자 금액을 계산 가능한 숫자로 바꿉니다.

@@ -1,8 +1,6 @@
 ---
 title: Excel 입력 계약이 필요한 이유: 틀린 파일을 먼저 멈추기
 slug: excel-input-contract
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: Excel 업무자동화
 summary: Excel 입력 계약으로 파일 이름과 시트 및 필수 열과 자료형과 빈값 기준을 검사합니다. 정상 파일은 통과하고 깨진 파일은 계산 전에 멈춥니다.

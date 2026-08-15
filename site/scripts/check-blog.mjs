@@ -16,8 +16,6 @@ const postName = /^(\d{3})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$/;
 const requiredMeta = [
   "title",
   "slug",
-  "date",
-  "modified",
   "author",
   "section",
   "summary",
@@ -77,11 +75,6 @@ function parseFrontmatter(file, raw) {
     if (!meta.get(key)) fail(file, `${key} 필드가 비었습니다`);
   }
   return { meta, body: match[2].trim() };
-}
-
-function validDate(value) {
-  const parsed = new Date(`${value}T00:00:00Z`);
-  return !Number.isNaN(parsed.valueOf()) && parsed.toISOString().slice(0, 10) === value;
 }
 
 function proseParagraphs(body) {
@@ -166,7 +159,6 @@ if (
 }
 if (
   curriculum.version !== 3 ||
-  !validDate(curriculum.updated) ||
   !String(curriculum.title ?? "").trim() ||
   !String(curriculum.promise ?? "").trim() ||
   !String(curriculum.audience ?? "").trim() ||
@@ -445,12 +437,8 @@ for (const file of posts) {
   const postId = file.replace(/\.md$/, "");
   const slug = meta.get("slug");
 
-  if (!validDate(meta.get("date"))) fail(file, "date가 유효한 YYYY-MM-DD 형식이 아닙니다");
-  if (!validDate(meta.get("modified"))) {
-    fail(file, "modified가 유효한 YYYY-MM-DD 형식이 아닙니다");
-  }
-  if (meta.get("modified") < meta.get("date")) {
-    fail(file, "modified가 최초 발행일보다 빠릅니다");
+  if (meta.has("date") || meta.has("modified")) {
+    fail(file, "발행 날짜 대신 파일 순번과 curriculum order만 사용합니다");
   }
   if (!publicSlug.test(slug)) {
     fail(file, "slug는 소문자·숫자·하이픈만 쓰고 날짜로 시작하지 않습니다");

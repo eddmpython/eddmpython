@@ -27,8 +27,6 @@ type PageMeta = {
   socialTitle: string;
   description: string;
   type: string;
-  published?: string;
-  modified?: string;
   author?: string;
   section?: string;
   image: string;
@@ -139,10 +137,8 @@ function prerender(): Plugin {
               `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, "\\u003c")}</script>`,
           )
           .join("");
-        const article = meta.published
+        const article = meta.type === "article"
           ? [
-              `<meta property="article:published_time" content="${meta.published}" />`,
-              `<meta property="article:modified_time" content="${meta.modified ?? meta.published}" />`,
               `<meta property="article:author" content="${ORIGIN}" />`,
               `<meta property="article:section" content="${escape(meta.section ?? "블로그")}" />`,
             ].join("")
@@ -235,23 +231,19 @@ function prerender(): Plugin {
         `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages
           .map(
             (p) =>
-              `  <url>\n    <loc>${ORIGIN}${p.path}</loc>${p.modified ? `\n    <lastmod>${p.modified}</lastmod>` : ""}\n  </url>`,
+              `  <url>\n    <loc>${ORIGIN}${p.path}</loc>\n  </url>`,
           )
           .join("\n")}\n</urlset>\n`,
         "utf8",
       );
 
       const posts = pages.filter((p) => p.type === "article");
-      const latestModified = posts
-        .map((post) => post.modified ?? post.published ?? "")
-        .sort()
-        .at(-1);
       writeFileSync(
         join(dist, "rss.xml"),
-        `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n  <channel>\n    <title>eddmpython 블로그</title>\n    <link>${ORIGIN}/blog</link>\n    <atom:link href="${ORIGIN}/rss.xml" rel="self" type="application/rss+xml" />\n    <description>제품을 만들면서 확인한 실패, 결정, 작업 방식을 독자가 다시 쓸 수 있는 판단 기준으로 설명합니다.</description>\n    <language>ko-KR</language>${latestModified ? `\n    <lastBuildDate>${new Date(`${latestModified}T00:00:00+09:00`).toUTCString()}</lastBuildDate>` : ""}\n${posts
+        `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n  <channel>\n    <title>eddmpython 블로그</title>\n    <link>${ORIGIN}/blog</link>\n    <atom:link href="${ORIGIN}/rss.xml" rel="self" type="application/rss+xml" />\n    <description>제품을 만들면서 확인한 실패, 결정, 작업 방식을 독자가 다시 쓸 수 있는 판단 기준으로 설명합니다.</description>\n    <language>ko-KR</language>\n${posts
           .map(
             (p) =>
-              `    <item>\n      <title>${escape(p.socialTitle)}</title>\n      <link>${ORIGIN}${p.path}</link>\n      <guid isPermaLink="true">${ORIGIN}${p.path}</guid>\n      <pubDate>${new Date(`${p.published}T00:00:00+09:00`).toUTCString()}</pubDate>${p.section ? `\n      <category>${escape(p.section)}</category>` : ""}\n      <description>${escape(p.description)}</description>\n    </item>`,
+              `    <item>\n      <title>${escape(p.socialTitle)}</title>\n      <link>${ORIGIN}${p.path}</link>\n      <guid isPermaLink="true">${ORIGIN}${p.path}</guid>${p.section ? `\n      <category>${escape(p.section)}</category>` : ""}\n      <description>${escape(p.description)}</description>\n    </item>`,
           )
           .join("\n")}\n  </channel>\n</rss>\n`,
         "utf8",

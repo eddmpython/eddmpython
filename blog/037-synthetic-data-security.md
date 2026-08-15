@@ -1,8 +1,6 @@
 ---
 title: AI 합성 데이터 만드는 방법: 회사 원본 없이 5행으로 검증하기
 slug: synthetic-data-security
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: AI 작업 환경
 summary: AI 합성 데이터 만드는 방법을 공유 금지 항목, 5행 샘플, 기대 결과, 공유 전 검사 순서로 설명합니다. 회사 원본 없이 같은 자동화 규칙을 검증합니다.

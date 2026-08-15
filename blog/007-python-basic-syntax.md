@@ -1,8 +1,6 @@
 ---
 title: Python 기초문법 6가지를 영상과 실행 셀로 배우는 방법
 slug: python-basic-syntax
-date: 2026-08-14
-modified: 2026-08-14
 author: eddmpython
 section: Python 학습과 자동화
 summary: Python 기초문법 배우는 방법을 1분 영상과 실행 셀로 설명합니다. 변수, 리스트, 딕셔너리, 조건문, 반복문, 함수를 지출내역 예제로 직접 바꿉니다.

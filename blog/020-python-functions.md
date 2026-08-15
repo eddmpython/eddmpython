@@ -1,8 +1,6 @@
 ---
 title: Python 함수 만들기: 업무 규칙을 한 번만 쓰는 방법
 slug: python-functions
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: Python 기초
 summary: Python 함수 만들기를 거래 분류 규칙으로 익힙니다. 입력과 반환값을 정하고 같은 함수를 재사용하며 작은 함수 네 개로 나누어 결과를 검사합니다.

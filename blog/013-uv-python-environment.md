@@ -1,8 +1,6 @@
 ---
 title: uv Python 환경 만들기: sync와 run으로 똑같이 실행하는 법
 slug: uv-python
-date: 2026-08-14
-modified: 2026-08-14
 author: eddmpython
 section: Python 프로젝트 환경
 summary: uv Python 환경 만들기를 Windows PowerShell에서 실습합니다. pyproject.toml과 uv.lock 및 .venv를 만들고 sync와 run으로 같은 패키지를 실행합니다.

@@ -1,8 +1,6 @@
 ---
 title: AI에게 링크 하나만 보내 코딩 환경을 구성하는 방법
 slug: ai-environment
-date: 2026-08-11
-modified: 2026-08-14
 author: eddmpython
 section: AI 작업 환경
 summary: AI 코딩 환경 구성을 매번 길게 설명하지 않아도 됩니다. 작업할 저장소에서 이 글의 URL만 AI에게 보내면 코드와 CI를 조사해 AGENTS.md와 CLAUDE.md를 만들고 실제 명령으로 검증하는 순서를 실행할 수 있습니다.

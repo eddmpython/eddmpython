@@ -1,8 +1,6 @@
 ---
 title: AI Excel 자동화 확장 방법: 변형 열과 금액 형식까지 안전하게
 slug: ai-variant-excel
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: AI 작업 환경
 summary: AI로 Excel 자동화를 확장할 때 기존 결과를 지키면서 다른 열 이름과 금액 형식을 표준화하는 방법을 설명합니다. 작업지시, 구현 코드, 회귀 테스트까지 연결합니다.

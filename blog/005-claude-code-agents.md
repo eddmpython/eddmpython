@@ -1,8 +1,6 @@
 ---
 title: Claude Code 에이전트가 최신 모델에서 일을 망치는 이유
 slug: claude-code-agents
-date: 2026-08-13
-modified: 2026-08-14
 author: eddmpython
 section: AI 작업 환경
 summary: Claude Code 에이전트가 최신 모델로 바뀐 뒤 일을 더 벌인다면 모델 탓은 절반입니다. 공식 문서의 행동 변화와 설정 문제를 나눠 보고, 바로 복사할 파일 두 개를 설명합니다.

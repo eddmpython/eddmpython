@@ -204,11 +204,12 @@ for (const { file, slug, path } of postRoutes) {
   if (
     posting.headline !== frontmatter.get("title") ||
     posting.description !== frontmatter.get("summary") ||
-    posting.datePublished !== frontmatter.get("date") ||
-    posting.dateModified !== frontmatter.get("modified") ||
     posting.articleSection !== frontmatter.get("section")
   ) {
     fail(file, "BlogPosting이 frontmatter와 다릅니다");
+  }
+  if ("datePublished" in posting || "dateModified" in posting) {
+    fail(file, "BlogPosting에 날짜가 남아 있습니다");
   }
   if (card.ogTitle !== frontmatter.get("title")) {
     fail(file, "공유 카드 제목이 글 제목과 다릅니다");
@@ -222,12 +223,13 @@ for (const { file, slug, path } of postRoutes) {
     fail(file, "공유 카드 이미지가 frontmatter와 다릅니다");
   }
   if (
-    meta(html, "property", "article:published_time", file) !== frontmatter.get("date") ||
-    meta(html, "property", "article:modified_time", file) !== frontmatter.get("modified") ||
     meta(html, "property", "article:section", file) !== frontmatter.get("section") ||
     meta(html, "name", "author", file) !== frontmatter.get("author")
   ) {
     fail(file, "Article 메타가 frontmatter와 다릅니다");
+  }
+  if (html.includes("article:published_time") || html.includes("article:modified_time")) {
+    fail(file, "Article 메타에 날짜가 남아 있습니다");
   }
 }
 
@@ -235,15 +237,8 @@ const sitemap = await readFile(resolve(distRoot, "sitemap.xml"), "utf8");
 if ((sitemap.match(/<loc>/g) ?? []).length !== pages.length) {
   fail("sitemap.xml", "페이지 수와 URL 수가 다릅니다");
 }
-if (/<loc>https:\/\/eddmpython\.com\/<\/loc>\s*<lastmod>/.test(sitemap)) {
-  fail("sitemap.xml", "홈에 빌드 날짜를 수정일처럼 넣었습니다");
-}
-for (const { file, path } of postRoutes) {
-  const frontmatter = parseFrontmatter(file, await readFile(resolve(blogRoot, file), "utf8"));
-  const url = `${origin}${path}`;
-  if (!sitemap.includes(`<loc>${url}</loc>\n    <lastmod>${frontmatter.get("modified")}</lastmod>`)) {
-    fail("sitemap.xml", `${file}의 실제 수정일이 없습니다`);
-  }
+if (sitemap.includes("<lastmod>")) {
+  fail("sitemap.xml", "날짜가 남아 있습니다");
 }
 
 const rss = await readFile(resolve(distRoot, "rss.xml"), "utf8");
@@ -252,6 +247,9 @@ if (!rss.includes(`atom:link href="${origin}/rss.xml" rel="self"`)) {
 }
 if ((rss.match(/<item>/g) ?? []).length !== postFiles.length) {
   fail("rss.xml", "글 수와 item 수가 다릅니다");
+}
+if (rss.includes("<pubDate>") || rss.includes("<lastBuildDate>")) {
+  fail("rss.xml", "날짜가 남아 있습니다");
 }
 
 const robots = await readFile(resolve(distRoot, "robots.txt"), "utf8");

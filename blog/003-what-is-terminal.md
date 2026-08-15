@@ -1,8 +1,6 @@
 ---
 title: 터미널이란 무엇인가? 개발자가 검은 창을 쓰는 이유
 slug: what-is-terminal
-date: 2026-08-09
-modified: 2026-08-14
 author: eddmpython
 section: Python 학습과 자동화
 summary: 터미널이란 무엇인가를 명령과 결과로 쉽게 설명합니다. Windows Terminal과 PowerShell의 차이, 현재 폴더를 확인하는 명령, Python 설치 여부를 찾는 방법까지 직접 따라 합니다.

@@ -1,8 +1,6 @@
 ---
 title: Python if문 경계값이 중요한 이유: 100000원은 어디로 갈까
 slug: python-if-boundary
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: Python 기초
 summary: Python if문 경계값을 거래 금액으로 익힙니다. 100000원을 포함하는 조건과 취소 및 입력 오류를 나누고 네 입력의 기대 결과를 확인합니다.

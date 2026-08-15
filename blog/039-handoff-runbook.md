@@ -1,8 +1,6 @@
 ---
 title: Python 자동화 인수인계서 작성 방법: 동료가 혼자 재실행하는 6단계
 slug: handoff-runbook
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: 실무 전환
 summary: Python 자동화 인수인계서 작성 방법을 설치, 입력, 실행, 결과, 검증, 오류복구 6단계로 설명합니다. 처음 보는 동료가 문서만으로 재실행하게 만듭니다.

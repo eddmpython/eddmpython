@@ -1,8 +1,6 @@
 ---
 title: VS Code Python 실행 방법: 프로젝트 폴더부터 결과 확인까지
 slug: vscode-python
-date: 2026-08-14
-modified: 2026-08-14
 author: eddmpython
 section: Python 프로젝트 환경
 summary: VS Code Python 실행 방법을 프로젝트 폴더 만들기부터 설명합니다. 인터프리터를 선택하고 src/main.py를 실행해 output 결과 파일까지 확인합니다.

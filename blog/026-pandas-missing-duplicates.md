@@ -1,8 +1,6 @@
 ---
 title: pandas 빈값 중복 처리: 데이터를 버리지 않는 정리 순서
 slug: pandas-missing-duplicates
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: Excel 업무자동화
 summary: pandas 빈값 중복 처리 순서를 실제 거래 데이터로 익힙니다. 누락과 중복 및 변환 실패를 확인필요 표로 나누고 행 수와 금액을 검증합니다.

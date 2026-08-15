@@ -1,8 +1,6 @@
 ---
 title: Python Excel 자동화 수행평가 방법: 처음 보는 파일로 100점 채점하기
 slug: performance-assessment
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: 실무 전환
 summary: Python Excel 자동화 수행평가를 처음 보는 7행 파일로 진행합니다. 60분 실행 순서와 100점 채점표 및 80점 통과 기준을 제공합니다.

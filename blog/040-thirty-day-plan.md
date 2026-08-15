@@ -1,8 +1,6 @@
 ---
 title: Python 자동화 30일 실행 계획: 4주 안에 실제 업무로 옮기는 방법
 slug: thirty-day-plan
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: 실무 전환
 summary: Python 자동화 30일 실행 계획을 4주로 나눕니다. 재실행, 직접 수정, AI 확장, 동료 인수인계를 결과물과 검증 기준으로 완료합니다.

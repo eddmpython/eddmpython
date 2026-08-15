@@ -3,15 +3,13 @@ import curriculum from "../../blog/curriculum.json";
 export type Post = {
   /** 파일 stem. media plan/catalog 키와 같다. */
   id: string;
-  /** 발행 파일의 고정 순번. 같은 날짜의 글도 이 값으로 나눈다. */
+  /** 파일과 미디어를 연결하는 고정 순번. */
   sequence: number;
   /** 블로그 목록과 강의가 함께 사용하는 학습 순서. */
   learningOrder: number;
   /** 공개 URL 경로. /blog/{slug} */
   slug: string;
   title: string;
-  date: string;
-  modified: string;
   author: string;
   section: string;
   summary: string;
@@ -47,8 +45,6 @@ function parse(path: string, raw: string): Post {
       learningOrder: Number.MAX_SAFE_INTEGER,
       slug: id,
       title: id,
-      date: "",
-      modified: "",
       author: "",
       section: "",
       summary: "",
@@ -70,8 +66,6 @@ function parse(path: string, raw: string): Post {
     learningOrder: learningOrderBySlug.get(slug) ?? Number.MAX_SAFE_INTEGER,
     slug,
     title: meta.title ?? id,
-    date: meta.date ?? "",
-    modified: meta.modified ?? meta.date ?? "",
     author: meta.author ?? "eddmpython",
     section: meta.section ?? "블로그",
     summary: meta.summary ?? "",

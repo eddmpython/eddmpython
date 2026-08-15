@@ -1,8 +1,6 @@
 ---
 title: pytest 사용법: Excel 자동화 검증을 반복하는 방법
 slug: pytest-excel-automation
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: Excel 업무자동화
 summary: pytest 사용법을 Excel 자동화 검증으로 익힙니다. 행 수와 금액 및 원본 보호와 재실행을 검사하고 경계값과 변형 입력을 한 명령으로 반복합니다.

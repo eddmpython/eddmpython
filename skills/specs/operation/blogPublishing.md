@@ -26,14 +26,13 @@ blog/NNN-kebab.md
 ```
 
 여기가 글의 정본이다. `NNN`은 `001`부터 빈 번호 없이 늘어나는 고정 발행 순번이다. 새 글은 현재
-가장 큰 번호에 1을 더한다. 파일 stem 전체는 post id이자 미디어 키다. frontmatter `date`는 실제
-발행일을 `YYYY-MM-DD`로 쓴다. 공개 경로는 frontmatter `slug`다. 사이트는 빌드 타임에 이
+가장 큰 번호에 1을 더한다. 파일 stem 전체는 post id이자 미디어 키다. 공개 경로는 frontmatter
+`slug`다. 사이트는 빌드 타임에 이
 폴더를 읽는다 (`site/src/posts.ts` 의
 `import.meta.glob`). 런타임 fetch 도 CMS 도 없다.
 
-파일 순번은 발행 뒤 바꾸지 않는다. 같은 날 여러 글은 순번만 다르고 `date`는 같을 수 있다. `date`는
-구조화 데이터와 RSS의 발행 기록에만 쓰며 블로그 화면에 표시하거나 목록 정렬에 쓰지 않는다. `/blog`
-목록과 강의 학습 순서는 `blog/curriculum.json`의 `order`로 관리한다.
+파일 순번은 발행 뒤 바꾸지 않는다. 발행일과 수정일은 저장하지 않는다. `/blog` 목록과 강의 학습
+순서는 `blog/curriculum.json`의 `order`로만 관리한다.
 
 파일 하나를 넣으면 빌드가 함께 만든다.
 
@@ -53,8 +52,6 @@ blog/NNN-kebab.md
 |---|---|
 | `title` | 질문이거나 주장. 명사 나열 금지. 인지도 없는 제품명을 앞에 두지 않음 (`blog/PIPELINE.md` 1.5절) |
 | `slug` | 공개 URL `/blog/{slug}`. 짧은 소문자 kebab, 날짜 금지. 예: `no-install` |
-| `date` | 실제 발행일 `YYYY-MM-DD`. 같은 날 여러 글이 같은 날짜를 써도 됨 |
-| `modified` | 마지막 수정일 |
 | `author` | 글쓴이 |
 | `section` | 글의 갈래 |
 | `summary` | 목록과 검색 결과에 나가는 한두 문장 |

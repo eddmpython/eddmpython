@@ -1,8 +1,6 @@
 ---
 title: AI 코드 변경 검토 방법: 테스트와 diff로 범위 확인하고 되돌리기
 slug: ai-change-control
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: AI 작업 환경
 summary: AI 코드 변경 검토 방법을 테스트와 Git diff로 설명합니다. 요청 범위를 확인하고 잘못 바뀐 파일 하나만 안전하게 되돌리는 절차까지 연결합니다.

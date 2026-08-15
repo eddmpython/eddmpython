@@ -1,8 +1,6 @@
 ---
 title: AI 코드 분석 요청 방법: 수정 0개로 진입점과 위험 찾기
 slug: ai-code-analysis
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: AI 작업 환경
 summary: AI 코드 분석 요청을 읽기 전용으로 시작하는 방법을 설명합니다. 실행 진입점과 입력 및 출력과 검증 및 위험 파일을 찾고 실제 코드와 대조합니다.

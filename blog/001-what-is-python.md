@@ -1,8 +1,6 @@
 ---
 title: 파이썬이란 무엇인가? 역사부터 인기와 중요한 이유까지
 slug: what-is-python
-date: 2026-08-07
-modified: 2026-08-14
 author: eddmpython
 section: Python 학습과 자동화
 summary: 파이썬이란 무엇인가를 붕어빵 주문 코드로 시작해 설명합니다. 1989년 역사, 읽기 쉬운 문법, AI와 데이터 생태계, 최신 인기 지표, 다른 언어가 더 나은 경우까지 한 번에 정리합니다.

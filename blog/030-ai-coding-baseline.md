@@ -1,8 +1,6 @@
 ---
 title: AI 코딩 기준선 만드는 방법: 맡기기 전에 결과부터 고정하기
 slug: ai-coding-baseline
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: AI 작업 환경
 summary: AI 코딩 기준선을 테스트 결과와 샘플 숫자로 만드는 방법을 설명합니다. 사람과 Python 및 AI의 역할을 나누고 변경 전 상태를 기록합니다.

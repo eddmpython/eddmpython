@@ -1,16 +1,13 @@
 # 블로그 한 편 양식
 
 파일명은 `NNN-kebab.md`로 쓴다. `NNN`은 발행할 때 한 번 부여하는 세 자리 고정 순번이며,
-실제 발행일과 학습 순서를 뜻하지 않는다. 날짜는 frontmatter에, 학습 순서는
-`blog/curriculum.json`에 둔다.
+학습 순서를 뜻하지 않는다. 날짜는 저장하지 않고 학습 순서는 `blog/curriculum.json`에 둔다.
 
 ## Frontmatter
 
 ```yaml
 title: 문제, 질문, 결과가 보이는 후킹 제목
 slug: 날짜 없는 짧은 공개 경로
-date: YYYY-MM-DD
-modified: YYYY-MM-DD
 author: eddmpython
 section: 상위 주제 하나
 summary: 핵심 검색어와 읽어서 얻는 결과를 담은 한두 문장

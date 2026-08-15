@@ -1,8 +1,6 @@
 ---
 title: Python 프로젝트 폴더 구조: 동료도 다시 실행하는 방법
 slug: python-project-runbook
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: Python 실행환경
 summary: Python 프로젝트 폴더를 input과 src 및 output으로 나누고 pyproject와 uv.lock 및 README를 남겨 새 폴더에서도 같은 결과를 만드는 방법을 설명합니다.

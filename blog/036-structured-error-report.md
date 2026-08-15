@@ -1,8 +1,6 @@
 ---
 title: AI 오류보고 작성 방법: 한 번에 재현되는 6가지 정보
 slug: structured-error-report
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: AI 작업 환경
 summary: AI 오류보고 작성 방법을 환경과 실행 명령, 합성 입력, 기대와 실제, Traceback, 변경 상태 여섯 가지로 설명합니다.

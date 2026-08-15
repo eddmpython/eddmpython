@@ -1,8 +1,6 @@
 ---
 title: Python import와 라이브러리 차이: Excel 도구 고르는 법
 slug: python-import
-date: 2026-08-14
-modified: 2026-08-14
 author: eddmpython
 section: Python 프로젝트 환경
 summary: Python import와 라이브러리 차이를 Excel 자동화 예제로 설명합니다. pathlib, pandas, openpyxl이 맡는 일을 구분하고 설치 여부까지 확인합니다.

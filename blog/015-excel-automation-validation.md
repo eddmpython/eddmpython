@@ -1,8 +1,6 @@
 ---
 title: Excel 자동화 검증 방법: 재실행해도 숫자가 맞는지 확인하기
 slug: excel-automation-validation
-date: 2026-08-14
-modified: 2026-08-14
 author: eddmpython
 section: Excel 업무자동화
 summary: Excel 자동화 검증 방법을 건수와 금액 차이 및 재실행 비교로 설명합니다. 원본 파일 해시를 확인하고 6개 PASS를 결과 시트에 저장합니다.

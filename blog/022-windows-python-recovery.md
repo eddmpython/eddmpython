@@ -1,8 +1,6 @@
 ---
 title: Windows Python 설치 오류 해결: 수업을 멈추지 않는 방법
 slug: windows-python-recovery
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: Python 실행환경
 summary: Windows Python 설치가 막힐 때 명령 위치부터 확인합니다. Python 설치 관리자와 uv를 복구하고 VS Code 확장 없이도 터미널로 실습을 계속합니다.

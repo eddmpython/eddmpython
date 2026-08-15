@@ -1,8 +1,6 @@
 ---
 title: 업무자동화 기획서 작성 방법: 코딩 전에 한 장으로 끝내기
 slug: work-automation-plan
-date: 2026-08-14
-modified: 2026-08-14
 author: eddmpython
 section: 업무자동화 프로젝트
 summary: 업무자동화 기획서 쓰는 법을 지출내역 예제로 설명합니다. 입력과 처리 및 판단과 출력과 검증을 적고 합성 자료로 첫 실험을 준비합니다.

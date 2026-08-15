@@ -1,8 +1,6 @@
 ---
 title: 업무자동화란 무엇인가? Python 전에 일을 나누는 5단계
 slug: work-automation
-date: 2026-08-14
-modified: 2026-08-14
 author: eddmpython
 section: Python 학습과 자동화
 summary: 업무자동화란 무엇인가를 부서별 Excel 취합 예제로 설명합니다. 입력, 처리, 판단, 출력, 검증 다섯 칸에 내 업무를 직접 적어 봅니다.

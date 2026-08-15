@@ -1,8 +1,6 @@
 ---
 title: Excel과 DataFrame 차이: 시트와 행 및 열은 어떻게 보일까
 slug: excel-dataframe-map
-date: 2026-08-15
-modified: 2026-08-15
 author: eddmpython
 section: Excel 업무자동화
 summary: Excel DataFrame 차이를 시트와 5행 4열 표로 설명합니다. shape와 columns 및 dtypes를 확인하고 loc로 거래 ID와 열 이름을 선택합니다.

@@ -1,8 +1,6 @@
 ---
 title: Python 오류 메시지 읽는 법: 3가지 오류 해결 순서
 slug: python-errors
-date: 2026-08-14
-modified: 2026-08-14
 author: eddmpython
 section: Python 기초와 실행
 summary: Python 오류 메시지 읽는 법을 NameError, TypeError, FileNotFoundError로 연습합니다. 마지막 줄에서 오류 이름을 찾고 파일과 줄 번호를 따라갑니다.
