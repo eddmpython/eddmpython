@@ -522,35 +522,65 @@
       "post": "012-vscode-python-project",
       "sha256": "fdc46eac15dde00678bbe97bbc1632bb1ea52bfa990675fc5cd04186ce4b7c7f"
     },
-    "013-uv-python-environment/create-project-files": {
-      "assetKey": "create-project-files",
-      "path": "objects/sha256/1c/1c47da7431bac5ef453cce4a198fdbece6262c83e4d519253f55375224e16857.png",
+    "013-uv-python-environment/clean-machine-proof": {
+      "assetKey": "clean-machine-proof",
+      "path": "objects/sha256/2f/2f4b25f3e8a90607c5b32886714681a62803c9e6174fbaede024cd6cc71a0471.png",
       "post": "013-uv-python-environment",
-      "sha256": "1c47da7431bac5ef453cce4a198fdbece6262c83e4d519253f55375224e16857"
+      "sha256": "2f4b25f3e8a90607c5b32886714681a62803c9e6174fbaede024cd6cc71a0471"
     },
-    "013-uv-python-environment/environment-difference": {
-      "assetKey": "environment-difference",
-      "path": "objects/sha256/8b/8b83833610b052016284fc464f90cd9fdb61fd626fd9250aca33c3934ac34672.png",
+    "013-uv-python-environment/code-environment-gap": {
+      "assetKey": "code-environment-gap",
+      "path": "objects/sha256/ee/ee2838cfef2ca70fb1c161bd28a8ba63e80e4b4f217c4fe38b7e8a05ee9079eb.png",
       "post": "013-uv-python-environment",
-      "sha256": "8b83833610b052016284fc464f90cd9fdb61fd626fd9250aca33c3934ac34672"
+      "sha256": "ee2838cfef2ca70fb1c161bd28a8ba63e80e4b4f217c4fe38b7e8a05ee9079eb"
     },
-    "013-uv-python-environment/install-verify": {
-      "assetKey": "install-verify",
-      "path": "objects/sha256/b7/b79d5025a079ac3cb8f33c8a583aa308ee89a50a2258b89a66f2a290ab27d335.png",
+    "013-uv-python-environment/controlled-package-change": {
+      "assetKey": "controlled-package-change",
+      "path": "objects/sha256/91/917208e2fbd8e420072e1cf6634281e4718723857dd6e939ba6904f74a069345.png",
       "post": "013-uv-python-environment",
-      "sha256": "b79d5025a079ac3cb8f33c8a583aa308ee89a50a2258b89a66f2a290ab27d335"
+      "sha256": "917208e2fbd8e420072e1cf6634281e4718723857dd6e939ba6904f74a069345"
     },
-    "013-uv-python-environment/run-project": {
-      "assetKey": "run-project",
-      "path": "objects/sha256/96/96b7e5d091658f7b1c5c4b81e134e5d9dd13a81c4bf5c02bd5ff0b35e4026631.png",
+    "013-uv-python-environment/expense-report-project": {
+      "assetKey": "expense-report-project",
+      "path": "objects/sha256/21/21725592f14ef798e8753a716b742c067f7beb2fcd93c57d2ec082c7ca567a01.png",
       "post": "013-uv-python-environment",
-      "sha256": "96b7e5d091658f7b1c5c4b81e134e5d9dd13a81c4bf5c02bd5ff0b35e4026631"
+      "sha256": "21725592f14ef798e8753a716b742c067f7beb2fcd93c57d2ec082c7ca567a01"
     },
-    "013-uv-python-environment/sync-project": {
-      "assetKey": "sync-project",
-      "path": "objects/sha256/19/19776f47c3f2c9094162a8eae9ca5a1a33a6194388d11be94e426034c9d2f3ce.png",
+    "013-uv-python-environment/four-project-files": {
+      "assetKey": "four-project-files",
+      "path": "objects/sha256/39/394387c08e52fd27fcc7dca3cad2b2acc77a59d42d4c42e2a0d1391345a327e7.png",
       "post": "013-uv-python-environment",
-      "sha256": "19776f47c3f2c9094162a8eae9ca5a1a33a6194388d11be94e426034c9d2f3ce"
+      "sha256": "394387c08e52fd27fcc7dca3cad2b2acc77a59d42d4c42e2a0d1391345a327e7"
+    },
+    "013-uv-python-environment/install-verify-uv": {
+      "assetKey": "install-verify-uv",
+      "path": "objects/sha256/39/3959b8ef6601e72d3eed80819592ae49617897a9e2c2b85f69e6de37fd085f0e.png",
+      "post": "013-uv-python-environment",
+      "sha256": "3959b8ef6601e72d3eed80819592ae49617897a9e2c2b85f69e6de37fd085f0e"
+    },
+    "013-uv-python-environment/lock-and-sync": {
+      "assetKey": "lock-and-sync",
+      "path": "objects/sha256/36/36c687f492aac8d1f2909f53cf19d4b701c7326c965e8b51ffa96a7a178386cc.png",
+      "post": "013-uv-python-environment",
+      "sha256": "36c687f492aac8d1f2909f53cf19d4b701c7326c965e8b51ffa96a7a178386cc"
+    },
+    "013-uv-python-environment/reproducibility-boundary": {
+      "assetKey": "reproducibility-boundary",
+      "path": "objects/sha256/66/663ad7a764baab250bc9dd3c7ba400c1575d2a6064d1492edf72ddf57627fe8f.png",
+      "post": "013-uv-python-environment",
+      "sha256": "663ad7a764baab250bc9dd3c7ba400c1575d2a6064d1492edf72ddf57627fe8f"
+    },
+    "013-uv-python-environment/run-and-verify-report": {
+      "assetKey": "run-and-verify-report",
+      "path": "objects/sha256/e6/e660fe9cc830f4d8af38fbe264aaf304317c394cb9d270fc84aaa22ad7499d0f.png",
+      "post": "013-uv-python-environment",
+      "sha256": "e660fe9cc830f4d8af38fbe264aaf304317c394cb9d270fc84aaa22ad7499d0f"
+    },
+    "013-uv-python-environment/three-failures-recovery": {
+      "assetKey": "three-failures-recovery",
+      "path": "objects/sha256/3c/3cf96f7ac03b07501104c128a070b895117bc20f065fa425214c9fd0d9c9b8c8.png",
+      "post": "013-uv-python-environment",
+      "sha256": "3cf96f7ac03b07501104c128a070b895117bc20f065fa425214c9fd0d9c9b8c8"
     },
     "014-python-excel-merge/department-summary": {
       "assetKey": "department-summary",
@@ -1457,6 +1487,13 @@
       "path": "objects/sha256/20/20b25773c80c400ec6dcffcfcecad37e1cec77ba9bef7d78c7797a4aff504908.png",
       "width": 1536
     },
+    "21725592f14ef798e8753a716b742c067f7beb2fcd93c57d2ec082c7ca567a01": {
+      "bytes": 1226668,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/21/21725592f14ef798e8753a716b742c067f7beb2fcd93c57d2ec082c7ca567a01.png",
+      "width": 1536
+    },
     "224f77ce7c9528b75c42653dfc4bcaf96ff50057765096fdb5db81ce568767a0": {
       "bytes": 2319716,
       "height": 1024,
@@ -1513,6 +1550,13 @@
       "path": "objects/sha256/2c/2cb1c25ad43fdda1d708ecf9a71f1877e3e0b7845cd5f8c509b996b1c979aed5.png",
       "width": 1536
     },
+    "2f4b25f3e8a90607c5b32886714681a62803c9e6174fbaede024cd6cc71a0471": {
+      "bytes": 1752968,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/2f/2f4b25f3e8a90607c5b32886714681a62803c9e6174fbaede024cd6cc71a0471.png",
+      "width": 1536
+    },
     "2f55c0f761b8e573e94f0a197cbbe8afad5ff4bf918a29825470d704b0a7608a": {
       "bytes": 2254578,
       "height": 1024,
@@ -1532,6 +1576,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/34/34c96f6b38214b253f61acaa2ef46cb2ee75249bf16873ffc13975249b85ebcd.png",
+      "width": 1536
+    },
+    "36c687f492aac8d1f2909f53cf19d4b701c7326c965e8b51ffa96a7a178386cc": {
+      "bytes": 1393482,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/36/36c687f492aac8d1f2909f53cf19d4b701c7326c965e8b51ffa96a7a178386cc.png",
       "width": 1536
     },
     "374bf3ad94df5b23d502470f64c985a9d64d359cafa729dc5abdbdf481eef46f": {
@@ -1555,6 +1606,20 @@
       "path": "objects/sha256/38/38d3f156aba3dc626ae473db7c57bc5c1d6f0564a13c7bcec42c491db7e0f529.png",
       "width": 1536
     },
+    "394387c08e52fd27fcc7dca3cad2b2acc77a59d42d4c42e2a0d1391345a327e7": {
+      "bytes": 1493196,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/39/394387c08e52fd27fcc7dca3cad2b2acc77a59d42d4c42e2a0d1391345a327e7.png",
+      "width": 1536
+    },
+    "3959b8ef6601e72d3eed80819592ae49617897a9e2c2b85f69e6de37fd085f0e": {
+      "bytes": 1151384,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/39/3959b8ef6601e72d3eed80819592ae49617897a9e2c2b85f69e6de37fd085f0e.png",
+      "width": 1536
+    },
     "395a2dbb2dc845b92619ed0791b5e6c50aaf31b6485c37f093d36c06fb313ea4": {
       "bytes": 1151944,
       "height": 1024,
@@ -1574,6 +1639,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/3a/3a32ae457b3851760457c6ce147e7297127ad3e7d403f3d45c3967fc1b8e9a44.png",
+      "width": 1536
+    },
+    "3cf96f7ac03b07501104c128a070b895117bc20f065fa425214c9fd0d9c9b8c8": {
+      "bytes": 1391526,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/3c/3cf96f7ac03b07501104c128a070b895117bc20f065fa425214c9fd0d9c9b8c8.png",
       "width": 1536
     },
     "3f4755e308663b77581f555e316ac04bd61dfb71ef0743bdf8686113b93712be": {
@@ -1784,6 +1856,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/66/6609338a7947e15c6bccbfc6f99d211ad4a1cce25f42afffd1ec52ca120c2eaa.png",
+      "width": 1536
+    },
+    "663ad7a764baab250bc9dd3c7ba400c1575d2a6064d1492edf72ddf57627fe8f": {
+      "bytes": 2371406,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/66/663ad7a764baab250bc9dd3c7ba400c1575d2a6064d1492edf72ddf57627fe8f.png",
       "width": 1536
     },
     "66dcdfb2a1462891e70b50e27b669fd8a5bda511db957d57558b2917fba6c0d3": {
@@ -2120,6 +2199,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/90/90c9bb9977f83bdae5d68d0a7f2748b135efe1d202cf5154a2de2da9e1b62b34.png",
+      "width": 1536
+    },
+    "917208e2fbd8e420072e1cf6634281e4718723857dd6e939ba6904f74a069345": {
+      "bytes": 1468113,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/91/917208e2fbd8e420072e1cf6634281e4718723857dd6e939ba6904f74a069345.png",
       "width": 1536
     },
     "9472eda159666363665e858a5f347e5363ece27c3cf01a747291518268f9c9c3": {
@@ -2542,6 +2628,13 @@
       "path": "objects/sha256/e4/e42c7b6d9c253f8cd09ed01338d36d09364b77320d48666286daecf6be20ecc3.png",
       "width": 1536
     },
+    "e660fe9cc830f4d8af38fbe264aaf304317c394cb9d270fc84aaa22ad7499d0f": {
+      "bytes": 1244287,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/e6/e660fe9cc830f4d8af38fbe264aaf304317c394cb9d270fc84aaa22ad7499d0f.png",
+      "width": 1536
+    },
     "e6e1ed9f0b182af40d4c6b78e2b8231a40cfc61f70987caecf885d65d6370a35": {
       "bytes": 1298866,
       "height": 1024,
@@ -2589,6 +2682,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/ed/edf68eba6adf2e16fda996a4b3c99f1e638f7e44e2638dec6b0f516153aeffba.png",
+      "width": 1536
+    },
+    "ee2838cfef2ca70fb1c161bd28a8ba63e80e4b4f217c4fe38b7e8a05ee9079eb": {
+      "bytes": 1520092,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/ee/ee2838cfef2ca70fb1c161bd28a8ba63e80e4b4f217c4fe38b7e8a05ee9079eb.png",
       "width": 1536
     },
     "f05d6e40a7b4e6e7a81d9760c7f4f728da507b616abc9a1abc0c1e21dac80f7a": {
