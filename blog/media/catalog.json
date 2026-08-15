@@ -428,33 +428,51 @@
     },
     "011-python-import-libraries/import-forms": {
       "assetKey": "import-forms",
-      "path": "objects/sha256/d2/d2af522c70117a776f8c3f58996d8dcdf40aa09af23b1e5b6178cce1e9ccd739.png",
+      "path": "objects/sha256/27/27b8eeae51a39fec8cd1e5984979a1bad88fa3cd2e4fa035fd37167dec527ae1.png",
       "post": "011-python-import-libraries",
-      "sha256": "d2af522c70117a776f8c3f58996d8dcdf40aa09af23b1e5b6178cce1e9ccd739"
+      "sha256": "27b8eeae51a39fec8cd1e5984979a1bad88fa3cd2e4fa035fd37167dec527ae1"
+    },
+    "011-python-import-libraries/import-search-path": {
+      "assetKey": "import-search-path",
+      "path": "objects/sha256/64/64fbfacfed7c396201f972c62f393a6d95cdc6ad5c5d9d7974653297a0ca42b7.png",
+      "post": "011-python-import-libraries",
+      "sha256": "64fbfacfed7c396201f972c62f393a6d95cdc6ad5c5d9d7974653297a0ca42b7"
     },
     "011-python-import-libraries/install-before-import": {
       "assetKey": "install-before-import",
-      "path": "objects/sha256/d6/d6c4e1814b17b45a77cd0ce1988316e052cb5c5ad66c68f0c88c027da9c948c4.png",
+      "path": "objects/sha256/ac/acb8fb4a30a161b898dfe6493f8f002aaeaa829b95f99108947acb01e58af946.png",
       "post": "011-python-import-libraries",
-      "sha256": "d6c4e1814b17b45a77cd0ce1988316e052cb5c5ad66c68f0c88c027da9c948c4"
+      "sha256": "acb8fb4a30a161b898dfe6493f8f002aaeaa829b95f99108947acb01e58af946"
     },
     "011-python-import-libraries/library-module-import": {
       "assetKey": "library-module-import",
-      "path": "objects/sha256/19/1980a71ffa02bb3e090a09aef86b0158ebf94560ef82b3892de6ff15a91a11e8.png",
+      "path": "objects/sha256/71/71bbdb306cf9566504675ea31944a23d957427a36dcb75ef4e6cb4b494a79868.png",
       "post": "011-python-import-libraries",
-      "sha256": "1980a71ffa02bb3e090a09aef86b0158ebf94560ef82b3892de6ff15a91a11e8"
+      "sha256": "71bbdb306cf9566504675ea31944a23d957427a36dcb75ef4e6cb4b494a79868"
+    },
+    "011-python-import-libraries/local-module-project": {
+      "assetKey": "local-module-project",
+      "path": "objects/sha256/69/694b3d85f92ba37a57c3c6c1df00fc1fb9873b419d6de14c6c638f102256c494.png",
+      "post": "011-python-import-libraries",
+      "sha256": "694b3d85f92ba37a57c3c6c1df00fc1fb9873b419d6de14c6c638f102256c494"
+    },
+    "011-python-import-libraries/main-guard": {
+      "assetKey": "main-guard",
+      "path": "objects/sha256/37/374bf3ad94df5b23d502470f64c985a9d64d359cafa729dc5abdbdf481eef46f.png",
+      "post": "011-python-import-libraries",
+      "sha256": "374bf3ad94df5b23d502470f64c985a9d64d359cafa729dc5abdbdf481eef46f"
     },
     "011-python-import-libraries/role-check-script": {
       "assetKey": "role-check-script",
-      "path": "objects/sha256/22/2217790024fd692136f55d2be3eedcf166f9ffad8c64b2587524a051ca61d314.png",
+      "path": "objects/sha256/d2/d23ee36fee82ef17e6c8f32e3fbda5b65e1f11c56e3b29770be4e8e02df8f819.png",
       "post": "011-python-import-libraries",
-      "sha256": "2217790024fd692136f55d2be3eedcf166f9ffad8c64b2587524a051ca61d314"
+      "sha256": "d23ee36fee82ef17e6c8f32e3fbda5b65e1f11c56e3b29770be4e8e02df8f819"
     },
     "011-python-import-libraries/three-library-roles": {
       "assetKey": "three-library-roles",
-      "path": "objects/sha256/4e/4ebb8a1b53ec56e2867fd8485823344cb10952d36fe97626f69f77d1a96b09fe.png",
+      "path": "objects/sha256/17/173328edd0643b6f3dfb11f34660f4626c290ab711ebdf087c2dbbfbfa24347d.png",
       "post": "011-python-import-libraries",
-      "sha256": "4ebb8a1b53ec56e2867fd8485823344cb10952d36fe97626f69f77d1a96b09fe"
+      "sha256": "173328edd0643b6f3dfb11f34660f4626c290ab711ebdf087c2dbbfbfa24347d"
     },
     "012-vscode-python-project/open-project-folder": {
       "assetKey": "open-project-folder",
@@ -1337,6 +1355,13 @@
       "path": "objects/sha256/16/16066535c61a7e50cf7fd8729f0f7c24c1d6d46285a1765d0998085dc5eb024b.png",
       "width": 1536
     },
+    "173328edd0643b6f3dfb11f34660f4626c290ab711ebdf087c2dbbfbfa24347d": {
+      "bytes": 1146803,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/17/173328edd0643b6f3dfb11f34660f4626c290ab711ebdf087c2dbbfbfa24347d.png",
+      "width": 1536
+    },
     "17aa65a8e98e2dd69a9eb054c860d14cc743fdee2aefa549e5e67353b8ca1532": {
       "bytes": 1932681,
       "height": 1024,
@@ -1363,13 +1388,6 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/19/19776f47c3f2c9094162a8eae9ca5a1a33a6194388d11be94e426034c9d2f3ce.png",
-      "width": 1536
-    },
-    "1980a71ffa02bb3e090a09aef86b0158ebf94560ef82b3892de6ff15a91a11e8": {
-      "bytes": 2132429,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/19/1980a71ffa02bb3e090a09aef86b0158ebf94560ef82b3892de6ff15a91a11e8.png",
       "width": 1536
     },
     "19c1506dd227553f6d2b400569a4d2eee5c41e3635722b87af5c053be76fbaa0": {
@@ -1414,13 +1432,6 @@
       "path": "objects/sha256/20/20b25773c80c400ec6dcffcfcecad37e1cec77ba9bef7d78c7797a4aff504908.png",
       "width": 1536
     },
-    "2217790024fd692136f55d2be3eedcf166f9ffad8c64b2587524a051ca61d314": {
-      "bytes": 1824566,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/22/2217790024fd692136f55d2be3eedcf166f9ffad8c64b2587524a051ca61d314.png",
-      "width": 1536
-    },
     "224f77ce7c9528b75c42653dfc4bcaf96ff50057765096fdb5db81ce568767a0": {
       "bytes": 2319716,
       "height": 1024,
@@ -1447,6 +1458,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/26/26f79e3e25d66e7b58b8eac4d1c1d592fa524726ecf3dee450ffda2069cc92d1.png",
+      "width": 1536
+    },
+    "27b8eeae51a39fec8cd1e5984979a1bad88fa3cd2e4fa035fd37167dec527ae1": {
+      "bytes": 1174066,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/27/27b8eeae51a39fec8cd1e5984979a1bad88fa3cd2e4fa035fd37167dec527ae1.png",
       "width": 1536
     },
     "2ca4bcdf771992707295f6ae45f40619c08b1d37ec414f86f026db808d1580df": {
@@ -1482,6 +1500,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/34/34c96f6b38214b253f61acaa2ef46cb2ee75249bf16873ffc13975249b85ebcd.png",
+      "width": 1536
+    },
+    "374bf3ad94df5b23d502470f64c985a9d64d359cafa729dc5abdbdf481eef46f": {
+      "bytes": 1205802,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/37/374bf3ad94df5b23d502470f64c985a9d64d359cafa729dc5abdbdf481eef46f.png",
       "width": 1536
     },
     "38c135b7076e211c171f871e2da74620bb7031e96915160d9d47e487e8c08eba": {
@@ -1617,13 +1642,6 @@
       "path": "objects/sha256/4e/4e456aa812a19f4368e6b124aedf7d06d8ddcf164186ab2b8f51c4c69b9fce8a.png",
       "width": 1536
     },
-    "4ebb8a1b53ec56e2867fd8485823344cb10952d36fe97626f69f77d1a96b09fe": {
-      "bytes": 1300282,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/4e/4ebb8a1b53ec56e2867fd8485823344cb10952d36fe97626f69f77d1a96b09fe.png",
-      "width": 1536
-    },
     "503272478e0ca292ad1939ccb6d9f7fd01a50f94a794bd9a7fb03c2af95f2e34": {
       "bytes": 1198819,
       "height": 1024,
@@ -1729,6 +1747,13 @@
       "path": "objects/sha256/62/62488340e5e810505fece29f7132248140d532aba3d498f37c6c212a1afd5a57.png",
       "width": 1536
     },
+    "64fbfacfed7c396201f972c62f393a6d95cdc6ad5c5d9d7974653297a0ca42b7": {
+      "bytes": 1184916,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/64/64fbfacfed7c396201f972c62f393a6d95cdc6ad5c5d9d7974653297a0ca42b7.png",
+      "width": 1536
+    },
     "6609338a7947e15c6bccbfc6f99d211ad4a1cce25f42afffd1ec52ca120c2eaa": {
       "bytes": 936586,
       "height": 1024,
@@ -1762,6 +1787,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/68/682cd98f605ecf8a64d979cc1184868b2405d0681f74be23ec4d755867529993.png",
+      "width": 1536
+    },
+    "694b3d85f92ba37a57c3c6c1df00fc1fb9873b419d6de14c6c638f102256c494": {
+      "bytes": 1238728,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/69/694b3d85f92ba37a57c3c6c1df00fc1fb9873b419d6de14c6c638f102256c494.png",
       "width": 1536
     },
     "6a2d36f4bfc21d6e06d629c893769de653aa9d621a430642915577c5e246f8da": {
@@ -1839,6 +1871,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/71/719a0afa01c526f8ac6e1c6a4744b3e803d65f1be55ff3fb050ba25b5ef1f131.png",
+      "width": 1536
+    },
+    "71bbdb306cf9566504675ea31944a23d957427a36dcb75ef4e6cb4b494a79868": {
+      "bytes": 1446103,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/71/71bbdb306cf9566504675ea31944a23d957427a36dcb75ef4e6cb4b494a79868.png",
       "width": 1536
     },
     "72e15672d7ff0a64c2616addd82a9005b31509d45640fa32e0b66d1b3d3cc2d4": {
@@ -2219,6 +2258,13 @@
       "path": "objects/sha256/ab/ab7201895eb1b7e57d5b31b8337e6955c647aa7e806abf591934e83b851af316.png",
       "width": 1536
     },
+    "acb8fb4a30a161b898dfe6493f8f002aaeaa829b95f99108947acb01e58af946": {
+      "bytes": 1266934,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/ac/acb8fb4a30a161b898dfe6493f8f002aaeaa829b95f99108947acb01e58af946.png",
+      "width": 1536
+    },
     "ae106aa16983b88a6e84d688759b9580f32a9a1978a9689857fc228314ce7470": {
       "bytes": 1190244,
       "height": 1024,
@@ -2373,11 +2419,11 @@
       "path": "objects/sha256/d0/d07c6bf96eec2dded6234b29ba6518206da50b8cd8c919414c4a67fcaa0eacd8.png",
       "width": 1536
     },
-    "d2af522c70117a776f8c3f58996d8dcdf40aa09af23b1e5b6178cce1e9ccd739": {
-      "bytes": 1295401,
+    "d23ee36fee82ef17e6c8f32e3fbda5b65e1f11c56e3b29770be4e8e02df8f819": {
+      "bytes": 1172908,
       "height": 1024,
       "mime": "image/png",
-      "path": "objects/sha256/d2/d2af522c70117a776f8c3f58996d8dcdf40aa09af23b1e5b6178cce1e9ccd739.png",
+      "path": "objects/sha256/d2/d23ee36fee82ef17e6c8f32e3fbda5b65e1f11c56e3b29770be4e8e02df8f819.png",
       "width": 1536
     },
     "d3650c4032267960a546c7905f06cf61a55a8281ff6bd914b6f778755c1459d2": {
@@ -2392,13 +2438,6 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/d4/d4528ca7fce1dcac4d81700d01184bbcaa23acd265edd4a903277fc123c840e9.png",
-      "width": 1536
-    },
-    "d6c4e1814b17b45a77cd0ce1988316e052cb5c5ad66c68f0c88c027da9c948c4": {
-      "bytes": 1269770,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/d6/d6c4e1814b17b45a77cd0ce1988316e052cb5c5ad66c68f0c88c027da9c948c4.png",
       "width": 1536
     },
     "daf268afa775457340a6acbafa198f44036e46ceac5fbe20bc7e00273bb21ed7": {
