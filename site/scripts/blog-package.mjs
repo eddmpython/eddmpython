@@ -17,6 +17,11 @@ const DEPTH_CONTRACTS = new Map([
   ["standalone-deep-v1", { h2: 6, prose: 3000 }],
   ["standalone-project-v1", { h2: 7, prose: 4000 }],
 ]);
+const LEGACY_SUPPORT_LABEL = /^(?:코드|예시|확인 목록|설명 목록|참고 자료)$/u;
+const DEEP_SUPPORT_LABEL =
+  /^(?:예시 코드|실행 명령|예상 결과|입력 예시|출력 예시|실패 예시|복구 코드|개념 확인|확인 목록|설명 목록|참고 자료):[ \t]+\S.+$/u;
+const DEEP_CODE_LABEL =
+  /^(?:예시 코드|실행 명령|예상 결과|입력 예시|출력 예시|실패 예시|복구 코드|개념 확인):/u;
 
 function issue(location, message, excerpt = "") {
   return { location, message, excerpt };
@@ -121,7 +126,7 @@ export function lintSeoPackage(meta, body, sections) {
   return issues;
 }
 
-export function lintSectionPackages(sections) {
+export function lintSectionPackages(sections, { requireCodeLabels = false } = {}) {
   const issues = [];
   for (const section of sections) {
     const parsed = parseSectionPackage(section);
@@ -143,14 +148,53 @@ export function lintSectionPackages(sections) {
     } else if (parsed.firstBlock.length < 60) {
       issues.push(issue(`H2 ${section.heading}`, "첫 설명 문단은 독자가 장면을 이해할 수 있게 60자 이상 씁니다", parsed.firstBlock));
     }
-    for (const match of parsed.remainder.matchAll(/^####[ \t]+(.+?)\s*$([\s\S]*?)(?=^####[ \t]+|(?![\s\S]))/gm)) {
+    const supports = [...parsed.remainder.matchAll(/^####[ \t]+(.+?)\s*$([\s\S]*?)(?=^####[ \t]+|(?![\s\S]))/gm)];
+    for (const match of supports) {
       const label = match[1].trim();
       const support = match[2].trimStart();
-      if (!/^(?:코드|예시|확인 목록|설명 목록|참고 자료)$/u.test(label)) {
-        issues.push(issue(`H2 ${section.heading}`, "보조자료 H4는 코드, 예시, 확인 목록, 설명 목록, 참고 자료만 씁니다", label));
+      const allowedLabel = requireCodeLabels ? DEEP_SUPPORT_LABEL : LEGACY_SUPPORT_LABEL;
+      if (!allowedLabel.test(label)) {
+        issues.push(
+          issue(
+            `H2 ${section.heading}`,
+            requireCodeLabels
+              ? "깊이 계약 글의 H4는 자료 역할과 설명할 개념을 함께 씁니다"
+              : "보조자료 H4는 코드, 예시, 확인 목록, 설명 목록, 참고 자료만 씁니다",
+            label,
+          ),
+        );
       }
-      if (!/^(?:```|[-*+]\s|\d+[.)]\s|\|[^\n]+\|)/u.test(support)) {
+      const codeBlocks = [...support.matchAll(/```[\s\S]*?```/g)];
+      if (requireCodeLabels && codeBlocks.length && !DEEP_CODE_LABEL.test(label)) {
+        issues.push(issue(`H2 ${section.heading}`, "코드 블록 H4에는 예시 코드, 실행 명령, 예상 결과처럼 역할을 씁니다", label));
+      }
+      if (requireCodeLabels && codeBlocks.length) {
+        const explanationLength = support
+          .replace(/```[\s\S]*?```/g, " ")
+          .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
+          .replace(/\s+/g, "")
+          .length;
+        if (explanationLength < 80) {
+          issues.push(
+            issue(
+              `H2 ${section.heading}`,
+              "코드 앞뒤에 입력, 핵심 줄, 예상 결과를 합쳐 80자 이상 설명합니다",
+              label,
+            ),
+          );
+        }
+      } else if (!/^(?:```|[-*+]\s|\d+[.)]\s|\|[^\n]+\|)/u.test(support)) {
         issues.push(issue(`H2 ${section.heading}`, "보조자료는 코드, 실제 예시, 설명용 목록이나 표로 구성합니다", label));
+      }
+    }
+    if (requireCodeLabels) {
+      for (const fence of parsed.remainder.matchAll(/^```/gm)) {
+        const prefix = parsed.remainder.slice(0, fence.index);
+        const headings = [...prefix.matchAll(/^####[ \t]+(.+?)\s*$/gm)];
+        const label = headings.at(-1)?.[1]?.trim() ?? "";
+        if (!DEEP_CODE_LABEL.test(label)) {
+          issues.push(issue(`H2 ${section.heading}`, "모든 코드 블록 바로 앞 범위에 역할과 개념이 보이는 H4를 둡니다", label));
+        }
       }
     }
   }

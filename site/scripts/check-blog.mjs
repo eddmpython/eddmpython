@@ -394,7 +394,7 @@ for (const file of posts) {
 
   const packageIssues = [
     ...lintSeoPackage(Object.fromEntries(meta), body, sections),
-    ...lintSectionPackages(sections),
+    ...lintSectionPackages(sections, { requireCodeLabels: meta.has("depthContract") }),
   ];
   if (packageIssues.length) {
     fail(

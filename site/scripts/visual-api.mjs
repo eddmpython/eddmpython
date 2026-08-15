@@ -181,7 +181,7 @@ async function preparePage(client, sessionRef) {
       if (document.fonts) await document.fonts.ready;
       const style = document.createElement("style");
       style.dataset.visualVerification = "true";
-      style.textContent = "*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important;scroll-behavior:auto!important}";
+      style.textContent = "*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important;scroll-behavior:auto!important}.fade-up,.reveal{opacity:1!important;transform:none!important}";
       document.head.appendChild(style);
       return true;
     })()`,

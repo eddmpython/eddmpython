@@ -126,7 +126,22 @@ assert.ok(
 const codeSupport = h2Sections(`${body}\n\n#### 코드\n\n\`\`\`text\nnpm test\n\`\`\``);
 assert.deepEqual(lintSectionPackages(codeSupport), []);
 
+const explainedCodeSupport = h2Sections(`${body}\n\n#### 예시 코드: 저장소 검사 명령 실행하기\n\n이 명령은 현재 저장소의 자동 검사를 시작합니다. 입력은 작업 폴더의 파일이고, 출력은 터미널에 표시되는 통과 또는 실패 결과입니다. 실패하면 첫 오류가 난 파일과 줄을 먼저 확인합니다. 명령을 바꾸지 않고 다시 실행했을 때 같은 결과가 나오는지도 살펴봅니다.\n\n\`\`\`text\nnpm test\n\`\`\``);
+assert.deepEqual(lintSectionPackages(explainedCodeSupport, { requireCodeLabels: true }), []);
+assert.ok(
+  lintSectionPackages(codeSupport, { requireCodeLabels: true }).some((value) =>
+    value.message.includes("자료 역할과 설명할 개념"),
+  ),
+);
+
+const unexplainedCodeSupport = h2Sections(`${body}\n\n#### 예시 코드: 저장소 검사 명령 실행하기\n\n\`\`\`text\nnpm test\n\`\`\``);
+assert.ok(
+  lintSectionPackages(unexplainedCodeSupport, { requireCodeLabels: true }).some((value) =>
+    value.message.includes("80자 이상 설명"),
+  ),
+);
+
 const linkPile = h2Sections(`${body}\n\n#### 관련 링크\n\nhttps://example.com`);
 assert.ok(lintSectionPackages(linkPile).some((value) => value.message.includes("보조자료 H4")));
 
-console.log("blog package fixtures: 14 cases");
+console.log("blog package fixtures: 17 cases");

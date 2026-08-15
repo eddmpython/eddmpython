@@ -37,9 +37,7 @@ const ROUTE_RULES = [
       TEXT("main#content h1", "실제로 작동하는 자동화로"),
       TEXT("main#content", "다루는 것"),
       COUNT('img[src^="/brand/"]', { min: 4 }),
-      VISIBLE(
-        'a[data-hero-product-link][href="https://eddmpython.github.io/dartlab/terminal"]',
-      ),
+      VISIBLE("a[data-hero-product-link]"),
       VISIBLE("#products"),
       TEXT("#data", "400 GB+"),
       TEXT("#data", "7,870"),
@@ -64,6 +62,13 @@ const ROUTE_RULES = [
       },
     ],
     interactions: [
+      {
+        id: "select-dartlab-terminal",
+        type: "click-until-text",
+        click: 'button[aria-label="DartLab 터미널 보기"]',
+        target: 'a[data-hero-product-link][href="https://eddmpython.github.io/dartlab/terminal"]',
+        includes: "DartLab 열기",
+      },
       {
         id: "select-xlpod",
         type: "click-until-text",
