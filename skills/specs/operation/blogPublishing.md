@@ -31,8 +31,8 @@ blog/NNN-kebab.md
 폴더를 읽는다 (`site/src/posts.ts` 의
 `import.meta.glob`). 런타임 fetch 도 CMS 도 없다.
 
-파일 순번은 발행 뒤 바꾸지 않는다. 발행일과 수정일은 저장하지 않는다. `/blog` 목록과 강의 학습
-순서는 `blog/curriculum.json`의 `order`로만 관리한다.
+파일 순번은 발행 뒤 바꾸지 않는다. 발행일과 수정일은 저장하지 않는다. `/blog`의 공개 읽기 순서는
+`blog/order.json`의 `order`로만 관리한다. 이 파일에는 강의 시간표와 차시 메타데이터를 넣지 않는다.
 
 파일 하나를 넣으면 빌드가 함께 만든다.
 
@@ -61,6 +61,7 @@ blog/NNN-kebab.md
 | `readerStartingPoint` | 독자가 이미 아는 것과 아직 모르는 것을 적은 문장 |
 | `primaryKeyword` | 제목, summary, 도입에서 함께 답할 두 단어 이상의 검색어 |
 | `searchIntent` | `explanation`, `how-to`, `troubleshooting`, `comparison` 중 하나 |
+| `depthContract` | 일반 글은 `standalone-deep-v1`, 프로젝트와 문제 해결 글은 `standalone-project-v1` |
 | `ogImage` | 공유 이미지 URL. Hugging Face 콘텐츠 주소 객체 |
 | `ogImageAlt` | 이미지 설명 |
 | `ogImageWidth` / `ogImageHeight` / `ogImageType` | 이미지 규격 |
@@ -68,6 +69,23 @@ blog/NNN-kebab.md
 `readerQuestion` 과 `readerTakeaway` 가 없으면 글이 기능 나열로 흐르기 쉽다.
 `readerStartingPoint` 가 없으면 글쓴이가 아는 말을 독자도 안다고 착각하기 쉽다. 별도 지시가
 없으면 `readerLevel`은 `beginner`로 쓴다. 자세한 작성 방법은 `blog/PIPELINE.md`를 본다.
+
+041번 이후 새 글에는 `depthContract`가 필수다. 기존 글을 전면 교정할 때도 알맞은 계약을 추가한다.
+
+## 블로그가 원문이고 강의가 참조한다
+
+블로그는 강의 차시를 길게 풀어 쓴 자료가 아니다. 검색이나 공유 링크로 한 편만 연 독자가 정의,
+원리, 실제 예제, 실패와 검증을 모두 이해할 수 있는 독립 원문이다. 강의 시간, 차시 범위, 슬라이드
+장수는 글의 목차와 분량을 줄이는 근거로 쓰지 않는다.
+
+새 글과 전면 교정 글은 의미 있는 H2 여섯 개와 공백을 뺀 서술 본문 3,000자 이상을 기본 출발선으로
+삼는다. 프로젝트와 문제 해결 글은 H2 일곱 개와 서술 본문 4,000자 이상을 출발선으로 삼는다. 숫자는
+정의, 작동 원리, 완성 예제, 다른 선택지, 실패와 복구, 검증, 적용 범위를 너무 일찍 생략하지 않게 하는
+하한선이며 반복 문장으로 채울 목표가 아니다.
+
+강의 슬라이드는 공개 `/blog/{slug}`를 깊이 읽기 링크로 사용한다. 여러 슬라이드가 같은 글을 참조할 수
+있고, 한 슬라이드도 여러 글을 참조할 수 있다. 슬라이드는 수업에 필요한 행동과 핵심 그림을 압축하지만
+블로그 원문을 강의 시간에 맞춰 줄이거나 차시 요약으로 바꾸지 않는다.
 
 ## 초보자가 읽을 수 있는지 확인한다
 
@@ -101,10 +119,15 @@ blog/NNN-kebab.md
 
 섹션 이미지는 `blog/media/plan.json`에서 `role: section`, 실제 H2와 H3에 맞는 `sectionHeading`,
 `sectionSubtitle`, 본문 원문 `contentAnchor`, 실제 피사체 `visualSubject`, 설명할 관계
-`visualRelationship`, `visualProfile: dark-editorial-v1`을 가진다. 다른 H2의 이미지를 재사용하지
-않는다. 이미지는 차콜과
-그레이 중심의 낮은 채도로 만들고 글자, 숫자, 코드, 로고를 바이트 안에 굽지 않는다. 제목과 캡션은
-HTML로 렌더해야 모바일, 검색, 접근성 표면에서 같은 문장을 유지할 수 있다.
+`visualRelationship`을 가진다. 다른 H2의 이미지를 재사용하지 않는다.
+
+새로 만들거나 교체하는 생성 이미지는 `visualProfile: eddmpython-dark-v2`와
+`palettePolicy: eddmpython-carbon-ivory-sand-v1`을 쓴다. 배경 `#101514`, 주요 밝은 면 `#f5f3ee`,
+작은 강조 `#d8be91`, 저채도 중성색만 허용한다. 파랑, 청록, 초록, 보라, 분홍, 빨강, 금색, 네온은
+쓰지 않고 성공과 실패는 모양, 명암, 선 굵기, 위치로 구분한다. `dark-editorial-v1`은 이전 자산을 찾는
+값일 뿐 새 작업에 사용하지 않는다. 실제 제품 스크린샷은 원래 화면 색을 보존한다. 글자, 숫자, 코드,
+로고는 생성 이미지 바이트 안에 굽지 않는다. 제목과 캡션은 HTML로 렌더해야 모바일, 검색, 접근성
+표면에서 같은 문장을 유지할 수 있다.
 
 DartLab 카드뉴스의 원칙 중 이미지와 큰 문장을 분리하고, 각 이미지가 그 문장이 말하는 장면을 맡는
 부분을 가져왔다. 세로 카드 비율과 화려한 SNS 장식은 가져오지 않는다. 블로그 본문에는 3:2 가로형과
@@ -128,8 +151,9 @@ cd site && npm run verify:media
 
 ## 글 하나 발행하는 순서
 
-1. 독자의 출발점과 첫 행동을 정하고, `blog/PIPELINE.md` 1.5절 유입 패키징 게이트를 통과한 뒤
-   다음 세 자리 순번으로 `blog/NNN-slug.md`를 쓰고 모든 H2의 이미지 자리를 함께 정한다. 카피 판단은
+1. 독자의 출발점과 첫 행동을 정하고, 직접 답, 정의, 원리, 완성 예제, 다른 선택지, 실패와 복구,
+   검증, 적용 범위를 채운 깊이 설계표를 만든다. `blog/PIPELINE.md` 1.5절 유입 패키징 게이트를 통과한
+   뒤 다음 세 자리 순번으로 `blog/NNN-slug.md`를 쓰고 모든 H2의 이미지 자리를 함께 정한다. 카피 판단은
    `operation.blogCopy`, 주제 선택은 `operation.contentStrategy`, 제품 맥락은
    `blog/product-marketing.md`를 본다.
 2. 섹션별 쉬운 설명을 먼저 쓴 뒤 `blog/media/plan.json`에 H2, H3, 본문 원문, 피사체, 관계, 출처,

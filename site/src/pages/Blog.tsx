@@ -18,9 +18,9 @@ export function Blog() {
                 <span
                   data-blog-order
                   className="pt-1 font-mono text-xs text-sand/70"
-                  aria-label={`${p.learningOrder}번째 글`}
+                  aria-label={`${p.readingOrder}번째 글`}
                 >
-                  {String(p.learningOrder).padStart(2, "0")}
+                  {String(p.readingOrder).padStart(2, "0")}
                 </span>
                 <span>
                   <span className="block text-lg font-medium tracking-tight transition-colors group-hover:text-white md:text-xl">

@@ -27,6 +27,8 @@ STAGING_ROOT = REPO_ROOT.parent / "eddmpython.out" / "blog-media"
 API = "https://api.replicate.com/v1/predictions"
 MODEL = "black-forest-labs/flux-1.1-pro"
 GEN_INTERVAL_SEC = 12
+COLOR_PROFILE = "eddmpython-dark-v2"
+PALETTE_POLICY = "eddmpython-carbon-ivory-sand-v1"
 
 
 def composePrompt(asset: dict[str, object]) -> str:
@@ -42,22 +44,38 @@ def composePrompt(asset: dict[str, object]) -> str:
     missing = [key for key in required if not str(asset.get(key) or "").strip()]
     if missing:
         raise ValueError(f"섹션 기반 이미지 필드가 비었다: {', '.join(missing)}")
-    return "\n".join(
+    lines = [
+        str(asset["prompt"]).strip(),
+        "Mandatory semantic grounding. If an earlier scene instruction conflicts, this block wins.",
+        f"Article section title: {asset['sectionHeading']}",
+        f"Section subtitle: {asset['sectionSubtitle']}",
+        f"Exact article claim: {asset['contentAnchor']}",
+        f"Concrete subject that must be visibly recognizable: {asset['visualSubject']}",
+        f"Relationship the image must explain: {asset['visualRelationship']}",
+        "Do not replace the concrete subject with a generic workshop, road, gate, machine, or decorative metaphor.",
+        "The image is rejected if a reader cannot connect it to this section without guessing.",
+    ]
+    if asset.get("visualProfile") == COLOR_PROFILE:
+        if asset.get("palettePolicy") != PALETTE_POLICY:
+            raise ValueError(f"{COLOR_PROFILE}에는 {PALETTE_POLICY}가 필요하다")
+        lines.extend(
+            (
+                "Mandatory brand palette. This block overrides every earlier color instruction.",
+                "Use carbon #101514 for the background and largest surfaces.",
+                "Use ivory #f5f3ee for primary subjects and light surfaces.",
+                "Use sand #d8be91 as the only small accent color.",
+                "All remaining colors must be nearly desaturated black, graphite, or warm gray.",
+                "Do not use blue, cyan, green, purple, pink, red, gold, rainbow colors, or neon light.",
+                "Show success, failure, selection, and direction through shape, line weight, value contrast, and position instead of extra hues.",
+            )
+        )
+    lines.extend(
         (
-            str(asset["prompt"]).strip(),
-            "Mandatory semantic grounding. If an earlier scene instruction conflicts, this block wins.",
-            f"Article section title: {asset['sectionHeading']}",
-            f"Section subtitle: {asset['sectionSubtitle']}",
-            f"Exact article claim: {asset['contentAnchor']}",
-            f"Concrete subject that must be visibly recognizable: {asset['visualSubject']}",
-            f"Relationship the image must explain: {asset['visualRelationship']}",
-            "Do not replace the concrete subject with a generic workshop, road, gate, machine, or decorative metaphor.",
-            "The image is rejected if a reader cannot connect it to this section without guessing.",
             "Final rendering constraint. The article title, subtitle, claim, and subject above are context only. Never draw or copy them into the image.",
-            "Render only unlabeled geometric cards, spreadsheet grids, file shapes, arrows, color states, and check or stop icons.",
             "No typography of any kind: no words, letters, numbers, code, labels, captions, headings, UI copy, pseudo-text, or watermark.",
         )
     )
+    return "\n".join(lines)
 
 
 def loadToken() -> str:

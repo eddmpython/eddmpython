@@ -79,4 +79,4 @@ status: curated
 
 ## 롤백
 
-글 파일의 `title`, `summary`, 도입만 이전 문장으로 되돌리고 `modified`를 그에 맞게 조정한다.
+글 파일의 `title`, `summary`, 도입만 이전 문장으로 되돌린다. 블로그는 수정 날짜를 저장하지 않는다.

@@ -10,6 +10,13 @@ const SECTION_LEAD =
 const CONCRETE_VISUAL =
   /(?:화면|버튼|메뉴|코드|파일|폴더|문서|명령|터미널|브라우저|표|목록|셀|결과|오류|로그|숫자|링크|설정|검사)/u;
 const VAGUE_SUBTITLE = /^(?:핵심 내용|자세한 설명|알아둘 점|중요한 이야기|이 절의 내용)$/u;
+const IMAGEGEN_V2 = "eddmpython-dark-v2";
+const IMAGEGEN_PALETTE = "eddmpython-carbon-ivory-sand-v1";
+const BANNED_IMAGEGEN_COLORS = /\b(?:blue|cyan|green|purple|pink|red|gold|amber|rainbow|neon)\b/iu;
+const DEPTH_CONTRACTS = new Map([
+  ["standalone-deep-v1", { h2: 6, prose: 3000 }],
+  ["standalone-project-v1", { h2: 7, prose: 4000 }],
+]);
 
 function issue(location, message, excerpt = "") {
   return { location, message, excerpt };
@@ -163,6 +170,50 @@ export function lintImageBrief(entry, section, parsed) {
   }
   if (!CONCRETE_VISUAL.test(String(entry.visualSubject ?? ""))) {
     issues.push(issue(section.heading, "visualSubject에는 화면, 코드, 파일, 명령, 결과처럼 실제로 그릴 대상을 적습니다", String(entry.visualSubject ?? "")));
+  }
+  return issues;
+}
+
+export function lintImagePolicy(entry) {
+  const issues = [];
+  if (entry.sourceKind !== "imagegen" || entry.visualProfile !== IMAGEGEN_V2) return issues;
+  if (entry.palettePolicy !== IMAGEGEN_PALETTE) {
+    issues.push(issue("palettePolicy", `${IMAGEGEN_V2}는 ${IMAGEGEN_PALETTE}를 사용합니다`, String(entry.palettePolicy ?? "")));
+  }
+  const prompt = String(entry.prompt ?? "");
+  const banned = prompt.match(BANNED_IMAGEGEN_COLORS)?.[0];
+  if (banned) {
+    issues.push(issue("prompt", "v2 생성 프롬프트에 브랜드 밖 색상 지시가 있습니다", banned));
+  }
+  return issues;
+}
+
+export function lintDepthContract(meta, body, sections, { required = false } = {}) {
+  const issues = [];
+  const contract = String(meta.depthContract ?? "").trim();
+  if (!contract) {
+    if (required) issues.push(issue("depthContract", "새 글에는 독립 원문 깊이 계약이 필요합니다"));
+    return issues;
+  }
+  const target = DEPTH_CONTRACTS.get(contract);
+  if (!target) {
+    issues.push(issue("depthContract", "지원하지 않는 독립 원문 깊이 계약입니다", contract));
+    return issues;
+  }
+  if (sections.length < target.h2) {
+    issues.push(issue("H2", `${contract}에는 의미 있는 H2가 ${target.h2}개 이상 필요합니다`, sections.length));
+  }
+  const proseLength = body
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
+    .split(/\r?\n/)
+    .filter((line) => !/^\s*(?:#{1,6}\s|[-*+]\s|\d+\.\s|>|\||https?:\/\/)/u.test(line))
+    .join(" ")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/[*_`<>]/g, "")
+    .replace(/\s+/g, "").length;
+  if (proseLength < target.prose) {
+    issues.push(issue("prose", `${contract}에는 공백을 뺀 서술 본문이 ${target.prose}자 이상 필요합니다`, proseLength));
   }
   return issues;
 }

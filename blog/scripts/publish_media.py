@@ -35,6 +35,8 @@ ASSET_ID_RE = re.compile(
     r"(?P<key>[a-z0-9]+(?:-[a-z0-9]+)*)"
 )
 SHA256_RE = re.compile(r"[0-9a-f]{64}")
+IMAGEGEN_V2 = "eddmpython-dark-v2"
+IMAGEGEN_PALETTE = "eddmpython-carbon-ivory-sand-v1"
 
 
 def load_json(path: Path) -> dict[str, object]:
@@ -99,14 +101,16 @@ def plan_entry(plan: dict[str, object], asset_id: str) -> dict[str, object]:
     source_kind = str(entry["sourceKind"])
     if source_kind not in {"imagegen", "screenshot", "official", "licensed"}:
         raise ValueError(f"지원하지 않는 sourceKind: {asset_id}: {source_kind}")
-    expected_profile = {
-        "imagegen": "dark-editorial-v1",
-        "screenshot": "product-screen-v1",
-        "official": "source-original-v1",
-        "licensed": "source-original-v1",
+    expected_profiles = {
+        "imagegen": {"dark-editorial-v1", IMAGEGEN_V2},
+        "screenshot": {"product-screen-v1"},
+        "official": {"source-original-v1"},
+        "licensed": {"source-original-v1"},
     }[source_kind]
-    if entry["visualProfile"] != expected_profile:
-        raise ValueError(f"visualProfile은 {expected_profile}이어야 함: {asset_id}")
+    if entry["visualProfile"] not in expected_profiles:
+        raise ValueError(f"지원하지 않는 visualProfile: {asset_id}: {entry['visualProfile']}")
+    if entry["visualProfile"] == IMAGEGEN_V2 and entry.get("palettePolicy") != IMAGEGEN_PALETTE:
+        raise ValueError(f"{IMAGEGEN_V2}에는 {IMAGEGEN_PALETTE}가 필요함: {asset_id}")
     if source_kind == "imagegen" and not str(entry.get("prompt") or "").strip():
         raise ValueError(f"ImageGen 계획에는 prompt가 필요함: {asset_id}")
     if source_kind == "screenshot":

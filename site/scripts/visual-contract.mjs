@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 
-const curriculum = JSON.parse(
-  readFileSync(new URL("../../blog/curriculum.json", import.meta.url), "utf8"),
+const blogOrder = JSON.parse(
+  readFileSync(new URL("../../blog/order.json", import.meta.url), "utf8"),
 );
 
 export const VISUAL_VIEWPORTS = [
@@ -82,13 +82,13 @@ const ROUTE_RULES = [
       COUNT("main#content h1", { exact: 1 }),
       COUNT("main#content time", { exact: 0 }),
       COUNT("[data-blog-list] > li", {
-        exact: curriculum.stages.length,
+        exact: blogOrder.posts.length,
       }),
-      COUNT("[data-blog-order]", { exact: curriculum.stages.length }),
+      COUNT("[data-blog-order]", { exact: blogOrder.posts.length }),
       TEXT("[data-blog-list] > li:first-child [data-blog-order]", "01"),
       TEXT("[data-blog-list] > li:last-child [data-blog-order]", "40"),
       COUNT('main#content a[href^="/blog/"]', {
-        exact: curriculum.stages.length,
+        exact: blogOrder.posts.length,
       }),
     ],
   },

@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import {
   h2Sections,
+  lintDepthContract,
   lintImageBrief,
+  lintImagePolicy,
   lintSectionPackages,
   lintSeoPackage,
   parseSectionPackage,
@@ -73,10 +75,58 @@ const detachedBrief = lintImageBrief(
 assert.ok(detachedBrief.some((value) => value.message.includes("실제 설명 문단")));
 assert.ok(detachedBrief.some((value) => value.message.includes("실제로 그릴 대상")));
 
+assert.deepEqual(
+  lintImagePolicy({
+    sourceKind: "imagegen",
+    visualProfile: "eddmpython-dark-v2",
+    palettePolicy: "eddmpython-carbon-ivory-sand-v1",
+    prompt: "Tactile graphite objects on a carbon background with one sand accent.",
+  }),
+  [],
+);
+assert.ok(
+  lintImagePolicy({
+    sourceKind: "imagegen",
+    visualProfile: "eddmpython-dark-v2",
+    palettePolicy: "wrong",
+    prompt: "Use blue connectors and green checks.",
+  }).some((value) => value.location === "palettePolicy"),
+);
+assert.ok(
+  lintImagePolicy({
+    sourceKind: "imagegen",
+    visualProfile: "eddmpython-dark-v2",
+    palettePolicy: "eddmpython-carbon-ivory-sand-v1",
+    prompt: "Use blue connectors and green checks.",
+  }).some((value) => value.location === "prompt"),
+);
+
+const deepBody = Array.from(
+  { length: 6 },
+  (_, index) => `## 질문 ${index + 1}\n\n${"독립 원문을 설명하는 쉬운 문장".repeat(80)}`,
+).join("\n\n");
+const deepSections = h2Sections(deepBody);
+assert.deepEqual(
+  lintDepthContract({ depthContract: "standalone-deep-v1" }, deepBody, deepSections),
+  [],
+);
+assert.ok(
+  lintDepthContract({}, deepBody, deepSections, { required: true }).some(
+    (value) => value.location === "depthContract",
+  ),
+);
+assert.ok(
+  lintDepthContract(
+    { depthContract: "standalone-project-v1" },
+    deepBody,
+    deepSections,
+  ).some((value) => value.location === "H2"),
+);
+
 const codeSupport = h2Sections(`${body}\n\n#### 코드\n\n\`\`\`text\nnpm test\n\`\`\``);
 assert.deepEqual(lintSectionPackages(codeSupport), []);
 
 const linkPile = h2Sections(`${body}\n\n#### 관련 링크\n\nhttps://example.com`);
 assert.ok(lintSectionPackages(linkPile).some((value) => value.message.includes("보조자료 H4")));
 
-console.log("blog package fixtures: 8 cases");
+console.log("blog package fixtures: 14 cases");

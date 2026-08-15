@@ -1,12 +1,12 @@
-import curriculum from "../../blog/curriculum.json";
+import blogOrder from "../../blog/order.json";
 
 export type Post = {
   /** 파일 stem. media plan/catalog 키와 같다. */
   id: string;
   /** 파일과 미디어를 연결하는 고정 순번. */
   sequence: number;
-  /** 블로그 목록과 강의가 함께 사용하는 학습 순서. */
-  learningOrder: number;
+  /** /blog 목록에서만 사용하는 공개 읽기 순서. */
+  readingOrder: number;
   /** 공개 URL 경로. /blog/{slug} */
   slug: string;
   title: string;
@@ -29,11 +29,7 @@ const files = import.meta.glob("../../blog/???-*.md", {
 }) as Record<string, string>;
 
 const slugPattern = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
-const learningOrderBySlug = new Map(
-  curriculum.stages
-    .filter((stage) => stage.status === "published" && stage.postSlug)
-    .map((stage) => [stage.postSlug, stage.order]),
-);
+const readingOrderBySlug = new Map(blogOrder.posts.map((entry) => [entry.slug, entry.order]));
 
 function parse(path: string, raw: string): Post {
   const id = path.replace(/^.*\//, "").replace(/\.md$/, "");
@@ -42,7 +38,7 @@ function parse(path: string, raw: string): Post {
     return {
       id,
       sequence: Number(id.slice(0, 3)),
-      learningOrder: Number.MAX_SAFE_INTEGER,
+      readingOrder: Number.MAX_SAFE_INTEGER,
       slug: id,
       title: id,
       author: "",
@@ -63,7 +59,7 @@ function parse(path: string, raw: string): Post {
   return {
     id,
     sequence: Number(id.slice(0, 3)),
-    learningOrder: learningOrderBySlug.get(slug) ?? Number.MAX_SAFE_INTEGER,
+    readingOrder: readingOrderBySlug.get(slug) ?? Number.MAX_SAFE_INTEGER,
     slug,
     title: meta.title ?? id,
     author: meta.author ?? "eddmpython",
@@ -80,7 +76,7 @@ function parse(path: string, raw: string): Post {
 
 export const POSTS: Post[] = Object.entries(files)
   .map(([path, raw]) => parse(path, raw))
-  .sort((a, b) => a.learningOrder - b.learningOrder || a.sequence - b.sequence);
+  .sort((a, b) => a.readingOrder - b.readingOrder || a.sequence - b.sequence);
 
 const slugs = new Set(POSTS.map((post) => post.slug));
 if (slugs.size !== POSTS.length) {
