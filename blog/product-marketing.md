@@ -1,7 +1,6 @@
 # Product Marketing Context
 
 **Document version:** v3
-**Last updated:** 2026-08-14
 
 이 파일은 블로그·랜딩 카피가 공유하는 제품 맥락이다. 확인된 공개 표면만 적는다.
 운영 절차는 `skills/specs/operation/productMarketing.md`를 본다.
