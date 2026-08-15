@@ -115,16 +115,16 @@ const ROUTE_RULES = [
     match: (path) => path === "/blog/python-basic-syntax",
     id: "python-basic-syntax",
     checks: [
-      TEXT("article#content h1", "Python 기초문법 6가지를 영상과 실행 셀로 배우는 방법"),
-      COUNT('button[aria-label="YouTube 영상 재생"]', { exact: 1 }),
+      TEXT("article#content h1", "Python 기초문법 배우는 방법: 지출내역 하나로 6가지 연결하기"),
+      COUNT("article#content figure", { exact: 8 }),
       COUNT('a[href="https://www.youtube.com/shorts/priwCYZJ8h4"]', { exact: 1 }),
       COUNT('aside[aria-label^="Codaro 실습 셀:"]', { exact: 7 }),
       VISIBLE('aside[aria-label="Codaro 실습 셀: 기준금액으로 거래 분류하기"] textarea'),
     ],
     captures: [
       {
-        id: "shorts-and-first-cell",
-        selector: '[data-youtube-player="priwCYZJ8h4"]',
+        id: "syntax-learning-map",
+        selector: "article#content figure:first-of-type",
       },
       {
         id: "condition-cell",

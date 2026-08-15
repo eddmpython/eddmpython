@@ -254,51 +254,51 @@
     },
     "007-python-basic-syntax/condition-branch": {
       "assetKey": "condition-branch",
-      "path": "objects/sha256/93/938fedb10321e58d5fbefe95d78fee444df1a98900a05019879e9fba72db8a62.png",
+      "path": "objects/sha256/52/5274db969e51c93221735e8d221b39f0c4a8e985a36de149a71cb6fba2722c50.png",
       "post": "007-python-basic-syntax",
-      "sha256": "938fedb10321e58d5fbefe95d78fee444df1a98900a05019879e9fba72db8a62"
+      "sha256": "5274db969e51c93221735e8d221b39f0c4a8e985a36de149a71cb6fba2722c50"
     },
     "007-python-basic-syntax/dictionary-column-map": {
       "assetKey": "dictionary-column-map",
-      "path": "objects/sha256/88/88f1273c59fc9d28554f8b6c7eee6a07df1bd43c22990ceffbbb7774341f56fd.png",
+      "path": "objects/sha256/71/716598bedae7e253bc30eb531341bdc6f91267aad3f4767b4b07b799dab5694e.png",
       "post": "007-python-basic-syntax",
-      "sha256": "88f1273c59fc9d28554f8b6c7eee6a07df1bd43c22990ceffbbb7774341f56fd"
+      "sha256": "716598bedae7e253bc30eb531341bdc6f91267aad3f4767b4b07b799dab5694e"
     },
     "007-python-basic-syntax/function-reuse": {
       "assetKey": "function-reuse",
-      "path": "objects/sha256/ba/ba22b13bfe117f620ed7cd2e3ddc8f671679e5e8212eed7c3eb3e71d1cf9ddfb.png",
+      "path": "objects/sha256/09/09f955a54389759a8505a136952fc826f81956cccf9d13c23efcdffbbe071e82.png",
       "post": "007-python-basic-syntax",
-      "sha256": "ba22b13bfe117f620ed7cd2e3ddc8f671679e5e8212eed7c3eb3e71d1cf9ddfb"
+      "sha256": "09f955a54389759a8505a136952fc826f81956cccf9d13c23efcdffbbe071e82"
     },
     "007-python-basic-syntax/list-amounts": {
       "assetKey": "list-amounts",
-      "path": "objects/sha256/68/68070b3221c00ebcea5fbc31528312641bd9fc6fd5db65cb86c82debda3b6af0.png",
+      "path": "objects/sha256/96/96aca7768b408fc5f4d264436f5c513e03c7fe4fb0469311fc973073afd63d54.png",
       "post": "007-python-basic-syntax",
-      "sha256": "68070b3221c00ebcea5fbc31528312641bd9fc6fd5db65cb86c82debda3b6af0"
+      "sha256": "96aca7768b408fc5f4d264436f5c513e03c7fe4fb0469311fc973073afd63d54"
     },
     "007-python-basic-syntax/loop-each-amount": {
       "assetKey": "loop-each-amount",
-      "path": "objects/sha256/74/741f080e209bb42b9f575de9f2d92b71c3c18e3928aa9f1bdfc1816cdaa901e9.png",
+      "path": "objects/sha256/c4/c488ba7323bf36a02f765f8644dfac04919af49d124d8a564f2fb9cca9f1ccfc.png",
       "post": "007-python-basic-syntax",
-      "sha256": "741f080e209bb42b9f575de9f2d92b71c3c18e3928aa9f1bdfc1816cdaa901e9"
+      "sha256": "c488ba7323bf36a02f765f8644dfac04919af49d124d8a564f2fb9cca9f1ccfc"
     },
     "007-python-basic-syntax/syntax-learning-map": {
       "assetKey": "syntax-learning-map",
-      "path": "objects/sha256/fc/fcfc19b3f647af1361c0935afb59d78f6277a113826f2b9cc06433cf2339b357.png",
+      "path": "objects/sha256/34/34c96f6b38214b253f61acaa2ef46cb2ee75249bf16873ffc13975249b85ebcd.png",
       "post": "007-python-basic-syntax",
-      "sha256": "fcfc19b3f647af1361c0935afb59d78f6277a113826f2b9cc06433cf2339b357"
+      "sha256": "34c96f6b38214b253f61acaa2ef46cb2ee75249bf16873ffc13975249b85ebcd"
     },
     "007-python-basic-syntax/syntax-together": {
       "assetKey": "syntax-together",
-      "path": "objects/sha256/ea/ea47def546eefb8e3c5d3d3e0bdcf2cdb08390dd313c77cfb32396967961be3c.png",
+      "path": "objects/sha256/24/2488fb08e37335b290eb7f97b6aafd94999e515c5ef34bb4650e9b4554dbfafd.png",
       "post": "007-python-basic-syntax",
-      "sha256": "ea47def546eefb8e3c5d3d3e0bdcf2cdb08390dd313c77cfb32396967961be3c"
+      "sha256": "2488fb08e37335b290eb7f97b6aafd94999e515c5ef34bb4650e9b4554dbfafd"
     },
     "007-python-basic-syntax/variables-values": {
       "assetKey": "variables-values",
-      "path": "objects/sha256/cd/cd7ce7ab554b1392b5ab7337770ab2d10d2dfb376a8c4ea4e0eedd197e16039e.png",
+      "path": "objects/sha256/18/18a507345379e23d2ab8b2b34821da8648e06fceeecf2368abdf6158aa476154.png",
       "post": "007-python-basic-syntax",
-      "sha256": "cd7ce7ab554b1392b5ab7337770ab2d10d2dfb376a8c4ea4e0eedd197e16039e"
+      "sha256": "18a507345379e23d2ab8b2b34821da8648e06fceeecf2368abdf6158aa476154"
     },
     "008-python-execution-types/amount-conversion": {
       "assetKey": "amount-conversion",
@@ -1237,6 +1237,13 @@
       "path": "objects/sha256/09/0979bf850559ea1d9f585f2cfc6b526e29dd2aa15f02814dedf49ef3f9d99705.png",
       "width": 1536
     },
+    "09f955a54389759a8505a136952fc826f81956cccf9d13c23efcdffbbe071e82": {
+      "bytes": 1153604,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/09/09f955a54389759a8505a136952fc826f81956cccf9d13c23efcdffbbe071e82.png",
+      "width": 1536
+    },
     "0a37d036af4841bee5d77ccb7fcf33304df9286c96c283e43179a39f18964f47": {
       "bytes": 1224853,
       "height": 1024,
@@ -1298,6 +1305,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/17/17aa65a8e98e2dd69a9eb054c860d14cc743fdee2aefa549e5e67353b8ca1532.png",
+      "width": 1536
+    },
+    "18a507345379e23d2ab8b2b34821da8648e06fceeecf2368abdf6158aa476154": {
+      "bytes": 1226860,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/18/18a507345379e23d2ab8b2b34821da8648e06fceeecf2368abdf6158aa476154.png",
       "width": 1536
     },
     "18c736933d9d390de5fa78dc75054b559cbfd3c522c6335a4b5550e616f8c7d1": {
@@ -1384,6 +1398,13 @@
       "path": "objects/sha256/24/24874ecb29f6f2d522b76f91e1a3e5a6b98e690937bfcc38a0ab708e49e4f326.png",
       "width": 1536
     },
+    "2488fb08e37335b290eb7f97b6aafd94999e515c5ef34bb4650e9b4554dbfafd": {
+      "bytes": 1171350,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/24/2488fb08e37335b290eb7f97b6aafd94999e515c5ef34bb4650e9b4554dbfafd.png",
+      "width": 1536
+    },
     "2cb1c25ad43fdda1d708ecf9a71f1877e3e0b7845cd5f8c509b996b1c979aed5": {
       "bytes": 1655381,
       "height": 1024,
@@ -1403,6 +1424,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/2f/2f55c0f761b8e573e94f0a197cbbe8afad5ff4bf918a29825470d704b0a7608a.png",
+      "width": 1536
+    },
+    "34c96f6b38214b253f61acaa2ef46cb2ee75249bf16873ffc13975249b85ebcd": {
+      "bytes": 1196453,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/34/34c96f6b38214b253f61acaa2ef46cb2ee75249bf16873ffc13975249b85ebcd.png",
       "width": 1536
     },
     "38c135b7076e211c171f871e2da74620bb7031e96915160d9d47e487e8c08eba": {
@@ -1566,6 +1594,13 @@
       "path": "objects/sha256/51/511d308bd81b6431348885ca2d494966ef961f52798c5ab50101fa286f7ad85f.png",
       "width": 1536
     },
+    "5274db969e51c93221735e8d221b39f0c4a8e985a36de149a71cb6fba2722c50": {
+      "bytes": 1176538,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/52/5274db969e51c93221735e8d221b39f0c4a8e985a36de149a71cb6fba2722c50.png",
+      "width": 1536
+    },
     "52be213d398cc25888464efd2728c5d37715737ba1a3181928afd7b03678bfad": {
       "bytes": 2681292,
       "height": 1024,
@@ -1664,13 +1699,6 @@
       "path": "objects/sha256/67/679308d1d895d5b759fb29da77e9f025c345b00789f614ffbe4adc2c0496f468.png",
       "width": 1536
     },
-    "68070b3221c00ebcea5fbc31528312641bd9fc6fd5db65cb86c82debda3b6af0": {
-      "bytes": 1095390,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/68/68070b3221c00ebcea5fbc31528312641bd9fc6fd5db65cb86c82debda3b6af0.png",
-      "width": 1536
-    },
     "6829c52f80f6a9485f1677894d47090e2229bf896df38502e10d016931c10488": {
       "bytes": 1133576,
       "height": 1024,
@@ -1755,6 +1783,13 @@
       "path": "objects/sha256/71/71589865f9e41b053480f413f149535a6cb0b4f7a4488860ab4203b8c875663c.png",
       "width": 1536
     },
+    "716598bedae7e253bc30eb531341bdc6f91267aad3f4767b4b07b799dab5694e": {
+      "bytes": 1171133,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/71/716598bedae7e253bc30eb531341bdc6f91267aad3f4767b4b07b799dab5694e.png",
+      "width": 1536
+    },
     "717ec8223a7f8a75609fe59ae3808211a3b2662af64fa8e93edf47b88e0e46ce": {
       "bytes": 2097652,
       "height": 1024,
@@ -1781,13 +1816,6 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/74/74109a9a4e7da1bb5b6da1ce846eec8d7cf501ce1ba481e217097cd5742b1d1b.png",
-      "width": 1536
-    },
-    "741f080e209bb42b9f575de9f2d92b71c3c18e3928aa9f1bdfc1816cdaa901e9": {
-      "bytes": 1199562,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/74/741f080e209bb42b9f575de9f2d92b71c3c18e3928aa9f1bdfc1816cdaa901e9.png",
       "width": 1536
     },
     "7588515483d961e23b1e6e595a4e5a6e92fedbd75cd056fd8078b693e5590819": {
@@ -1916,13 +1944,6 @@
       "path": "objects/sha256/88/88998b6bd1ab98652af7d7c8c3be210e200ea7ab017df6df49bc7b3ec6cf08d6.png",
       "width": 1536
     },
-    "88f1273c59fc9d28554f8b6c7eee6a07df1bd43c22990ceffbbb7774341f56fd": {
-      "bytes": 1143384,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/88/88f1273c59fc9d28554f8b6c7eee6a07df1bd43c22990ceffbbb7774341f56fd.png",
-      "width": 1536
-    },
     "8919a63fbe36e6325b58021b902636d6fcdcbdde83ab764476afd9d9ad57ccee": {
       "bytes": 1255093,
       "height": 1024,
@@ -1965,18 +1986,18 @@
       "path": "objects/sha256/90/90c9bb9977f83bdae5d68d0a7f2748b135efe1d202cf5154a2de2da9e1b62b34.png",
       "width": 1536
     },
-    "938fedb10321e58d5fbefe95d78fee444df1a98900a05019879e9fba72db8a62": {
-      "bytes": 1202403,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/93/938fedb10321e58d5fbefe95d78fee444df1a98900a05019879e9fba72db8a62.png",
-      "width": 1536
-    },
     "9472eda159666363665e858a5f347e5363ece27c3cf01a747291518268f9c9c3": {
       "bytes": 1228610,
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/94/9472eda159666363665e858a5f347e5363ece27c3cf01a747291518268f9c9c3.png",
+      "width": 1536
+    },
+    "96aca7768b408fc5f4d264436f5c513e03c7fe4fb0469311fc973073afd63d54": {
+      "bytes": 1256363,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/96/96aca7768b408fc5f4d264436f5c513e03c7fe4fb0469311fc973073afd63d54.png",
       "width": 1536
     },
     "96b7e5d091658f7b1c5c4b81e134e5d9dd13a81c4bf5c02bd5ff0b35e4026631": {
@@ -2196,13 +2217,6 @@
       "path": "objects/sha256/b8/b81113f251d58e921d6bc191b74fe292d6cafa6a65d877578be8f94f672c3d4f.png",
       "width": 1536
     },
-    "ba22b13bfe117f620ed7cd2e3ddc8f671679e5e8212eed7c3eb3e71d1cf9ddfb": {
-      "bytes": 1220489,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/ba/ba22b13bfe117f620ed7cd2e3ddc8f671679e5e8212eed7c3eb3e71d1cf9ddfb.png",
-      "width": 1536
-    },
     "baee7b819d25f5cb8cc66e12aa26f0fd81098742de010fe986b0d2c4654d565d": {
       "bytes": 1499792,
       "height": 1024,
@@ -2238,6 +2252,13 @@
       "path": "objects/sha256/bf/bf5c8b44d4666afc4da74ec6de1f76821285a270c2a35cfd1661aef38fe7475e.png",
       "width": 1536
     },
+    "c488ba7323bf36a02f765f8644dfac04919af49d124d8a564f2fb9cca9f1ccfc": {
+      "bytes": 1187983,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/c4/c488ba7323bf36a02f765f8644dfac04919af49d124d8a564f2fb9cca9f1ccfc.png",
+      "width": 1536
+    },
     "c48d24f41874f452270a34c0e360353458d9abaf91f5d0063711a674a87a7582": {
       "bytes": 1133731,
       "height": 1024,
@@ -2271,13 +2292,6 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/cb/cb2d765ef317034ae5bb6f7617011574a10488fad76a23f753a4de4d45206462.png",
-      "width": 1536
-    },
-    "cd7ce7ab554b1392b5ab7337770ab2d10d2dfb376a8c4ea4e0eedd197e16039e": {
-      "bytes": 1283993,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/cd/cd7ce7ab554b1392b5ab7337770ab2d10d2dfb376a8c4ea4e0eedd197e16039e.png",
       "width": 1536
     },
     "d07c6bf96eec2dded6234b29ba6518206da50b8cd8c919414c4a67fcaa0eacd8": {
@@ -2406,13 +2420,6 @@
       "path": "objects/sha256/e9/e9850269647432bf2f6e97a1400c5a77ebabfa9eef038af5f1a1eeb0fb47c792.png",
       "width": 1536
     },
-    "ea47def546eefb8e3c5d3d3e0bdcf2cdb08390dd313c77cfb32396967961be3c": {
-      "bytes": 1618164,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/ea/ea47def546eefb8e3c5d3d3e0bdcf2cdb08390dd313c77cfb32396967961be3c.png",
-      "width": 1536
-    },
     "ea6e53f09c81ce2b8dfc505a791cb1f71c603bec0d6371cd1f6e74c99e4fd042": {
       "bytes": 1173996,
       "height": 1024,
@@ -2481,13 +2488,6 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/f8/f859ddbeca90cdb5542d6a92a044de7585de96f1657f5d830ba80a75fa49dfe9.png",
-      "width": 1536
-    },
-    "fcfc19b3f647af1361c0935afb59d78f6277a113826f2b9cc06433cf2339b357": {
-      "bytes": 1250107,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/fc/fcfc19b3f647af1361c0935afb59d78f6277a113826f2b9cc06433cf2339b357.png",
       "width": 1536
     },
     "fd2861943e1008956826164d20a67bb9545b0132228337891a1531604b903d0a": {
