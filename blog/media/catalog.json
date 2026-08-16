@@ -786,29 +786,77 @@
       "post": "016-work-automation-plan",
       "sha256": "e515d1192950239468f14f4602d68d1643c54ec2f3c24f6cb3be97d29e0b5af8"
     },
-    "017-python-list-dictionary/append-and-key": {
-      "assetKey": "append-and-key",
-      "path": "objects/sha256/e0/e01047abda28146686397da5c80b7236a194c3035f1780c86c4ab260deda0da1.png",
+    "017-python-list-dictionary/alternative-types": {
+      "assetKey": "alternative-types",
+      "path": "objects/sha256/e5/e50adefacc3de302df9f060e62c555f4e26c9206b30160081d56a381f473390a.png",
       "post": "017-python-list-dictionary",
-      "sha256": "e01047abda28146686397da5c80b7236a194c3035f1780c86c4ab260deda0da1"
+      "sha256": "e50adefacc3de302df9f060e62c555f4e26c9206b30160081d56a381f473390a"
     },
-    "017-python-list-dictionary/list-vs-dict": {
-      "assetKey": "list-vs-dict",
-      "path": "objects/sha256/cb/cb2d765ef317034ae5bb6f7617011574a10488fad76a23f753a4de4d45206462.png",
+    "017-python-list-dictionary/choosing-container": {
+      "assetKey": "choosing-container",
+      "path": "objects/sha256/59/59718d62d283372e6b82e2ea89b78dac62b609d09410344bb9d9dcf38a6a8a61.png",
       "post": "017-python-list-dictionary",
-      "sha256": "cb2d765ef317034ae5bb6f7617011574a10488fad76a23f753a4de4d45206462"
+      "sha256": "59718d62d283372e6b82e2ea89b78dac62b609d09410344bb9d9dcf38a6a8a61"
     },
-    "017-python-list-dictionary/safe-dict-access": {
-      "assetKey": "safe-dict-access",
-      "path": "objects/sha256/78/785457fba403802969a8f1f8c8be09636142816bf3c2319a15afeea362d88482.png",
+    "017-python-list-dictionary/dictionary-key": {
+      "assetKey": "dictionary-key",
+      "path": "objects/sha256/7b/7bf9168d0b434bac901e0199051a44ee0740605120b4875330513938c80b6142.png",
       "post": "017-python-list-dictionary",
-      "sha256": "785457fba403802969a8f1f8c8be09636142816bf3c2319a15afeea362d88482"
+      "sha256": "7bf9168d0b434bac901e0199051a44ee0740605120b4875330513938c80b6142"
     },
-    "017-python-list-dictionary/transaction-record": {
-      "assetKey": "transaction-record",
-      "path": "objects/sha256/78/78e07d937374750640d157a7bcaa5fa3c73a9c293e3bd22dbf9e218134cc8b6f.png",
+    "017-python-list-dictionary/hashable-key": {
+      "assetKey": "hashable-key",
+      "path": "objects/sha256/d0/d06f5719d26fdaefc402b08a088ed13d74078004223501de8a800c12b0a832fa.png",
       "post": "017-python-list-dictionary",
-      "sha256": "78e07d937374750640d157a7bcaa5fa3c73a9c293e3bd22dbf9e218134cc8b6f"
+      "sha256": "d06f5719d26fdaefc402b08a088ed13d74078004223501de8a800c12b0a832fa"
+    },
+    "017-python-list-dictionary/list-of-dicts": {
+      "assetKey": "list-of-dicts",
+      "path": "objects/sha256/b0/b01fe0f63c7b375c048cf5c01f13834545398f7a4bfad00aadf7200be57adb8d.png",
+      "post": "017-python-list-dictionary",
+      "sha256": "b01fe0f63c7b375c048cf5c01f13834545398f7a4bfad00aadf7200be57adb8d"
+    },
+    "017-python-list-dictionary/list-position": {
+      "assetKey": "list-position",
+      "path": "objects/sha256/d6/d67afbeb9fd71261b65139c30c4577c957a03b4a5393890f824dd98fe278129c.png",
+      "post": "017-python-list-dictionary",
+      "sha256": "d67afbeb9fd71261b65139c30c4577c957a03b4a5393890f824dd98fe278129c"
+    },
+    "017-python-list-dictionary/missing-access": {
+      "assetKey": "missing-access",
+      "path": "objects/sha256/ad/ad3c158d13a7613053fcd30804b408362ce5f03e01ed6cd1bde49385ca4afe3c.png",
+      "post": "017-python-list-dictionary",
+      "sha256": "ad3c158d13a7613053fcd30804b408362ce5f03e01ed6cd1bde49385ca4afe3c"
+    },
+    "017-python-list-dictionary/nested-copy": {
+      "assetKey": "nested-copy",
+      "path": "objects/sha256/9c/9cc5597e6b318dfc0b590d90b5ed3815c766df6513c9dde465bc5d2772c9bf2f.png",
+      "post": "017-python-list-dictionary",
+      "sha256": "9cc5597e6b318dfc0b590d90b5ed3815c766df6513c9dde465bc5d2772c9bf2f"
+    },
+    "017-python-list-dictionary/report-pipeline": {
+      "assetKey": "report-pipeline",
+      "path": "objects/sha256/12/127597911d9e0160b02cd32afc9c9ccb7656fd4fd243226baa830babf4f8d165.png",
+      "post": "017-python-list-dictionary",
+      "sha256": "127597911d9e0160b02cd32afc9c9ccb7656fd4fd243226baa830babf4f8d165"
+    },
+    "017-python-list-dictionary/safe-filtering": {
+      "assetKey": "safe-filtering",
+      "path": "objects/sha256/12/1284d8100995cea5b5f155b30b9360b655adc485fd93e79c93a8bfd0300a0c18.png",
+      "post": "017-python-list-dictionary",
+      "sha256": "1284d8100995cea5b5f155b30b9360b655adc485fd93e79c93a8bfd0300a0c18"
+    },
+    "017-python-list-dictionary/selection-checklist": {
+      "assetKey": "selection-checklist",
+      "path": "objects/sha256/1a/1af5971f72c627a61442d4f3c485c184d2a1a2992c7b9719efafca5127148bd8.png",
+      "post": "017-python-list-dictionary",
+      "sha256": "1af5971f72c627a61442d4f3c485c184d2a1a2992c7b9719efafca5127148bd8"
+    },
+    "017-python-list-dictionary/test-cases": {
+      "assetKey": "test-cases",
+      "path": "objects/sha256/2d/2dac884ce5bf6a1d53ab44509dd17c5a255f3c8f64589d01d3741c9503e119d8.png",
+      "post": "017-python-list-dictionary",
+      "sha256": "2dac884ce5bf6a1d53ab44509dd17c5a255f3c8f64589d01d3741c9503e119d8"
     },
     "018-python-if-boundary/boundary-table": {
       "assetKey": "boundary-table",
@@ -1526,6 +1574,20 @@
       "path": "objects/sha256/11/116a94fe09afb4fd46b4b540ab74ed4dbc17e8795b50042afa4f55fd4df78d7a.png",
       "width": 1536
     },
+    "127597911d9e0160b02cd32afc9c9ccb7656fd4fd243226baa830babf4f8d165": {
+      "bytes": 1136372,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/12/127597911d9e0160b02cd32afc9c9ccb7656fd4fd243226baa830babf4f8d165.png",
+      "width": 1536
+    },
+    "1284d8100995cea5b5f155b30b9360b655adc485fd93e79c93a8bfd0300a0c18": {
+      "bytes": 1270371,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/12/1284d8100995cea5b5f155b30b9360b655adc485fd93e79c93a8bfd0300a0c18.png",
+      "width": 1536
+    },
     "1459a78e3a15e44cbc474b23f0262c249123963779b46d0ca5408387c2039285": {
       "bytes": 1129730,
       "height": 1024,
@@ -1594,6 +1656,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/1a/1a54ba9d0ae6ed31f118f4a1d34d4c859b39679e74cdd08a1f34367923ac82c3.png",
+      "width": 1536
+    },
+    "1af5971f72c627a61442d4f3c485c184d2a1a2992c7b9719efafca5127148bd8": {
+      "bytes": 1142093,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/1a/1af5971f72c627a61442d4f3c485c184d2a1a2992c7b9719efafca5127148bd8.png",
       "width": 1536
     },
     "1b5edab6ea81daadcb376423054b4c77af98e0fe18840c491036896bc7625d86": {
@@ -1706,6 +1775,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/2c/2cb1c25ad43fdda1d708ecf9a71f1877e3e0b7845cd5f8c509b996b1c979aed5.png",
+      "width": 1536
+    },
+    "2dac884ce5bf6a1d53ab44509dd17c5a255f3c8f64589d01d3741c9503e119d8": {
+      "bytes": 1190974,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/2d/2dac884ce5bf6a1d53ab44509dd17c5a255f3c8f64589d01d3741c9503e119d8.png",
       "width": 1536
     },
     "2e221463fa5dc1a4053751654fa5a91ba2e2a4c4ef275b86ef53ce441b1e44c7": {
@@ -1930,6 +2006,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/59/592cf0e492c49e1d5e24247726beecbae6cfcb045df69df1944859690068d2c7.png",
+      "width": 1536
+    },
+    "59718d62d283372e6b82e2ea89b78dac62b609d09410344bb9d9dcf38a6a8a61": {
+      "bytes": 1196124,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/59/59718d62d283372e6b82e2ea89b78dac62b609d09410344bb9d9dcf38a6a8a61.png",
       "width": 1536
     },
     "5b147cfff2b937f6ec69165c7d43e5a97c96d8febc2e782ff0507fc4fff00673": {
@@ -2177,25 +2260,11 @@
       "path": "objects/sha256/76/76e4b5d693ded21319dd1fab3881528039f25a63c6d11472a4ee62a08dce5493.png",
       "width": 1536
     },
-    "785457fba403802969a8f1f8c8be09636142816bf3c2319a15afeea362d88482": {
-      "bytes": 1540106,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/78/785457fba403802969a8f1f8c8be09636142816bf3c2319a15afeea362d88482.png",
-      "width": 1536
-    },
     "78dad0b22ceefef352d97eee3d7ad6c10e1d1c7c32f32c16a6c97408c84e096b": {
       "bytes": 1235138,
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/78/78dad0b22ceefef352d97eee3d7ad6c10e1d1c7c32f32c16a6c97408c84e096b.png",
-      "width": 1536
-    },
-    "78e07d937374750640d157a7bcaa5fa3c73a9c293e3bd22dbf9e218134cc8b6f": {
-      "bytes": 1191981,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/78/78e07d937374750640d157a7bcaa5fa3c73a9c293e3bd22dbf9e218134cc8b6f.png",
       "width": 1536
     },
     "79349c81900d130243394b66f6de28284c447aa5a24965261d57a69c9f72aa2e": {
@@ -2217,6 +2286,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/7b/7b1c3fccf0762cd7dfadf70fbb7881000530ad0ac9cae4ab9e24a8a579946608.png",
+      "width": 1536
+    },
+    "7bf9168d0b434bac901e0199051a44ee0740605120b4875330513938c80b6142": {
+      "bytes": 1132433,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/7b/7bf9168d0b434bac901e0199051a44ee0740605120b4875330513938c80b6142.png",
       "width": 1536
     },
     "7d22b486bdfa20f53a94c830c6b96dff32910decdc4fbd464fc15fe8ec0ee68d": {
@@ -2422,6 +2498,13 @@
       "path": "objects/sha256/9c/9ca88b95015b6c2284c1c80dca967dfe0d9997999ed508974f41571647242bee.png",
       "width": 1536
     },
+    "9cc5597e6b318dfc0b590d90b5ed3815c766df6513c9dde465bc5d2772c9bf2f": {
+      "bytes": 1165556,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/9c/9cc5597e6b318dfc0b590d90b5ed3815c766df6513c9dde465bc5d2772c9bf2f.png",
+      "width": 1536
+    },
     "9e89e27b6d89c72f2844b90755c8d48312e32564e6d3a546f79a597568dfee5d": {
       "bytes": 1578395,
       "height": 1024,
@@ -2569,11 +2652,25 @@
       "path": "objects/sha256/ac/acb8fb4a30a161b898dfe6493f8f002aaeaa829b95f99108947acb01e58af946.png",
       "width": 1536
     },
+    "ad3c158d13a7613053fcd30804b408362ce5f03e01ed6cd1bde49385ca4afe3c": {
+      "bytes": 1185866,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/ad/ad3c158d13a7613053fcd30804b408362ce5f03e01ed6cd1bde49385ca4afe3c.png",
+      "width": 1536
+    },
     "ae106aa16983b88a6e84d688759b9580f32a9a1978a9689857fc228314ce7470": {
       "bytes": 1190244,
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/ae/ae106aa16983b88a6e84d688759b9580f32a9a1978a9689857fc228314ce7470.png",
+      "width": 1536
+    },
+    "b01fe0f63c7b375c048cf5c01f13834545398f7a4bfad00aadf7200be57adb8d": {
+      "bytes": 1166299,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/b0/b01fe0f63c7b375c048cf5c01f13834545398f7a4bfad00aadf7200be57adb8d.png",
       "width": 1536
     },
     "b1616142738c76180bbcd27c684c12204f52a0f8c5d622db296121506ece7748": {
@@ -2702,11 +2799,11 @@
       "path": "objects/sha256/c9/c971af6073bc2ae4c6df02e812f23090eb417a8287a8943c77d82a3250d650ec.png",
       "width": 1536
     },
-    "cb2d765ef317034ae5bb6f7617011574a10488fad76a23f753a4de4d45206462": {
-      "bytes": 1197782,
+    "d06f5719d26fdaefc402b08a088ed13d74078004223501de8a800c12b0a832fa": {
+      "bytes": 1221317,
       "height": 1024,
       "mime": "image/png",
-      "path": "objects/sha256/cb/cb2d765ef317034ae5bb6f7617011574a10488fad76a23f753a4de4d45206462.png",
+      "path": "objects/sha256/d0/d06f5719d26fdaefc402b08a088ed13d74078004223501de8a800c12b0a832fa.png",
       "width": 1536
     },
     "d23ee36fee82ef17e6c8f32e3fbda5b65e1f11c56e3b29770be4e8e02df8f819": {
@@ -2728,6 +2825,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/d4/d4528ca7fce1dcac4d81700d01184bbcaa23acd265edd4a903277fc123c840e9.png",
+      "width": 1536
+    },
+    "d67afbeb9fd71261b65139c30c4577c957a03b4a5393890f824dd98fe278129c": {
+      "bytes": 1159786,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/d6/d67afbeb9fd71261b65139c30c4577c957a03b4a5393890f824dd98fe278129c.png",
       "width": 1536
     },
     "d90745837d66c16e2b9b6dea8b845cdf4d0514234f8654a388effb58175c6964": {
@@ -2786,13 +2890,6 @@
       "path": "objects/sha256/df/df182eaa6d8817cfd9a0617e5820e39969af9ff084b998575b6b9713e5d1140d.png",
       "width": 1536
     },
-    "e01047abda28146686397da5c80b7236a194c3035f1780c86c4ab260deda0da1": {
-      "bytes": 1379371,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/e0/e01047abda28146686397da5c80b7236a194c3035f1780c86c4ab260deda0da1.png",
-      "width": 1536
-    },
     "e1d55f556afa25f776007872caa38940de34d08182fbbc662ae22250653437e7": {
       "bytes": 1184917,
       "height": 1024,
@@ -2812,6 +2909,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/e4/e42c7b6d9c253f8cd09ed01338d36d09364b77320d48666286daecf6be20ecc3.png",
+      "width": 1536
+    },
+    "e50adefacc3de302df9f060e62c555f4e26c9206b30160081d56a381f473390a": {
+      "bytes": 1246889,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/e5/e50adefacc3de302df9f060e62c555f4e26c9206b30160081d56a381f473390a.png",
       "width": 1536
     },
     "e515d1192950239468f14f4602d68d1643c54ec2f3c24f6cb3be97d29e0b5af8": {
