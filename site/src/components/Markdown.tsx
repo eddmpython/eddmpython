@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { decodeHashId } from "../hashNavigation";
 import { CodaroCellEmbed } from "./CodaroCellEmbed";
 
 const THREADS = /^https?:\/\/(?:www\.)?threads\.(?:net|com)\/@[\w.]+\/post\/[\w-]+/;
@@ -161,7 +162,8 @@ function ArticleToc({ headings }: { headings: ArticleHeading[] }) {
   const [activeId, setActiveId] = useState(headings[0]?.id ?? "");
 
   useEffect(() => {
-    setActiveId(headings[0]?.id ?? "");
+    const hashId = decodeHashId(window.location.hash);
+    setActiveId(headings.some((heading) => heading.id === hashId) ? hashId! : (headings[0]?.id ?? ""));
     const elements = headings
       .map((heading) => document.getElementById(heading.id))
       .filter((element): element is HTMLElement => Boolean(element));
@@ -173,7 +175,7 @@ function ArticleToc({ headings }: { headings: ArticleHeading[] }) {
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
         if (visible?.target.id) setActiveId(visible.target.id);
       },
-      { rootMargin: "-12% 0px -72% 0px", threshold: [0, 1] },
+      { rootMargin: "-80px 0px -75% 0px", threshold: [0, 1] },
     );
     elements.forEach((element) => observer.observe(element));
     return () => observer.disconnect();
@@ -193,6 +195,7 @@ function ArticleToc({ headings }: { headings: ArticleHeading[] }) {
           <li key={heading.id}>
             <a
               href={`#${heading.id}`}
+              onClick={() => setActiveId(heading.id)}
               aria-current={activeId === heading.id ? "location" : undefined}
               className={`block text-[13px] leading-relaxed transition-colors ${
                 activeId === heading.id ? "text-ivory" : "text-ivory/42 hover:text-ivory/72"

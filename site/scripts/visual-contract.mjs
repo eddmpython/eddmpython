@@ -110,6 +110,17 @@ const ROUTE_RULES = [
         { exact: 1 },
       ),
     ],
+    interactions: [
+      {
+        id: "toc-second-heading",
+        type: "click-hash-target",
+        click: 'nav[aria-label="글 목차"] li:nth-child(2) a',
+        viewports: ["desktop"],
+        minTop: 80,
+        maxTop: 112,
+        captureAfter: true,
+      },
+    ],
   },
   {
     match: (path) => path === "/blog/python-basic-syntax",

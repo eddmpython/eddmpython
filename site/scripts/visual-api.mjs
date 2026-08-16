@@ -279,6 +279,54 @@ async function inspectPage(client, sessionRef, checks) {
 }
 
 async function runInteraction(client, sessionRef, interaction) {
+  if (interaction.type === "click-hash-target") {
+    const target = await evaluate(
+      client,
+      sessionRef,
+      `(() => {
+        const link = document.querySelector(${JSON.stringify(interaction.click)});
+        if (!link) throw new Error("목차 링크가 없습니다: " + ${JSON.stringify(interaction.click)});
+        const href = link.getAttribute("href") ?? "";
+        if (!href.startsWith("#")) throw new Error("목차 링크가 해시가 아닙니다: " + href);
+        const id = decodeURIComponent(href.slice(1));
+        if (!document.getElementById(id)) throw new Error("목차 대상이 없습니다: " + id);
+        return { href, id };
+      })()`,
+    );
+    await client.act(
+      sessionRef,
+      [{ kind: "click", selector: interaction.click, expectedRisk: "externalEffect" }],
+      { timeoutMs: interaction.timeoutMs ?? 30000 },
+    );
+    return evaluate(
+      client,
+      sessionRef,
+      `(async () => {
+        const id = ${JSON.stringify(target.id)};
+        const minTop = ${interaction.minTop ?? 80};
+        const maxTop = ${interaction.maxTop ?? 112};
+        const started = Date.now();
+        while (true) {
+          const currentId = decodeURIComponent(location.hash.slice(1));
+          const activeHref = document.querySelector('nav[aria-label="글 목차"] a[aria-current="location"]')
+            ?.getAttribute("href") ?? "";
+          const activeId = activeHref.startsWith("#") ? decodeURIComponent(activeHref.slice(1)) : "";
+          const top = document.getElementById(id)?.getBoundingClientRect().top;
+          if (currentId === id && activeId === id && typeof top === "number" && top >= minTop && top <= maxTop) {
+            await new Promise((resolveFrame) => requestAnimationFrame(() => requestAnimationFrame(resolveFrame)));
+            await new Promise((resolveWait) => setTimeout(resolveWait, 200));
+            return { hash: location.hash, activeId, targetId: id, targetTop: top };
+          }
+          if (Date.now() - started > ${interaction.timeoutMs ?? 30000}) {
+            throw new Error("목차 위치 불일치: " + JSON.stringify({ currentId, activeId, id, top, minTop, maxTop }));
+          }
+          await new Promise((resolveWait) => setTimeout(resolveWait, 50));
+        }
+      })()`,
+      { awaitPromise: true },
+    );
+    return;
+  }
   if (interaction.type !== "click-until-text") {
     throw new Error(`지원하지 않는 상호작용 검증: ${interaction.type}`);
   }
@@ -367,6 +415,7 @@ export async function captureVisualEvidence({ baseUrl, routeFilters = [] } = {})
           const startedAt = Date.now();
           const errors = [];
           const screenshotFiles = [];
+          const interactionEvidence = [];
           let metrics = null;
           let opened = null;
           let sessionRef = null;
@@ -390,8 +439,21 @@ export async function captureVisualEvidence({ baseUrl, routeFilters = [] } = {})
             errors.push(`깨진 이미지 ${metrics.brokenImages.join(", ")}`);
           }
           for (const interaction of contract.interactions) {
+            if (interaction.viewports && !interaction.viewports.includes(viewport.id)) continue;
             try {
-              await runInteraction(client, sessionRef, interaction);
+              const evidence = await runInteraction(client, sessionRef, interaction);
+              const captured = { id: interaction.id, evidence };
+              if (interaction.captureAfter) {
+                const interactionFile = `${contract.id}.${viewport.id}.interaction-${interaction.id}.jpg`;
+                await saveScreenshot(client, sessionRef, join(runDir, interactionFile), { quality: 90 });
+                screenshotFiles.push({
+                  kind: "interaction",
+                  id: interaction.id,
+                  file: interactionFile,
+                });
+                captured.screenshot = interactionFile;
+              }
+              interactionEvidence.push(captured);
             } catch (error) {
               errors.push(`${interaction.id}: ${errorText(error)}`);
             }
@@ -504,6 +566,7 @@ export async function captureVisualEvidence({ baseUrl, routeFilters = [] } = {})
             durationMs: Date.now() - startedAt,
             metrics,
             errors,
+            interactions: interactionEvidence,
             pyprocManifest: relative(runDir, manifestPath).replace(/\\/g, "/"),
           });
         }
