@@ -1116,29 +1116,101 @@
       "post": "020-python-functions",
       "sha256": "2e597ca5c7533ea021e07194048ff11e03cadf1af2e321f7b5683bbc2ce9b9ba"
     },
-    "021-python-project-runbook/fresh-folder-replay": {
-      "assetKey": "fresh-folder-replay",
-      "path": "objects/sha256/3f/3fc08ea17c9a5e77630362011f5049442ff3078c166f8e7ade8cc32c7728a23d.png",
+    "021-python-project-runbook/explicit-paths": {
+      "assetKey": "explicit-paths",
+      "path": "objects/sha256/c8/c8cc29146575e718fda8329c35fb9d91c2db56d240cd9fcc753545d34990766a.png",
       "post": "021-python-project-runbook",
-      "sha256": "3fc08ea17c9a5e77630362011f5049442ff3078c166f8e7ade8cc32c7728a23d"
+      "sha256": "c8cc29146575e718fda8329c35fb9d91c2db56d240cd9fcc753545d34990766a"
     },
-    "021-python-project-runbook/project-files-contract": {
-      "assetKey": "project-files-contract",
-      "path": "objects/sha256/6a/6a2d36f4bfc21d6e06d629c893769de653aa9d621a430642915577c5e246f8da.png",
+    "021-python-project-runbook/failure-layers": {
+      "assetKey": "failure-layers",
+      "path": "objects/sha256/6d/6d1f7d47d68b1e32a1e28b258b4228160072bbe560a4c27fff90c688c260c76f.png",
       "post": "021-python-project-runbook",
-      "sha256": "6a2d36f4bfc21d6e06d629c893769de653aa9d621a430642915577c5e246f8da"
+      "sha256": "6d1f7d47d68b1e32a1e28b258b4228160072bbe560a4c27fff90c688c260c76f"
     },
-    "021-python-project-runbook/project-folder-map": {
-      "assetKey": "project-folder-map",
-      "path": "objects/sha256/51/511d308bd81b6431348885ca2d494966ef961f52798c5ab50101fa286f7ad85f.png",
+    "021-python-project-runbook/fresh-clone-replay": {
+      "assetKey": "fresh-clone-replay",
+      "path": "objects/sha256/06/067a134337d618f096b6b66a5935dcdc2b2b2f53594927e7b5f6d72449c583b6.png",
       "post": "021-python-project-runbook",
-      "sha256": "511d308bd81b6431348885ca2d494966ef961f52798c5ab50101fa286f7ad85f"
+      "sha256": "067a134337d618f096b6b66a5935dcdc2b2b2f53594927e7b5f6d72449c583b6"
     },
-    "021-python-project-runbook/readme-command-path": {
-      "assetKey": "readme-command-path",
-      "path": "objects/sha256/be/be5d2974f686ef65e4dbc3efb458e9649c12a0a994789f12e7edee3cb7b376fa.png",
+    "021-python-project-runbook/git-boundary": {
+      "assetKey": "git-boundary",
+      "path": "objects/sha256/f1/f15864138a8d5e7925127d7db0537d360f2ee691e73ba994e4eb469397573368.png",
       "post": "021-python-project-runbook",
-      "sha256": "be5d2974f686ef65e4dbc3efb458e9649c12a0a994789f12e7edee3cb7b376fa"
+      "sha256": "f15864138a8d5e7925127d7db0537d360f2ee691e73ba994e4eb469397573368"
+    },
+    "021-python-project-runbook/input-output-safety": {
+      "assetKey": "input-output-safety",
+      "path": "objects/sha256/4a/4ae7a14e3c602b415020c9db2027ef0255f827ffe64967a3598fe9ff5064a032.png",
+      "post": "021-python-project-runbook",
+      "sha256": "4ae7a14e3c602b415020c9db2027ef0255f827ffe64967a3598fe9ff5064a032"
+    },
+    "021-python-project-runbook/metadata-lock-contract": {
+      "assetKey": "metadata-lock-contract",
+      "path": "objects/sha256/17/17bd9f99f179eaeb531a3ef5ea3a41ed4840cb0f6ae4acf8a7560507664596ef.png",
+      "post": "021-python-project-runbook",
+      "sha256": "17bd9f99f179eaeb531a3ef5ea3a41ed4840cb0f6ae4acf8a7560507664596ef"
+    },
+    "021-python-project-runbook/project-root-map": {
+      "assetKey": "project-root-map",
+      "path": "objects/sha256/a2/a270a8fc9d6aaba4c2e9d1d667e4ca434961c612277ebbba8d8d4dae7994ed0f.png",
+      "post": "021-python-project-runbook",
+      "sha256": "a270a8fc9d6aaba4c2e9d1d667e4ca434961c612277ebbba8d8d4dae7994ed0f"
+    },
+    "021-python-project-runbook/reader-validation": {
+      "assetKey": "reader-validation",
+      "path": "objects/sha256/50/50ae595087562fdc3e668d2e2eadd3c7c6c0736b508b5630702406166d06b32d.png",
+      "post": "021-python-project-runbook",
+      "sha256": "50ae595087562fdc3e668d2e2eadd3c7c6c0736b508b5630702406166d06b32d"
+    },
+    "021-python-project-runbook/readme-runbook": {
+      "assetKey": "readme-runbook",
+      "path": "objects/sha256/65/65db674dd2ba331d0860858caa1cda8339d43dc2add38ffd6c0423cf579ab24b.png",
+      "post": "021-python-project-runbook",
+      "sha256": "65db674dd2ba331d0860858caa1cda8339d43dc2add38ffd6c0423cf579ab24b"
+    },
+    "021-python-project-runbook/reproducible-contract": {
+      "assetKey": "reproducible-contract",
+      "path": "objects/sha256/e9/e9e4d1d04b62b97caa3a550191f433f10b896c12292ded6c1a1654bc3103f934.png",
+      "post": "021-python-project-runbook",
+      "sha256": "e9e4d1d04b62b97caa3a550191f433f10b896c12292ded6c1a1654bc3103f934"
+    },
+    "021-python-project-runbook/scope-checklist": {
+      "assetKey": "scope-checklist",
+      "path": "objects/sha256/90/90deefb9a345e92d9341b2eb413238fe77a611a21f3424ba4ceed88847dfcf43.png",
+      "post": "021-python-project-runbook",
+      "sha256": "90deefb9a345e92d9341b2eb413238fe77a611a21f3424ba4ceed88847dfcf43"
+    },
+    "021-python-project-runbook/script-package-choice": {
+      "assetKey": "script-package-choice",
+      "path": "objects/sha256/81/813bf48e3146e990e4ad935132cf21e891459aadaf1272ff6ec404a9d05080b4.png",
+      "post": "021-python-project-runbook",
+      "sha256": "813bf48e3146e990e4ad935132cf21e891459aadaf1272ff6ec404a9d05080b4"
+    },
+    "021-python-project-runbook/summary-write-pipeline": {
+      "assetKey": "summary-write-pipeline",
+      "path": "objects/sha256/d1/d1cd2ac9e50c84718e1783846d70cbe2c1a35e064b912f8656beca0bfafe8e14.png",
+      "post": "021-python-project-runbook",
+      "sha256": "d1cd2ac9e50c84718e1783846d70cbe2c1a35e064b912f8656beca0bfafe8e14"
+    },
+    "021-python-project-runbook/synthetic-input-contract": {
+      "assetKey": "synthetic-input-contract",
+      "path": "objects/sha256/4f/4f5fe6f157cd765be92a249db561306138f38321370b8e512629ed46c7310149.png",
+      "post": "021-python-project-runbook",
+      "sha256": "4f5fe6f157cd765be92a249db561306138f38321370b8e512629ed46c7310149"
+    },
+    "021-python-project-runbook/temporary-test-isolation": {
+      "assetKey": "temporary-test-isolation",
+      "path": "objects/sha256/16/16a0c2a62daa4fd081275c157104ce696e569afca509f58d84d8638544551b83.png",
+      "post": "021-python-project-runbook",
+      "sha256": "16a0c2a62daa4fd081275c157104ce696e569afca509f58d84d8638544551b83"
+    },
+    "021-python-project-runbook/uv-project-bootstrap": {
+      "assetKey": "uv-project-bootstrap",
+      "path": "objects/sha256/24/24d7eea4bf390f460821442d8f945293776a0d03bb5f996ce50eb598646a12a0.png",
+      "post": "021-python-project-runbook",
+      "sha256": "24d7eea4bf390f460821442d8f945293776a0d03bb5f996ce50eb598646a12a0"
     },
     "022-windows-python-recovery/command-triage": {
       "assetKey": "command-triage",
@@ -1648,6 +1720,13 @@
       "path": "objects/sha256/04/04ff1c72912b07a1af7c85c3e560b40d9914d8f71fec2c4e318601b7640e5156.png",
       "width": 1536
     },
+    "067a134337d618f096b6b66a5935dcdc2b2b2f53594927e7b5f6d72449c583b6": {
+      "bytes": 1150025,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/06/067a134337d618f096b6b66a5935dcdc2b2b2f53594927e7b5f6d72449c583b6.png",
+      "width": 1536
+    },
     "06db9bae71ecbeb350ff87dbbed92dca39c5aef3448c34fe92dcf9bb40eb08c5": {
       "bytes": 1291570,
       "height": 1024,
@@ -1795,6 +1874,13 @@
       "path": "objects/sha256/16/16066535c61a7e50cf7fd8729f0f7c24c1d6d46285a1765d0998085dc5eb024b.png",
       "width": 1536
     },
+    "16a0c2a62daa4fd081275c157104ce696e569afca509f58d84d8638544551b83": {
+      "bytes": 1255925,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/16/16a0c2a62daa4fd081275c157104ce696e569afca509f58d84d8638544551b83.png",
+      "width": 1536
+    },
     "173328edd0643b6f3dfb11f34660f4626c290ab711ebdf087c2dbbfbfa24347d": {
       "bytes": 1146803,
       "height": 1024,
@@ -1814,6 +1900,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/17/17aa65a8e98e2dd69a9eb054c860d14cc743fdee2aefa549e5e67353b8ca1532.png",
+      "width": 1536
+    },
+    "17bd9f99f179eaeb531a3ef5ea3a41ed4840cb0f6ae4acf8a7560507664596ef": {
+      "bytes": 1171032,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/17/17bd9f99f179eaeb531a3ef5ea3a41ed4840cb0f6ae4acf8a7560507664596ef.png",
       "width": 1536
     },
     "17c286b84ad876537379331e062d40c28bc370ed9c3fb52efe03c55ed0bc0482": {
@@ -1940,6 +2033,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/24/2488fb08e37335b290eb7f97b6aafd94999e515c5ef34bb4650e9b4554dbfafd.png",
+      "width": 1536
+    },
+    "24d7eea4bf390f460821442d8f945293776a0d03bb5f996ce50eb598646a12a0": {
+      "bytes": 1191791,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/24/24d7eea4bf390f460821442d8f945293776a0d03bb5f996ce50eb598646a12a0.png",
       "width": 1536
     },
     "26f79e3e25d66e7b58b8eac4d1c1d592fa524726ecf3dee450ffda2069cc92d1": {
@@ -2131,13 +2231,6 @@
       "path": "objects/sha256/3f/3f5e473c50ab2b3042eda49cc9e3b0c8649f2adb7345bc9f77f3c0a5eb774a80.png",
       "width": 1536
     },
-    "3fc08ea17c9a5e77630362011f5049442ff3078c166f8e7ade8cc32c7728a23d": {
-      "bytes": 1643759,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/3f/3fc08ea17c9a5e77630362011f5049442ff3078c166f8e7ade8cc32c7728a23d.png",
-      "width": 1536
-    },
     "41bd712f25bb7d76d19a96baedd661c9bb93b0b1b63555d8639e36e1ea09d5fd": {
       "bytes": 1204615,
       "height": 1024,
@@ -2201,6 +2294,13 @@
       "path": "objects/sha256/4a/4a9aae7bd42bdb2a57af63e7175517c6eb51933664b7875689be4b407bd37723.png",
       "width": 1536
     },
+    "4ae7a14e3c602b415020c9db2027ef0255f827ffe64967a3598fe9ff5064a032": {
+      "bytes": 1131590,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/4a/4ae7a14e3c602b415020c9db2027ef0255f827ffe64967a3598fe9ff5064a032.png",
+      "width": 1536
+    },
     "4b0f0fafec8ea9edf075c8b6a0ba4ae023dbdfde80dff5c4568b10693bb904d1": {
       "bytes": 1377001,
       "height": 1024,
@@ -2236,6 +2336,13 @@
       "path": "objects/sha256/4e/4e456aa812a19f4368e6b124aedf7d06d8ddcf164186ab2b8f51c4c69b9fce8a.png",
       "width": 1536
     },
+    "4f5fe6f157cd765be92a249db561306138f38321370b8e512629ed46c7310149": {
+      "bytes": 1151639,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/4f/4f5fe6f157cd765be92a249db561306138f38321370b8e512629ed46c7310149.png",
+      "width": 1536
+    },
     "50533a474c413ff801d16a7f721f795afff17c5a42c996d44a7e8912b253f915": {
       "bytes": 1196328,
       "height": 1024,
@@ -2243,11 +2350,11 @@
       "path": "objects/sha256/50/50533a474c413ff801d16a7f721f795afff17c5a42c996d44a7e8912b253f915.png",
       "width": 1536
     },
-    "511d308bd81b6431348885ca2d494966ef961f52798c5ab50101fa286f7ad85f": {
-      "bytes": 1225103,
+    "50ae595087562fdc3e668d2e2eadd3c7c6c0736b508b5630702406166d06b32d": {
+      "bytes": 1180163,
       "height": 1024,
       "mime": "image/png",
-      "path": "objects/sha256/51/511d308bd81b6431348885ca2d494966ef961f52798c5ab50101fa286f7ad85f.png",
+      "path": "objects/sha256/50/50ae595087562fdc3e668d2e2eadd3c7c6c0736b508b5630702406166d06b32d.png",
       "width": 1536
     },
     "5274db969e51c93221735e8d221b39f0c4a8e985a36de149a71cb6fba2722c50": {
@@ -2376,6 +2483,13 @@
       "path": "objects/sha256/65/650759fb310a10fb1befee4028a16ca736e2dab559e813667646676534bce9ba.png",
       "width": 1536
     },
+    "65db674dd2ba331d0860858caa1cda8339d43dc2add38ffd6c0423cf579ab24b": {
+      "bytes": 1095215,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/65/65db674dd2ba331d0860858caa1cda8339d43dc2add38ffd6c0423cf579ab24b.png",
+      "width": 1536
+    },
     "6609338a7947e15c6bccbfc6f99d211ad4a1cce25f42afffd1ec52ca120c2eaa": {
       "bytes": 936586,
       "height": 1024,
@@ -2425,13 +2539,6 @@
       "path": "objects/sha256/69/694b3d85f92ba37a57c3c6c1df00fc1fb9873b419d6de14c6c638f102256c494.png",
       "width": 1536
     },
-    "6a2d36f4bfc21d6e06d629c893769de653aa9d621a430642915577c5e246f8da": {
-      "bytes": 1821937,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/6a/6a2d36f4bfc21d6e06d629c893769de653aa9d621a430642915577c5e246f8da.png",
-      "width": 1536
-    },
     "6ada0be533bce8265fba47e89edf008c0de344fc6845a6dd045e805544fc7238": {
       "bytes": 2067583,
       "height": 1024,
@@ -2458,6 +2565,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/6c/6cc78d178605421a17d6e744aed05c7f6825d72ded36f50bcd07bbf6915590d3.png",
+      "width": 1536
+    },
+    "6d1f7d47d68b1e32a1e28b258b4228160072bbe560a4c27fff90c688c260c76f": {
+      "bytes": 1225871,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/6d/6d1f7d47d68b1e32a1e28b258b4228160072bbe560a4c27fff90c688c260c76f.png",
       "width": 1536
     },
     "6e9b1729610da9429db505a7542eb91b4e4adb6dffd6f1ae00df6f11c7dd2b86": {
@@ -2621,6 +2735,13 @@
       "path": "objects/sha256/81/810a0a376579b205d73f87a350ee8ad7eb56ed0b2afe2f860e57a5062725829d.png",
       "width": 1536
     },
+    "813bf48e3146e990e4ad935132cf21e891459aadaf1272ff6ec404a9d05080b4": {
+      "bytes": 1149355,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/81/813bf48e3146e990e4ad935132cf21e891459aadaf1272ff6ec404a9d05080b4.png",
+      "width": 1536
+    },
     "81903f73887ec755a95234337a970dc97d80f9eef02efb394ea7793545c4ab55": {
       "bytes": 1193364,
       "height": 1024,
@@ -2738,6 +2859,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/90/90c9bb9977f83bdae5d68d0a7f2748b135efe1d202cf5154a2de2da9e1b62b34.png",
+      "width": 1536
+    },
+    "90deefb9a345e92d9341b2eb413238fe77a611a21f3424ba4ceed88847dfcf43": {
+      "bytes": 1218703,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/90/90deefb9a345e92d9341b2eb413238fe77a611a21f3424ba4ceed88847dfcf43.png",
       "width": 1536
     },
     "917208e2fbd8e420072e1cf6634281e4718723857dd6e939ba6904f74a069345": {
@@ -2899,6 +3027,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/a2/a21da2b967cdab9712760663bdccdddbcb3ecf97a9ad4708dbcb8c92b5251a10.png",
+      "width": 1536
+    },
+    "a270a8fc9d6aaba4c2e9d1d667e4ca434961c612277ebbba8d8d4dae7994ed0f": {
+      "bytes": 1159578,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/a2/a270a8fc9d6aaba4c2e9d1d667e4ca434961c612277ebbba8d8d4dae7994ed0f.png",
       "width": 1536
     },
     "a46eb8a66f9e4b812c3965dba68c30d4b87f3f7a5660201420071f503fdbb800": {
@@ -3097,13 +3232,6 @@
       "path": "objects/sha256/bd/bdea0c86f940c0da9bcd8b211e89c142585c77d68df6ee4854e3258a548f6454.png",
       "width": 1536
     },
-    "be5d2974f686ef65e4dbc3efb458e9649c12a0a994789f12e7edee3cb7b376fa": {
-      "bytes": 1311967,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/be/be5d2974f686ef65e4dbc3efb458e9649c12a0a994789f12e7edee3cb7b376fa.png",
-      "width": 1536
-    },
     "bf5c8b44d4666afc4da74ec6de1f76821285a270c2a35cfd1661aef38fe7475e": {
       "bytes": 1259774,
       "height": 1024,
@@ -3146,6 +3274,13 @@
       "path": "objects/sha256/c7/c7c4f6c8ea1a1e29b52de742d5ea62751f5f2a6aa5db93b099155f19a6dc41e9.png",
       "width": 1536
     },
+    "c8cc29146575e718fda8329c35fb9d91c2db56d240cd9fcc753545d34990766a": {
+      "bytes": 1128419,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/c8/c8cc29146575e718fda8329c35fb9d91c2db56d240cd9fcc753545d34990766a.png",
+      "width": 1536
+    },
     "c971af6073bc2ae4c6df02e812f23090eb417a8287a8943c77d82a3250d650ec": {
       "bytes": 1231241,
       "height": 1024,
@@ -3158,6 +3293,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/d0/d06f5719d26fdaefc402b08a088ed13d74078004223501de8a800c12b0a832fa.png",
+      "width": 1536
+    },
+    "d1cd2ac9e50c84718e1783846d70cbe2c1a35e064b912f8656beca0bfafe8e14": {
+      "bytes": 1145952,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/d1/d1cd2ac9e50c84718e1783846d70cbe2c1a35e064b912f8656beca0bfafe8e14.png",
       "width": 1536
     },
     "d225def4b9a0c0d307ed559f4910e8e038027ebc5d23e2e5d88256d146d5f439": {
@@ -3349,6 +3491,13 @@
       "path": "objects/sha256/e9/e9850269647432bf2f6e97a1400c5a77ebabfa9eef038af5f1a1eeb0fb47c792.png",
       "width": 1536
     },
+    "e9e4d1d04b62b97caa3a550191f433f10b896c12292ded6c1a1654bc3103f934": {
+      "bytes": 1119928,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/e9/e9e4d1d04b62b97caa3a550191f433f10b896c12292ded6c1a1654bc3103f934.png",
+      "width": 1536
+    },
     "edf68eba6adf2e16fda996a4b3c99f1e638f7e44e2638dec6b0f516153aeffba": {
       "bytes": 1607635,
       "height": 1024,
@@ -3382,6 +3531,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/f0/f05d6e40a7b4e6e7a81d9760c7f4f728da507b616abc9a1abc0c1e21dac80f7a.png",
+      "width": 1536
+    },
+    "f15864138a8d5e7925127d7db0537d360f2ee691e73ba994e4eb469397573368": {
+      "bytes": 1137580,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/f1/f15864138a8d5e7925127d7db0537d360f2ee691e73ba994e4eb469397573368.png",
       "width": 1536
     },
     "f198c80e6f05597de0ddadeddc3c927bf794075bd23a1c4737432f9f62d23a77": {
