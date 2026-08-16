@@ -1026,29 +1026,95 @@
       "post": "019-python-for-loop",
       "sha256": "d450fd61f6139d9cc76d13b0de4cf4610bfc1ee6919dd6f092813325770318ac"
     },
-    "020-python-functions/function-tests": {
-      "assetKey": "function-tests",
-      "path": "objects/sha256/18/18c736933d9d390de5fa78dc75054b559cbfd3c522c6335a4b5550e616f8c7d1.png",
+    "020-python-functions/alternatives": {
+      "assetKey": "alternatives",
+      "path": "objects/sha256/c4/c4a65361c1460e32333bd076397cc9fb671dc1f54c4405afbd817d8bfd1aa740.png",
       "post": "020-python-functions",
-      "sha256": "18c736933d9d390de5fa78dc75054b559cbfd3c522c6335a4b5550e616f8c7d1"
+      "sha256": "c4a65361c1460e32333bd076397cc9fb671dc1f54c4405afbd817d8bfd1aa740"
     },
-    "020-python-functions/input-output-box": {
-      "assetKey": "input-output-box",
-      "path": "objects/sha256/0d/0da779c86729a1fdc079e65845337f9364d16374f685e3187ee466e04324de4a.png",
+    "020-python-functions/boundary-tests": {
+      "assetKey": "boundary-tests",
+      "path": "objects/sha256/67/676a279344492625cf752619379fede637caf8aceff9d5baf766df2ef9b3d8fb.png",
       "post": "020-python-functions",
-      "sha256": "0da779c86729a1fdc079e65845337f9364d16374f685e3187ee466e04324de4a"
+      "sha256": "676a279344492625cf752619379fede637caf8aceff9d5baf766df2ef9b3d8fb"
     },
-    "020-python-functions/reused-rule": {
-      "assetKey": "reused-rule",
-      "path": "objects/sha256/66/66dcdfb2a1462891e70b50e27b669fd8a5bda511db957d57558b2917fba6c0d3.png",
+    "020-python-functions/complete-program": {
+      "assetKey": "complete-program",
+      "path": "objects/sha256/30/3075e2d92ae65329b3adab45bb7faf9dac67a3fb7f3ef453bb73e3e8d6ff4104.png",
       "post": "020-python-functions",
-      "sha256": "66dcdfb2a1462891e70b50e27b669fd8a5bda511db957d57558b2917fba6c0d3"
+      "sha256": "3075e2d92ae65329b3adab45bb7faf9dac67a3fb7f3ef453bb73e3e8d6ff4104"
     },
-    "020-python-functions/small-functions": {
-      "assetKey": "small-functions",
-      "path": "objects/sha256/9c/9ca88b95015b6c2284c1c80dca967dfe0d9997999ed508974f41571647242bee.png",
+    "020-python-functions/definition-and-call": {
+      "assetKey": "definition-and-call",
+      "path": "objects/sha256/e0/e062f6806cdd36faea17ef54f7671283863317c7164f6de1e6a615eef89176e5.png",
       "post": "020-python-functions",
-      "sha256": "9ca88b95015b6c2284c1c80dca967dfe0d9997999ed508974f41571647242bee"
+      "sha256": "e062f6806cdd36faea17ef54f7671283863317c7164f6de1e6a615eef89176e5"
+    },
+    "020-python-functions/first-refactor": {
+      "assetKey": "first-refactor",
+      "path": "objects/sha256/0f/0fdb589a7b9f944becc6296d8939d3721d98b1d59497c2bdf6ad7995d8f20436.png",
+      "post": "020-python-functions",
+      "sha256": "0fdb589a7b9f944becc6296d8939d3721d98b1d59497c2bdf6ad7995d8f20436"
+    },
+    "020-python-functions/function-as-value": {
+      "assetKey": "function-as-value",
+      "path": "objects/sha256/ef/ef81136ea9888a1a0adbc3bbe58d50bcde31a6c912972bcedca944499d489431.png",
+      "post": "020-python-functions",
+      "sha256": "ef81136ea9888a1a0adbc3bbe58d50bcde31a6c912972bcedca944499d489431"
+    },
+    "020-python-functions/function-composition": {
+      "assetKey": "function-composition",
+      "path": "objects/sha256/07/076f4eff4bbc0a2d4269abb0865e57ffb4668ab8d0479fe7841de310cddcbc94.png",
+      "post": "020-python-functions",
+      "sha256": "076f4eff4bbc0a2d4269abb0865e57ffb4668ab8d0479fe7841de310cddcbc94"
+    },
+    "020-python-functions/function-contract": {
+      "assetKey": "function-contract",
+      "path": "objects/sha256/67/67d2f5bdac8c6a4e4f51b24751e9cb429406413f0841f4e29f18a58dae9168f6.png",
+      "post": "020-python-functions",
+      "sha256": "67d2f5bdac8c6a4e4f51b24751e9cb429406413f0841f4e29f18a58dae9168f6"
+    },
+    "020-python-functions/input-exception": {
+      "assetKey": "input-exception",
+      "path": "objects/sha256/49/496a65225e49f0eeba96e1ec03579c3d416f6c5c7df2048b9e442caeb55ca6d5.png",
+      "post": "020-python-functions",
+      "sha256": "496a65225e49f0eeba96e1ec03579c3d416f6c5c7df2048b9e442caeb55ca6d5"
+    },
+    "020-python-functions/local-call-scope": {
+      "assetKey": "local-call-scope",
+      "path": "objects/sha256/55/55a220cf9be84a9c621ad2d28487d6d5bfeb0fa504f355905e7398fb27427dc7.png",
+      "post": "020-python-functions",
+      "sha256": "55a220cf9be84a9c621ad2d28487d6d5bfeb0fa504f355905e7398fb27427dc7"
+    },
+    "020-python-functions/mutable-default": {
+      "assetKey": "mutable-default",
+      "path": "objects/sha256/7f/7f7e69dedcb155c332f6b96b23e291f00a4cce6d53c2c9afe0b519c89fcb42fa.png",
+      "post": "020-python-functions",
+      "sha256": "7f7e69dedcb155c332f6b96b23e291f00a4cce6d53c2c9afe0b519c89fcb42fa"
+    },
+    "020-python-functions/object-reference": {
+      "assetKey": "object-reference",
+      "path": "objects/sha256/48/48918440bbeb85539ecbfae0c1a04db2d14d891162804a48bd627b79a6d932e8.png",
+      "post": "020-python-functions",
+      "sha256": "48918440bbeb85539ecbfae0c1a04db2d14d891162804a48bd627b79a6d932e8"
+    },
+    "020-python-functions/parameter-argument": {
+      "assetKey": "parameter-argument",
+      "path": "objects/sha256/17/17919ef6307662cbe02bb996935cf859896cc5bf4c590da8a6b07c6cfec143c1.png",
+      "post": "020-python-functions",
+      "sha256": "17919ef6307662cbe02bb996935cf859896cc5bf4c590da8a6b07c6cfec143c1"
+    },
+    "020-python-functions/return-versus-print": {
+      "assetKey": "return-versus-print",
+      "path": "objects/sha256/5b/5bd6c0d4727e2cb83955377a082681905e7eb5fec64df6d2075a9214e24eafe7.png",
+      "post": "020-python-functions",
+      "sha256": "5bd6c0d4727e2cb83955377a082681905e7eb5fec64df6d2075a9214e24eafe7"
+    },
+    "020-python-functions/type-hints-docstring": {
+      "assetKey": "type-hints-docstring",
+      "path": "objects/sha256/2e/2e597ca5c7533ea021e07194048ff11e03cadf1af2e321f7b5683bbc2ce9b9ba.png",
+      "post": "020-python-functions",
+      "sha256": "2e597ca5c7533ea021e07194048ff11e03cadf1af2e321f7b5683bbc2ce9b9ba"
     },
     "021-python-project-runbook/fresh-folder-replay": {
       "assetKey": "fresh-folder-replay",
@@ -1589,6 +1655,13 @@
       "path": "objects/sha256/06/06db9bae71ecbeb350ff87dbbed92dca39c5aef3448c34fe92dcf9bb40eb08c5.png",
       "width": 1536
     },
+    "076f4eff4bbc0a2d4269abb0865e57ffb4668ab8d0479fe7841de310cddcbc94": {
+      "bytes": 1201287,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/07/076f4eff4bbc0a2d4269abb0865e57ffb4668ab8d0479fe7841de310cddcbc94.png",
+      "width": 1536
+    },
     "08804fa085a5c06307cbf4778def08cd2391ef856ded871e000bef68365231ab": {
       "bytes": 1172324,
       "height": 1024,
@@ -1659,18 +1732,18 @@
       "path": "objects/sha256/0d/0d9ee95ced4f58d90aaf85da0eaea81324783a4ca36e0ce3fd227e617a6d20d2.png",
       "width": 1536
     },
-    "0da779c86729a1fdc079e65845337f9364d16374f685e3187ee466e04324de4a": {
-      "bytes": 1151536,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/0d/0da779c86729a1fdc079e65845337f9364d16374f685e3187ee466e04324de4a.png",
-      "width": 1536
-    },
     "0e52c23b722c9244fcfbfb4cd5e8544007e603753f82005c54825f1003dadcfe": {
       "bytes": 1180866,
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/0e/0e52c23b722c9244fcfbfb4cd5e8544007e603753f82005c54825f1003dadcfe.png",
+      "width": 1536
+    },
+    "0fdb589a7b9f944becc6296d8939d3721d98b1d59497c2bdf6ad7995d8f20436": {
+      "bytes": 1279302,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/0f/0fdb589a7b9f944becc6296d8939d3721d98b1d59497c2bdf6ad7995d8f20436.png",
       "width": 1536
     },
     "10c0d2f5adad46238367f65e74466275a894dccac4deeaeb6c0b4d8390f3c708": {
@@ -1729,6 +1802,13 @@
       "path": "objects/sha256/17/173328edd0643b6f3dfb11f34660f4626c290ab711ebdf087c2dbbfbfa24347d.png",
       "width": 1536
     },
+    "17919ef6307662cbe02bb996935cf859896cc5bf4c590da8a6b07c6cfec143c1": {
+      "bytes": 1464002,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/17/17919ef6307662cbe02bb996935cf859896cc5bf4c590da8a6b07c6cfec143c1.png",
+      "width": 1536
+    },
     "17aa65a8e98e2dd69a9eb054c860d14cc743fdee2aefa549e5e67353b8ca1532": {
       "bytes": 1932681,
       "height": 1024,
@@ -1755,13 +1835,6 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/18/18a507345379e23d2ab8b2b34821da8648e06fceeecf2368abdf6158aa476154.png",
-      "width": 1536
-    },
-    "18c736933d9d390de5fa78dc75054b559cbfd3c522c6335a4b5550e616f8c7d1": {
-      "bytes": 1176046,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/18/18c736933d9d390de5fa78dc75054b559cbfd3c522c6335a4b5550e616f8c7d1.png",
       "width": 1536
     },
     "19c1506dd227553f6d2b400569a4d2eee5c41e3635722b87af5c053be76fbaa0": {
@@ -1925,6 +1998,13 @@
       "path": "objects/sha256/2e/2e221463fa5dc1a4053751654fa5a91ba2e2a4c4ef275b86ef53ce441b1e44c7.png",
       "width": 1536
     },
+    "2e597ca5c7533ea021e07194048ff11e03cadf1af2e321f7b5683bbc2ce9b9ba": {
+      "bytes": 1179138,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/2e/2e597ca5c7533ea021e07194048ff11e03cadf1af2e321f7b5683bbc2ce9b9ba.png",
+      "width": 1536
+    },
     "2f4b25f3e8a90607c5b32886714681a62803c9e6174fbaede024cd6cc71a0471": {
       "bytes": 1752968,
       "height": 1024,
@@ -1937,6 +2017,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/2f/2f55c0f761b8e573e94f0a197cbbe8afad5ff4bf918a29825470d704b0a7608a.png",
+      "width": 1536
+    },
+    "3075e2d92ae65329b3adab45bb7faf9dac67a3fb7f3ef453bb73e3e8d6ff4104": {
+      "bytes": 1178396,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/30/3075e2d92ae65329b3adab45bb7faf9dac67a3fb7f3ef453bb73e3e8d6ff4104.png",
       "width": 1536
     },
     "3354d0a19e03b14749d7b71c672590c7db87b62f142dbc4a6f7d50f61d4994f7": {
@@ -2072,11 +2159,25 @@
       "path": "objects/sha256/42/42ee2ee6e00b6d6376f50f87edf950b771f3e79384e935010a2938cd06eec774.png",
       "width": 1536
     },
+    "48918440bbeb85539ecbfae0c1a04db2d14d891162804a48bd627b79a6d932e8": {
+      "bytes": 1202426,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/48/48918440bbeb85539ecbfae0c1a04db2d14d891162804a48bd627b79a6d932e8.png",
+      "width": 1536
+    },
     "48cdb7964af4c8dac7c37585daa6da46ab3ba0df272090fa65b5c418d42d5610": {
       "bytes": 1504667,
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/48/48cdb7964af4c8dac7c37585daa6da46ab3ba0df272090fa65b5c418d42d5610.png",
+      "width": 1536
+    },
+    "496a65225e49f0eeba96e1ec03579c3d416f6c5c7df2048b9e442caeb55ca6d5": {
+      "bytes": 1195115,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/49/496a65225e49f0eeba96e1ec03579c3d416f6c5c7df2048b9e442caeb55ca6d5.png",
       "width": 1536
     },
     "497c48cf54ac124b1898d8c3c29a69dc7ae99f9d1e667c505c5afc3951206c13": {
@@ -2156,6 +2257,13 @@
       "path": "objects/sha256/52/5274db969e51c93221735e8d221b39f0c4a8e985a36de149a71cb6fba2722c50.png",
       "width": 1536
     },
+    "55a220cf9be84a9c621ad2d28487d6d5bfeb0fa504f355905e7398fb27427dc7": {
+      "bytes": 1165076,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/55/55a220cf9be84a9c621ad2d28487d6d5bfeb0fa504f355905e7398fb27427dc7.png",
+      "width": 1536
+    },
     "56ac992cf73e385dc0bde19c4577aff131afd541084eeb62693fd87f0f70c54b": {
       "bytes": 1339712,
       "height": 1024,
@@ -2203,6 +2311,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/5b/5b265b79f7f8c9da65bcc93c98a7a2ac1fbc66a4b3b37cb17624f6b4f74daccd.png",
+      "width": 1536
+    },
+    "5bd6c0d4727e2cb83955377a082681905e7eb5fec64df6d2075a9214e24eafe7": {
+      "bytes": 1631308,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/5b/5bd6c0d4727e2cb83955377a082681905e7eb5fec64df6d2075a9214e24eafe7.png",
       "width": 1536
     },
     "5c06900abb00b67f31e460c9a097872ca648c5f397451494c319d2a980e93418": {
@@ -2275,11 +2390,11 @@
       "path": "objects/sha256/66/663ad7a764baab250bc9dd3c7ba400c1575d2a6064d1492edf72ddf57627fe8f.png",
       "width": 1536
     },
-    "66dcdfb2a1462891e70b50e27b669fd8a5bda511db957d57558b2917fba6c0d3": {
-      "bytes": 1205184,
+    "676a279344492625cf752619379fede637caf8aceff9d5baf766df2ef9b3d8fb": {
+      "bytes": 1272723,
       "height": 1024,
       "mime": "image/png",
-      "path": "objects/sha256/66/66dcdfb2a1462891e70b50e27b669fd8a5bda511db957d57558b2917fba6c0d3.png",
+      "path": "objects/sha256/67/676a279344492625cf752619379fede637caf8aceff9d5baf766df2ef9b3d8fb.png",
       "width": 1536
     },
     "679308d1d895d5b759fb29da77e9f025c345b00789f614ffbe4adc2c0496f468": {
@@ -2287,6 +2402,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/67/679308d1d895d5b759fb29da77e9f025c345b00789f614ffbe4adc2c0496f468.png",
+      "width": 1536
+    },
+    "67d2f5bdac8c6a4e4f51b24751e9cb429406413f0841f4e29f18a58dae9168f6": {
+      "bytes": 1156078,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/67/67d2f5bdac8c6a4e4f51b24751e9cb429406413f0841f4e29f18a58dae9168f6.png",
       "width": 1536
     },
     "6829c52f80f6a9485f1677894d47090e2229bf896df38502e10d016931c10488": {
@@ -2483,6 +2605,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/7f/7f4a1ebb90114c294e69b453b3bf0c0108e4b38b1065962dab7b4dcde33621cd.png",
+      "width": 1536
+    },
+    "7f7e69dedcb155c332f6b96b23e291f00a4cce6d53c2c9afe0b519c89fcb42fa": {
+      "bytes": 1296999,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/7f/7f7e69dedcb155c332f6b96b23e291f00a4cce6d53c2c9afe0b519c89fcb42fa.png",
       "width": 1536
     },
     "810a0a376579b205d73f87a350ee8ad7eb56ed0b2afe2f860e57a5062725829d": {
@@ -2686,13 +2815,6 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/9b/9b618344c542a1e5221a83f51d169d362b038c2b512e8c756fe43428311cbe07.png",
-      "width": 1536
-    },
-    "9ca88b95015b6c2284c1c80dca967dfe0d9997999ed508974f41571647242bee": {
-      "bytes": 1205370,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/9c/9ca88b95015b6c2284c1c80dca967dfe0d9997999ed508974f41571647242bee.png",
       "width": 1536
     },
     "9cc5597e6b318dfc0b590d90b5ed3815c766df6513c9dde465bc5d2772c9bf2f": {
@@ -3003,6 +3125,13 @@
       "path": "objects/sha256/c4/c48d24f41874f452270a34c0e360353458d9abaf91f5d0063711a674a87a7582.png",
       "width": 1536
     },
+    "c4a65361c1460e32333bd076397cc9fb671dc1f54c4405afbd817d8bfd1aa740": {
+      "bytes": 1196892,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/c4/c4a65361c1460e32333bd076397cc9fb671dc1f54c4405afbd817d8bfd1aa740.png",
+      "width": 1536
+    },
     "c513256699081fae62c2b04639f8b7b8d01a6978773eb90d20ebd80463859d16": {
       "bytes": 1195374,
       "height": 1024,
@@ -3136,6 +3265,13 @@
       "path": "objects/sha256/df/df182eaa6d8817cfd9a0617e5820e39969af9ff084b998575b6b9713e5d1140d.png",
       "width": 1536
     },
+    "e062f6806cdd36faea17ef54f7671283863317c7164f6de1e6a615eef89176e5": {
+      "bytes": 1557052,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/e0/e062f6806cdd36faea17ef54f7671283863317c7164f6de1e6a615eef89176e5.png",
+      "width": 1536
+    },
     "e1d55f556afa25f776007872caa38940de34d08182fbbc662ae22250653437e7": {
       "bytes": 1184917,
       "height": 1024,
@@ -3225,6 +3361,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/ee/ee2838cfef2ca70fb1c161bd28a8ba63e80e4b4f217c4fe38b7e8a05ee9079eb.png",
+      "width": 1536
+    },
+    "ef81136ea9888a1a0adbc3bbe58d50bcde31a6c912972bcedca944499d489431": {
+      "bytes": 1246283,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/ef/ef81136ea9888a1a0adbc3bbe58d50bcde31a6c912972bcedca944499d489431.png",
       "width": 1536
     },
     "efc1ef0fccdad1bd856837bab6350b4614feb267fa8eca3d7b8a1f8756cf5221": {
