@@ -642,35 +642,77 @@
       "post": "014-python-excel-merge",
       "sha256": "09b6de3b88e14a06d0ab20f13466c7baeb70011f660952b055853a1417dc568a"
     },
-    "015-excel-automation-validation/input-hash-check": {
-      "assetKey": "input-hash-check",
-      "path": "objects/sha256/ca/cad99250b355a671e6bcc653ee23871c0354b376761a0368990b6648bf80eda3.png",
+    "015-excel-automation-validation/complete-validation-run": {
+      "assetKey": "complete-validation-run",
+      "path": "objects/sha256/8c/8cda21db4cb3f78f8960b4524e4cb402129b594f6d265fe259fc8c61ed8a2ce1.png",
       "post": "015-excel-automation-validation",
-      "sha256": "cad99250b355a671e6bcc653ee23871c0354b376761a0368990b6648bf80eda3"
+      "sha256": "8cda21db4cb3f78f8960b4524e4cb402129b594f6d265fe259fc8c61ed8a2ce1"
     },
-    "015-excel-automation-validation/reconcile-count-total": {
-      "assetKey": "reconcile-count-total",
-      "path": "objects/sha256/fd/fd86614c50737abb3c0b9e78935f8ae994fc199820e67854a5e7de0a87dfc78d.png",
+    "015-excel-automation-validation/derived-sheet-recalculation": {
+      "assetKey": "derived-sheet-recalculation",
+      "path": "objects/sha256/db/dba53d7f96828b0e034a171d2686662785f9f8a255b6c809245bbe5c557571af.png",
       "post": "015-excel-automation-validation",
-      "sha256": "fd86614c50737abb3c0b9e78935f8ae994fc199820e67854a5e7de0a87dfc78d"
+      "sha256": "dba53d7f96828b0e034a171d2686662785f9f8a255b6c809245bbe5c557571af"
     },
-    "015-excel-automation-validation/safe-rerun": {
-      "assetKey": "safe-rerun",
-      "path": "objects/sha256/b8/b81113f251d58e921d6bc191b74fe292d6cafa6a65d877578be8f94f672c3d4f.png",
+    "015-excel-automation-validation/fault-injection-tests": {
+      "assetKey": "fault-injection-tests",
+      "path": "objects/sha256/04/04ff1c72912b07a1af7c85c3e560b40d9914d8f71fec2c4e318601b7640e5156.png",
       "post": "015-excel-automation-validation",
-      "sha256": "b81113f251d58e921d6bc191b74fe292d6cafa6a65d877578be8f94f672c3d4f"
+      "sha256": "04ff1c72912b07a1af7c85c3e560b40d9914d8f71fec2c4e318601b7640e5156"
     },
-    "015-excel-automation-validation/validation-report-exit": {
-      "assetKey": "validation-report-exit",
-      "path": "objects/sha256/68/682cd98f605ecf8a64d979cc1184868b2405d0681f74be23ec4d755867529993.png",
+    "015-excel-automation-validation/independent-expected-actual": {
+      "assetKey": "independent-expected-actual",
+      "path": "objects/sha256/ba/ba0aeffadb54a1b22869da8034595ac2226761723ccad07b59fadc16f1cfe8f7.png",
       "post": "015-excel-automation-validation",
-      "sha256": "682cd98f605ecf8a64d979cc1184868b2405d0681f74be23ec4d755867529993"
+      "sha256": "ba0aeffadb54a1b22869da8034595ac2226761723ccad07b59fadc16f1cfe8f7"
     },
-    "015-excel-automation-validation/validation-six-checks": {
-      "assetKey": "validation-six-checks",
-      "path": "objects/sha256/f8/f859ddbeca90cdb5542d6a92a044de7585de96f1657f5d830ba80a75fa49dfe9.png",
+    "015-excel-automation-validation/offsetting-row-error": {
+      "assetKey": "offsetting-row-error",
+      "path": "objects/sha256/23/23da085a737f2a035037f335c7524bd3fa263af6e18d2bda39207e110c20f267.png",
       "post": "015-excel-automation-validation",
-      "sha256": "f859ddbeca90cdb5542d6a92a044de7585de96f1657f5d830ba80a75fa49dfe9"
+      "sha256": "23da085a737f2a035037f335c7524bd3fa263af6e18d2bda39207e110c20f267"
+    },
+    "015-excel-automation-validation/semantic-rerun-comparison": {
+      "assetKey": "semantic-rerun-comparison",
+      "path": "objects/sha256/f1/f198c80e6f05597de0ddadeddc3c927bf794075bd23a1c4737432f9f62d23a77.png",
+      "post": "015-excel-automation-validation",
+      "sha256": "f198c80e6f05597de0ddadeddc3c927bf794075bd23a1c4737432f9f62d23a77"
+    },
+    "015-excel-automation-validation/source-file-hashes": {
+      "assetKey": "source-file-hashes",
+      "path": "objects/sha256/e8/e8879098091e7a0458756f85551f9a6ef0ca337af62a55b791a9cfa824e9f6df.png",
+      "post": "015-excel-automation-validation",
+      "sha256": "e8879098091e7a0458756f85551f9a6ef0ca337af62a55b791a9cfa824e9f6df"
+    },
+    "015-excel-automation-validation/validation-boundaries": {
+      "assetKey": "validation-boundaries",
+      "path": "objects/sha256/2e/2e221463fa5dc1a4053751654fa5a91ba2e2a4c4ef275b86ef53ce441b1e44c7.png",
+      "post": "015-excel-automation-validation",
+      "sha256": "2e221463fa5dc1a4053751654fa5a91ba2e2a4c4ef275b86ef53ce441b1e44c7"
+    },
+    "015-excel-automation-validation/validation-contract": {
+      "assetKey": "validation-contract",
+      "path": "objects/sha256/63/63927a6401a7aff43f16ad4f4b78733907396bb2dc78d1253c6f6de0917ab25f.png",
+      "post": "015-excel-automation-validation",
+      "sha256": "63927a6401a7aff43f16ad4f4b78733907396bb2dc78d1253c6f6de0917ab25f"
+    },
+    "015-excel-automation-validation/validation-layers": {
+      "assetKey": "validation-layers",
+      "path": "objects/sha256/20/20f8b564392100e61319cf3cfcce9bced8cda4aac3fbc397e2006ea2bcaa2f9f.png",
+      "post": "015-excel-automation-validation",
+      "sha256": "20f8b564392100e61319cf3cfcce9bced8cda4aac3fbc397e2006ea2bcaa2f9f"
+    },
+    "015-excel-automation-validation/validation-project-files": {
+      "assetKey": "validation-project-files",
+      "path": "objects/sha256/04/047b3cf8d935a6c5e5c3b9289c4a06891b230ef25f51345a37257eb3117b7b36.png",
+      "post": "015-excel-automation-validation",
+      "sha256": "047b3cf8d935a6c5e5c3b9289c4a06891b230ef25f51345a37257eb3117b7b36"
+    },
+    "015-excel-automation-validation/validation-report-and-exit": {
+      "assetKey": "validation-report-and-exit",
+      "path": "objects/sha256/aa/aa8679fdd578ffba04ba9f24b4b35f8bb9c25d1adf6c54e6575b2ed0d28b9e78.png",
+      "post": "015-excel-automation-validation",
+      "sha256": "aa8679fdd578ffba04ba9f24b4b35f8bb9c25d1adf6c54e6575b2ed0d28b9e78"
     },
     "016-work-automation-plan/choose-one-task": {
       "assetKey": "choose-one-task",
@@ -1322,11 +1364,25 @@
       "path": "objects/sha256/03/03bb89bcddfc43c4e9034e4e86c36867b768af409302e7ac88701227e3fb21d7.png",
       "width": 1536
     },
+    "047b3cf8d935a6c5e5c3b9289c4a06891b230ef25f51345a37257eb3117b7b36": {
+      "bytes": 1728806,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/04/047b3cf8d935a6c5e5c3b9289c4a06891b230ef25f51345a37257eb3117b7b36.png",
+      "width": 1536
+    },
     "04d4ff033587ccc56cef40bc3ed470742917961c90edeffc00ed35396ec229a2": {
       "bytes": 1265828,
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/04/04d4ff033587ccc56cef40bc3ed470742917961c90edeffc00ed35396ec229a2.png",
+      "width": 1536
+    },
+    "04ff1c72912b07a1af7c85c3e560b40d9914d8f71fec2c4e318601b7640e5156": {
+      "bytes": 1739207,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/04/04ff1c72912b07a1af7c85c3e560b40d9914d8f71fec2c4e318601b7640e5156.png",
       "width": 1536
     },
     "06db9bae71ecbeb350ff87dbbed92dca39c5aef3448c34fe92dcf9bb40eb08c5": {
@@ -1518,6 +1574,13 @@
       "path": "objects/sha256/20/20b25773c80c400ec6dcffcfcecad37e1cec77ba9bef7d78c7797a4aff504908.png",
       "width": 1536
     },
+    "20f8b564392100e61319cf3cfcce9bced8cda4aac3fbc397e2006ea2bcaa2f9f": {
+      "bytes": 1647177,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/20/20f8b564392100e61319cf3cfcce9bced8cda4aac3fbc397e2006ea2bcaa2f9f.png",
+      "width": 1536
+    },
     "21725592f14ef798e8753a716b742c067f7beb2fcd93c57d2ec082c7ca567a01": {
       "bytes": 1226668,
       "height": 1024,
@@ -1530,6 +1593,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/22/224f77ce7c9528b75c42653dfc4bcaf96ff50057765096fdb5db81ce568767a0.png",
+      "width": 1536
+    },
+    "23da085a737f2a035037f335c7524bd3fa263af6e18d2bda39207e110c20f267": {
+      "bytes": 1591974,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/23/23da085a737f2a035037f335c7524bd3fa263af6e18d2bda39207e110c20f267.png",
       "width": 1536
     },
     "24874ecb29f6f2d522b76f91e1a3e5a6b98e690937bfcc38a0ab708e49e4f326": {
@@ -1579,6 +1649,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/2c/2cb1c25ad43fdda1d708ecf9a71f1877e3e0b7845cd5f8c509b996b1c979aed5.png",
+      "width": 1536
+    },
+    "2e221463fa5dc1a4053751654fa5a91ba2e2a4c4ef275b86ef53ce441b1e44c7": {
+      "bytes": 1980627,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/2e/2e221463fa5dc1a4053751654fa5a91ba2e2a4c4ef275b86ef53ce441b1e44c7.png",
       "width": 1536
     },
     "2f4b25f3e8a90607c5b32886714681a62803c9e6174fbaede024cd6cc71a0471": {
@@ -1868,6 +1945,13 @@
       "path": "objects/sha256/62/62ca4107a36005d49f98cb37d575de65a44981bb5a645903f223b45a23b407e7.png",
       "width": 1536
     },
+    "63927a6401a7aff43f16ad4f4b78733907396bb2dc78d1253c6f6de0917ab25f": {
+      "bytes": 1777086,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/63/63927a6401a7aff43f16ad4f4b78733907396bb2dc78d1253c6f6de0917ab25f.png",
+      "width": 1536
+    },
     "64fbfacfed7c396201f972c62f393a6d95cdc6ad5c5d9d7974653297a0ca42b7": {
       "bytes": 1184916,
       "height": 1024,
@@ -1915,13 +1999,6 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/68/6829c52f80f6a9485f1677894d47090e2229bf896df38502e10d016931c10488.png",
-      "width": 1536
-    },
-    "682cd98f605ecf8a64d979cc1184868b2405d0681f74be23ec4d755867529993": {
-      "bytes": 1789502,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/68/682cd98f605ecf8a64d979cc1184868b2405d0681f74be23ec4d755867529993.png",
       "width": 1536
     },
     "694b3d85f92ba37a57c3c6c1df00fc1fb9873b419d6de14c6c638f102256c494": {
@@ -2197,6 +2274,13 @@
       "path": "objects/sha256/8a/8a0933b116b001f5b1e7e0b9226ef7f6a86cf4ed266820bd7254250ada5f064b.png",
       "width": 1536
     },
+    "8cda21db4cb3f78f8960b4524e4cb402129b594f6d265fe259fc8c61ed8a2ce1": {
+      "bytes": 1290429,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/8c/8cda21db4cb3f78f8960b4524e4cb402129b594f6d265fe259fc8c61ed8a2ce1.png",
+      "width": 1536
+    },
     "8da6da4beb36a994488e2e79553ace349f184febbd16894cd9921188120495d8": {
       "bytes": 1635619,
       "height": 1024,
@@ -2400,6 +2484,13 @@
       "path": "objects/sha256/a9/a9d472cab4c68a460d8a056740d27d700240296b35912e3fb3910d2471ed9c1f.png",
       "width": 1536
     },
+    "aa8679fdd578ffba04ba9f24b4b35f8bb9c25d1adf6c54e6575b2ed0d28b9e78": {
+      "bytes": 1517862,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/aa/aa8679fdd578ffba04ba9f24b4b35f8bb9c25d1adf6c54e6575b2ed0d28b9e78.png",
+      "width": 1536
+    },
     "ab7201895eb1b7e57d5b31b8337e6955c647aa7e806abf591934e83b851af316": {
       "bytes": 1214660,
       "height": 1024,
@@ -2470,18 +2561,18 @@
       "path": "objects/sha256/b6/b6a2974bca5dff1168d07089c8d55159adeeff5369a97ff918ff94b90f0e7314.png",
       "width": 1536
     },
-    "b81113f251d58e921d6bc191b74fe292d6cafa6a65d877578be8f94f672c3d4f": {
-      "bytes": 1251000,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/b8/b81113f251d58e921d6bc191b74fe292d6cafa6a65d877578be8f94f672c3d4f.png",
-      "width": 1536
-    },
     "b8ad831fc9ef79da76adad407a3d4342a1e103340dec551c8ee1273be1a1b3aa": {
       "bytes": 806958,
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/b8/b8ad831fc9ef79da76adad407a3d4342a1e103340dec551c8ee1273be1a1b3aa.png",
+      "width": 1536
+    },
+    "ba0aeffadb54a1b22869da8034595ac2226761723ccad07b59fadc16f1cfe8f7": {
+      "bytes": 1715663,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/ba/ba0aeffadb54a1b22869da8034595ac2226761723ccad07b59fadc16f1cfe8f7.png",
       "width": 1536
     },
     "bd1d023793222e742f3deed27ed46ff9b553aee5514807e5dcdce26bfd5e81cf": {
@@ -2547,13 +2638,6 @@
       "path": "objects/sha256/c9/c971af6073bc2ae4c6df02e812f23090eb417a8287a8943c77d82a3250d650ec.png",
       "width": 1536
     },
-    "cad99250b355a671e6bcc653ee23871c0354b376761a0368990b6648bf80eda3": {
-      "bytes": 1495455,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/ca/cad99250b355a671e6bcc653ee23871c0354b376761a0368990b6648bf80eda3.png",
-      "width": 1536
-    },
     "cb2d765ef317034ae5bb6f7617011574a10488fad76a23f753a4de4d45206462": {
       "bytes": 1197782,
       "height": 1024,
@@ -2615,6 +2699,13 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/db/db09a4aa1753cf6577e84aff28e08e885bd7bed60230cc7a2d76cff155108b8c.png",
+      "width": 1536
+    },
+    "dba53d7f96828b0e034a171d2686662785f9f8a255b6c809245bbe5c557571af": {
+      "bytes": 1614139,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/db/dba53d7f96828b0e034a171d2686662785f9f8a255b6c809245bbe5c557571af.png",
       "width": 1536
     },
     "dc7fc4cb85aea713ff43c2dbc40188ec3495aaf78bd0be5bf0df7c4c43b9cf05": {
@@ -2687,6 +2778,13 @@
       "path": "objects/sha256/e7/e73d4c46c9f28f6baeb7f7ea09433ca25fe59858416f9280899289784c47d09e.png",
       "width": 1536
     },
+    "e8879098091e7a0458756f85551f9a6ef0ca337af62a55b791a9cfa824e9f6df": {
+      "bytes": 1640163,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/e8/e8879098091e7a0458756f85551f9a6ef0ca337af62a55b791a9cfa824e9f6df.png",
+      "width": 1536
+    },
     "e8e6ecab067341a51ec01d27983f0dd194b95f6ee6b1245f92f22539a9e71340": {
       "bytes": 1198894,
       "height": 1024,
@@ -2729,6 +2827,13 @@
       "path": "objects/sha256/f0/f05d6e40a7b4e6e7a81d9760c7f4f728da507b616abc9a1abc0c1e21dac80f7a.png",
       "width": 1536
     },
+    "f198c80e6f05597de0ddadeddc3c927bf794075bd23a1c4737432f9f62d23a77": {
+      "bytes": 1419178,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/f1/f198c80e6f05597de0ddadeddc3c927bf794075bd23a1c4737432f9f62d23a77.png",
+      "width": 1536
+    },
     "f3e10a5d91b6ab8315e0cf92c2221462ebc8c81bf2e4b04e5018da6eca3f7bb1": {
       "bytes": 2110614,
       "height": 1024,
@@ -2743,13 +2848,6 @@
       "path": "objects/sha256/f6/f6418b88632b856ad681ea6b5d09aaff1d52647547adf5b80a2b33a88fa948de.png",
       "width": 1536
     },
-    "f859ddbeca90cdb5542d6a92a044de7585de96f1657f5d830ba80a75fa49dfe9": {
-      "bytes": 1283612,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/f8/f859ddbeca90cdb5542d6a92a044de7585de96f1657f5d830ba80a75fa49dfe9.png",
-      "width": 1536
-    },
     "fd080ff8f8074593dcd5177f5ac50dbfee6f45b7777be64aa0a2d14eb097cae1": {
       "bytes": 985290,
       "height": 1024,
@@ -2762,13 +2860,6 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/fd/fd2861943e1008956826164d20a67bb9545b0132228337891a1531604b903d0a.png",
-      "width": 1536
-    },
-    "fd86614c50737abb3c0b9e78935f8ae994fc199820e67854a5e7de0a87dfc78d": {
-      "bytes": 1285958,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/fd/fd86614c50737abb3c0b9e78935f8ae994fc199820e67854a5e7de0a87dfc78d.png",
       "width": 1536
     },
     "fdc46eac15dde00678bbe97bbc1632bb1ea52bfa990675fc5cd04186ce4b7c7f": {

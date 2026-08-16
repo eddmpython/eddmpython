@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { PyProcControlClient } from "pyproc/control";
 import { preview } from "vite";
 import { VISUAL_VIEWPORTS, visualContractFor } from "./visual-contract.mjs";
+import { planFullPageCaptures } from "./visual-capture-plan.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SITE_ROOT = resolve(HERE, "..");
@@ -164,6 +165,14 @@ async function preparePage(client, sessionRef) {
           await new Promise((resolveWait) => setTimeout(resolveWait, 50));
         }
       };
+      const settle = async (test, timeoutMs) => {
+        const started = Date.now();
+        while (!test()) {
+          if (Date.now() - started > timeoutMs) return false;
+          await new Promise((resolveWait) => setTimeout(resolveWait, 50));
+        }
+        return true;
+      };
       await until(() => document.readyState === "complete", 30000);
       for (const image of document.images) {
         const style = getComputedStyle(image);
@@ -171,13 +180,33 @@ async function preparePage(client, sessionRef) {
           && style.display !== "none" && style.visibility !== "hidden" && Number(style.opacity) > 0;
         if (relevant) image.loading = "eager";
       }
-      await until(() => Array.from(document.images).every((image) => {
+      await settle(() => Array.from(document.images).every((image) => {
         const style = getComputedStyle(image);
         const relevant = image.getAttribute("aria-hidden") !== "true"
           && style.display !== "none" && style.visibility !== "hidden" && Number(style.opacity) > 0;
         return !relevant || image.complete;
       }), 30000);
       await Promise.allSettled(Array.from(document.images).map((image) => image.decode()));
+      const retryDelays = [2000, 4000, 8000];
+      for (let attempt = 0; attempt < retryDelays.length; attempt += 1) {
+        const broken = Array.from(document.images).filter((image) => {
+          const style = getComputedStyle(image);
+          const relevant = image.getAttribute("aria-hidden") !== "true"
+            && style.display !== "none" && style.visibility !== "hidden" && Number(style.opacity) > 0;
+          return relevant && (!image.complete || image.naturalWidth === 0 || image.naturalHeight === 0);
+        });
+        if (!broken.length) break;
+        await new Promise((resolveWait) => setTimeout(resolveWait, retryDelays[attempt]));
+        for (const image of broken) {
+          const source = image.currentSrc || image.src;
+          const retryUrl = new URL(source, location.href);
+          retryUrl.searchParams.set("eddm_visual_retry", String(attempt + 1));
+          image.removeAttribute("srcset");
+          image.src = retryUrl.href;
+        }
+        await settle(() => broken.every((image) => image.complete), 30000);
+        await Promise.allSettled(broken.map((image) => image.decode()));
+      }
       if (document.fonts) await document.fonts.ready;
       const style = document.createElement("style");
       style.dataset.visualVerification = "true";
@@ -389,9 +418,47 @@ export async function captureVisualEvidence({ baseUrl, routeFilters = [] } = {})
             [{ kind: "hydrateLazy", maxScrolls: 100, settleMs: 50, timeoutMs: 30000, expectedRisk: "externalEffect" }],
             { timeoutMs: 60000 },
           );
-          const fullFile = `${contract.id}.${viewport.id}.full.jpg`;
-          await saveScreenshot(client, sessionRef, join(runDir, fullFile), { quality: 84, fullPage: true });
-          screenshotFiles.push({ kind: "full", file: fullFile });
+          const fullPageBounds = await evaluate(
+            client,
+            sessionRef,
+            `(() => ({
+              width: Math.min(innerWidth, Math.max(document.documentElement.scrollWidth, document.body?.scrollWidth ?? 0)),
+              height: Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight ?? 0),
+            }))()`,
+          );
+          for (const capture of planFullPageCaptures({
+            ...fullPageBounds,
+            viewportHeight: metrics.viewportHeight,
+          })) {
+            if (Number.isFinite(capture.scrollY)) {
+              await evaluate(
+                client,
+                sessionRef,
+                `(async () => {
+                  scrollTo(0, ${capture.scrollY});
+                  await new Promise((resolveFrame) => requestAnimationFrame(() => requestAnimationFrame(resolveFrame)));
+                  return scrollY;
+                })()`,
+                { awaitPromise: true },
+              );
+            }
+            const fullFile = `${contract.id}.${viewport.id}.${capture.fileToken}.jpg`;
+            await saveScreenshot(client, sessionRef, join(runDir, fullFile), {
+              quality: 84,
+              ...capture.options,
+            });
+            screenshotFiles.push({
+              kind: capture.kind,
+              file: fullFile,
+              ...(capture.segment
+                ? {
+                    segment: capture.segment,
+                    segmentCount: capture.segmentCount,
+                    scrollY: capture.scrollY,
+                  }
+                : {}),
+            });
+          }
 
           for (const capture of contract.captures) {
             const focusFile = `${contract.id}.${viewport.id}.${capture.id}.jpg`;
