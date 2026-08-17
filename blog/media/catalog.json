@@ -228,18 +228,6 @@
       "post": "006-work-automation",
       "sha256": "810a0a376579b205d73f87a350ee8ad7eb56ed0b2afe2f860e57a5062725829d"
     },
-    "006-work-automation/before-after-files": {
-      "assetKey": "before-after-files",
-      "path": "objects/sha256/a4/a477f773e96da1023dd6c41ea4ef19dbb34199731d8e9d46ae7c79fd672e523f.png",
-      "post": "006-work-automation",
-      "sha256": "a477f773e96da1023dd6c41ea4ef19dbb34199731d8e9d46ae7c79fd672e523f"
-    },
-    "006-work-automation/fill-five-cards": {
-      "assetKey": "fill-five-cards",
-      "path": "objects/sha256/57/57c42bdb79c83cc315f2d0ab0376b48d87d47bac1709134f1b68defe89ccc291.png",
-      "post": "006-work-automation",
-      "sha256": "57c42bdb79c83cc315f2d0ab0376b48d87d47bac1709134f1b68defe89ccc291"
-    },
     "006-work-automation/output-validation": {
       "assetKey": "output-validation",
       "path": "objects/sha256/75/7588515483d961e23b1e6e595a4e5a6e92fedbd75cd056fd8078b693e5590819.png",
@@ -2385,13 +2373,6 @@
       "path": "objects/sha256/57/57a319f7b8b14b5a6271e0ab6f27f2607921bd5e5b669861ba4266a32dd5fc7e.png",
       "width": 1536
     },
-    "57c42bdb79c83cc315f2d0ab0376b48d87d47bac1709134f1b68defe89ccc291": {
-      "bytes": 1207529,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/57/57c42bdb79c83cc315f2d0ab0376b48d87d47bac1709134f1b68defe89ccc291.png",
-      "width": 1536
-    },
     "592cf0e492c49e1d5e24247726beecbae6cfcb045df69df1944859690068d2c7": {
       "bytes": 1222647,
       "height": 1024,
@@ -3041,13 +3022,6 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/a4/a46eb8a66f9e4b812c3965dba68c30d4b87f3f7a5660201420071f503fdbb800.png",
-      "width": 1536
-    },
-    "a477f773e96da1023dd6c41ea4ef19dbb34199731d8e9d46ae7c79fd672e523f": {
-      "bytes": 1157020,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/a4/a477f773e96da1023dd6c41ea4ef19dbb34199731d8e9d46ae7c79fd672e523f.png",
       "width": 1536
     },
     "a511253cfdfecc35eab19e3b0411fa999ea1202a228f3aea1f943403cf564a04": {

@@ -144,4 +144,66 @@ assert.ok(
 const linkPile = h2Sections(`${body}\n\n#### 관련 링크\n\nhttps://example.com`);
 assert.ok(lintSectionPackages(linkPile).some((value) => value.message.includes("보조자료 H4")));
 
-console.log("blog package fixtures: 17 cases");
+// v2 계약: H3 부제와 절당 이미지를 강제하지 않는다. 그 강제가 40편 278개 절을
+// 같은 네 줄 머리로 만들었다.
+const leanSection = `## 5행이 맞는데 90,000원이 없습니다
+
+원본은 세 파일입니다. 손으로 더하면 390,000원인데 프로그램이 만든 결과 파일의 합계는 300,000원이었습니다. 행 수는 5행 그대로라 화면만 보면 성공으로 보입니다.`;
+const leanSections = h2Sections(leanSection);
+assert.ok(
+  lintSectionPackages(leanSections).some((value) => value.message.includes("H3 한 줄 부제")),
+);
+assert.deepEqual(lintSectionPackages(leanSections, { strictLead: false }), []);
+
+// v2는 H4 라벨 어휘를 닫지 않는다. 역할과 설명을 나눈 형태만 요구한다.
+const freeLabel = h2Sections(
+  `${leanSection}\n\n#### 검산 절차: 원본 합계와 결과 합계 맞춰 보기\n\n- 원본에서 금액을 직접 더합니다.\n- 결과 파일의 합계와 나란히 찍어 봅니다.`,
+);
+assert.ok(lintSectionPackages(freeLabel, { requireCodeLabels: true }).length);
+assert.deepEqual(lintSectionPackages(freeLabel, { strictLead: false, openLabels: true }), []);
+
+const vagueRole = h2Sections(`${leanSection}\n\n#### 코드: 병합 실행\n\n\`\`\`text\npython merge.py\n\`\`\``);
+assert.ok(
+  lintSectionPackages(vagueRole, { strictLead: false, openLabels: true }).some((value) =>
+    value.message.includes("역할어"),
+  ),
+);
+
+// v2의 깊이는 글자 수가 아니라 명제 개수와 본문 이미지 상한으로 잰다.
+const v2Body = ["하나", "둘", "셋", "넷"]
+  .map((name) => `## ${name}번 검사를 통과합니다\n\n원본 합계와 결과 합계를 나란히 찍어 보면 차이가 난 행이 바로 보입니다.`)
+  .join("\n\n");
+const v2Sections = h2Sections(v2Body);
+const v2Claims = [
+  "실행이 성공한 것과 결과가 맞는 것은 서로 다른 검사다",
+  "행 수만 맞춰 보면 금액이 사라져도 화면에 드러나지 않는다",
+  "Excel 금액 열의 문자열은 오류 없이 0으로 바뀔 수 있다",
+].join(" | ");
+assert.deepEqual(
+  lintDepthContract({ depthContract: "standalone-deep-v2", claims: v2Claims }, v2Body, v2Sections, {}),
+  [],
+);
+assert.ok(
+  lintDepthContract({ depthContract: "standalone-deep-v2" }, v2Body, v2Sections, {}).some((value) =>
+    value.location === "claims",
+  ),
+);
+assert.ok(
+  lintDepthContract({ depthContract: "standalone-deep-v2", claims: "짧다 | 둘 | 셋" }, v2Body, v2Sections, {}).some(
+    (value) => value.message.includes("8자 이상"),
+  ),
+);
+const imageHeavy = `${v2Body}\n\n${Array.from({ length: 4 }, (_, index) => `![대체 ${index}](https://example.com/${index}.webp "캡션")`).join("\n\n")}`;
+assert.ok(
+  lintDepthContract({ depthContract: "standalone-deep-v2", claims: v2Claims }, imageHeavy, v2Sections, {}).some(
+    (value) => value.message.includes("본문 이미지는 3장 이하"),
+  ),
+);
+
+// 도입 두 문단 핵심어 강제를 뺐다. 제목과 요약에만 있으면 통과한다.
+assert.deepEqual(
+  lintSeoPackage(meta, "장면부터 씁니다.\n\n두 번째 문단입니다.\n\n## 저장소 규칙을 파일에 적습니다", sections),
+  [],
+);
+
+console.log("blog package fixtures: 26 cases");

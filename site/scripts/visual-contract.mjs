@@ -26,7 +26,7 @@ export const VISUAL_VIEWPORTS = [
 const VISIBLE = (selector) => ({ type: "visible", selector });
 const COUNT = (selector, expected) => ({ type: "count", selector, ...expected });
 const TEXT = (selector, includes) => ({ type: "text", selector, includes });
-const EQUAL_COUNT = (left, right) => ({ type: "equal-count", left, right });
+const AT_MOST_COUNT = (left, right) => ({ type: "at-most-count", left, right });
 
 const ROUTE_RULES = [
   {
@@ -104,7 +104,9 @@ const ROUTE_RULES = [
       COUNT("article#content h1", { exact: 1 }),
       COUNT("article#content h2", { min: 1 }),
       COUNT('nav[aria-label="글 목차"]', { exact: 1 }),
-      EQUAL_COUNT("article#content h2", "article#content img"),
+      // v2 계약 글은 이미지 없는 절을 허용한다. 이미지가 H2보다 많으면 여전히 실패한다.
+      COUNT("article#content img", { min: 1 }),
+      AT_MOST_COUNT("article#content img", "article#content h2"),
       COUNT(
         'script[src^="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]',
         { exact: 1 },

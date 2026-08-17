@@ -247,6 +247,10 @@ async function inspectPage(client, sessionRef, checks) {
             const left = document.querySelectorAll(check.left).length;
             const right = document.querySelectorAll(check.right).length;
             if (left !== right) errors.push(check.left + " " + left + "개와 " + check.right + " " + right + "개가 다릅니다");
+          } else if (check.type === "at-most-count") {
+            const left = document.querySelectorAll(check.left).length;
+            const right = document.querySelectorAll(check.right).length;
+            if (left > right) errors.push(check.left + " " + left + "개가 " + check.right + " " + right + "개보다 많습니다");
           } else {
             errors.push("지원하지 않는 시각 검증 규칙: " + check.type);
           }

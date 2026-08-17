@@ -1,14 +1,15 @@
 import { readdir, readFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
-import { lintBlogStyle } from "./blog-style.mjs";
+import { lintBlogStyle, lintProseTexture } from "./blog-style.mjs";
 import {
+  depthContractOf,
   h2Sections,
   lintDepthContract,
   lintImageBrief,
   lintImagePolicy,
   lintSectionPackages,
   lintSeoPackage,
-  parseSectionPackage,
+  parseSectionParts,
 } from "./blog-package.mjs";
 
 const blogDir = resolve(process.cwd(), "../blog");
@@ -211,8 +212,11 @@ for (const [id, entry] of Object.entries(plan.assets)) {
   if (entry.post !== match[1] || entry.assetKey !== match[2]) {
     fail("blog/media/plan.json", `${id}의 post 또는 assetKey가 id와 다릅니다`);
   }
-  if (entry.role === "section" && entry.placement !== "H3 부제 바로 뒤") {
-    fail("blog/media/plan.json", `${id}의 placement는 H3 부제 바로 뒤여야 합니다`);
+  if (
+    entry.role === "section" &&
+    !["H3 부제 바로 뒤", "H2 제목 바로 뒤"].includes(entry.placement)
+  ) {
+    fail("blog/media/plan.json", `${id}의 placement는 H3 부제 바로 뒤 또는 H2 제목 바로 뒤여야 합니다`);
   }
   if (entry.sourcePolicy !== "auto") fail("blog/media/plan.json", `${id}의 sourcePolicy는 auto여야 합니다`);
   if (!["hero", "section", "support"].includes(entry.role)) {
@@ -374,7 +378,12 @@ for (const file of posts) {
   }
   const sections = h2Sections(body);
   if (sections.length < 3) fail(file, "독자 흐름을 나누는 H2가 3개보다 적습니다");
-  const depthIssues = lintDepthContract(Object.fromEntries(meta), body, sections, {
+  const metaObject = Object.fromEntries(meta);
+  // v2 계약은 H3 부제와 절당 이미지를 강제하지 않는 대신 명제와 리듬과 진입을 검사한다.
+  const contract = depthContractOf(metaObject);
+  const strictLead = contract ? contract.strictLead !== false : true;
+  const modernContract = Boolean(contract?.claims);
+  const depthIssues = lintDepthContract(metaObject, body, sections, {
     required: Number(file.slice(0, 3)) >= 41,
   });
   if (depthIssues.length) {
@@ -393,8 +402,12 @@ for (const file of posts) {
   if (/\b(?:TODO|TBD)\b/.test(raw)) fail(file, "미완성 표식이 남았습니다");
 
   const packageIssues = [
-    ...lintSeoPackage(Object.fromEntries(meta), body, sections),
-    ...lintSectionPackages(sections, { requireCodeLabels: meta.has("depthContract") }),
+    ...lintSeoPackage(metaObject, body, sections),
+    ...lintSectionPackages(sections, {
+      requireCodeLabels: meta.has("depthContract"),
+      strictLead,
+      openLabels: modernContract,
+    }),
   ];
   if (packageIssues.length) {
     fail(
@@ -405,14 +418,18 @@ for (const file of posts) {
     );
   }
 
-  const styleIssues = lintBlogStyle({
-    fields: {
-      summary: meta.get("summary"),
-      readerTakeaway: meta.get("readerTakeaway"),
-    },
-    body,
-    sections,
-  });
+  const styleIssues = [
+    ...lintBlogStyle({
+      fields: {
+        summary: meta.get("summary"),
+        readerTakeaway: meta.get("readerTakeaway"),
+      },
+      body,
+      sections,
+      strictAnchor: modernContract,
+    }),
+    ...(modernContract ? lintProseTexture(body) : []),
+  ];
   if (styleIssues.length) {
     fail(
       file,
@@ -456,30 +473,34 @@ for (const file of posts) {
 
   const sectionAssets = new Set();
   for (const section of sections) {
-    const parsed = parseSectionPackage(section);
-    if (!parsed) fail(file, `섹션 패키지를 읽을 수 없습니다: ${section.heading}`);
-    const { alt, url, caption } = parsed;
-    if (!caption.trim()) fail(file, `섹션 이미지 캡션이 비었습니다: ${section.heading}`);
-    const id = assetIdByPostUrl.get(`${postId}|${url}`);
-    if (!id) fail(file, `섹션 이미지가 catalog.json의 글 매핑에 없습니다: ${section.heading}`);
-    const entry = plan.assets[id];
-    if (entry.role !== "section" || entry.sectionHeading !== section.heading) {
-      fail(file, `섹션 이미지 계획이 H2와 맞지 않습니다: ${section.heading}`);
+    const parsed = parseSectionParts(section);
+    if (strictLead && (!parsed.subtitle || !parsed.image)) {
+      fail(file, `섹션 패키지를 읽을 수 없습니다: ${section.heading}`);
     }
-    if (alt.trim() !== entry.alt) {
-      fail(file, `섹션 이미지 대체 텍스트가 plan.json과 다릅니다: ${section.heading}`);
+    if (parsed.image) {
+      const { alt, url, caption } = parsed.image;
+      if (!caption.trim()) fail(file, `섹션 이미지 캡션이 비었습니다: ${section.heading}`);
+      const id = assetIdByPostUrl.get(`${postId}|${url}`);
+      if (!id) fail(file, `섹션 이미지가 catalog.json의 글 매핑에 없습니다: ${section.heading}`);
+      const entry = plan.assets[id];
+      if (entry.role !== "section" || entry.sectionHeading !== section.heading) {
+        fail(file, `섹션 이미지 계획이 H2와 맞지 않습니다: ${section.heading}`);
+      }
+      if (alt.trim() !== entry.alt) {
+        fail(file, `섹션 이미지 대체 텍스트가 plan.json과 다릅니다: ${section.heading}`);
+      }
+      const briefIssues = lintImageBrief(entry, section, parsed, { requireSubtitle: strictLead });
+      if (briefIssues.length) {
+        fail(
+          file,
+          `섹션 이미지 관련성 검사 실패 ${briefIssues.length}건: ${section.heading}\n${briefIssues
+            .map((issue) => `  - ${issue.message} (${issue.excerpt})`)
+            .join("\n")}`,
+        );
+      }
+      if (sectionAssets.has(id)) fail(file, `서로 다른 H2가 같은 섹션 이미지를 재사용합니다: ${id}`);
+      sectionAssets.add(id);
     }
-    const briefIssues = lintImageBrief(entry, section, parsed);
-    if (briefIssues.length) {
-      fail(
-        file,
-        `섹션 이미지 관련성 검사 실패 ${briefIssues.length}건: ${section.heading}\n${briefIssues
-          .map((issue) => `  - ${issue.message} (${issue.excerpt})`)
-          .join("\n")}`,
-      );
-    }
-    if (sectionAssets.has(id)) fail(file, `서로 다른 H2가 같은 섹션 이미지를 재사용합니다: ${id}`);
-    sectionAssets.add(id);
 
     const prose = parsed.remainder
       .replace(/```[\s\S]*?```/g, " ")
@@ -489,7 +510,7 @@ for (const file of posts) {
       .replace(/\s+/g, " ")
       .trim();
     if (prose.length < 120) {
-      fail(file, `섹션 이미지 뒤 설명이 120자보다 짧습니다: ${section.heading}`);
+      fail(file, `절의 설명이 120자보다 짧습니다: ${section.heading}`);
     }
   }
   const refs = [];
