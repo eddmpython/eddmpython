@@ -1,5 +1,17 @@
 {
   "assets": {
+    "001-what-is-python/biz-status-sheet": {
+      "assetKey": "biz-status-sheet",
+      "path": "objects/sha256/5e/5e4de925132c227ae7380d32d551c427793a4ff40006d02f321f4f06259c8b1d.mp4",
+      "post": "001-what-is-python",
+      "sha256": "5e4de925132c227ae7380d32d551c427793a4ff40006d02f321f4f06259c8b1d"
+    },
+    "001-what-is-python/excel-dashboard": {
+      "assetKey": "excel-dashboard",
+      "path": "objects/sha256/45/45a2d0545791403e5c48fd1115880a14c8da715d3e3b31cc440c4a486d8b7d1e.mp4",
+      "post": "001-what-is-python",
+      "sha256": "45a2d0545791403e5c48fd1115880a14c8da715d3e3b31cc440c4a486d8b7d1e"
+    },
     "001-what-is-python/first-python-run": {
       "assetKey": "first-python-run",
       "path": "objects/sha256/57/57a319f7b8b14b5a6271e0ab6f27f2607921bd5e5b669861ba4266a32dd5fc7e.png",
@@ -11,6 +23,24 @@
       "path": "objects/sha256/9b/9b029651ee8ef83cbcd60e5a6bd3f5fdbf359d0200368fa3b4b4edb268651f94.png",
       "post": "001-what-is-python",
       "sha256": "9b029651ee8ef83cbcd60e5a6bd3f5fdbf359d0200368fa3b4b4edb268651f94"
+    },
+    "001-what-is-python/nasdaq-forecast": {
+      "assetKey": "nasdaq-forecast",
+      "path": "objects/sha256/af/af0807f0918766f5780d23f06fb42e1055b8803d22a44fec22ed19120a7718c6.mp4",
+      "post": "001-what-is-python",
+      "sha256": "af0807f0918766f5780d23f06fb42e1055b8803d22a44fec22ed19120a7718c6"
+    },
+    "001-what-is-python/playwright-demo": {
+      "assetKey": "playwright-demo",
+      "path": "objects/sha256/6d/6d7cfb1ebc80d49de79f20640d4ca71260aad30ae7ebb9c0236622244c5978e9.mp4",
+      "post": "001-what-is-python",
+      "sha256": "6d7cfb1ebc80d49de79f20640d4ca71260aad30ae7ebb9c0236622244c5978e9"
+    },
+    "001-what-is-python/pyautogui-demo": {
+      "assetKey": "pyautogui-demo",
+      "path": "objects/sha256/26/26a61e5a395d39d010b201143df44ff76e3725c913d1c9a4399c314e8dbb288d.mp4",
+      "post": "001-what-is-python",
+      "sha256": "26a61e5a395d39d010b201143df44ff76e3725c913d1c9a4399c314e8dbb288d"
     },
     "001-what-is-python/python-ecosystem": {
       "assetKey": "python-ecosystem",
@@ -2030,6 +2060,13 @@
       "path": "objects/sha256/24/24d7eea4bf390f460821442d8f945293776a0d03bb5f996ce50eb598646a12a0.png",
       "width": 1536
     },
+    "26a61e5a395d39d010b201143df44ff76e3725c913d1c9a4399c314e8dbb288d": {
+      "bytes": 7422300,
+      "height": 1080,
+      "mime": "video/mp4",
+      "path": "objects/sha256/26/26a61e5a395d39d010b201143df44ff76e3725c913d1c9a4399c314e8dbb288d.mp4",
+      "width": 1920
+    },
     "26f79e3e25d66e7b58b8eac4d1c1d592fa524726ecf3dee450ffda2069cc92d1": {
       "bytes": 1250866,
       "height": 1024,
@@ -2240,6 +2277,13 @@
       "path": "objects/sha256/42/42ee2ee6e00b6d6376f50f87edf950b771f3e79384e935010a2938cd06eec774.png",
       "width": 1536
     },
+    "45a2d0545791403e5c48fd1115880a14c8da715d3e3b31cc440c4a486d8b7d1e": {
+      "bytes": 4547673,
+      "height": 942,
+      "mime": "video/mp4",
+      "path": "objects/sha256/45/45a2d0545791403e5c48fd1115880a14c8da715d3e3b31cc440c4a486d8b7d1e.mp4",
+      "width": 1920
+    },
     "48918440bbeb85539ecbfae0c1a04db2d14d891162804a48bd627b79a6d932e8": {
       "bytes": 1202426,
       "height": 1024,
@@ -2415,6 +2459,13 @@
       "path": "objects/sha256/5c/5c06900abb00b67f31e460c9a097872ca648c5f397451494c319d2a980e93418.png",
       "width": 1536
     },
+    "5e4de925132c227ae7380d32d551c427793a4ff40006d02f321f4f06259c8b1d": {
+      "bytes": 5149707,
+      "height": 702,
+      "mime": "video/mp4",
+      "path": "objects/sha256/5e/5e4de925132c227ae7380d32d551c427793a4ff40006d02f321f4f06259c8b1d.mp4",
+      "width": 918
+    },
     "60ae3e534f05c0c553dc43a2491ea7319262065266fef9f503008e942a5ac5e4": {
       "bytes": 1301402,
       "height": 1024,
@@ -2554,6 +2605,13 @@
       "mime": "image/png",
       "path": "objects/sha256/6d/6d1f7d47d68b1e32a1e28b258b4228160072bbe560a4c27fff90c688c260c76f.png",
       "width": 1536
+    },
+    "6d7cfb1ebc80d49de79f20640d4ca71260aad30ae7ebb9c0236622244c5978e9": {
+      "bytes": 112196,
+      "height": 720,
+      "mime": "video/mp4",
+      "path": "objects/sha256/6d/6d7cfb1ebc80d49de79f20640d4ca71260aad30ae7ebb9c0236622244c5978e9.mp4",
+      "width": 1280
     },
     "6e9b1729610da9429db505a7542eb91b4e4adb6dffd6f1ae00df6f11c7dd2b86": {
       "bytes": 1349929,
@@ -3114,6 +3172,13 @@
       "mime": "image/png",
       "path": "objects/sha256/ae/ae106aa16983b88a6e84d688759b9580f32a9a1978a9689857fc228314ce7470.png",
       "width": 1536
+    },
+    "af0807f0918766f5780d23f06fb42e1055b8803d22a44fec22ed19120a7718c6": {
+      "bytes": 9938440,
+      "height": 934,
+      "mime": "video/mp4",
+      "path": "objects/sha256/af/af0807f0918766f5780d23f06fb42e1055b8803d22a44fec22ed19120a7718c6.mp4",
+      "width": 1128
     },
     "b01fe0f63c7b375c048cf5c01f13834545398f7a4bfad00aadf7200be57adb8d": {
       "bytes": 1166299,

@@ -125,6 +125,25 @@ const ROUTE_RULES = [
     ],
   },
   {
+    match: (path) => path === "/blog/what-is-python",
+    id: "what-is-python",
+    checks: [
+      TEXT("article#content h2", "코드가 일을 대신합니다"),
+      COUNT("article#content video", { exact: 5 }),
+      COUNT('article#content source[src$=".mp4"]', { exact: 5 }),
+    ],
+    captures: [
+      {
+        id: "pyautogui-demo",
+        selector: "article#content figure:first-of-type",
+      },
+      {
+        id: "playwright-demo",
+        selector: 'article#content figure:has(video[aria-label="공식 할 일 목록에 Buy milk가 입력되고 완료로 표시되는 화면"])',
+      },
+    ],
+  },
+  {
     match: (path) => path === "/blog/python-basic-syntax",
     id: "python-basic-syntax",
     checks: [

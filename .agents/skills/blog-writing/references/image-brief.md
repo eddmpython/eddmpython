@@ -4,9 +4,11 @@
 
 1. 실제 제품 화면이 핵심이면 `sourceKind: screenshot`, `visualProfile: product-screen-v1`,
    `sourceUrl`, `captureState`를 쓴다.
-2. 공식 문서의 모양이 핵심이면 `sourceKind: official`, `visualProfile: source-original-v1`을 고른다.
-3. 코드와 설정값이 핵심이면 본문의 코드 블록을 우선하고, 이미지는 파일과 결과의 관계만 설명한다.
-4. 실제 화면이 없는 전후 차이, 순서, 공간 관계만 imagegen으로 만든다.
+2. 화면이 움직이는 녹화가 핵심이면 `sourceKind: recording`, `visualProfile: source-original-v1`,
+   `captureState`, `credit`을 쓴다. 로그인과 개인정보가 보이면 올리지 않는다.
+3. 공식 문서의 모양이 핵심이면 `sourceKind: official`, `visualProfile: source-original-v1`을 고른다.
+4. 코드와 설정값이 핵심이면 본문의 코드 블록을 우선하고, 이미지는 파일과 결과의 관계만 설명한다.
+5. 실제 화면이 없는 전후 차이, 순서, 공간 관계만 imagegen으로 만든다.
 
 ## 생성 이미지 색상
 

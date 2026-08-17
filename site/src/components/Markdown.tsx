@@ -6,6 +6,7 @@ import { CodaroCellEmbed } from "./CodaroCellEmbed";
 
 const THREADS = /^https?:\/\/(?:www\.)?threads\.(?:net|com)\/@[\w.]+\/post\/[\w-]+/;
 const IMAGE = /\.(png|jpe?g|gif|webp|avif|svg)(\?.*)?$/i;
+const VIDEO = /\.(mp4|webm)(\?.*)?$/i;
 const CODARO_CELL =
   /^https:\/\/eddmpython\.com\/codaro\/run\/\?example=([a-z0-9]+(?:-[a-z0-9]+)*)$/;
 
@@ -43,6 +44,35 @@ function onlyImage(node: unknown): { src: string; alt: string; title: string } |
     alt: typeof properties.alt === "string" ? properties.alt : "",
     title: typeof properties.title === "string" ? properties.title : "",
   };
+}
+
+function ArticleVideo({
+  src,
+  alt,
+  caption,
+}: {
+  src: string;
+  alt: string;
+  caption: string;
+}) {
+  return (
+    <figure className="my-7 overflow-hidden rounded-xl border border-white/10 bg-black/20">
+      <video
+        controls
+        playsInline
+        preload="metadata"
+        aria-label={alt}
+        className="block w-full bg-black"
+      >
+        <source src={src} type="video/mp4" />
+      </video>
+      {caption && (
+        <figcaption className="border-t border-white/8 bg-white/[0.02] px-4 py-3 text-left text-sm leading-relaxed text-ivory/48">
+          {caption}
+        </figcaption>
+      )}
+    </figure>
+  );
 }
 
 type YouTubeVideo = { id: string; vertical: boolean };
@@ -272,6 +302,11 @@ export function Markdown({ children }: { children: string }) {
         p({ children: kids, node }) {
           const picture = onlyImage(node);
           if (picture) {
+            if (VIDEO.test(picture.src)) {
+              return (
+                <ArticleVideo src={picture.src} alt={picture.alt} caption={picture.title} />
+              );
+            }
             return (
               <figure className="my-7 overflow-hidden rounded-xl border border-white/10 bg-black/20">
                 <img
@@ -304,6 +339,9 @@ export function Markdown({ children }: { children: string }) {
                   <img src={url} alt="" loading="lazy" className="block w-full" />
                 </span>
               );
+            }
+            if (VIDEO.test(url)) {
+              return <ArticleVideo src={url} alt="본문 영상" caption="" />;
             }
           }
           return <p className="my-5 leading-[1.85] text-ivory/75">{kids}</p>;
@@ -359,14 +397,17 @@ export function Markdown({ children }: { children: string }) {
             {k}
           </pre>
         ),
-        img: ({ src, alt }) => (
-          <img
-            src={typeof src === "string" ? src : undefined}
-            alt={alt ?? ""}
-            loading="lazy"
-            className="my-7 block w-full rounded-xl border border-white/10"
-          />
-        ),
+        img: ({ src, alt, title }) =>
+          typeof src === "string" && VIDEO.test(src) ? (
+            <ArticleVideo src={src} alt={alt ?? ""} caption={typeof title === "string" ? title : ""} />
+          ) : (
+            <img
+              src={typeof src === "string" ? src : undefined}
+              alt={alt ?? ""}
+              loading="lazy"
+              className="my-7 block w-full rounded-xl border border-white/10"
+            />
+          ),
         hr: () => <hr className="my-10 border-white/10" />,
         table: ({ children: k }) => (
           <div className="my-6 overflow-x-auto">

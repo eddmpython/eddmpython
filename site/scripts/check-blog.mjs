@@ -45,6 +45,9 @@ const mediaSuffixes = new Set([
   ".heic",
   ".tif",
   ".tiff",
+  ".mp4",
+  ".webm",
+  ".mov",
 ]);
 const assetId = /^(\d{3}-[a-z0-9]+(?:-[a-z0-9]+)*)\/([a-z0-9]+(?:-[a-z0-9]+)*)$/;
 const sha256 = /^[0-9a-f]{64}$/;
@@ -53,6 +56,7 @@ const mimeBySuffix = new Map([
   [".png", "image/png"],
   [".jpg", "image/jpeg"],
   [".gif", "image/gif"],
+  [".mp4", "video/mp4"],
 ]);
 const imageRef = /!\[([^\]]*)\]\(\s*<?([^\s)>]+)>?(?:\s+["'][^"']*["'])?\s*\)/g;
 const codaroEmbedRef =
@@ -225,7 +229,7 @@ for (const [id, entry] of Object.entries(plan.assets)) {
   if (entry.role === "section" && !String(entry.sectionHeading ?? "").trim()) {
     fail("blog/media/plan.json", `${id}의 sectionHeading이 비었습니다`);
   }
-  if (!["imagegen", "screenshot", "official", "licensed"].includes(entry.sourceKind)) {
+  if (!["imagegen", "screenshot", "official", "licensed", "recording"].includes(entry.sourceKind)) {
     fail("blog/media/plan.json", `${id}의 sourceKind를 지원하지 않습니다`);
   }
   const expectedProfiles =
@@ -262,6 +266,11 @@ for (const [id, entry] of Object.entries(plan.assets)) {
   if (entry.sourceKind === "licensed" && !String(entry.license ?? "").trim()) {
     fail("blog/media/plan.json", `${id}의 license가 비었습니다`);
   }
+  if (entry.sourceKind === "recording") {
+    if (!String(entry.captureState ?? "").trim() || !String(entry.credit ?? "").trim()) {
+      fail("blog/media/plan.json", `${id}의 recording captureState 또는 credit이 비었습니다`);
+    }
+  }
 }
 
 const urlsByPost = new Map();
@@ -280,7 +289,7 @@ for (const [id, record] of Object.entries(catalog.assets)) {
   }
   const suffix = String(record.path ?? "").match(/(\.[a-z0-9]+)$/)?.[1] ?? "";
   const expectedPath = `${catalog.objectPrefix}/${record.sha256.slice(0, 2)}/${record.sha256}${suffix}`;
-  if (![".webp", ".png", ".jpg", ".gif"].includes(suffix) || record.path !== expectedPath) {
+  if (![".webp", ".png", ".jpg", ".gif", ".mp4"].includes(suffix) || record.path !== expectedPath) {
     fail("blog/media/catalog.json", `${id}가 콘텐츠 주소 경로를 쓰지 않습니다`);
   }
   const object = catalog.objects[record.sha256];
@@ -549,6 +558,9 @@ for (const file of posts) {
       }
       if (object.width * object.height < 50000) {
         fail(file, "ogImage는 검색 대표 이미지로 쓰기에는 해상도가 너무 작습니다");
+      }
+      if (!String(object.mime).startsWith("image/")) {
+        fail(file, "ogImage는 이미지여야 합니다");
       }
     }
     referencedMedia.add(ref);

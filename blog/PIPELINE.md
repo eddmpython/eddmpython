@@ -412,6 +412,11 @@ DartLab 카드뉴스에서 가져오는 핵심은 이미지에 문장을 구워 
 실제 제품 화면은 `sourceKind: screenshot`, `visualProfile: product-screen-v1`으로 두고 원본
 `sourceUrl`과 재현할 `captureState`를 적는다. 실제 화면은 기능을 사실대로 보여 주기 위해 원래 색을
 보존하며 생성 이미지 팔레트로 강제로 다시 칠하지 않는다.
+화면이 움직이는 녹화는 `sourceKind: recording`, `visualProfile: source-original-v1`으로 두고
+`captureState`와 `credit`을 적는다. 작업본은 저장소 밖 staging의 `.mp4`이며 Git에 넣지 않는다.
+본문에는 이미지와 같은 `![대체 텍스트](media://asset-key "캡션")` 자리를 쓰고, 사이트는 이 주소를
+재생 컨트롤이 있는 영상으로 렌더한다. 로그인, 비밀번호, 신청자 이름, 주민번호가 보이는 녹화는
+올리지 않는다. 영상은 ogImage로 쓰지 않는다.
 인물, 행사, 장소처럼 모양이 사실과 맞아야 하는 이미지는 공식 자료나 사용 가능한 라이선스 이미지를
 쓴다. 이때 `sourceKind`는 `official` 또는 `licensed`, `visualProfile`은 `source-original-v1`이고
 `sourceUrl`, `credit`, `licensed` 이미지에는 `license`를 함께 기록한다.

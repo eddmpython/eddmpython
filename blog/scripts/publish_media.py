@@ -24,11 +24,14 @@ STAGING_ROOT = REPO_ROOT.parent / "eddmpython.out" / "blog-media"
 DEFAULT_HF_REPO = "eddmpython/eddmpython-media"
 OBJECT_PREFIX = "objects/sha256"
 IMAGE_SUFFIXES = (".webp", ".png", ".jpg", ".jpeg", ".gif")
+VIDEO_SUFFIXES = (".mp4",)
+MEDIA_SUFFIXES = IMAGE_SUFFIXES + VIDEO_SUFFIXES
 IMAGE_MIME = {
     ".webp": "image/webp",
     ".png": "image/png",
     ".jpg": "image/jpeg",
     ".gif": "image/gif",
+    ".mp4": "video/mp4",
 }
 ASSET_ID_RE = re.compile(
     r"(?P<post>\d{3}-[a-z0-9]+(?:-[a-z0-9]+)*)/"
@@ -99,13 +102,14 @@ def plan_entry(plan: dict[str, object], asset_id: str) -> dict[str, object]:
     if role == "section" and entry.get("placement") != "H3 부제 바로 뒤":
         raise ValueError(f"section 이미지 placement는 H3 부제 바로 뒤여야 함: {asset_id}")
     source_kind = str(entry["sourceKind"])
-    if source_kind not in {"imagegen", "screenshot", "official", "licensed"}:
+    if source_kind not in {"imagegen", "screenshot", "official", "licensed", "recording"}:
         raise ValueError(f"지원하지 않는 sourceKind: {asset_id}: {source_kind}")
     expected_profiles = {
         "imagegen": {"dark-editorial-v1", IMAGEGEN_V2},
         "screenshot": {"product-screen-v1"},
         "official": {"source-original-v1"},
         "licensed": {"source-original-v1"},
+        "recording": {"source-original-v1"},
     }[source_kind]
     if entry["visualProfile"] not in expected_profiles:
         raise ValueError(f"지원하지 않는 visualProfile: {asset_id}: {entry['visualProfile']}")
@@ -123,13 +127,17 @@ def plan_entry(plan: dict[str, object], asset_id: str) -> dict[str, object]:
                 raise ValueError(f"{source_kind} 계획에는 {key}가 필요함: {asset_id}")
     if source_kind == "licensed" and not str(entry.get("license") or "").strip():
         raise ValueError(f"licensed 계획에는 license가 필요함: {asset_id}")
+    if source_kind == "recording":
+        for key in ("captureState", "credit"):
+            if not str(entry.get(key) or "").strip():
+                raise ValueError(f"recording 계획에는 {key}가 필요함: {asset_id}")
     return entry
 
 
 def canonical_suffix(path: Path) -> str:
     suffix = path.suffix.lower()
-    if suffix not in IMAGE_SUFFIXES:
-        raise ValueError(f"지원하지 않는 이미지 확장자: {path.name}")
+    if suffix not in MEDIA_SUFFIXES:
+        raise ValueError(f"지원하지 않는 미디어 확장자: {path.name}")
     return ".jpg" if suffix == ".jpeg" else suffix
 
 
@@ -141,9 +149,10 @@ def validate_magic(path: Path) -> None:
         ".jpg": head.startswith(b"\xff\xd8\xff"),
         ".gif": head.startswith((b"GIF87a", b"GIF89a")),
         ".webp": len(head) >= 12 and head[:4] == b"RIFF" and head[8:12] == b"WEBP",
+        ".mp4": len(head) >= 8 and head[4:8] == b"ftyp",
     }
     if not valid.get(suffix, False):
-        raise ValueError(f"확장자와 이미지 바이트가 다름: {path}")
+        raise ValueError(f"확장자와 미디어 바이트가 다름: {path}")
 
 
 def image_metadata(path: Path) -> dict[str, object]:
@@ -152,7 +161,9 @@ def image_metadata(path: Path) -> dict[str, object]:
     width = 0
     height = 0
 
-    if suffix == ".png" and len(data) >= 24:
+    if suffix == ".mp4":
+        width, height = mp4_dimensions(data)
+    elif suffix == ".png" and len(data) >= 24:
         width, height = struct.unpack(">II", data[16:24])
     elif suffix == ".gif" and len(data) >= 10:
         width, height = struct.unpack("<HH", data[6:10])
@@ -223,8 +234,53 @@ def image_metadata(path: Path) -> dict[str, object]:
             offset = payload + chunk_size + (chunk_size % 2)
 
     if width <= 0 or height <= 0:
-        raise ValueError(f"이미지 크기를 읽을 수 없음: {path}")
+        raise ValueError(f"미디어 크기를 읽을 수 없음: {path}")
     return {"width": width, "height": height, "mime": IMAGE_MIME[suffix]}
+
+
+def mp4_dimensions(data: bytes) -> tuple[int, int]:
+    def u32(offset: int) -> int:
+        return int.from_bytes(data[offset : offset + 4], "big")
+
+    boxes: list[int] = []
+
+    def collect(start: int, end: int) -> None:
+        offset = start
+        while offset + 8 <= end:
+            size = u32(offset)
+            box_type = data[offset + 4 : offset + 8]
+            if size == 1:
+                if offset + 16 > end:
+                    return
+                size = int.from_bytes(data[offset + 8 : offset + 16], "big")
+                header = 16
+            elif size == 0:
+                size = end - offset
+                header = 8
+            else:
+                header = 8
+            if size < header or offset + size > end:
+                return
+            if box_type == b"tkhd":
+                boxes.append(offset)
+            elif box_type in {b"moov", b"trak", b"mdia", b"minf", b"stbl"}:
+                collect(offset + header, offset + size)
+            offset += size
+
+    collect(0, len(data))
+    for box in boxes:
+        payload = box + 8
+        if payload >= len(data):
+            continue
+        version = data[payload]
+        width_off = payload + (76 if version == 0 else 88)
+        if width_off + 8 > len(data):
+            continue
+        width = int.from_bytes(data[width_off : width_off + 4], "big") >> 16
+        height = int.from_bytes(data[width_off + 4 : width_off + 8], "big") >> 16
+        if width > 0 and height > 0:
+            return width, height
+    raise ValueError("mp4 비디오 너비와 높이를 읽을 수 없음")
 
 
 def staging_path(post: str, key: str, explicit: str | None) -> Path:
@@ -240,12 +296,12 @@ def staging_path(post: str, key: str, explicit: str | None) -> Path:
         if path.stem != key:
             raise ValueError(f"작업본 파일명은 assetKey와 같아야 함: {key}{path.suffix}")
         if not path.is_file():
-            raise ValueError(f"이미지 작업본이 없음: {path}")
+            raise ValueError(f"미디어 작업본이 없음: {path}")
         return path
-    matches = [stage_dir / f"{key}{suffix}" for suffix in IMAGE_SUFFIXES]
+    matches = [stage_dir / f"{key}{suffix}" for suffix in MEDIA_SUFFIXES]
     existing = [path for path in matches if path.is_file()]
     if len(existing) != 1:
-        raise ValueError(f"이미지 작업본은 정확히 하나여야 함: {stage_dir / key}.*")
+        raise ValueError(f"미디어 작업본은 정확히 하나여야 함: {stage_dir / key}.*")
     return existing[0]
 
 
@@ -294,9 +350,11 @@ def updated_post(
     elif old_url and old_url in raw:
         updated = raw.replace(old_url, next_url)
     else:
-        raise ValueError(f"본문이나 ogImage에 이미지 자리표시자가 없음: {placeholder}")
+        raise ValueError(f"본문이나 ogImage에 미디어 자리표시자가 없음: {placeholder}")
     if not used_as_og:
         return updated
+    if str(metadata["mime"]).startswith("video/"):
+        raise ValueError("영상은 ogImage로 쓸 수 없음")
     return upsert_frontmatter(
         updated,
         {

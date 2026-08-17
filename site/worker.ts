@@ -53,6 +53,7 @@ const CSP = [
   "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com",
   "script-src 'self' 'wasm-unsafe-eval' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://www.threads.com",
   "connect-src 'self' https://cdn.jsdelivr.net https://pypi.org https://files.pythonhosted.org https://huggingface.co https://cdn-lfs.huggingface.co https://*.hf.co",
+  "media-src 'self' https:",
   "frame-src https://www.youtube-nocookie.com https://www.threads.com",
   "worker-src 'self' blob:",
 ].join("; ");
@@ -70,6 +71,7 @@ const ADSENSE_CSP = [
   "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https:",
   "connect-src 'self' https:",
+  "media-src 'self' https:",
   "frame-src https:",
   "worker-src 'self' blob:",
 ].join("; ");
