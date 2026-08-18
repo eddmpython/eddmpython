@@ -167,8 +167,35 @@ if (
 ) {
   fail("blog/embeds/codaro-cells.json", "version 또는 examples 계약이 잘못됐습니다");
 }
-if (blogOrder.version !== 1 || !Array.isArray(blogOrder.posts) || !blogOrder.posts.length) {
-  fail("blog/order.json", "version 또는 posts 계약이 잘못됐습니다");
+if (
+  blogOrder.version !== 2 ||
+  !Array.isArray(blogOrder.categories) ||
+  !blogOrder.categories.length ||
+  !Array.isArray(blogOrder.posts) ||
+  !blogOrder.posts.length
+) {
+  fail("blog/order.json", "version 또는 categories 또는 posts 계약이 잘못됐습니다");
+}
+
+// 카테고리 하나가 강의 한 묶음이다. 공개 URL 은 /blog/{slug} 그대로이며 카테고리는
+// 목록에서 묶는 데만 쓴다. 발행한 slug 는 바꾸지 않는다.
+const categorySlugs = new Set();
+let previousCategoryOrder = 0;
+for (const entry of blogOrder.categories) {
+  const slug = String(entry?.slug ?? "");
+  const order = Number(entry?.order);
+  if (!publicSlug.test(slug)) fail("blog/order.json", `올바르지 않은 카테고리 slug: ${slug}`);
+  if (categorySlugs.has(slug)) fail("blog/order.json", `카테고리 slug가 중복됐습니다: ${slug}`);
+  if (!Number.isInteger(order) || order !== previousCategoryOrder + 1) {
+    fail("blog/order.json", `카테고리 order가 1부터 빈 번호 없이 이어지지 않습니다: ${order}`);
+  }
+  if (!String(entry?.title ?? "").trim()) fail("blog/order.json", `${slug}의 title이 비었습니다`);
+  const summary = String(entry?.summary ?? "").trim();
+  if (summary.length < 20 || summary.length > 200) {
+    fail("blog/order.json", `${slug}의 summary는 20자 이상 200자 이하로 씁니다`);
+  }
+  categorySlugs.add(slug);
+  previousCategoryOrder = order;
 }
 
 const orderedSlugs = new Set();
@@ -181,6 +208,9 @@ for (const entry of blogOrder.posts) {
   }
   if (!publicSlug.test(slug)) fail("blog/order.json", `올바르지 않은 slug: ${slug}`);
   if (orderedSlugs.has(slug)) fail("blog/order.json", `slug가 중복됐습니다: ${slug}`);
+  if (!categorySlugs.has(String(entry?.category ?? ""))) {
+    fail("blog/order.json", `${slug}의 category가 categories에 없습니다: ${entry?.category}`);
+  }
   orderedSlugs.add(slug);
   previousReadingOrder = order;
 }

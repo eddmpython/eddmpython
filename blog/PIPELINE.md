@@ -78,6 +78,30 @@ H2 순서를 바꾸면 글이 깨져야 한다. 순서를 바꿔도 성립하면
 분량은 목표가 아니다. 주제 하나를 끝까지 답했으면 짧아도 된다.
 
 
+### 카테고리는 강의 한 묶음이다
+
+`blog/order.json` 의 `categories` 가 카테고리 정본이다. 카테고리 하나가 강의 한 묶음이며 글은
+`posts[].category` 로 그 묶음에 속한다.
+
+```json
+{
+  "version": 2,
+  "categories": [
+    { "slug": "work-automation-basics", "title": "업무자동화 기초지식", "order": 1, "summary": "..." }
+  ],
+  "posts": [{ "order": 1, "slug": "work-automation", "category": "work-automation-basics" }]
+}
+```
+
+**공개 URL 은 카테고리를 넣지 않는다.** `/blog/{slug}` 한 형태를 유지한다. 이미 발행한 slug 를
+바꾸면 검색 색인과 외부 링크가 끊어진다. 카테고리는 `/blog` 목록에서 묶어 보여 주는 데만 쓴다.
+
+`check:blog` 가 카테고리 slug 형식과 중복, order 연속성, summary 길이, 그리고 모든 글의
+`category` 가 실제로 존재하는 카테고리인지 검사한다.
+
+카테고리와 frontmatter 의 `section` 은 층이 다르다. 카테고리는 강의 묶음이고 `section` 은 글
+하나의 소주제다. 한 카테고리 안에 여러 `section` 이 들어간다.
+
 ### 블로그 순서와 강의 참조 계약
 
 `blog/order.json`은 `/blog`의 공개 읽기 순서만 관리한다. `/blog`에는 날짜나 별도 커리큘럼 소개를

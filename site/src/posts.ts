@@ -9,6 +9,8 @@ export type Post = {
   readingOrder: number;
   /** 공개 URL 경로. /blog/{slug} */
   slug: string;
+  /** 이 글이 속한 카테고리 slug. 카테고리 하나가 강의 한 묶음이다. */
+  category: string;
   title: string;
   author: string;
   section: string;
@@ -30,6 +32,14 @@ const files = import.meta.glob("../../blog/???-*.md", {
 
 const slugPattern = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const readingOrderBySlug = new Map(blogOrder.posts.map((entry) => [entry.slug, entry.order]));
+const categoryBySlug = new Map(blogOrder.posts.map((entry) => [entry.slug, entry.category]));
+
+export type Category = {
+  slug: string;
+  title: string;
+  order: number;
+  summary: string;
+};
 
 function parse(path: string, raw: string): Post {
   const id = path.replace(/^.*\//, "").replace(/\.md$/, "");
@@ -40,6 +50,7 @@ function parse(path: string, raw: string): Post {
       sequence: Number(id.slice(0, 3)),
       readingOrder: Number.MAX_SAFE_INTEGER,
       slug: id,
+      category: "",
       title: id,
       author: "",
       section: "",
@@ -61,6 +72,7 @@ function parse(path: string, raw: string): Post {
     sequence: Number(id.slice(0, 3)),
     readingOrder: readingOrderBySlug.get(slug) ?? Number.MAX_SAFE_INTEGER,
     slug,
+    category: categoryBySlug.get(slug) ?? "",
     title: meta.title ?? id,
     author: meta.author ?? "eddmpython",
     section: meta.section ?? "블로그",
@@ -82,6 +94,19 @@ const slugs = new Set(POSTS.map((post) => post.slug));
 if (slugs.size !== POSTS.length) {
   throw new Error("blog slug가 중복됐습니다");
 }
+
+/** 공개 목록 순서대로 정렬한 카테고리. 카테고리 하나가 강의 한 묶음이다. */
+export const CATEGORIES: Category[] = [...(blogOrder.categories as Category[])].sort(
+  (a, b) => a.order - b.order,
+);
+
+/** 카테고리별로 묶은 글. 목록 화면이 이 순서 그대로 렌더한다. */
+export const POSTS_BY_CATEGORY: { category: Category; posts: Post[] }[] = CATEGORIES.map(
+  (category) => ({
+    category,
+    posts: POSTS.filter((post) => post.category === category.slug),
+  }),
+).filter((group) => group.posts.length > 0);
 
 export function findPost(slug: string): Post | undefined {
   return POSTS.find((p) => p.slug === slug);
