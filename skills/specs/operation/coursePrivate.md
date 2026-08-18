@@ -119,7 +119,7 @@ admin 이 하는 일은 강의장 라우트를 만들고, 카테고리별 라우
 Google Cloud Console 에서 OAuth 클라이언트는 필요하다. 리디렉션 URI 는
 `https://eddmpython.com/admin/callback` 처럼 이 도메인이 된다.
 
-진행 상태와 아직 정하지 않은 것은 추적하지 않는 `memory/project_courseRoom.md` 에 있다.
+진행 상태와 아직 정하지 않은 것은 추적하지 않는 `memory/courseRoom.md` 에 있다.
 
 ## 수강생 접근
 
