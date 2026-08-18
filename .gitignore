@@ -47,6 +47,7 @@ coverage/
 
 # Local data and generated exports
 /course/
+/memory/
 cache/
 .cache/
 data/

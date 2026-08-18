@@ -17,7 +17,7 @@ blocked=""
 # 1. 비공개 경로
 for path in $staged; do
   case "$path" in
-    course/*|*/course/*|private/*|*/private/*)
+    course/*|*/course/*|private/*|*/private/*|memory/*|*/memory/*)
       blocked="$blocked\n  경로: $path"
       ;;
   esac
