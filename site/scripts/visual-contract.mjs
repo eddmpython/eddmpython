@@ -91,7 +91,10 @@ const ROUTE_RULES = [
       }),
       COUNT("[data-blog-order]", { exact: blogOrder.posts.length }),
       TEXT("[data-blog-list] > li:first-child [data-blog-order]", "01"),
-      TEXT("[data-blog-list] > li:last-child [data-blog-order]", "40"),
+      TEXT(
+        "[data-blog-list] > li:last-child [data-blog-order]",
+        String(blogOrder.posts.length).padStart(2, "0"),
+      ),
       COUNT('main#content a[href^="/blog/"]', {
         exact: blogOrder.posts.length,
       }),

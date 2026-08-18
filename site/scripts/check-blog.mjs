@@ -168,13 +168,14 @@ if (
   fail("blog/embeds/codaro-cells.json", "version 또는 examples 계약이 잘못됐습니다");
 }
 if (
-  blogOrder.version !== 2 ||
+  blogOrder.version !== 3 ||
   !Array.isArray(blogOrder.categories) ||
   !blogOrder.categories.length ||
   !Array.isArray(blogOrder.posts) ||
-  !blogOrder.posts.length
+  !blogOrder.posts.length ||
+  !Array.isArray(blogOrder.archived)
 ) {
-  fail("blog/order.json", "version 또는 categories 또는 posts 계약이 잘못됐습니다");
+  fail("blog/order.json", "version 또는 categories 또는 posts 또는 archived 계약이 잘못됐습니다");
 }
 
 // 카테고리 하나가 강의 한 묶음이다. 공개 URL 은 /blog/{slug} 그대로이며 카테고리는
@@ -198,6 +199,18 @@ for (const entry of blogOrder.categories) {
   previousCategoryOrder = order;
 }
 
+// 아카이브한 글은 /blog 목록에서만 빠진다. URL 과 sitemap 은 그대로 둔다.
+const archivedSlugs = new Set();
+for (const entry of blogOrder.archived) {
+  const slug = String(entry?.slug ?? "");
+  if (!publicSlug.test(slug)) fail("blog/order.json", `올바르지 않은 archived slug: ${slug}`);
+  if (archivedSlugs.has(slug)) fail("blog/order.json", `archived slug가 중복됐습니다: ${slug}`);
+  if (!String(entry?.note ?? "").trim()) {
+    fail("blog/order.json", `${slug}를 왜 목록에서 뺐는지 note에 적습니다`);
+  }
+  archivedSlugs.add(slug);
+}
+
 const orderedSlugs = new Set();
 let previousReadingOrder = 0;
 for (const entry of blogOrder.posts) {
@@ -208,6 +221,7 @@ for (const entry of blogOrder.posts) {
   }
   if (!publicSlug.test(slug)) fail("blog/order.json", `올바르지 않은 slug: ${slug}`);
   if (orderedSlugs.has(slug)) fail("blog/order.json", `slug가 중복됐습니다: ${slug}`);
+  if (archivedSlugs.has(slug)) fail("blog/order.json", `${slug}가 목록과 archived에 동시에 있습니다`);
   if (!categorySlugs.has(String(entry?.category ?? ""))) {
     fail("blog/order.json", `${slug}의 category가 categories에 없습니다: ${entry?.category}`);
   }
@@ -590,7 +604,12 @@ if (!targetPost) {
     if (!slugs.has(slug)) fail("blog/order.json", `목록의 글을 찾지 못했습니다: ${slug}`);
   }
   for (const slug of slugs.keys()) {
-    if (!orderedSlugs.has(slug)) fail("blog/order.json", `${slug} 글에 공개 읽기 순서가 없습니다`);
+    if (!orderedSlugs.has(slug) && !archivedSlugs.has(slug)) {
+      fail("blog/order.json", `${slug} 글이 목록에도 archived에도 없습니다`);
+    }
+  }
+  for (const slug of archivedSlugs) {
+    if (!slugs.has(slug)) fail("blog/order.json", `archived에 없는 글이 있습니다: ${slug}`);
   }
 
   const postSlugs = new Set(posts.map((file) => file.replace(/\.md$/, "")));

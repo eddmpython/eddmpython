@@ -11,6 +11,8 @@ export type Post = {
   slug: string;
   /** 이 글이 속한 카테고리 slug. 카테고리 하나가 강의 한 묶음이다. */
   category: string;
+  /** 목록에서 뺀 글. URL 은 살아 있다. */
+  archived: boolean;
   title: string;
   author: string;
   section: string;
@@ -33,6 +35,8 @@ const files = import.meta.glob("../../blog/???-*.md", {
 const slugPattern = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const readingOrderBySlug = new Map(blogOrder.posts.map((entry) => [entry.slug, entry.order]));
 const categoryBySlug = new Map(blogOrder.posts.map((entry) => [entry.slug, entry.category]));
+/* 아카이브한 글은 /blog 목록에서만 빠진다. URL 과 sitemap 은 그대로 두어 검색 유입을 지킨다. */
+const archivedSlugs = new Set(blogOrder.archived.map((entry) => entry.slug));
 
 export type Category = {
   slug: string;
@@ -51,6 +55,7 @@ function parse(path: string, raw: string): Post {
       readingOrder: Number.MAX_SAFE_INTEGER,
       slug: id,
       category: "",
+      archived: false,
       title: id,
       author: "",
       section: "",
@@ -73,6 +78,7 @@ function parse(path: string, raw: string): Post {
     readingOrder: readingOrderBySlug.get(slug) ?? Number.MAX_SAFE_INTEGER,
     slug,
     category: categoryBySlug.get(slug) ?? "",
+    archived: archivedSlugs.has(slug),
     title: meta.title ?? id,
     author: meta.author ?? "eddmpython",
     section: meta.section ?? "블로그",
@@ -104,7 +110,7 @@ export const CATEGORIES: Category[] = [...(blogOrder.categories as Category[])].
 export const POSTS_BY_CATEGORY: { category: Category; posts: Post[] }[] = CATEGORIES.map(
   (category) => ({
     category,
-    posts: POSTS.filter((post) => post.category === category.slug),
+    posts: POSTS.filter((post) => post.category === category.slug && !post.archived),
   }),
 ).filter((group) => group.posts.length > 0);
 

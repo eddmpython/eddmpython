@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "categories": [
     {
       "slug": "work-automation-basics",
@@ -11,203 +11,166 @@
   "posts": [
     {
       "order": 1,
-      "slug": "work-automation",
-      "category": "work-automation-basics"
-    },
-    {
-      "order": 2,
       "slug": "what-is-python",
       "category": "work-automation-basics"
+    }
+  ],
+  "archived": [
+    {
+      "slug": "work-automation",
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 3,
       "slug": "no-install",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 4,
       "slug": "python-basic-syntax",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 5,
       "slug": "python-types",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 6,
       "slug": "python-list-dictionary",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 7,
       "slug": "python-if-boundary",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 8,
       "slug": "python-for-loop",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 9,
       "slug": "python-functions",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 10,
       "slug": "python-errors",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 11,
       "slug": "python-import",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 12,
       "slug": "what-is-terminal",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 13,
       "slug": "powershell-paths",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 14,
       "slug": "vscode-python",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 15,
       "slug": "uv-python",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 16,
       "slug": "python-project-runbook",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 17,
       "slug": "windows-python-recovery",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 18,
       "slug": "excel-dataframe-map",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 19,
       "slug": "excel-input-contract",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 20,
       "slug": "python-excel-merge",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 21,
       "slug": "excel-data-normalization",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 22,
       "slug": "pandas-missing-duplicates",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 23,
       "slug": "pandas-groupby-summary",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 24,
       "slug": "openpyxl-excel-output",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 25,
       "slug": "excel-automation-validation",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 26,
       "slug": "pytest-excel-automation",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 27,
       "slug": "ai-coding-baseline",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 28,
       "slug": "ai-environment",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 29,
       "slug": "ai-code-analysis",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 30,
       "slug": "ai-work-spec",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 31,
       "slug": "ai-variant-excel",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 32,
       "slug": "ai-boundary-change",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 33,
       "slug": "ai-change-control",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 34,
       "slug": "structured-error-report",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 35,
       "slug": "claude-code-agents",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 36,
       "slug": "synthetic-data-security",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 37,
       "slug": "work-automation-plan",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 38,
       "slug": "performance-assessment",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 39,
       "slug": "handoff-runbook",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     },
     {
-      "order": 40,
       "slug": "thirty-day-plan",
-      "category": "work-automation-basics"
+      "note": "새 커리큘럼으로 다시 쓸 때까지 목록에서 뺀다"
     }
   ]
 }
