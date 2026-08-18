@@ -6,7 +6,8 @@ purpose: 무료로 공개하는 블로그와 유료 수강생만 보는 강의 �
 whenToUse:
   - 강의 자료를 어디에 두나
   - 수강생만 보게 하려면
-  - Cloudflare Access 설정
+  - admin 로그인
+  - 강의장 라우트
   - 수강생 승인과 해제
   - 좌석이 몇 개인가
   - 유료 자료가 깃에 나갔나
@@ -65,8 +66,8 @@ git config core.hooksPath .githooks
 **3. `npm run check:leak`** 이 공개 빌드 산출물을 검사한다. 이 검사가 가장 중요하다.
 
 이 사이트는 글 본문을 JS 번들로 굽는다. `site-dist/assets/index-*.js` 안에 블로그 본문
-문자열이 그대로 들어 있는 것을 확인했다. 그래서 Cloudflare Access 로 `/course` 경로를 막아도,
-강의 본문이 같은 빌드 파이프라인을 타면 공개 JS 청크와 sitemap 으로 새어 나간다. Access 는 경로
+문자열이 그대로 들어 있는 것을 확인했다. 그래서 `/course` 라우트를 로그인이나 비밀번호로 막아도,
+강의 본문이 같은 빌드 파이프라인을 타면 공개 JS 청크와 sitemap 으로 새어 나간다. 라우트 잠금은
 요청만 막지 번들 안의 문자열은 막지 못한다.
 
 검사는 `course/` 원본에서 특징적인 문장을 뽑아 공개 산출물에서 찾는다. 하나라도 나오면 실패다.
@@ -77,7 +78,7 @@ git config core.hooksPath .githooks
 
 | 대상 | 방법 | 상태 |
 |---|---|---|
-| 운영자 admin | Google 로그인 + Cloudflare Access. 허용 계정 하나 | 설정 진행 |
+| 운영자 admin | 자체 Google OAuth. 허용 계정 `eddmpython@gmail.com` 하나 | 아직 만들지 않았다 |
 | 오프라인 강의장 | 별도 라우트 + 비밀번호. 강의가 끝나면 라우트를 닫는다 | 아직 만들지 않았다 |
 | 블로그 | 막지 않는다. 무료 공개다 | 공개 |
 
@@ -90,46 +91,35 @@ git config core.hooksPath .githooks
 
 ## 운영자 admin
 
-admin 은 운영자 한 명만 들어간다. 인증은 Cloudflare Access 가 맡고 앱 코드에는 인증을 넣지 않는다.
-`CLAUDE.md` 가 자체 인증 구축을 금지하므로 Access 로 앞을 막는 방식만 쓴다.
+**아직 만들지 않았다.** 방향만 정해져 있다. 강의장 기능을 만들 때 함께 만든다.
 
-### Google Cloud Console
+admin 인증은 **자체 Google OAuth** 로 한다. Cloudflare Access 를 쓰지 않는다. 허용 계정은
+`eddmpython@gmail.com` 하나로 고정하고, 구글 인증을 통과한 이메일이 그것과 같을 때만 들어간다.
 
-1. APIs & Services 에서 Credentials 를 열고 Configure Consent Screen 을 External 로 만든다
-2. Create OAuth client 를 고르고 Application type 은 Web application 로 한다
-3. 아래 두 칸을 정확히 채운다. 한 글자만 달라도 로그인이 실패한다
+`CLAUDE.md` 의 "공용 고객 계정과 공용 OAuth 를 만들지 않는다" 는 고객 계정을 겨냥한 조항이며
+운영자 한 명의 admin 로그인은 여기 걸리지 않는다.
 
-| 칸 | 값 |
+admin 이 하는 일은 강의장 라우트를 만들고, 카테고리별 라우트를 추가하고, 켜고 끄는 것이다.
+
+### 만들 때 반드시 덮을 다섯 가지
+
+이 저장소는 공개된다. 인증 코드도 공개된다. 실수하면 누구나 읽고 뚫는다. Cloudflare Access 를
+쓰지 않기로 했으므로 아래는 전부 직접 책임진다.
+
+| 항목 | 틀리면 |
 |---|---|
-| Authorized JavaScript origins | `https://<팀이름>.cloudflareaccess.com` |
-| Authorized redirect URIs | `https://<팀이름>.cloudflareaccess.com/cdn-cgi/access/callback` |
+| `state` 파라미터 검증 | CSRF 로 남의 로그인이 운영자 세션이 된다 |
+| 세션 쿠키 서명 | 서명하지 않으면 쿠키에 이메일을 적어 넣는 것으로 통과된다 |
+| `HttpOnly`, `Secure`, `SameSite` | 쿠키 탈취 |
+| Client Secret 보관 | Worker secret 에 둔다. 코드나 저장소에 넣으면 끝이다 |
+| 토큰과 세션 만료 | 영구 세션이 된다 |
 
-팀 이름은 Cloudflare 대시보드의 `Settings` 에서 `Team name and domain` 의 `Team name` 이다.
-추측해서 넣지 않고 그 화면에서 직접 확인한다.
+다섯 가지를 사람 눈으로만 확인하지 않고 검사로 덮는다.
 
-4. Client ID 와 Client Secret 을 복사한다
+Google Cloud Console 에서 OAuth 클라이언트는 필요하다. 리디렉션 URI 는
+`https://eddmpython.com/admin/callback` 처럼 이 도메인이 된다.
 
-### Cloudflare 등록
-
-Zero Trust 에서 Integrations 의 Identity providers 로 가서 Google 을 추가하고 위 두 값을 넣는다.
-한 번 등록하면 이후 만드는 모든 Access 앱에서 다시 쓸 수 있다.
-
-### Access 앱
-
-Access controls 의 Applications 에서 self-hosted 로 만들고 도메인은 `eddmpython.com` 이다.
-Path 는 `admin` 과 `admin/*` 을 모두 넣는다. 와일드카드가 부모 경로를 포함하지 않기 때문이다.
-
-정책은 Allow 하나이고 selector 는 `Emails` 에 `eddmpython@gmail.com` 한 줄이다. 한 명이라
-List 를 만들지 않는다. IdP 는 Google 하나만 켜고 `Apply instant authentication` 을 켠다. 그러면
-로그인 선택 화면을 건너뛰고 바로 구글로 간다.
-
-### 확인
-
-시크릿 창에서 `eddmpython.com/admin` 을 연다. 구글 로그인 화면이 뜨고 통과한 뒤 사이트 404 가
-나오면 인증 체인이 정상이다. 아직 그 경로에 페이지를 만들지 않았으므로 404 가 정상 신호다.
-
-admin 은 미검증 OAuth 앱의 100 명 상한과 무관하다. 운영자 계정 하나만 쓰기 때문이다. 그 상한은
-수강생을 구글로 받을 때만 문제가 된다.
+진행 상태와 아직 정하지 않은 것은 추적하지 않는 `memory/project_courseRoom.md` 에 있다.
 
 ## 수강생 접근
 
