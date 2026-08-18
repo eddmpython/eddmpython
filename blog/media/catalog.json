@@ -1655,6 +1655,24 @@
       "path": "objects/sha256/03/03bb89bcddfc43c4e9034e4e86c36867b768af409302e7ac88701227e3fb21d7.png",
       "post": "040-thirty-day-plan",
       "sha256": "03bb89bcddfc43c4e9034e4e86c36867b768af409302e7ac88701227e3fb21d7"
+    },
+    "001-what-is-python/python-history": {
+      "assetKey": "python-history",
+      "path": "objects/sha256/8d/8da6da4beb36a994488e2e79553ace349f184febbd16894cd9921188120495d8.png",
+      "post": "001-what-is-python",
+      "sha256": "8da6da4beb36a994488e2e79553ace349f184febbd16894cd9921188120495d8"
+    },
+    "001-what-is-python/readable-syntax": {
+      "assetKey": "readable-syntax",
+      "path": "objects/sha256/f0/f05d6e40a7b4e6e7a81d9760c7f4f728da507b616abc9a1abc0c1e21dac80f7a.png",
+      "post": "001-what-is-python",
+      "sha256": "f05d6e40a7b4e6e7a81d9760c7f4f728da507b616abc9a1abc0c1e21dac80f7a"
+    },
+    "001-what-is-python/python-popularity": {
+      "assetKey": "python-popularity",
+      "path": "objects/sha256/7f/7f4a1ebb90114c294e69b453b3bf0c0108e4b38b1065962dab7b4dcde33621cd.png",
+      "post": "001-what-is-python",
+      "sha256": "7f4a1ebb90114c294e69b453b3bf0c0108e4b38b1065962dab7b4dcde33621cd"
     }
   },
   "objectPrefix": "objects/sha256",
@@ -3589,6 +3607,27 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/fe/fe9a1e28e8808bdd0519b087da7059185a89eb3fbcc2bbda0f0b465e0dac812c.png",
+      "width": 1536
+    },
+    "8da6da4beb36a994488e2e79553ace349f184febbd16894cd9921188120495d8": {
+      "bytes": 1635619,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/8d/8da6da4beb36a994488e2e79553ace349f184febbd16894cd9921188120495d8.png",
+      "width": 1536
+    },
+    "f05d6e40a7b4e6e7a81d9760c7f4f728da507b616abc9a1abc0c1e21dac80f7a": {
+      "bytes": 1141436,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/f0/f05d6e40a7b4e6e7a81d9760c7f4f728da507b616abc9a1abc0c1e21dac80f7a.png",
+      "width": 1536
+    },
+    "7f4a1ebb90114c294e69b453b3bf0c0108e4b38b1065962dab7b4dcde33621cd": {
+      "bytes": 1382676,
+      "height": 1024,
+      "mime": "image/png",
+      "path": "objects/sha256/7f/7f4a1ebb90114c294e69b453b3bf0c0108e4b38b1065962dab7b4dcde33621cd.png",
       "width": 1536
     }
   },
