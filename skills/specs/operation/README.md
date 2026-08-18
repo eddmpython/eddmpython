@@ -28,6 +28,7 @@ status: curated
 | [`operation.visualVerification`](visualVerification.md) | 시각 검증과 승인 | 화면을 바꾸고 배포하기 전에 |
 | [`operation.workspace`](workspace.md) | 산출물과 임시 파일 | 작업을 끝낼 때 |
 | [`operation.secrets`](secrets.md) | 비밀정보와 공개 경계 | 커밋과 공개 전에 |
+| [`operation.coursePrivate`](coursePrivate.md) | 유료 강의 자료 비공개 | 강의 자료를 다룰 때 |
 
 ## 공통 원칙
 
