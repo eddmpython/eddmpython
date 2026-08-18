@@ -40,7 +40,7 @@ const METAPHOR_TERMS = ["작업장", "갈림길", "낭떠러지", "주사위", "
 const GENERIC_HEADING = /^(?:핵심|핵심 구조|새로운 흐름|더 나은 방식|확장 가능한 구조|마무리|결론|시작하기)$/u;
 const MARKUP_ANCHOR = /`[^`]+`|\[[^\]]+\]\([^)]+\)|\d|["“][^"”]+["”]/u;
 // 숫자 하나만 있어도 추상어 검사가 면제되던 탓에 발행 40편 1,751개 블록에서 이 검사가
-// 한 번도 발동하지 않았다. v2는 숫자를 앵커로 인정하지 않는다.
+// 한 번도 발동하지 않았다. 한 편 검사는 숫자를 앵커로 인정하지 않는다.
 const STRICT_MARKUP_ANCHOR = /`[^`]+`|\[[^\]]+\]\([^)]+\)/u;
 // 문단이 "X는 ...입니다" 정의로 열리는 비율. 용어집 순회로 쓴 글에서 뚜렷하게 높다.
 const DEFINITION_OPENER =
@@ -123,6 +123,22 @@ export function lintProseTexture(body) {
     });
   }
 
+  // 문장 하나가 추상어를 쓰면 그 문장 안에 실물이 있어야 한다. 문단 단위로 재던
+  // 검사는 추상 문장 하나가 구체적인 이웃 문장에 묻어가는 것을 막지 못했다.
+  for (const paragraph of paragraphs) {
+    for (const sentence of paragraph.split(/(?<=\.)\s+/u)) {
+      const text = sentence.trim();
+      if (!text) continue;
+      if (!countTerms(text, ABSTRACT_TERMS)) continue;
+      if (hasConcreteAnchor(text, true)) continue;
+      issues.push({
+        location: "추상 문장",
+        message: "추상어를 쓴 문장에는 같은 문장 안에 파일, 화면, 명령, 값, 오류 중 하나를 넣습니다",
+        excerpt: excerpt(text),
+      });
+    }
+  }
+
   const definitions = paragraphs.filter((paragraph) => DEFINITION_OPENER.test(paragraph));
   const ratio = definitions.length / paragraphs.length;
   if (ratio > DEFINITION_RATIO_MAX) {
@@ -195,5 +211,27 @@ export function lintBlogStyle({ fields = {}, body, sections = [], strictAnchor =
     }
   }
 
+  return issues;
+}
+
+// 서술 문단은 소스에서도 한 줄이다. 하드 줄바꿈은 문장을 자의적으로 끊어 보이게 하고
+// 교정할 때 문단 단위로 다시 읽기 어렵게 만든다.
+const SOURCE_SKIP = /^\s*(?:#{1,6}\s|[-*+]\s|\d+[.)]\s|>|\||!\[|https?:\/\/)/u;
+
+export function lintSourceWrapping(body) {
+  const issues = [];
+  for (const part of body.split(/```[\s\S]*?```/)) {
+    for (const block of part.split(/(?:\r?\n){2,}/)) {
+      const lines = block.split(/\r?\n/).filter((line) => line.trim());
+      if (!lines.length || SOURCE_SKIP.test(lines[0])) continue;
+      if (lines.length > 1) {
+        issues.push({
+          location: "원문 줄바꿈",
+          message: "서술 문단은 줄을 바꾸지 않고 한 줄로 씁니다",
+          excerpt: excerpt(lines[0]),
+        });
+      }
+    }
+  }
   return issues;
 }

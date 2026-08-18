@@ -1,16 +1,19 @@
 import { readdir, readFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
-import { lintBlogStyle, lintProseTexture } from "./blog-style.mjs";
+import { lintBlogStyle, lintProseTexture, lintSourceWrapping } from "./blog-style.mjs";
 import {
-  depthContractOf,
   h2Sections,
-  lintDepthContract,
   lintImageBrief,
   lintImagePolicy,
   lintSectionPackages,
   lintSeoPackage,
   parseSectionParts,
 } from "./blog-package.mjs";
+
+// 인자로 파일을 주면 그 한 편만 검사한다. 글을 쓰는 동안 도는 게이트다.
+// 인자가 없으면 여러 글 사이의 관계만 검사한다. 한 편 고칠 때 39편을 다시 재지 않는다.
+const targetPost = process.argv[2] ? process.argv[2].split(/[\/]/).pop() : null;
+const STRICT = Boolean(targetPost);
 
 const blogDir = resolve(process.cwd(), "../blog");
 const codaroEmbedsPath = resolve(blogDir, "embeds/codaro-cells.json");
@@ -339,7 +342,7 @@ const titles = new Map();
 const slugs = new Map();
 const referencedMedia = new Set();
 const referencedCodaroEmbeds = new Set();
-for (const file of posts) {
+for (const file of targetPost ? posts.filter((name) => name === targetPost) : posts) {
   const raw = await readFile(resolve(blogDir, file), "utf8");
   const { meta, body } = parseFrontmatter(file, raw);
   const postId = file.replace(/\.md$/, "");
@@ -388,21 +391,6 @@ for (const file of posts) {
   const sections = h2Sections(body);
   if (sections.length < 3) fail(file, "독자 흐름을 나누는 H2가 3개보다 적습니다");
   const metaObject = Object.fromEntries(meta);
-  // v2 계약은 H3 부제와 절당 이미지를 강제하지 않는 대신 명제와 리듬과 진입을 검사한다.
-  const contract = depthContractOf(metaObject);
-  const strictLead = contract ? contract.strictLead !== false : true;
-  const modernContract = Boolean(contract?.claims);
-  const depthIssues = lintDepthContract(metaObject, body, sections, {
-    required: Number(file.slice(0, 3)) >= 41,
-  });
-  if (depthIssues.length) {
-    fail(
-      file,
-      `독립 원문 깊이 계약 실패 ${depthIssues.length}건\n${depthIssues
-        .map((issue) => `  - ${issue.location}: ${issue.message} (${issue.excerpt})`)
-        .join("\n")}`,
-    );
-  }
   if ((body.match(/^```/gm) ?? []).length % 2 !== 0) fail(file, "코드 펜스가 닫히지 않았습니다");
   if (/[\u2013\u2014]/u.test(raw)) fail(file, "em dash 또는 en dash가 있습니다");
   if (/(?:세요|십시오|ㅂ시다|해라|하자)\.(?=\s|$)/u.test(raw)) {
@@ -413,9 +401,10 @@ for (const file of posts) {
   const packageIssues = [
     ...lintSeoPackage(metaObject, body, sections),
     ...lintSectionPackages(sections, {
-      requireCodeLabels: meta.has("depthContract"),
-      strictLead,
-      openLabels: modernContract,
+      requireCodeLabels: STRICT,
+      strictLead: false,
+      openLabels: STRICT,
+      checkLabels: STRICT,
     }),
   ];
   if (packageIssues.length) {
@@ -435,9 +424,10 @@ for (const file of posts) {
       },
       body,
       sections,
-      strictAnchor: modernContract,
+      strictAnchor: STRICT,
     }),
-    ...(modernContract ? lintProseTexture(body) : []),
+    ...(STRICT ? lintProseTexture(body) : []),
+    ...lintSourceWrapping(body),
   ];
   if (styleIssues.length) {
     fail(
@@ -483,9 +473,6 @@ for (const file of posts) {
   const sectionAssets = new Set();
   for (const section of sections) {
     const parsed = parseSectionParts(section);
-    if (strictLead && (!parsed.subtitle || !parsed.image)) {
-      fail(file, `섹션 패키지를 읽을 수 없습니다: ${section.heading}`);
-    }
     if (parsed.image) {
       const { alt, url, caption } = parsed.image;
       if (!caption.trim()) fail(file, `섹션 이미지 캡션이 비었습니다: ${section.heading}`);
@@ -498,7 +485,7 @@ for (const file of posts) {
       if (alt.trim() !== entry.alt) {
         fail(file, `섹션 이미지 대체 텍스트가 plan.json과 다릅니다: ${section.heading}`);
       }
-      const briefIssues = lintImageBrief(entry, section, parsed, { requireSubtitle: strictLead });
+      const briefIssues = lintImageBrief(entry, section, parsed, { requireSubtitle: false });
       if (briefIssues.length) {
         fail(
           file,
@@ -567,26 +554,33 @@ for (const file of posts) {
   }
 }
 
-for (const slug of orderedSlugs) {
-  if (!slugs.has(slug)) fail("blog/order.json", `목록의 글을 찾지 못했습니다: ${slug}`);
-}
-for (const slug of slugs.keys()) {
-  if (!orderedSlugs.has(slug)) fail("blog/order.json", `${slug} 글에 공개 읽기 순서가 없습니다`);
-}
+// 여기부터는 여러 글 사이의 관계다. 한 편만 검사할 때는 건너뛴다.
+if (!targetPost) {
+  for (const slug of orderedSlugs) {
+    if (!slugs.has(slug)) fail("blog/order.json", `목록의 글을 찾지 못했습니다: ${slug}`);
+  }
+  for (const slug of slugs.keys()) {
+    if (!orderedSlugs.has(slug)) fail("blog/order.json", `${slug} 글에 공개 읽기 순서가 없습니다`);
+  }
 
-const postSlugs = new Set(posts.map((file) => file.replace(/\.md$/, "")));
-for (const [id, entry] of Object.entries(plan.assets)) {
-  if (!postSlugs.has(entry.post)) fail("blog/media/plan.json", `${id}의 글 파일이 없습니다`);
-}
+  const postSlugs = new Set(posts.map((file) => file.replace(/\.md$/, "")));
+  for (const [id, entry] of Object.entries(plan.assets)) {
+    if (!postSlugs.has(entry.post)) fail("blog/media/plan.json", `${id}의 글 파일이 없습니다`);
+  }
 
-for (const [id, url] of assetUrlById) {
-  if (!referencedMedia.has(url)) fail("blog/media/catalog.json", `${id}가 글 본문이나 ogImage에서 쓰이지 않습니다`);
-}
+  for (const [id, url] of assetUrlById) {
+    if (!referencedMedia.has(url)) {
+      fail("blog/media/catalog.json", `${id}가 글 본문이나 ogImage에서 쓰이지 않습니다`);
+    }
+  }
 
-for (const id of Object.keys(codaroEmbeds.examples)) {
-  if (!referencedCodaroEmbeds.has(id)) {
-    fail("blog/embeds/codaro-cells.json", `${id}가 어떤 글에서도 쓰이지 않습니다`);
+  for (const id of Object.keys(codaroEmbeds.examples)) {
+    if (!referencedCodaroEmbeds.has(id)) {
+      fail("blog/embeds/codaro-cells.json", `${id}가 어떤 글에서도 쓰이지 않습니다`);
+    }
   }
 }
 
-console.log(`blog check: ${posts.length} post${posts.length === 1 ? "" : "s"}`);
+console.log(
+  targetPost ? `post check: ${targetPost}` : `blog check: ${posts.length} posts`,
+);

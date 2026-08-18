@@ -48,29 +48,11 @@
       "post": "001-what-is-python",
       "sha256": "3a32ae457b3851760457c6ce147e7297127ad3e7d403f3d45c3967fc1b8e9a44"
     },
-    "001-what-is-python/python-history": {
-      "assetKey": "python-history",
-      "path": "objects/sha256/8d/8da6da4beb36a994488e2e79553ace349f184febbd16894cd9921188120495d8.png",
-      "post": "001-what-is-python",
-      "sha256": "8da6da4beb36a994488e2e79553ace349f184febbd16894cd9921188120495d8"
-    },
     "001-what-is-python/python-is-instructions": {
       "assetKey": "python-is-instructions",
       "path": "objects/sha256/7d/7dd30cfe6faea2d684950be94309e088999242e29ca6514ba2fddf98ad824c15.png",
       "post": "001-what-is-python",
       "sha256": "7dd30cfe6faea2d684950be94309e088999242e29ca6514ba2fddf98ad824c15"
-    },
-    "001-what-is-python/python-popularity": {
-      "assetKey": "python-popularity",
-      "path": "objects/sha256/7f/7f4a1ebb90114c294e69b453b3bf0c0108e4b38b1065962dab7b4dcde33621cd.png",
-      "post": "001-what-is-python",
-      "sha256": "7f4a1ebb90114c294e69b453b3bf0c0108e4b38b1065962dab7b4dcde33621cd"
-    },
-    "001-what-is-python/readable-syntax": {
-      "assetKey": "readable-syntax",
-      "path": "objects/sha256/f0/f05d6e40a7b4e6e7a81d9760c7f4f728da507b616abc9a1abc0c1e21dac80f7a.png",
-      "post": "001-what-is-python",
-      "sha256": "f05d6e40a7b4e6e7a81d9760c7f4f728da507b616abc9a1abc0c1e21dac80f7a"
     },
     "002-codaro-guide/decision-boundary": {
       "assetKey": "decision-boundary",
@@ -252,23 +234,11 @@
       "post": "006-work-automation",
       "sha256": "ae106aa16983b88a6e84d688759b9580f32a9a1978a9689857fc228314ce7470"
     },
-    "006-work-automation/automation-input": {
-      "assetKey": "automation-input",
-      "path": "objects/sha256/81/810a0a376579b205d73f87a350ee8ad7eb56ed0b2afe2f860e57a5062725829d.png",
-      "post": "006-work-automation",
-      "sha256": "810a0a376579b205d73f87a350ee8ad7eb56ed0b2afe2f860e57a5062725829d"
-    },
     "006-work-automation/output-validation": {
       "assetKey": "output-validation",
       "path": "objects/sha256/75/7588515483d961e23b1e6e595a4e5a6e92fedbd75cd056fd8078b693e5590819.png",
       "post": "006-work-automation",
       "sha256": "7588515483d961e23b1e6e595a4e5a6e92fedbd75cd056fd8078b693e5590819"
-    },
-    "006-work-automation/process-and-decision": {
-      "assetKey": "process-and-decision",
-      "path": "objects/sha256/83/83566263ff5ad840db5f704af3c03b83fc3a8e0c17c964c5a2ecae60b496b777.png",
-      "post": "006-work-automation",
-      "sha256": "83566263ff5ad840db5f704af3c03b83fc3a8e0c17c964c5a2ecae60b496b777"
     },
     "007-python-basic-syntax/condition-branch": {
       "assetKey": "condition-branch",
@@ -2753,25 +2723,11 @@
       "path": "objects/sha256/7e/7e6f46d9932191e2ec5474f83a32c9ad7264035be7ab84d33b920d41618477aa.png",
       "width": 1536
     },
-    "7f4a1ebb90114c294e69b453b3bf0c0108e4b38b1065962dab7b4dcde33621cd": {
-      "bytes": 1382676,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/7f/7f4a1ebb90114c294e69b453b3bf0c0108e4b38b1065962dab7b4dcde33621cd.png",
-      "width": 1536
-    },
     "7f7e69dedcb155c332f6b96b23e291f00a4cce6d53c2c9afe0b519c89fcb42fa": {
       "bytes": 1296999,
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/7f/7f7e69dedcb155c332f6b96b23e291f00a4cce6d53c2c9afe0b519c89fcb42fa.png",
-      "width": 1536
-    },
-    "810a0a376579b205d73f87a350ee8ad7eb56ed0b2afe2f860e57a5062725829d": {
-      "bytes": 1163522,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/81/810a0a376579b205d73f87a350ee8ad7eb56ed0b2afe2f860e57a5062725829d.png",
       "width": 1536
     },
     "813bf48e3146e990e4ad935132cf21e891459aadaf1272ff6ec404a9d05080b4": {
@@ -2800,13 +2756,6 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/82/826c4a80803fe780da498133246f6eee1f2569eb3dd4f36d401227c465729e1e.png",
-      "width": 1536
-    },
-    "83566263ff5ad840db5f704af3c03b83fc3a8e0c17c964c5a2ecae60b496b777": {
-      "bytes": 1204189,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/83/83566263ff5ad840db5f704af3c03b83fc3a8e0c17c964c5a2ecae60b496b777.png",
       "width": 1536
     },
     "8581132c2780527c8a89a5aa8f297e1e7e334cf43290e46aef8bde08e6d27bb5": {
@@ -2870,13 +2819,6 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/8d/8d8c2bf03f4a2e938cd0538f2d6d17818d4c4de1b7fa177cab12f4a8a0e36f95.png",
-      "width": 1536
-    },
-    "8da6da4beb36a994488e2e79553ace349f184febbd16894cd9921188120495d8": {
-      "bytes": 1635619,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/8d/8da6da4beb36a994488e2e79553ace349f184febbd16894cd9921188120495d8.png",
       "width": 1536
     },
     "8dd2baa2a3e801c613b423219b8242cd463dc2902b5b84c55f5b1abf86a14e12": {
@@ -3563,13 +3505,6 @@
       "height": 1024,
       "mime": "image/png",
       "path": "objects/sha256/ef/efc1ef0fccdad1bd856837bab6350b4614feb267fa8eca3d7b8a1f8756cf5221.png",
-      "width": 1536
-    },
-    "f05d6e40a7b4e6e7a81d9760c7f4f728da507b616abc9a1abc0c1e21dac80f7a": {
-      "bytes": 1141436,
-      "height": 1024,
-      "mime": "image/png",
-      "path": "objects/sha256/f0/f05d6e40a7b4e6e7a81d9760c7f4f728da507b616abc9a1abc0c1e21dac80f7a.png",
       "width": 1536
     },
     "f15864138a8d5e7925127d7db0537d360f2ee691e73ba994e4eb469397573368": {

@@ -104,7 +104,7 @@ const ROUTE_RULES = [
       COUNT("article#content h1", { exact: 1 }),
       COUNT("article#content h2", { min: 1 }),
       COUNT('nav[aria-label="글 목차"]', { exact: 1 }),
-      // v2 계약 글은 이미지 없는 절을 허용한다. 이미지가 H2보다 많으면 여전히 실패한다.
+      // 이미지 없는 절을 허용한다. 이미지가 H2보다 많으면 여전히 실패한다.
       COUNT("article#content img", { min: 1 }),
       AT_MOST_COUNT("article#content img", "article#content h2"),
       COUNT(
@@ -128,7 +128,7 @@ const ROUTE_RULES = [
     match: (path) => path === "/blog/what-is-python",
     id: "what-is-python",
     checks: [
-      TEXT("article#content h2", "코드가 일을 대신합니다"),
+      TEXT("article#content h2", "그림판에 선이 혼자 그려집니다"),
       COUNT("article#content video", { exact: 5 }),
       COUNT('article#content source[src$=".mp4"]', { exact: 5 }),
     ],
