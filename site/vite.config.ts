@@ -258,7 +258,7 @@ function prerender(): Plugin {
 
 export default defineConfig({
   plugins: [react(), tailwindcss(), brandAssets(), prerender()],
-  // 글은 저장소 루트 blog/ 에 있다. dev 서버가 site/ 밖을 읽게 허용한다.
+  // 글은 blog/<category-slug>/ 에 있다. dev 서버가 site/ 밖을 읽게 허용한다.
   server: { fs: { allow: [".."] } },
   build: {
     outDir: OUT_DIR,

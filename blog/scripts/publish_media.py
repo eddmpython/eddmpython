@@ -42,6 +42,20 @@ IMAGEGEN_V2 = "eddmpython-dark-v2"
 IMAGEGEN_PALETTE = "eddmpython-carbon-ivory-sand-v1"
 
 
+SKIP_DIRS = frozenset({"media", "scripts", "embeds"})
+
+
+def find_post_markdown(post: str) -> Path:
+    matches = [
+        path
+        for path in BLOG_ROOT.rglob(f"{post}.md")
+        if path.is_file() and path.parent.name not in SKIP_DIRS
+    ]
+    if len(matches) != 1:
+        raise ValueError(f"글 파일이 없거나 중복: {post} -> {matches}")
+    return matches[0]
+
+
 def load_json(path: Path) -> dict[str, object]:
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
@@ -391,9 +405,7 @@ def publish(
     entry = plan_entry(plan, asset_id)
     post = str(entry["post"])
     key = str(entry["assetKey"])
-    post_path = BLOG_ROOT / f"{post}.md"
-    if not post_path.is_file():
-        raise ValueError(f"글 파일이 없음: {post_path}")
+    post_path = find_post_markdown(post)
 
     local_path = staging_path(post, key, explicit_file)
     validate_magic(local_path)

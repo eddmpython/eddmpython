@@ -1,11 +1,12 @@
 import { readdir, readFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { join, resolve } from "node:path";
 
 const origin = "https://eddmpython.com";
 const repoRoot = resolve(process.cwd(), "..");
 const blogRoot = resolve(repoRoot, "blog");
 const distRoot = resolve(repoRoot, "../eddmpython.out/site-dist");
 const postName = /^(\d{3}-[a-z0-9]+(?:-[a-z0-9]+)*)\.md$/;
+const skipDirs = new Set(["media", "scripts", "embeds"]);
 const adsenseClient = "ca-pub-6438440376456212";
 const adsenseScript = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
 
@@ -85,6 +86,22 @@ function nodesOfType(value, type, found = []) {
   return found;
 }
 
+async function collectPosts(dir, rel = "") {
+  const posts = [];
+  for (const entry of await readdir(dir, { withFileTypes: true })) {
+    if (entry.name.startsWith(".")) continue;
+    const relPath = rel ? `${rel}/${entry.name}` : entry.name;
+    const abs = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (skipDirs.has(entry.name)) continue;
+      posts.push(...(await collectPosts(abs, relPath)));
+      continue;
+    }
+    if (postName.test(entry.name)) posts.push({ file: relPath, abs, name: entry.name });
+  }
+  return posts.sort((a, b) => a.name.localeCompare(b.name));
+}
+
 async function pageHtml(path) {
   const file = path === "/" ? "index.html" : `${path.slice(1)}/index.html`;
   return readFile(resolve(distRoot, file), "utf8");
@@ -146,16 +163,13 @@ function checkShared(html, path) {
   return { ogTitle, ogImage, ogImageAlt, imageWidth, imageHeight, structured };
 }
 
-const postFiles = (await readdir(blogRoot)).filter((name) => postName.test(name)).sort();
+const postFiles = await collectPosts(blogRoot);
 const postRoutes = [];
-for (const file of postFiles) {
-  const frontmatter = parseFrontmatter(
-    file,
-    await readFile(resolve(blogRoot, file), "utf8"),
-  );
+for (const post of postFiles) {
+  const frontmatter = parseFrontmatter(post.file, await readFile(post.abs, "utf8"));
   const slug = frontmatter.get("slug");
-  if (!slug) fail(file, "slug frontmatter가 없습니다");
-  postRoutes.push({ file, slug, path: `/blog/${slug}` });
+  if (!slug) fail(post.file, "slug frontmatter가 없습니다");
+  postRoutes.push({ file: post.file, abs: post.abs, slug, path: `/blog/${slug}` });
 }
 const pages = ["/", "/blog", ...postRoutes.map((post) => post.path)];
 for (const path of pages) checkShared(await pageHtml(path), path);
@@ -181,8 +195,8 @@ if (nodesOfType(blogStructured, "BreadcrumbList").length !== 1) {
   fail("/blog", "탐색 경로 구조화 데이터가 없습니다");
 }
 
-for (const { file, slug, path } of postRoutes) {
-  const raw = await readFile(resolve(blogRoot, file), "utf8");
+for (const { file, abs, slug, path } of postRoutes) {
+  const raw = await readFile(abs, "utf8");
   const frontmatter = parseFrontmatter(file, raw);
   const html = await pageHtml(path);
   const adScripts = [...html.matchAll(/<script async src="([^"]+)" crossorigin="anonymous"><\/script>/g)]

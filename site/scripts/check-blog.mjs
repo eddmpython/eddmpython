@@ -33,7 +33,9 @@ const requiredMeta = [
   "searchIntent",
 ];
 const readerLevels = new Set(["beginner", "working", "advanced"]);
-const allowedDocs = new Set(["PIPELINE.md", "product-marketing.md"]);
+const skipDirs = new Set(["media", "scripts", "embeds"]);
+const rootDocs = new Set(["PIPELINE.md", "product-marketing.md", "README.md"]);
+const categoryDocs = new Set(["README.md", "원장.md"]);
 const publicSlug = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const mediaSuffixes = new Set([
   ".svg",
@@ -115,6 +117,22 @@ async function filesUnder(dir) {
     else files.push(path);
   }
   return files;
+}
+
+async function collectMarkdownDocs(dir, rel = "") {
+  const docs = [];
+  for (const entry of await readdir(dir, { withFileTypes: true })) {
+    if (entry.name.startsWith(".")) continue;
+    const relPath = rel ? `${rel}/${entry.name}` : entry.name;
+    const abs = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (skipDirs.has(entry.name)) continue;
+      docs.push(...(await collectMarkdownDocs(abs, relPath)));
+      continue;
+    }
+    if (entry.name.endsWith(".md")) docs.push({ name: entry.name, relPath, abs });
+  }
+  return docs;
 }
 
 async function loadJson(path, label) {
@@ -366,31 +384,48 @@ for (const id of Object.keys(plan.assets)) {
   if (!catalog.assets[id]) fail("blog/media/plan.json", `${id}가 아직 Hugging Face에 발행되지 않았습니다`);
 }
 
-const names = await readdir(blogDir);
-const markdown = names.filter((name) => name.endsWith(".md"));
-const unknown = markdown.filter((name) => !postName.test(name) && !allowedDocs.has(name));
-if (unknown.length) {
-  fail("blog", `발행 글이나 운영 문서로 분류되지 않은 파일: ${unknown.join(", ")}`);
-}
-
-const posts = markdown.filter((name) => postName.test(name)).sort();
-if (!posts.length) fail("blog", "발행 글이 한 편도 없습니다");
-for (const [index, file] of posts.entries()) {
-  const sequence = Number(file.match(postName)[1]);
-  if (sequence !== index + 1) {
-    fail(file, `파일 순번은 001부터 빈 번호 없이 이어져야 합니다: ${sequence}`);
+const markdownDocs = await collectMarkdownDocs(blogDir);
+for (const doc of markdownDocs) {
+  if (postName.test(doc.name)) continue;
+  const depth = doc.relPath.split("/").length;
+  const allowed = depth === 1 ? rootDocs.has(doc.name) : depth === 2 && categoryDocs.has(doc.name);
+  if (!allowed) {
+    fail(doc.relPath, "발행 글이나 운영 문서로 분류되지 않은 파일입니다");
   }
 }
 
+const posts = markdownDocs
+  .filter((doc) => postName.test(doc.name))
+  .map((doc) => ({
+    ...doc,
+    sequence: Number(doc.name.match(postName)[1]),
+    id: doc.name.replace(/\.md$/, ""),
+  }))
+  .sort((a, b) => a.sequence - b.sequence);
+if (!posts.length) fail("blog", "발행 글이 한 편도 없습니다");
+for (const [index, post] of posts.entries()) {
+  if (post.sequence !== index + 1) {
+    fail(post.relPath, `파일 순번은 001부터 빈 번호 없이 이어져야 합니다: ${post.sequence}`);
+  }
+}
+
+const listedCategoryBySlug = new Map(blogOrder.posts.map((entry) => [entry.slug, entry.category]));
 const titles = new Map();
 const slugs = new Map();
 const referencedMedia = new Set();
 const referencedCodaroEmbeds = new Set();
-for (const file of targetPost ? posts.filter((name) => name === targetPost) : posts) {
-  const raw = await readFile(resolve(blogDir, file), "utf8");
+for (const post of targetPost ? posts.filter((entry) => entry.name === targetPost) : posts) {
+  const file = post.relPath;
+  const raw = await readFile(post.abs, "utf8");
   const { meta, body } = parseFrontmatter(file, raw);
-  const postId = file.replace(/\.md$/, "");
+  const postId = post.id;
   const slug = meta.get("slug");
+  if (file === post.name) fail(file, "발행 글은 카테고리 폴더 안에 둡니다");
+  const folder = file.split("/")[0];
+  const listedCategory = listedCategoryBySlug.get(slug);
+  if (listedCategory && folder !== listedCategory) {
+    fail(file, `글 폴더 ${folder}와 category ${listedCategory}가 다릅니다`);
+  }
 
   if (meta.has("date") || meta.has("modified")) {
     fail(file, "발행 날짜 대신 파일 순번과 blog/order.json의 순서만 사용합니다");
@@ -612,7 +647,7 @@ if (!targetPost) {
     if (!slugs.has(slug)) fail("blog/order.json", `archived에 없는 글이 있습니다: ${slug}`);
   }
 
-  const postSlugs = new Set(posts.map((file) => file.replace(/\.md$/, "")));
+  const postSlugs = new Set(posts.map((post) => post.id));
   for (const [id, entry] of Object.entries(plan.assets)) {
     if (!postSlugs.has(entry.post)) fail("blog/media/plan.json", `${id}의 글 파일이 없습니다`);
   }

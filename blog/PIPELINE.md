@@ -81,15 +81,16 @@ H2 순서를 바꾸면 글이 깨져야 한다. 순서를 바꿔도 성립하면
 ### 카테고리는 강의 한 묶음이다
 
 `blog/order.json` 의 `categories` 가 카테고리 정본이다. 카테고리 하나가 강의 한 묶음이며 글은
-`posts[].category` 로 그 묶음에 속한다.
+`posts[].category` 로 그 묶음에 속한다. 글 파일은 `blog/<category-slug>/NNN-kebab.md` 에 둔다.
+폴더 이름과 category slug 는 같다. 그 폴더의 `원장.md` 가 글 제목 사슬의 정본이다.
 
 ```json
 {
-  "version": 2,
+  "version": 3,
   "categories": [
-    { "slug": "work-automation-basics", "title": "업무자동화 기초지식", "order": 1, "summary": "..." }
+    { "slug": "work-process-automation", "title": "업무프로세스자동화", "order": 1, "summary": "..." }
   ],
-  "posts": [{ "order": 1, "slug": "work-automation", "category": "work-automation-basics" }]
+  "posts": [{ "order": 1, "slug": "what-is-python", "category": "work-process-automation" }]
 }
 ```
 
@@ -155,7 +156,7 @@ slug다.
 
 ## 발행 파일 계약
 
-발행 글은 `blog/NNN-kebab.md` 한 파일이다. `NNN`은 `001`부터 빈 번호 없이 증가하는 발행 순번이다.
+발행 글은 `blog/<category-slug>/NNN-kebab.md` 한 파일이다. `NNN`은 저장소 전체에서 `001`부터 빈 번호 없이 증가하는 발행 순번이다.
 한 번 발행한 순번은 공개 읽기 순서가 바뀌어도 고치지 않는다. 파일 stem 전체는 미디어 키용
 **post id**다. 새 글은 현재 가장 큰 순번에 1을 더해 만든다. 공개 URL은 frontmatter `slug`만 쓴다
 (`/blog/{slug}`). 날짜는 저장하거나 정렬에 사용하지 않는다.

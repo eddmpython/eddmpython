@@ -1,6 +1,6 @@
 ---
 name: blog-writing
-description: eddmpython의 한국어 블로그를 주제 조사부터 SEO 제목, 섹션 설계, 쉬운 본문, 관련 이미지 브리프, 검수와 발행까지 한 세트로 만들고 고친다. 블로그 초안, 개요, 전체 교정, 추상적인 글, 관련 없는 이미지, 후킹 제목, 검색 유입, blog/*.md 작업에 사용한다. 랜딩 카피만 고치거나 이미지만 단독 제작할 때는 사용하지 않는다.
+description: eddmpython의 한국어 블로그를 주제 조사부터 SEO 제목, 섹션 설계, 쉬운 본문, 관련 이미지 브리프, 검수와 발행까지 한 세트로 만들고 고친다. 블로그 초안, 개요, 전체 교정, 추상적인 글, 관련 없는 이미지, 후킹 제목, 검색 유입, blog/*/*.md 작업에 사용한다. 랜딩 카피만 고치거나 이미지만 단독 제작할 때는 사용하지 않는다.
 ---
 
 # 토탈 블로그 작가 파이프라인
@@ -17,6 +17,7 @@ description: eddmpython의 한국어 블로그를 주제 조사부터 SEO 제목
 - `CLAUDE.md`
 - `blog/product-marketing.md`
 - `blog/PIPELINE.md`의 1절부터 4절
+- 해당 카테고리 폴더의 `원장.md`
 - `skills/specs/operation/blogCopy.md`
 - 고칠 글과 그 글이 설명하는 실제 코드, 문서, 화면
 

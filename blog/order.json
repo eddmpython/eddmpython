@@ -2,17 +2,17 @@
   "version": 3,
   "categories": [
     {
-      "slug": "work-automation-basics",
-      "title": "업무자동화 기초지식",
+      "slug": "work-process-automation",
+      "title": "업무프로세스자동화",
       "order": 1,
-      "summary": "Python 을 한 줄도 써 본 적 없는 상태에서 시작해 회사 Excel 파일을 프로그램으로 처리하고 결과가 맞는지 숫자로 확인하는 데까지 갑니다."
+      "summary": "파이썬을 한 줄도 써 본 적 없는 상태에서 시작해, 회사 엑셀과 문서를 프로그램으로 다루고 결과가 맞는지 확인하는 데까지 갑니다."
     }
   ],
   "posts": [
     {
       "order": 1,
       "slug": "what-is-python",
-      "category": "work-automation-basics"
+      "category": "work-process-automation"
     }
   ],
   "archived": [

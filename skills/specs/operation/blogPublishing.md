@@ -22,14 +22,14 @@ status: observed
 ## 정본은 한 곳이다
 
 ```
-blog/NNN-kebab.md
+blog/<category-slug>/NNN-kebab.md
 ```
 
-여기가 글의 정본이다. `NNN`은 `001`부터 빈 번호 없이 늘어나는 고정 발행 순번이다. 새 글은 현재
-가장 큰 번호에 1을 더한다. 파일 stem 전체는 post id이자 미디어 키다. 공개 경로는 frontmatter
-`slug`다. 사이트는 빌드 타임에 이
-폴더를 읽는다 (`site/src/posts.ts` 의
-`import.meta.glob`). 런타임 fetch 도 CMS 도 없다.
+여기가 글의 정본이다. 카테고리 폴더 이름과 `order.json`의 category slug는 같다. 그 폴더의
+`원장.md`가 글 제목 사슬의 정본이다. `NNN`은 저장소 전체에서 `001`부터 빈 번호 없이 늘어나는
+고정 발행 순번이다. 새 글은 현재 가장 큰 번호에 1을 더한다. 파일 stem 전체는 post id이자 미디어
+키다. 공개 경로는 frontmatter `slug`다. 사이트는 빌드 타임에 카테고리 폴더를 읽는다
+(`site/src/posts.ts`의 `import.meta.glob`). 런타임 fetch도 CMS도 없다.
 
 파일 순번은 발행 뒤 바꾸지 않는다. 발행일과 수정일은 저장하지 않는다. `/blog`의 공개 읽기 순서는
 `blog/order.json`의 `order`로만 관리한다. 이 파일에는 강의 시간표와 차시 메타데이터를 넣지 않는다.
@@ -157,7 +157,7 @@ cd site && npm run verify:media
 
 1. 독자의 출발점과 첫 행동을 정하고, 직접 답, 정의, 원리, 완성 예제, 다른 선택지, 실패와 복구,
    검증, 적용 범위를 채운 깊이 설계표를 만든다. `blog/PIPELINE.md` 1.5절 유입 패키징 게이트를 통과한
-   뒤 다음 세 자리 순번으로 `blog/NNN-slug.md`를 쓰고 모든 H2의 이미지 자리를 함께 정한다. 카피 판단은
+   뒤 다음 세 자리 순번으로 `blog/<category-slug>/NNN-slug.md`를 쓰고 모든 H2의 이미지 자리를 함께 정한다. 카피 판단은
    `operation.blogCopy`, 주제 선택은 `operation.contentStrategy`, 제품 맥락은
    `blog/product-marketing.md`를 본다.
 2. 섹션별 쉬운 설명을 먼저 쓴 뒤 `blog/media/plan.json`에 H2, H3, 본문 원문, 피사체, 관계, 출처,

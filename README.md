@@ -146,7 +146,7 @@ DartLab은 Python에서 바로 기업을 열고, pyproc은 웹 제품 안에 영
 | 경로 | 역할 |
 |---|---|
 | `site/` | React 19, TypeScript, Vite 기반 랜딩과 Cloudflare Worker |
-| `blog/` | 발행 글과 집필 파이프라인의 정본 |
+| `blog/` | 발행 글, 카테고리 원장, 집필 파이프라인의 정본 |
 | `agent-template/` | AI 코딩 에이전트를 위한 공개 작업 환경 템플릿 |
 | `skills/` | 배포, 도메인, SEO, 발행 절차의 정본 |
 
