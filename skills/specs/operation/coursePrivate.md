@@ -73,31 +73,76 @@ git config core.hooksPath .githooks
 `sitemap.xml`, `rss.xml`, `robots.txt` 에 `/course` 주소가 올라갔는지도 함께 본다.
 `npm run deploy` 가 빌드 직후 이 검사를 부르므로 새는 상태로는 배포되지 않는다.
 
-## Cloudflare Access 설정
+## 무엇을 무엇으로 막는가
 
-계정 작업이라 대시보드에서 직접 한다. 순서는 이렇다.
+| 대상 | 방법 | 상태 |
+|---|---|---|
+| 운영자 admin | Google 로그인 + Cloudflare Access. 허용 계정 하나 | 설정 진행 |
+| 오프라인 강의장 | 별도 라우트 + 비밀번호. 강의가 끝나면 라우트를 닫는다 | 아직 만들지 않았다 |
+| 블로그 | 막지 않는다. 무료 공개다 | 공개 |
 
-1. Zero Trust 대시보드에서 Access 애플리케이션을 self-hosted 로 만든다
-2. 도메인은 `eddmpython.com`, 경로는 `course` 로 좁힌다. `/blog` 와 홈은 공개로 남긴다
-3. 로그인 방법은 One-time PIN 을 켠다. 이메일로 코드를 받는 방식이라 별도 IdP 를 붙이지 않아도 된다
-4. Access Group 을 하나 만들고 수강생 이메일을 그 그룹에 넣는다
-5. 정책은 Allow 하나로 두고 그 그룹만 참조한다. 정책이 늘어도 명단은 한 곳에 남는다
+강의장에 Access 를 쓰지 않기로 한 이유가 있다. 오프라인이고 인원이 고정이며 강의가 끝나면 닫으므로
+암호가 새도 수명이 짧다. 반대로 Access 는 학생마다 계정 인증을 요구해서 강의장에서 여러 명이 동시에
+처음 로그인할 때 가장 취약하다. 그 순간이 하필 오프라인 강의의 핵심 장면이다.
 
-명단을 정책에 직접 적지 않고 그룹으로 빼는 이유는 나중에 정책이 여러 개가 되어도 사람을 한
-곳에서만 고치기 위해서다.
+강의장 라우트와 그것을 열고 닫는 admin 기능은 블로그 40 편이 확정되고 슬라이드를 만들기 시작할 때
+함께 만든다. 지킬 콘텐츠가 없는 상태에서 잠금장치부터 만들지 않는다.
 
-## 수강생 승인과 해제
+## 운영자 admin
 
-- 승인은 Access Group 에 이메일을 추가하는 일이다
-- 해제는 그 목록에서 빼는 일이다
-- 학생이 겪는 흐름은 주소 열기, 이메일 입력, 메일로 온 코드 입력, 세션 동안 열람이다
+admin 은 운영자 한 명만 들어간다. 인증은 Cloudflare Access 가 맡고 앱 코드에는 인증을 넣지 않는다.
+`CLAUDE.md` 가 자체 인증 구축을 금지하므로 Access 로 앞을 막는 방식만 쓴다.
 
-## 좌석
+### Google Cloud Console
+
+1. APIs & Services 에서 Credentials 를 열고 Configure Consent Screen 을 External 로 만든다
+2. Create OAuth client 를 고르고 Application type 은 Web application 로 한다
+3. 아래 두 칸을 정확히 채운다. 한 글자만 달라도 로그인이 실패한다
+
+| 칸 | 값 |
+|---|---|
+| Authorized JavaScript origins | `https://<팀이름>.cloudflareaccess.com` |
+| Authorized redirect URIs | `https://<팀이름>.cloudflareaccess.com/cdn-cgi/access/callback` |
+
+팀 이름은 Cloudflare 대시보드의 `Settings` 에서 `Team name and domain` 의 `Team name` 이다.
+추측해서 넣지 않고 그 화면에서 직접 확인한다.
+
+4. Client ID 와 Client Secret 을 복사한다
+
+### Cloudflare 등록
+
+Zero Trust 에서 Integrations 의 Identity providers 로 가서 Google 을 추가하고 위 두 값을 넣는다.
+한 번 등록하면 이후 만드는 모든 Access 앱에서 다시 쓸 수 있다.
+
+### Access 앱
+
+Access controls 의 Applications 에서 self-hosted 로 만들고 도메인은 `eddmpython.com` 이다.
+Path 는 `admin` 과 `admin/*` 을 모두 넣는다. 와일드카드가 부모 경로를 포함하지 않기 때문이다.
+
+정책은 Allow 하나이고 selector 는 `Emails` 에 `eddmpython@gmail.com` 한 줄이다. 한 명이라
+List 를 만들지 않는다. IdP 는 Google 하나만 켜고 `Apply instant authentication` 을 켠다. 그러면
+로그인 선택 화면을 건너뛰고 바로 구글로 간다.
+
+### 확인
+
+시크릿 창에서 `eddmpython.com/admin` 을 연다. 구글 로그인 화면이 뜨고 통과한 뒤 사이트 404 가
+나오면 인증 체인이 정상이다. 아직 그 경로에 페이지를 만들지 않았으므로 404 가 정상 신호다.
+
+admin 은 미검증 OAuth 앱의 100 명 상한과 무관하다. 운영자 계정 하나만 쓰기 때문이다. 그 상한은
+수강생을 구글로 받을 때만 문제가 된다.
+
+## 수강생 접근
+
+강의장은 비밀번호 방식이므로 수강생 이메일을 Access 에 등록하지 않는다. 명단 관리와 좌석 소모가
+아예 없다.
+
+나중에 원격 수강이나 상시 열람이 필요해져서 수강생을 Access 로 받게 되면 그때 아래를 참고한다.
 
 - 좌석은 등록이 아니라 인증할 때 소모된다
 - 무료 좌석은 50 석이다. 다 차면 새 사용자의 로그인이 막히고 기존 사용자는 영향이 없다
-- 자동 회수가 있다. 1 개월에서 1 년 사이 미접속자를 자동으로 빼는 설정이며 하루 한 번 돈다.
-  기수제 강의라면 만료를 짧게 걸어 두면 50 석으로 오래 버틴다
+- 1 개월에서 1 년 사이 미접속자를 자동으로 빼는 설정이 있으며 하루 한 번 돈다
+- 명단은 `Reusable components` 의 `Lists` 에 `User email addresses` 형식으로 CSV 로 올리고
+  정책에서 `Emails` 를 `in list` 로 참조한다
 
 **확인하지 않은 것**: 50 석을 넘겼을 때의 사용자당 단가. 공개 요금 페이지에서 숫자를 확인하지
 못했다. 결제 전에 대시보드에서 직접 확인한다.
