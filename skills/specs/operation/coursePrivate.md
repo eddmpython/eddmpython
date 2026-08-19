@@ -17,7 +17,21 @@ verify:
   - cd site && npm test
 ---
 
-# 유료 강의 자료 비공개 운영
+# 유료 강의 자료 비공개
+
+**커리큘럼 교안 정본은 `course/curriculum/` 이다.** 2026-08-19 에 발행했던 네 편을 여기로
+옮기고 블로그 공개를 닫았다. 운영자 결정이고 전면 금지다. 내린 주소는 `site/worker.ts` 의
+`LEGACY_BLOG` 가 `/blog` 로 넘겨 죽은 링크만 막는다. 본문은 어디에도 공개하지 않는다.
+
+```text
+course/curriculum/
+  원장.md                  카테고리 순서와 글 사슬의 정본
+  01-automation-start/     카테고리 01. 글 4편과 실행 칸 예제
+```
+
+**카테고리 폴더는 두 자리 번호로 시작한다.** `NN-kebab` 이고 번호가 읽는 순서다.
+실행 칸 예제도 여기 둔다. `blog/embeds/codaro-cells.json` 에 넣으면 공개 번들에 구워져
+`check:leak` 이 막는다. 2026-08-19 에 실제로 걸려서 옮겼다. 운영
 
 ## 경계
 

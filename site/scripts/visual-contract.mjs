@@ -90,11 +90,16 @@ const ROUTE_RULES = [
         exact: blogOrder.posts.length,
       }),
       COUNT("[data-blog-order]", { exact: blogOrder.posts.length }),
-      TEXT("[data-blog-list] > li:first-child [data-blog-order]", "01"),
-      TEXT(
-        "[data-blog-list] > li:last-child [data-blog-order]",
-        String(blogOrder.posts.length).padStart(2, "0"),
-      ),
+      // 글이 없는 구간이 정상이다. 번호 검사는 목록에 글이 있을 때만 건다.
+      ...(blogOrder.posts.length
+        ? [
+            TEXT("[data-blog-list] > li:first-child [data-blog-order]", "01"),
+            TEXT(
+              "[data-blog-list] > li:last-child [data-blog-order]",
+              String(blogOrder.posts.length).padStart(2, "0"),
+            ),
+          ]
+        : []),
       COUNT('main#content a[href^="/blog/"]', {
         exact: blogOrder.posts.length,
       }),
@@ -124,86 +129,6 @@ const ROUTE_RULES = [
         minTop: 80,
         maxTop: 112,
         captureAfter: true,
-      },
-    ],
-  },
-  {
-    match: (path) => path === "/blog/what-automation-does",
-    id: "what-automation-does",
-    checks: [
-      TEXT("article#content h2", "마우스를 사람이 안 잡아도 그림이 그려집니다"),
-      COUNT("article#content video", { exact: 5 }),
-      COUNT('article#content source[src$=".mp4"]', { exact: 5 }),
-    ],
-    captures: [
-      {
-        id: "pyautogui-demo",
-        selector: "article#content figure:first-of-type",
-      },
-      {
-        id: "playwright-demo",
-        selector: 'article#content figure:has(video[aria-label="공식 할 일 목록에 Buy milk가 입력되고 완료로 표시되는 화면"])',
-      },
-    ],
-  },
-  {
-    match: (path) => path === "/blog/what-is-python",
-    id: "what-is-python",
-    checks: [
-      TEXT("article#content h2", "남이 만들어 둔 코드를 불러 씁니다"),
-      COUNT("article#content img", { exact: 3 }),
-      COUNT("article#content video", { exact: 0 }),
-    ],
-    captures: [
-      {
-        id: "readable-syntax",
-        selector: "article#content figure:first-of-type",
-      },
-    ],
-  },
-  {
-    match: (path) => path === "/blog/python-basic-syntax",
-    id: "python-basic-syntax",
-    checks: [
-      TEXT("article#content h2", "파이썬 기초문법, 1분이면 된다고 하면 믿기시나요"),
-      COUNT("article#content img", { exact: 8 }),
-      COUNT('a[href="https://www.youtube.com/shorts/priwCYZJ8h4"]', { min: 1 }),
-      COUNT('aside[aria-label^="Codaro 실습 셀:"]', { exact: 7 }),
-      VISIBLE('aside[aria-label="Codaro 실습 셀: 기준금액으로 거래 분류하기"] textarea'),
-    ],
-    captures: [
-      {
-        id: "syntax-learning-map",
-        selector: "article#content figure:first-of-type",
-      },
-      {
-        id: "condition-cell",
-        selector: 'aside[aria-label="Codaro 실습 셀: 기준금액으로 거래 분류하기"]',
-      },
-    ],
-    interactions: [
-      {
-        id: "run-condition-example",
-        type: "click-until-text",
-        click: 'aside[aria-label="Codaro 실습 셀: 기준금액으로 거래 분류하기"] button',
-        target: 'aside[aria-label="Codaro 실습 셀: 기준금액으로 거래 분류하기"] output',
-        includes: "100,000원: 확인필요",
-        timeoutMs: 120_000,
-      },
-    ],
-  },
-  {
-    match: (path) => path === "/blog/first-python-code",
-    id: "first-python-code",
-    checks: [
-      TEXT("article#content h2", "첫 코드는 여섯 줄이면 됩니다"),
-      COUNT("article#content img", { exact: 2 }),
-      COUNT('aside[aria-label^="Codaro 실습 셀:"]', { exact: 1 }),
-    ],
-    captures: [
-      {
-        id: "python-is-instructions",
-        selector: "article#content figure:first-of-type",
       },
     ],
   },

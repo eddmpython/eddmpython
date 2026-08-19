@@ -187,12 +187,12 @@ if (
 ) {
   fail("blog/embeds/codaro-cells.json", "version 또는 examples 계약이 잘못됐습니다");
 }
+// 글이 하나도 없는 상태를 허용한다. 2026-08-19 에 커리큘럼을 유료 강의로 옮기면서
+// 블로그가 비었다. 블로그는 이제 그때그때 올리는 단편이라 빈 구간이 정상이다.
 if (
   blogOrder.version !== 3 ||
   !Array.isArray(blogOrder.categories) ||
-  !blogOrder.categories.length ||
   !Array.isArray(blogOrder.posts) ||
-  !blogOrder.posts.length ||
   !Array.isArray(blogOrder.archived)
 ) {
   fail("blog/order.json", "version 또는 categories 또는 posts 또는 archived 계약이 잘못됐습니다");
@@ -405,7 +405,8 @@ const posts = markdownDocs
     id: doc.name.replace(/\.md$/, ""),
   }))
   .sort((a, b) => a.sequence - b.sequence);
-if (!posts.length) fail("blog", "발행 글이 한 편도 없습니다");
+// 빈 블로그를 허용한다. 단편을 그때그때 올리는 구조라 글이 없는 구간이 정상이다.
+if (targetPost && !posts.length) fail("blog", `${targetPost} 를 찾지 못했습니다`);
 for (const [index, post] of posts.entries()) {
   if (post.sequence !== index + 1) {
     fail(post.relPath, `파일 순번은 001부터 빈 번호 없이 이어져야 합니다: ${post.sequence}`);
@@ -671,7 +672,9 @@ if (!targetPost) {
     }
   }
 
-  for (const id of Object.keys(codaroEmbeds.examples)) {
+  // 안 쓰는 실행 칸을 남겨 둔다. 미디어 객체와 같은 이유다. 글을 갈아엎어도 예제는 다시 쓴다.
+  // 반대로 글이 없는 예제를 가리키는 것은 여전히 막는다.
+  for (const id of []) {
     if (!referencedCodaroEmbeds.has(id)) {
       fail("blog/embeds/codaro-cells.json", `${id}가 어떤 글에서도 쓰이지 않습니다`);
     }

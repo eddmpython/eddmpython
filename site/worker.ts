@@ -30,6 +30,12 @@ const LEGACY_BLOG: Record<string, string> = {
   "/blog/2026-08-08-ai-needs-an-environment": "/blog/ai-environment",
   "/blog/run-python-without-install": "/blog/no-install",
   "/blog/ai-needs-an-environment": "/blog/ai-environment",
+  // 2026-08-19 에 커리큘럼 네 편을 유료 강의로 옮기고 공개를 닫았다. 본문은 공개하지 않고
+  // 이미 색인된 주소만 목록으로 넘겨 죽은 링크를 막는다.
+  "/blog/what-automation-does": "/blog",
+  "/blog/what-is-python": "/blog",
+  "/blog/first-python-code": "/blog",
+  "/blog/python-basic-syntax": "/blog",
 };
 
 const SECURITY_HEADERS: Record<string, string> = {

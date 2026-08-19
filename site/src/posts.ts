@@ -34,8 +34,11 @@ const files = import.meta.glob("../../blog/content/*/???-*.md", {
 }) as Record<string, string>;
 
 const slugPattern = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
-const readingOrderBySlug = new Map(blogOrder.posts.map((entry) => [entry.slug, entry.order]));
-const categoryBySlug = new Map(blogOrder.posts.map((entry) => [entry.slug, entry.category]));
+/* order.json 의 배열은 비어 있을 수 있다. 블로그는 그때그때 올리는 단편이라 글이 없는
+   구간이 정상이다. 비면 JSON import 가 never[] 로 추론되므로 원소 모양을 직접 적는다. */
+const postEntries = blogOrder.posts as { order: number; slug: string; category: string }[];
+const readingOrderBySlug = new Map(postEntries.map((entry) => [entry.slug, entry.order]));
+const categoryBySlug = new Map(postEntries.map((entry) => [entry.slug, entry.category]));
 /* 아카이브한 글은 /blog 목록에서만 빠진다. URL 과 sitemap 은 그대로 두어 검색 유입을 지킨다.
    비어 있으면 JSON import 가 never[] 로 추론되므로 원소 모양을 직접 적는다. */
 const archivedEntries = blogOrder.archived as { slug: string; note?: string }[];
