@@ -63,8 +63,8 @@ status: curated
 - 수동태와 수식어를 줄인다.
 - beginner 글은 `PIPELINE.md` 길이 한도를 지킨다.
 
-본문을 새로 쓰거나 전체 교정할 때는 저장소용 `$blog-writing` 스킬을 사용한다. 스킬의 정본은
-`.agents/skills/blog-writing/SKILL.md`이며 `blog/PIPELINE.md` 4절의 규칙을 실제 집필 순서로 적용한다.
+본문을 새로 쓰거나 전체 교정할 때는 저장소용 `$blog-writing` 스킬을 사용한다. 스킬 파일은
+포인터일 뿐이고 집필 규칙의 정본은 `memory/blogWriter.md`이며 발행 계약은 `blog/PIPELINE.md`다.
 `cd site && npm run test:blog-style`과 `npm run test:blog-package`로 검사 규칙 표본을 먼저 확인하고
 `npm run check:blog`로 실제 글을 검사한다.
 

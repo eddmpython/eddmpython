@@ -34,7 +34,7 @@ const requiredMeta = [
 ];
 const readerLevels = new Set(["beginner", "working", "advanced"]);
 const skipDirs = new Set(["media", "scripts", "embeds"]);
-const rootDocs = new Set(["PIPELINE.md", "WRITER.md", "product-marketing.md", "README.md"]);
+const rootDocs = new Set(["PIPELINE.md", "product-marketing.md", "README.md"]);
 const categoryDocs = new Set(["README.md", "원장.md"]);
 const publicSlug = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const mediaSuffixes = new Set([
