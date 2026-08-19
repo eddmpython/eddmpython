@@ -45,10 +45,12 @@ IMAGEGEN_PALETTE = "eddmpython-carbon-ivory-sand-v1"
 SKIP_DIRS = frozenset({"media", "scripts", "embeds"})
 
 
-def find_post_markdown(post: str) -> Path:
+def find_post_markdown(post: str, root: Path | None = None) -> Path:
+    """글 파일을 찾는다. 교안은 plan 이 있는 폴더 옆에, 블로그는 blog/content 아래에 있다."""
+    search = root or BLOG_ROOT
     matches = [
         path
-        for path in BLOG_ROOT.rglob(f"{post}.md")
+        for path in search.rglob(f"{post}.md")
         if path.is_file() and path.parent.name not in SKIP_DIRS
     ]
     if len(matches) != 1:
@@ -73,7 +75,9 @@ def save_json(path: Path, payload: dict[str, object]) -> None:
     )
 
 
-def plan_entry(plan: dict[str, object], asset_id: str) -> dict[str, object]:
+def plan_entry(
+    plan: dict[str, object], asset_id: str, plan_label: str = "blog/media/plan.json"
+) -> dict[str, object]:
     match = ASSET_ID_RE.fullmatch(asset_id)
     if not match:
         raise ValueError("asset id는 <post id>/<영문 kebab-case 키> 형식이어야 함")
@@ -82,7 +86,7 @@ def plan_entry(plan: dict[str, object], asset_id: str) -> dict[str, object]:
         or plan.get("promptContract") != "section-grounded-v2"
         or not isinstance(plan.get("assets"), dict)
     ):
-        raise ValueError("blog/media/plan.json 계약 위반")
+        raise ValueError(f"{plan_label} 계약 위반")
     entry = plan["assets"].get(asset_id)
     if not isinstance(entry, dict):
         raise ValueError(f"이미지 계획이 없음: {asset_id}")
@@ -400,12 +404,20 @@ def publish(
     dry_run: bool,
     create_repo: bool,
     reviewed: bool,
+    plan_arg: str = "",
 ) -> str:
-    plan = load_json(PLAN_PATH)
-    entry = plan_entry(plan, asset_id)
+    # 교안 plan 은 course 아래에 있고 추적하지 않는다. 본문 문장을 들고 있는 sectionHeading 과
+    # contentAnchor 가 공개 저장소로 새지 않게 하려는 것이다. 이미지 자체와 catalog 는 공유한다.
+    plan_path = Path(plan_arg).resolve() if plan_arg else PLAN_PATH
+    if not plan_path.exists():
+        raise ValueError(f"plan 을 찾을 수 없음: {plan_path}")
+    plan_label = str(plan_path.relative_to(REPO_ROOT)) if plan_path.is_relative_to(REPO_ROOT) else str(plan_path)
+    plan = load_json(plan_path)
+    entry = plan_entry(plan, asset_id, plan_label)
     post = str(entry["post"])
     key = str(entry["assetKey"])
-    post_path = find_post_markdown(post)
+    post_root = plan_path.parent if plan_arg else None
+    post_path = find_post_markdown(post, post_root)
 
     local_path = staging_path(post, key, explicit_file)
     validate_magic(local_path)
@@ -612,6 +624,11 @@ def parse_args() -> argparse.Namespace:
         help="참조가 끊긴 객체 레코드를 정리한다. 기본은 보여 주기만 한다",
     )
     parser.add_argument("--apply", action="store_true", help="--prune-objects 를 실제로 실행")
+    parser.add_argument(
+        "--plan",
+        default="",
+        help="다른 plan.json 경로. 교안은 course/curriculum/<카테고리>/plan.json 을 쓴다",
+    )
     parser.add_argument("--file", help="저장소 밖 staging 이미지 경로")
     parser.add_argument("--dry-run", action="store_true", help="업로드와 파일 수정 없이 계약만 확인")
     parser.add_argument("--create-repo", action="store_true", help="HF 데이터셋이 없으면 공개 저장소 생성")
@@ -633,7 +650,9 @@ def main() -> None:
         elif args.prune_objects:
             prune_objects(args.apply)
         else:
-            publish(args.asset, args.file, args.dry_run, args.create_repo, args.reviewed)
+            publish(
+                args.asset, args.file, args.dry_run, args.create_repo, args.reviewed, args.plan
+            )
     except (OSError, RuntimeError, ValueError) as exc:
         raise SystemExit(f"블로그 미디어 발행 실패: {exc}") from exc
 

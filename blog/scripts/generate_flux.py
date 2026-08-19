@@ -123,9 +123,17 @@ def main() -> None:
     parser.add_argument("post", help="post id (파일 stem, 예: 005-claude-code-agents)")
     parser.add_argument("--only", default="", help="쉼표로 나눈 assetKey 목록만 생성")
     parser.add_argument("--force", action="store_true", help="이미 있는 파일도 다시 생성")
+    parser.add_argument(
+        "--plan",
+        default="",
+        help="다른 plan.json 경로. 교안은 course/curriculum/<카테고리>/plan.json 을 쓴다",
+    )
     args = parser.parse_args()
 
-    plan = json.loads(PLAN_PATH.read_text(encoding="utf-8"))
+    plan_path = Path(args.plan).resolve() if args.plan else PLAN_PATH
+    if not plan_path.exists():
+        sys.exit(f"plan 을 찾을 수 없다: {plan_path}")
+    plan = json.loads(plan_path.read_text(encoding="utf-8"))
     if plan.get("version") != 2 or plan.get("promptContract") != "section-grounded-v2":
         sys.exit("plan.json의 section-grounded-v2 계약이 필요하다.")
     assets = plan.get("assets", {})
