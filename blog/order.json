@@ -11,7 +11,17 @@
   "posts": [
     {
       "order": 1,
+      "slug": "what-automation-does",
+      "category": "work-automation"
+    },
+    {
+      "order": 2,
       "slug": "what-is-python",
+      "category": "work-automation"
+    },
+    {
+      "order": 3,
+      "slug": "first-python-code",
       "category": "work-automation"
     }
   ],

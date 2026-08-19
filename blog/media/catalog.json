@@ -1,21 +1,21 @@
 {
   "assets": {
-    "001-what-is-python/biz-status-sheet": {
+    "002-what-automation-does/biz-status-sheet": {
       "assetKey": "biz-status-sheet",
       "path": "objects/sha256/5e/5e4de925132c227ae7380d32d551c427793a4ff40006d02f321f4f06259c8b1d.mp4",
-      "post": "001-what-is-python",
+      "post": "002-what-automation-does",
       "sha256": "5e4de925132c227ae7380d32d551c427793a4ff40006d02f321f4f06259c8b1d"
     },
-    "001-what-is-python/excel-dashboard": {
+    "002-what-automation-does/excel-dashboard": {
       "assetKey": "excel-dashboard",
       "path": "objects/sha256/45/45a2d0545791403e5c48fd1115880a14c8da715d3e3b31cc440c4a486d8b7d1e.mp4",
-      "post": "001-what-is-python",
+      "post": "002-what-automation-does",
       "sha256": "45a2d0545791403e5c48fd1115880a14c8da715d3e3b31cc440c4a486d8b7d1e"
     },
-    "001-what-is-python/first-python-run": {
+    "003-first-python-code/first-python-run": {
       "assetKey": "first-python-run",
       "path": "objects/sha256/57/57a319f7b8b14b5a6271e0ab6f27f2607921bd5e5b669861ba4266a32dd5fc7e.png",
-      "post": "001-what-is-python",
+      "post": "003-first-python-code",
       "sha256": "57a319f7b8b14b5a6271e0ab6f27f2607921bd5e5b669861ba4266a32dd5fc7e"
     },
     "001-what-is-python/language-choice": {
@@ -24,34 +24,28 @@
       "post": "001-what-is-python",
       "sha256": "9b029651ee8ef83cbcd60e5a6bd3f5fdbf359d0200368fa3b4b4edb268651f94"
     },
-    "001-what-is-python/nasdaq-forecast": {
+    "002-what-automation-does/nasdaq-forecast": {
       "assetKey": "nasdaq-forecast",
       "path": "objects/sha256/af/af0807f0918766f5780d23f06fb42e1055b8803d22a44fec22ed19120a7718c6.mp4",
-      "post": "001-what-is-python",
+      "post": "002-what-automation-does",
       "sha256": "af0807f0918766f5780d23f06fb42e1055b8803d22a44fec22ed19120a7718c6"
     },
-    "001-what-is-python/playwright-demo": {
+    "002-what-automation-does/playwright-demo": {
       "assetKey": "playwright-demo",
       "path": "objects/sha256/6d/6d7cfb1ebc80d49de79f20640d4ca71260aad30ae7ebb9c0236622244c5978e9.mp4",
-      "post": "001-what-is-python",
+      "post": "002-what-automation-does",
       "sha256": "6d7cfb1ebc80d49de79f20640d4ca71260aad30ae7ebb9c0236622244c5978e9"
     },
-    "001-what-is-python/pyautogui-demo": {
+    "002-what-automation-does/pyautogui-demo": {
       "assetKey": "pyautogui-demo",
       "path": "objects/sha256/26/26a61e5a395d39d010b201143df44ff76e3725c913d1c9a4399c314e8dbb288d.mp4",
-      "post": "001-what-is-python",
+      "post": "002-what-automation-does",
       "sha256": "26a61e5a395d39d010b201143df44ff76e3725c913d1c9a4399c314e8dbb288d"
     },
-    "001-what-is-python/python-ecosystem": {
-      "assetKey": "python-ecosystem",
-      "path": "objects/sha256/3a/3a32ae457b3851760457c6ce147e7297127ad3e7d403f3d45c3967fc1b8e9a44.png",
-      "post": "001-what-is-python",
-      "sha256": "3a32ae457b3851760457c6ce147e7297127ad3e7d403f3d45c3967fc1b8e9a44"
-    },
-    "001-what-is-python/python-is-instructions": {
+    "003-first-python-code/python-is-instructions": {
       "assetKey": "python-is-instructions",
       "path": "objects/sha256/7d/7dd30cfe6faea2d684950be94309e088999242e29ca6514ba2fddf98ad824c15.png",
-      "post": "001-what-is-python",
+      "post": "003-first-python-code",
       "sha256": "7dd30cfe6faea2d684950be94309e088999242e29ca6514ba2fddf98ad824c15"
     },
     "001-what-is-python/python-history": {
@@ -65,6 +59,12 @@
       "path": "objects/sha256/f0/f05d6e40a7b4e6e7a81d9760c7f4f728da507b616abc9a1abc0c1e21dac80f7a.png",
       "post": "001-what-is-python",
       "sha256": "f05d6e40a7b4e6e7a81d9760c7f4f728da507b616abc9a1abc0c1e21dac80f7a"
+    },
+    "002-what-automation-does/python-ecosystem": {
+      "assetKey": "python-ecosystem",
+      "path": "objects/sha256/3a/3a32ae457b3851760457c6ce147e7297127ad3e7d403f3d45c3967fc1b8e9a44.png",
+      "post": "002-what-automation-does",
+      "sha256": "3a32ae457b3851760457c6ce147e7297127ad3e7d403f3d45c3967fc1b8e9a44"
     }
   },
   "objectPrefix": "objects/sha256",

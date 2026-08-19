@@ -1,16 +1,16 @@
 {
   "assets": {
-    "001-what-is-python/first-python-run": {
+    "003-first-python-code/first-python-run": {
       "alt": "브라우저 코드 입력칸의 붕어빵 수량이 실행 버튼을 거쳐 새 영수증 결과로 바뀌는 모습",
       "assetKey": "first-python-run",
       "narrativeUse": "팥 수량을 바꾸고 다시 실행하면 전체 개수와 가격이 함께 달라지는 첫 실습을 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "001-what-is-python",
+      "post": "003-first-python-code",
       "prompt": "Use case: infographic-diagram. Create a direct wide 3:2 browser execution diagram with no metaphor. On the left show one browser code panel made from five clean abstract code strokes, with exactly one small sand token visibly changing between two stacked states. In the center show one triangular run control. On the right show two receipt-shaped result cards: the first contains exactly three simple fish-shaped pastry icons and three matching coin marks, and the second contains exactly six pastry icons and six matching coin marks. Connect changed input to execution and changed output explicitly. Use carbon black #101514 for the background, ivory #f5f3ee for primary cards and lines, sand #d8be91 as a small accent, near-neutral graphite, and warm gray. No additional hues. No readable text, letters, numbers, pseudo-text, real code, people, hands, robots, logos, brands, watermarks, checks, or clutter.",
       "role": "section",
-      "sectionHeading": "여섯 줄을 지금 고쳐서 실행해 봅니다",
+      "sectionHeading": "지금 고쳐서 실행해 봅니다",
       "sectionSubtitle": "팥 수량을 바꾸고 실행을 누르면 합계가 같이 달라집니다",
-      "contentAnchor": "설치는 하지 않아도 됩니다.",
+      "contentAnchor": "아래 칸에 앞에서 본 붕어빵 코드가 그대로 들어 있습니다.",
       "visualSubject": "브라우저 코드 입력칸, 바뀐 수량 값, 실행 버튼, 세 개와 여섯 개의 붕어빵 영수증 결과",
       "visualRelationship": "수량 값을 바꾸고 실행하면 전체 개수와 가격 결과가 함께 증가한다",
       "sourceKind": "imagegen",
@@ -26,7 +26,7 @@
       "post": "001-what-is-python",
       "prompt": "Use case: infographic-diagram. Create a direct wide 3:2 task-to-language-fit diagram with no metaphor. Arrange exactly five concrete task cards in one row: a browser interface, a mobile phone app, a high-performance engine with a speed gauge, a network server rack, and a data table connected to an AI model node. Beneath them place five visibly different abstract code-file cards and connect each file to its fitting task. Make the data and AI path originate from a clean indented script card while the other tasks use distinct file shapes. Use carbon black #101514 for the background, ivory #f5f3ee for primary cards and lines, sand #d8be91 as a small accent, near-neutral graphite, and warm gray. No additional hues. No readable text, letters, numbers, pseudo-text, real code, people, robots, logos, brands, snakes, watermarks, trophies, or clutter.",
       "role": "section",
-      "sectionHeading": "파이썬이 나쁜 선택인 자리도 있습니다",
+      "sectionHeading": "파이썬으로 열지 않는 편이 나은 자리",
       "sectionSubtitle": "화면, 앱, 속도가 걸린 곳에서는 다른 언어가 먼저입니다",
       "contentAnchor": "브라우저 화면을 만드는 일은 `JavaScript` 와 `TypeScript` 가 먼저입니다.",
       "visualSubject": "브라우저, 모바일 앱, 속도계가 있는 엔진, 서버, 데이터와 AI 작업 카드와 서로 다른 코드 경로",
@@ -36,7 +36,7 @@
       "visualProfile": "eddmpython-dark-v2",
       "palettePolicy": "eddmpython-carbon-ivory-sand-v1"
     },
-    "001-what-is-python/pyautogui-demo": {
+    "002-what-automation-does/pyautogui-demo": {
       "alt": "왼쪽 코드가 실행되는 동안 오른쪽 그림판에 사각 나선이 그려지는 화면",
       "assetKey": "pyautogui-demo",
       "captureState": "Marimo에서 pyautogui 코드를 실행하면 그림판 캔버스에 사각 나선이 완성된다",
@@ -44,7 +44,7 @@
       "credit": "eddmpython",
       "narrativeUse": "Python 코드가 마우스를 움직여 그림판에 선을 그리는 자동화를 직접 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "001-what-is-python",
+      "post": "002-what-automation-does",
       "role": "section",
       "sectionHeading": "화면을 대신 눌러 줍니다",
       "sectionSubtitle": "마우스와 키보드를 사람이 잡지 않은 채 두 화면이 움직입니다",
@@ -54,7 +54,7 @@
       "visualRelationship": "코드가 실행되는 동안 그림판 캔버스에 사각 나선이 그려진다",
       "visualSubject": "그림판 화면, 마우스 드래그, 사각 나선 결과"
     },
-    "001-what-is-python/playwright-demo": {
+    "002-what-automation-does/playwright-demo": {
       "alt": "공식 할 일 목록에 Buy milk가 입력되고 완료로 표시되는 화면",
       "assetKey": "playwright-demo",
       "captureState": "Playwright가 demo.playwright.dev/todomvc에 Buy milk, Write a report, Send the report를 넣고 첫 항목을 완료로 표시한 뒤 Completed와 Active 필터를 전환한다",
@@ -62,7 +62,7 @@
       "credit": "eddmpython",
       "narrativeUse": "Python 코드가 공식 브라우저 데모의 입력칸과 버튼을 찾아 할 일 목록을 채우는 자동화를 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "001-what-is-python",
+      "post": "002-what-automation-does",
       "role": "section",
       "sectionSubtitle": "마우스와 키보드를 사람이 잡지 않은 채 두 화면이 움직입니다",
       "sourceKind": "recording",
@@ -72,7 +72,7 @@
       "visualSubject": "공식 TodoMVC 데모 화면, 할 일 입력칸, Buy milk 항목, Completed 필터 결과",
       "sectionHeading": "화면을 대신 눌러 줍니다"
     },
-    "001-what-is-python/biz-status-sheet": {
+    "002-what-automation-does/biz-status-sheet": {
       "alt": "사업자등록번호를 넣자 표에 계속사업자라는 상태가 채워지는 화면",
       "assetKey": "biz-status-sheet",
       "captureState": "사업자등록번호를 보정한 뒤 공공 API 결과가 표의 사업상태 열에 계속사업자로 채워진다",
@@ -80,17 +80,17 @@
       "credit": "eddmpython",
       "narrativeUse": "표에 번호를 넣으면 공공 API가 사업자 상태를 채워 주는 자동화를 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "001-what-is-python",
+      "post": "002-what-automation-does",
       "role": "section",
-      "sectionSubtitle": "미리 몰랐던 값을 코드가 찾아오고 흩어진 숫자를 한눈에 모읍니다",
+      "sectionSubtitle": "실행하기 전에는 몰랐던 값을 코드가 찾아와 칸에 채웁니다",
       "sourceKind": "recording",
       "sourcePolicy": "auto",
       "visualProfile": "source-original-v1",
       "visualRelationship": "사업자번호를 넣으면 표에 계속사업자 상태가 채워진다",
       "visualSubject": "사업자등록번호 열, 보정 열, 사업상태 결과가 있는 표 화면",
-      "sectionHeading": "이미 있는 값을 찾아서 정리합니다"
+      "sectionHeading": "흩어진 값을 찾아 모읍니다"
     },
-    "001-what-is-python/excel-dashboard": {
+    "002-what-automation-does/excel-dashboard": {
       "alt": "엑셀 파일을 올리자 계정별 막대 그래프 대시보드가 생기는 화면",
       "assetKey": "excel-dashboard",
       "captureState": "엑셀을 업로드하면 이자수익과 보험료 같은 계정별 그래프 카드가 격자 대시보드로 생긴다",
@@ -98,17 +98,17 @@
       "credit": "eddmpython",
       "narrativeUse": "엑셀 업로드만으로 계정별 그래프 대시보드가 만들어지는 모습을 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "001-what-is-python",
+      "post": "002-what-automation-does",
       "role": "section",
-      "sectionSubtitle": "미리 몰랐던 값을 코드가 찾아오고 흩어진 숫자를 한눈에 모읍니다",
+      "sectionSubtitle": "실행하기 전에는 몰랐던 값을 코드가 찾아와 칸에 채웁니다",
       "sourceKind": "recording",
       "sourcePolicy": "auto",
       "visualProfile": "source-original-v1",
       "visualRelationship": "엑셀 파일을 올리면 계정별 그래프 카드가 생긴다",
       "visualSubject": "엑셀 업로드 화면과 계정별 막대 그래프 대시보드",
-      "sectionHeading": "이미 있는 값을 찾아서 정리합니다"
+      "sectionHeading": "흩어진 값을 찾아 모읍니다"
     },
-    "001-what-is-python/nasdaq-forecast": {
+    "002-what-automation-does/nasdaq-forecast": {
       "alt": "나스닥 숫자 표와 앞으로 30일 예측 선이 한 화면에 나타나는 모습",
       "assetKey": "nasdaq-forecast",
       "captureState": "나스닥과 예측 모델을 고르면 1,482행을 읽고 앞으로 30일 예측 선이 그래프에 나타난다",
@@ -116,7 +116,7 @@
       "credit": "eddmpython",
       "narrativeUse": "시세 표를 읽어 30일 예측 선을 그리는 화면으로 데이터 자동화를 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "001-what-is-python",
+      "post": "002-what-automation-does",
       "role": "section",
       "sectionSubtitle": "지난 시세만 있는 표에서 오지 않은 날짜의 선이 이어집니다",
       "sourceKind": "recording",
@@ -124,37 +124,19 @@
       "visualProfile": "source-original-v1",
       "visualRelationship": "나스닥 시세를 읽은 뒤 30일 예측 선이 그래프에 나타난다",
       "visualSubject": "나스닥 시세 표, 예측 모델 설정, 30일 예측 선 그래프",
-      "sectionHeading": "아직 없는 값을 만들어 내기도 합니다"
+      "sectionHeading": "없는 값을 만들어 내기도 합니다"
     },
-    "001-what-is-python/python-ecosystem": {
-      "alt": "하나의 Python 파일이 표 계산, 웹 요청, 자동화 시계, AI 모델 결과에 각각 연결된 모습",
-      "assetKey": "python-ecosystem",
-      "narrativeUse": "Python 문법 하나가 라이브러리를 통해 데이터, 웹, 자동화, AI 작업을 연결하는 생태계를 보여 준다.",
-      "placement": "H3 부제 바로 뒤",
-      "post": "001-what-is-python",
-      "prompt": "Use case: infographic-diagram. Create a direct wide 3:2 hub-and-spoke diagram with no metaphor. In the center show one clean indented script-file card made from abstract horizontal strokes. Four explicit connectors lead to four concrete and distinct outputs: a spreadsheet with one summarized column, a web response window with structured blocks, a clock triggering a completed file, and an AI model node producing one aligned result card. Show one script coordinating four specialized capabilities. Use carbon black #101514 for the background, ivory #f5f3ee for primary cards and lines, sand #d8be91 as a small accent, near-neutral graphite, and warm gray. No additional hues. No readable text, letters, numbers, pseudo-text, real code, people, robots, logos, brands, snakes, watermarks, checks, or clutter.",
-      "role": "section",
-      "sectionHeading": "남이 만든 코드를 불러 씁니다",
-      "sectionSubtitle": "마우스를 움직이는 코드도 표를 읽는 코드도 이미 누군가 만들어 뒀습니다",
-      "contentAnchor": "앞에서 마우스를 끈 `pyautogui` 와 브라우저를 연 `Playwright` 는 파이썬 문법이 아닙니다.",
-      "visualSubject": "중앙 Python 스크립트 파일과 연결된 표, 웹 응답, 예약 자동화, AI 모델 결과",
-      "visualRelationship": "하나의 스크립트가 목적별 라이브러리를 불러 네 종류의 실제 결과를 만든다",
-      "sourceKind": "imagegen",
-      "sourcePolicy": "auto",
-      "visualProfile": "eddmpython-dark-v2",
-      "palettePolicy": "eddmpython-carbon-ivory-sand-v1"
-    },
-    "001-what-is-python/python-is-instructions": {
+    "003-first-python-code/python-is-instructions": {
       "alt": "짧은 Python 명령이 붕어빵 주문 영수증 결과로 바뀌는 실행 흐름",
       "assetKey": "python-is-instructions",
       "narrativeUse": "사람이 수량과 가격을 코드로 적으면 Python이 계산해 눈에 보이는 결과를 만든다는 정의를 보여 준다.",
       "placement": "H3 부제 바로 뒤",
-      "post": "001-what-is-python",
+      "post": "003-first-python-code",
       "prompt": "Use case: infographic-diagram. Create a direct wide 3:2 input-process-output diagram with no metaphor. On the left show one clean indented script card containing exactly three quantity tokens and one multiplication symbol, with no readable code. In the center show one compact execution module containing two sequential calculation blocks. On the right show one receipt card containing exactly three small fish-shaped pastry icons and three equal coin marks. Use arrows to make instructions, calculation, and visible result unmistakable. Use carbon black #101514 for the background, ivory #f5f3ee for primary cards and lines, sand #d8be91 as a small accent, near-neutral graphite, and warm gray. No additional hues. No readable text, letters, numbers, pseudo-text, people, hands, robots, logos, brands, snakes, watermarks, checks, or clutter.",
       "role": "section",
       "sectionHeading": "첫 코드는 여섯 줄이면 됩니다",
       "sectionSubtitle": "값을 적고 계산하고 화면에 내보내는 세 동작이 전부입니다",
-      "contentAnchor": "파이썬 코드는 사람이 읽는 문장에 가깝습니다.",
+      "contentAnchor": "붕어빵 가게에서 팥 두 개와 슈크림 한 개를 한 개 `1000` 원에 팔았다고 하겠습니다.",
       "visualSubject": "수량과 가격이 있는 짧은 스크립트 카드, 실행 표시, 붕어빵 세 개와 가격이 있는 영수증",
       "visualRelationship": "사람이 적은 수량과 가격 명령을 실행하면 계산된 주문 결과가 나온다",
       "sourceKind": "imagegen",
@@ -188,11 +170,29 @@
       "post": "001-what-is-python",
       "prompt": "Use case: infographic-diagram. Create a direct wide 3:2 comparison of two code layouts performing the same filtering and sum task with no metaphor. On the left show a compact code card with exactly four short abstract rows, consistent indentation, and very few punctuation marks. On the right show a wider code card with nested brackets, braces, arrow shapes, and semicolon marks. Connect both cards to two visually identical total-result cards so both are correct and only readability and density differ. Use carbon black #101514 for the background, ivory #f5f3ee for primary cards and lines, sand #d8be91 as a small accent, near-neutral graphite, and warm gray. No additional hues. No readable text, letters, numbers, pseudo-text, real code, people, robots, logos, brands, snakes, watermarks, trophies, checks, or clutter.",
       "role": "section",
-      "sectionHeading": "문법이 읽혀야 고칠 수 있습니다",
+      "sectionHeading": "몇 달 뒤에도 읽혀야 고칠 수 있습니다",
       "sectionSubtitle": "다음 달에 다시 열었을 때 무슨 뜻인지 알아야 자동화가 유지됩니다",
       "contentAnchor": "자동화는 한 번 돌리고 끝나지 않습니다.",
       "visualSubject": "들여쓰기가 일정한 짧은 코드 카드와 기호가 많은 긴 코드 카드 및 같은 계산 결과",
       "visualRelationship": "두 코드가 같은 결과를 내지만 들여쓰기 중심 코드는 계산 순서를 더 적은 기호로 보여 준다",
+      "sourceKind": "imagegen",
+      "sourcePolicy": "auto",
+      "visualProfile": "eddmpython-dark-v2",
+      "palettePolicy": "eddmpython-carbon-ivory-sand-v1"
+    },
+    "002-what-automation-does/python-ecosystem": {
+      "alt": "하나의 Python 파일이 표 계산, 웹 요청, 자동화 시계, AI 모델 결과에 각각 연결된 모습",
+      "assetKey": "python-ecosystem",
+      "narrativeUse": "Python 문법 하나가 라이브러리를 통해 데이터, 웹, 자동화, AI 작업을 연결하는 생태계를 보여 준다.",
+      "placement": "H3 부제 바로 뒤",
+      "post": "002-what-automation-does",
+      "prompt": "Use case: infographic-diagram. Create a direct wide 3:2 hub-and-spoke diagram with no metaphor. In the center show one clean indented script-file card made from abstract horizontal strokes. Four explicit connectors lead to four concrete and distinct outputs: a spreadsheet with one summarized column, a web response window with structured blocks, a clock triggering a completed file, and an AI model node producing one aligned result card. Show one script coordinating four specialized capabilities. Use carbon black #101514 for the background, ivory #f5f3ee for primary cards and lines, sand #d8be91 as a small accent, near-neutral graphite, and warm gray. No additional hues. No readable text, letters, numbers, pseudo-text, real code, people, robots, logos, brands, snakes, watermarks, checks, or clutter.",
+      "role": "section",
+      "sectionHeading": "자동화 한 건에 셋이 섞여 있습니다",
+      "sectionSubtitle": "파일 하나가 목적에 맞는 도구를 하나씩 불러 씁니다",
+      "contentAnchor": "지금까지 본 다섯 화면을 하는 일로 묶으면 셋이 됩니다.",
+      "visualSubject": "중앙 Python 스크립트 파일과 연결된 표, 웹 응답, 예약 자동화, AI 모델 결과",
+      "visualRelationship": "하나의 스크립트가 목적별 라이브러리를 불러 네 종류의 실제 결과를 만든다",
       "sourceKind": "imagegen",
       "sourcePolicy": "auto",
       "visualProfile": "eddmpython-dark-v2",
