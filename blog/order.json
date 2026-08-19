@@ -2,17 +2,17 @@
   "version": 3,
   "categories": [
     {
-      "slug": "work-process-automation",
-      "title": "업무프로세스자동화",
+      "slug": "work-automation",
+      "title": "업무자동화",
       "order": 1,
-      "summary": "파이썬을 한 줄도 써 본 적 없는 상태에서 시작해, 회사 엑셀과 문서를 프로그램으로 다루고 결과가 맞는지 확인하는 데까지 갑니다."
+      "summary": "파이썬을 한 줄도 써 본 적 없는 상태에서 시작해, 회사 엑셀과 문서를 프로그램으로 다루고 결과가 맞는지 확인한 뒤 사람이 안 눌러도 돌게 하는 데까지 갑니다."
     }
   ],
   "posts": [
     {
       "order": 1,
       "slug": "what-is-python",
-      "category": "work-process-automation"
+      "category": "work-automation"
     }
   ],
   "archived": []

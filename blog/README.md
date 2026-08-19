@@ -18,7 +18,7 @@
 
 ## 카테고리 하나를 열 때
 
-1. 폴더를 만든다. 예: `blog/work-process-automation/`
+1. 폴더를 만든다. 예: `blog/work-automation/`
 2. 그 안에 `README.md`와 `원장.md`를 둔다. 원장에 글 제목 사슬을 먼저 적는다.
 3. `order.json`의 `categories`에 같은 slug를 넣는다.
 4. 글 파일은 `blog/<category-slug>/NNN-kebab.md`다. `NNN`은 저장소 전체에서 001부터 빈 번호 없이 이어진다.
@@ -43,4 +43,4 @@ python blog/scripts/outline.py --chain          절 사슬을 한 화면에 편�
 
 | 폴더 | 목록 제목 | 원장 |
 |---|---|---|
-| `work-process-automation/` | 업무프로세스자동화 | [원장.md](work-process-automation/원장.md) |
+| `work-automation/` | 업무자동화 | [원장.md](work-automation/원장.md) |

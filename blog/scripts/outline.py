@@ -5,7 +5,7 @@
 
     python blog/scripts/outline.py                  모든 카테고리를 대조한다
     python blog/scripts/outline.py --chain          절 사슬을 한 화면에 편다
-    python blog/scripts/outline.py --category work-process-automation
+    python blog/scripts/outline.py --category work-automation
 
 종료 코드 1은 원장과 글이 어긋났다는 뜻이지 글이 나쁘다는 뜻이 아니다.
 """

@@ -88,9 +88,9 @@ H2 순서를 바꾸면 글이 깨져야 한다. 순서를 바꿔도 성립하면
 {
   "version": 3,
   "categories": [
-    { "slug": "work-process-automation", "title": "업무프로세스자동화", "order": 1, "summary": "..." }
+    { "slug": "work-automation", "title": "업무자동화", "order": 1, "summary": "..." }
   ],
-  "posts": [{ "order": 1, "slug": "what-is-python", "category": "work-process-automation" }]
+  "posts": [{ "order": 1, "slug": "what-is-python", "category": "work-automation" }]
 }
 ```
 
