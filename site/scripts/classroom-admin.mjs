@@ -80,6 +80,34 @@ if (argv.includes("--sync-only")) {
   process.exit(0);
 }
 
+/**
+ * 운영 토큰을 새로 뽑아 Worker secret 과 이 설정에 같이 넣는다.
+ *
+ * 손으로 옮겨 적게 두면 언젠가 한 글자가 어긋나고, 그것을 강의장에 가서 401 로 만난다.
+ * 두 곳을 한 번에 바꾸는 것이 이 명령이 있는 이유다.
+ */
+if (argv.includes("--link-production")) {
+  const target = config.targets.find((t) => t.id === "production");
+  if (!target) throw new Error("설정에 production 대상이 없다");
+  const token = randomBytes(32).toString("hex");
+  console.log(`  ${target.base} 에 새 운영 토큰을 넣습니다`);
+  const put = spawn("npx", ["wrangler", "secret", "put", "CR_ADMIN_TOKEN"], {
+    cwd: SITE,
+    stdio: ["pipe", "inherit", "inherit"],
+    shell: true,
+  });
+  put.stdin.end(`${token}\n`);
+  const code = await new Promise((resolve) => put.on("close", resolve));
+  if (code !== 0) {
+    console.error("  wrangler 가 실패했습니다. 설정은 건드리지 않았습니다");
+    process.exit(1);
+  }
+  target.token = token;
+  await writeFile(CONFIG, `${JSON.stringify(config, null, 2)}\n`, "utf8");
+  console.log("  Worker secret 과 설정을 같은 값으로 맞췄습니다");
+  process.exit(0);
+}
+
 /** 대상 Worker 를 두드린다. 토큰은 이 프로세스 밖으로 나가지 않는다. */
 async function drive(targetId, body) {
   const target = config.targets.find((t) => t.id === targetId);

@@ -111,7 +111,6 @@ site\scripts\classroom-dev.ps1
 
 대상과 토큰은 `site/.classroom-admin.json` 이다. 추적하지 않고 처음 실행할 때 만들어진다.
 로컬 토큰은 거기서 뽑아 `site/.dev.vars` 와 자동으로 맞춘다. **운영 토큰은 비어 있다.**
-`wrangler secret put CR_ADMIN_TOKEN` 으로 넣은 값을 같은 파일에 옮겨 적어야 운영을 조종한다.
 
 wrangler 상태는 `../eddmpython.out/wrangler-state` 에 둔다. 저장소 안에 `.wrangler` 를
 만들지 않는다.
@@ -139,11 +138,16 @@ node scripts/classroom-shot.mjs
 ## 배포
 
 ```powershell
-npx wrangler secret put CR_ADMIN_TOKEN
+npm run deploy
+node scripts/classroom-admin.mjs --link-production
 ```
 
+두 번째 줄이 운영 토큰을 새로 뽑아 **Worker secret 과 `.classroom-admin.json` 에 같이
+넣는다.** 손으로 옮겨 적지 않는다. 어긋나면 그것을 강의장에 가서 401 로 만난다.
+
 Durable Object 마이그레이션이 `wrangler.jsonc` 에 있으므로 첫 배포에서 클래스가 만들어진다.
-토큰을 넣기 전에는 운영 화면이 401 을 받고 아무도 방을 못 만든다.
+토큰을 넣기 전에는 운영 화면이 401 을 받고 아무도 방을 못 만든다. 그래서 배포 자체는
+강의장을 열지 않는다.
 
 ## 롤백
 

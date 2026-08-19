@@ -11,6 +11,7 @@
  * 4번이 이 파일이 존재하는 이유다. 클라이언트에서 거르면 개발자 도구로 앞 내용을 먼저 본다.
  */
 import { COURSE, type CourseCategory } from "./course-content.generated";
+import { esc, renderMarkdown } from "./classroom-render";
 
 export type Env = {
   CLASSROOM: DurableObjectNamespace;
@@ -290,18 +291,6 @@ function sessionCookie(token: string, slug: string, url: URL): string {
 
 /* 화면 ------------------------------------------------------------------ */
 
-const ESCAPES: Record<string, string> = {
-  "&": "&amp;",
-  "<": "&lt;",
-  ">": "&gt;",
-  '"': "&quot;",
-  "'": "&#39;",
-};
-
-function esc(text: string): string {
-  return text.replace(/[&<>"']/g, (c) => ESCAPES[c]);
-}
-
 const STYLE = `
 :root { color-scheme: dark; }
 * { box-sizing: border-box; }
@@ -336,12 +325,49 @@ article table { display:block; overflow-x:auto; border-collapse:collapse; }
 .zoom.on { display:flex; }
 .zoom img { max-width:100%; max-height:100%; border-radius:.4rem; }
 .back { color:#f5f3ee88; text-decoration:none; font-size:.9rem; }
+article a { color:#d8be91; text-decoration:none; border-bottom:1px solid #d8be9155; }
+article a:hover { border-bottom-color:#d8be91; }
+.yt { margin:1.2rem 0; }
+.yt .frame { position:relative; width:100%; padding-top:56.25%; border-radius:.6rem;
+  overflow:hidden; background:#000; }
+.yt.tall .frame { padding-top:0; aspect-ratio:9/16; max-width:22rem; margin-inline:auto; }
+.yt iframe, .yt .ytplay { position:absolute; inset:0; width:100%; height:100%; border:0; }
+.yt .ytplay { background-color:#000; background-size:cover; background-position:center;
+  cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; }
+.yt .ytplay span { width:4rem; height:4rem; border-radius:50%; background:#000000bf;
+  border:1px solid #ffffff40; display:flex; align-items:center; justify-content:center;
+  transition:transform .15s; }
+.yt .ytplay span::after { content:""; margin-left:.28rem; border-style:solid;
+  border-width:.62rem 0 .62rem 1rem; border-color:transparent transparent transparent #f5f3ee; }
+.yt .ytplay:hover span { transform:scale(1.06); }
+.yt.tall iframe { position:static; aspect-ratio:9/16; }
+.yt figcaption { display:flex; flex-wrap:wrap; justify-content:space-between; gap:.35rem 1rem;
+  align-items:baseline; margin-top:.5rem; font-size:.88rem; color:#f5f3ee85; }
+.yt figcaption a { color:#f5f3eeb8; white-space:nowrap; }
+.pending { border:1px dashed #ffffff26; border-radius:.6rem; margin:1.2rem 0; padding:2.4rem 1.5rem;
+  text-align:center; background:#ffffff08; }
+.pending b { display:block; font-size:.72rem; letter-spacing:.14em; color:#f5f3ee60;
+  text-transform:uppercase; margin-bottom:.6rem; font-weight:500; }
+.pending span { display:block; font-size:.9rem; color:#f5f3ee85; line-height:1.7; }
+.pending i { display:block; margin-top:.5rem; font-size:.75rem; color:#f5f3ee48; font-style:normal; }
+.slider .pending { flex:0 0 88%; margin:0; scroll-snap-align:center; }
 `;
 
 const ZOOM_SCRIPT = `
 const z = document.getElementById("zoom");
 document.addEventListener("click", (e) => {
   const t = e.target;
+  const play = t.closest ? t.closest("button.ytplay") : null;
+  if (play) {
+    const f = document.createElement("iframe");
+    f.src = "https://www.youtube-nocookie.com/embed/" + play.dataset.yt + "?autoplay=1&rel=0&playsinline=1";
+    f.title = play.dataset.label || "YouTube 영상";
+    f.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+    f.referrerPolicy = "strict-origin-when-cross-origin";
+    f.allowFullscreen = true;
+    play.replaceWith(f);
+    return;
+  }
   if (t.tagName === "IMG" && t.closest("article")) {
     z.querySelector("img").src = t.src;
     z.querySelector("img").alt = t.alt;
@@ -397,51 +423,6 @@ function loginPage(slug: string, title: string, message = ""): Response {
        <button type="submit">들어가기</button>
      </form>${message ? `<p class="err">${esc(message)}</p>` : ""}`,
   );
-}
-
-/** 아주 작은 마크다운 렌더. 교안이 쓰는 것만 다룬다. 연속 이미지는 슬라이더가 된다. */
-function renderMarkdown(body: string): string {
-  const blocks = body.replace(/\r\n/g, "\n").split(/\n{2,}/);
-  const out: string[] = [];
-  let images: string[] = [];
-  const flush = () => {
-    if (!images.length) return;
-    out.push(images.length > 1 ? `<div class="slider">${images.join("")}</div>` : images[0]);
-    images = [];
-  };
-  for (const raw of blocks) {
-    const b = raw.trim();
-    if (!b) continue;
-    const img = b.match(/^!\[([^\]]*)\]\(([^\s)]+)(?:\s+"([^"]*)")?\)$/);
-    if (img) {
-      // 영상도 시각 자산이다. 확장자로 갈라 태그를 바꾼다.
-      if (/\.(mp4|webm|mov)$/i.test(img[2])) {
-        flush();
-        out.push(`<video src="${esc(img[2])}" controls playsinline preload="metadata"></video>`);
-      } else {
-        images.push(`<img src="${esc(img[2])}" alt="${esc(img[1])}" loading="lazy">`);
-      }
-      continue;
-    }
-    flush();
-    if (b.startsWith("## ")) out.push(`<h2>${esc(b.slice(3))}</h2>`);
-    else if (b.startsWith("#### ")) out.push(`<h4>${esc(b.slice(5))}</h4>`);
-    else if (b.startsWith("```")) out.push(`<pre>${esc(b.replace(/^```\w*\n?|\n?```$/g, ""))}</pre>`);
-    else if (/^[-*]\s/m.test(b)) {
-      const items = b.split("\n").filter((l) => /^[-*]\s/.test(l.trim()));
-      out.push(`<ul>${items.map((l) => `<li>${inline(l.trim().slice(2))}</li>`).join("")}</ul>`);
-    } else if (/^https?:\/\/\S+$/.test(b)) out.push(`<p><a href="${esc(b)}">${esc(b)}</a></p>`);
-    else out.push(`<p>${inline(b)}</p>`);
-  }
-  flush();
-  return out.join("\n");
-}
-
-function inline(text: string): string {
-  return esc(text)
-    .replace(/`([^`]+)`/g, "<code>$1</code>")
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
 }
 
 /* 라우팅 ---------------------------------------------------------------- */
