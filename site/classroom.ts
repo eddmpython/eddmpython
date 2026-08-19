@@ -143,13 +143,21 @@ async function hmac(secret: string, message: string): Promise<string> {
   return hex(await crypto.subtle.sign("HMAC", key, enc.encode(message)));
 }
 
-/** 강의장 비밀번호는 짧다. 그대로 해시하면 금방 뒤집히므로 반복해서 늘린다. */
+/**
+ * 강의장 비밀번호는 짧다. 그대로 해시하면 금방 뒤집히므로 반복해서 늘린다.
+ *
+ * 반복은 10만 회다. **Cloudflare Workers 가 PBKDF2 반복을 10만 회로 막는다.** 12만 회를
+ * 요청했더니 로컬 miniflare 는 통과하고 배포된 Worker 만 NotSupportedError 로 던졌다.
+ * 로그를 잡기 전까지 create 와 login 이 프로덕션에서만 500 이었다. 이 상한을 넘기지 않는다.
+ */
+const PBKDF2_ITERATIONS = 100000;
+
 async function stretch(password: string, salt: string): Promise<string> {
   const key = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, [
     "deriveBits",
   ]);
   const bits = await crypto.subtle.deriveBits(
-    { name: "PBKDF2", salt: enc.encode(salt), iterations: 120000, hash: "SHA-256" },
+    { name: "PBKDF2", salt: enc.encode(salt), iterations: PBKDF2_ITERATIONS, hash: "SHA-256" },
     key,
     256,
   );

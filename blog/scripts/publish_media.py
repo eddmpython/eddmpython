@@ -661,7 +661,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--plan",
         default="",
-        help="다른 plan.json 경로. 교안은 course/curriculum/<카테고리>/plan.json 을 쓴다",
+        help="다른 plan.json 경로. 교안은 ../eddmpython-course/curriculum/<카테고리>/plan.json 을 쓴다",
     )
     parser.add_argument("--file", help="저장소 밖 staging 이미지 경로")
     parser.add_argument("--dry-run", action="store_true", help="업로드와 파일 수정 없이 계약만 확인")

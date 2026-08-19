@@ -2,7 +2,7 @@
 
 사용: python -X utf8 blog/scripts/generate_flux.py <post-id> [--only key1,key2] [--force] [--plan 경로]
 - 계약: skills/specs/operation/blogMedia.md. 블로그는 blog/media/plan.json이 정본이다.
-- 교안은 --plan course/curriculum/<카테고리>/plan.json 을 준다. 본문 문장이 공개 저장소로
+- 교안은 --plan ../eddmpython-course/curriculum/<카테고리>/plan.json 을 준다. 본문 문장이 공개 저장소로
   새지 않게 plan만 갈라 두었고 이미지와 catalog는 블로그와 공유한다.
 - 출력: ../eddmpython.out/blog-media/<post-id>/<assetKey>.webp (Git 밖, 검수 후 publish_media.py로 HF 발행)
 - 키: 저장소 루트 .env의 REPLICATE_API_TOKEN. 값은 어디에도 출력하지 않는다.
@@ -128,7 +128,7 @@ def main() -> None:
     parser.add_argument(
         "--plan",
         default="",
-        help="다른 plan.json 경로. 교안은 course/curriculum/<카테고리>/plan.json 을 쓴다",
+        help="다른 plan.json 경로. 교안은 ../eddmpython-course/curriculum/<카테고리>/plan.json 을 쓴다",
     )
     args = parser.parse_args()
 

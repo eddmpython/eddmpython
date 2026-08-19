@@ -278,7 +278,7 @@ def main() -> int:
     parser.add_argument(
         "--root",
         default="",
-        help="카테고리를 찾을 폴더. 교안은 course/curriculum 을 준다",
+        help="카테고리를 찾을 폴더. 교안은 ../eddmpython-course/curriculum 을 준다",
     )
     args = parser.parse_args()
 
