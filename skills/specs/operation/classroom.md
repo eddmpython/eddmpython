@@ -180,5 +180,5 @@ Durable Object 마이그레이션이 `wrangler.jsonc` 에 있으므로 첫 배�
 ## 롤백
 
 `site/wrangler.jsonc` 의 `durable_objects` 와 `migrations` 를 지우고 `worker.ts` 의
-`/cr` 분기와 `Classroom` export 를 빼면 강의장이 사라진다. 교안 본문은 저장소 밖이 아니라
-`course/` 에 그대로 있으므로 잃는 것이 없다.
+`/cr` 분기와 `Classroom` export 를 빼면 강의장이 사라진다. 교안 본문은 형제 비공개 저장소
+`../eddmpython-course` 에 그대로 있으므로 잃는 것이 없다.

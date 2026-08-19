@@ -34,7 +34,7 @@ status: observed
 | 무엇 | 어디 | 추적 |
 |---|---|---|
 | 의미와 출처 계획 | `blog/media/plan.json` | Git |
-| 교안의 의미와 출처 계획 | `course/curriculum/<카테고리>/plan.json` | 추적 안 함 |
+| 교안의 의미와 출처 계획 | `../eddmpython-course/curriculum/<카테고리>/plan.json` | 형제 비공개 저장소 |
 | 글과 원격 객체의 대응 | `blog/media/catalog.json` | Git |
 | 실제 바이트 | Hugging Face `eddmpython/eddmpython-media` | 원격만 |
 
@@ -49,8 +49,8 @@ status: observed
 `visualSubject` 와 `sourcePost` 만 들어가고 그것은 이미지 설명이다.
 
 ```bash
-python -X utf8 blog/scripts/generate_flux.py <post-id> --plan course/curriculum/01-automation-start/plan.json
-python -X utf8 blog/scripts/publish_media.py --asset <post-id>/<key> --plan course/curriculum/01-automation-start/plan.json --reviewed
+python -X utf8 blog/scripts/generate_flux.py <post-id> --plan ../eddmpython-course/curriculum/01-automation-start/plan.json
+python -X utf8 blog/scripts/publish_media.py --asset <post-id>/<key> --plan ../eddmpython-course/curriculum/01-automation-start/plan.json --reviewed
 ```
 
 **`--plan` 을 주면 글 파일을 그 plan 이 있는 폴더 아래에서 찾는다.** 교안 글이 plan 옆에
