@@ -34,7 +34,8 @@ const requiredMeta = [
   "searchIntent",
 ];
 const readerLevels = new Set(["beginner", "working", "advanced"]);
-const skipDirs = new Set(["media", "scripts", "embeds"]);
+// 글과 카테고리 문서는 blog/content 아래에만 있다. 나머지는 기계라 걷지 않는다.
+const contentDirName = "content";
 const rootDocs = new Set(["README.md"]);
 const categoryDocs = new Set(["README.md", "원장.md"]);
 const publicSlug = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
@@ -127,7 +128,7 @@ async function collectMarkdownDocs(dir, rel = "") {
     const relPath = rel ? `${rel}/${entry.name}` : entry.name;
     const abs = join(dir, entry.name);
     if (entry.isDirectory()) {
-      if (skipDirs.has(entry.name)) continue;
+      if (!rel && entry.name !== contentDirName) continue;
       docs.push(...(await collectMarkdownDocs(abs, relPath)));
       continue;
     }
@@ -389,7 +390,8 @@ const markdownDocs = await collectMarkdownDocs(blogDir);
 for (const doc of markdownDocs) {
   if (postName.test(doc.name)) continue;
   const depth = doc.relPath.split("/").length;
-  const allowed = depth === 1 ? rootDocs.has(doc.name) : depth === 2 && categoryDocs.has(doc.name);
+  // blog/README.md 는 depth 1, blog/content/<카테고리>/README.md 와 원장.md 는 depth 3 이다.
+  const allowed = depth === 1 ? rootDocs.has(doc.name) : depth === 3 && categoryDocs.has(doc.name);
   if (!allowed) {
     fail(doc.relPath, "발행 글이나 운영 문서로 분류되지 않은 파일입니다");
   }
@@ -427,8 +429,12 @@ for (const post of targetPosts) {
   const { meta, body } = parseFrontmatter(file, raw);
   const postId = post.id;
   const slug = meta.get("slug");
-  if (file === post.name) fail(file, "발행 글은 카테고리 폴더 안에 둡니다");
-  const folder = file.split("/")[0];
+  // relPath 는 content/<카테고리>/NNN-kebab.md 다. 카테고리는 두 번째 조각이다.
+  const segments = file.split("/");
+  if (segments.length !== 3 || segments[0] !== contentDirName) {
+    fail(file, `발행 글은 ${contentDirName}/<카테고리>/ 안에 둡니다`);
+  }
+  const folder = segments[1];
   const listedCategory = listedCategoryBySlug.get(slug);
   if (listedCategory && folder !== listedCategory) {
     fail(file, `글 폴더 ${folder}와 category ${listedCategory}가 다릅니다`);

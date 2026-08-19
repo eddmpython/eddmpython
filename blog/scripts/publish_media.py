@@ -473,11 +473,16 @@ def publish(
     next_objects = next_catalog["objects"]
     next_assets = next_catalog["assets"]
     assert isinstance(next_objects, dict) and isinstance(next_assets, dict)
+    # 객체 레코드는 자기 설명을 함께 가진다. 글이 사라져도 무엇이 그려진 이미지인지 남아야
+    # 나중에 찾아 쓸 수 있다. 004 가 옛 글 이미지 여덟 장을 재활용한 것이 이 정보 덕분이었다.
     next_objects[sha256] = {
+        "alt": entry.get("alt", ""),
         "bytes": local_path.stat().st_size,
         "height": metadata["height"],
         "mime": metadata["mime"],
         "path": remote_path,
+        "sourcePost": post,
+        "visualSubject": entry.get("visualSubject", ""),
         "width": metadata["width"],
     }
     next_assets[asset_id] = {
@@ -486,14 +491,8 @@ def publish(
         "sha256": sha256,
         "path": remote_path,
     }
-    referenced_objects = {
-        str(record.get("sha256"))
-        for record in next_assets.values()
-        if isinstance(record, dict) and record.get("sha256")
-    }
-    for object_sha in list(next_objects):
-        if object_sha not in referenced_objects:
-            del next_objects[object_sha]
+    # 참조가 끊긴 객체를 여기서 지우지 않는다. 글을 갈아엎어도 이미지는 남겨 두고 다시 쓴다.
+    # 정리는 --prune-objects 로 명시해서 한다.
 
     save_json(CATALOG_PATH, next_catalog)
     post_path.write_text(next_raw, encoding="utf-8")
@@ -535,11 +534,84 @@ def verify_remote() -> None:
     print(f"블로그 미디어 원격 검증: 객체 {len(paths)}개")
 
 
+def unreferenced_objects(catalog: dict) -> list[str]:
+    """assets 가 가리키지 않는 객체 sha 목록을 돌려준다."""
+    objects = catalog.get("objects") or {}
+    assets = catalog.get("assets") or {}
+    referenced = {
+        str(record.get("sha256"))
+        for record in assets.values()
+        if isinstance(record, dict) and record.get("sha256")
+    }
+    return sorted(sha for sha in objects if sha not in referenced)
+
+
+def find_objects(query: str) -> None:
+    """설명으로 재사용할 이미지를 찾는다. 지금 글이 안 쓰는 것도 함께 보여 준다."""
+    catalog = load_json(CATALOG_PATH)
+    objects = catalog.get("objects") or {}
+    assets = catalog.get("assets") or {}
+    used = {
+        str(record.get("sha256")): asset_id
+        for asset_id, record in assets.items()
+        if isinstance(record, dict) and record.get("sha256")
+    }
+    needle = query.strip().lower()
+    hits = []
+    for sha, record in objects.items():
+        if not isinstance(record, dict):
+            continue
+        haystack = " ".join(
+            str(record.get(field, ""))
+            for field in ("alt", "visualSubject", "sourcePost")
+        ).lower()
+        if needle in haystack:
+            hits.append((sha, record))
+    if not hits:
+        print(f"'{query}' 로 찾은 이미지가 없다. 객체 {len(objects)}개를 뒤졌다")
+        return
+    for sha, record in sorted(hits, key=lambda item: str(item[1].get("sourcePost", ""))):
+        mark = f"쓰는 중 {used[sha]}" if sha in used else "안 쓰는 중"
+        print(f"[{mark}] {record.get('sourcePost', '?')}")
+        print(f"  {record.get('alt') or record.get('visualSubject') or '(설명 없음)'}")
+        print(f"  {catalog['repo']} / {record.get('path')}")
+    print(f"{len(hits)}개 찾았다. 객체 {len(objects)}개 중")
+
+
+def prune_objects(apply: bool) -> None:
+    """참조가 끊긴 객체 레코드를 지운다. HF 의 실제 바이트는 건드리지 않는다."""
+    catalog = load_json(CATALOG_PATH)
+    orphans = unreferenced_objects(catalog)
+    if not orphans:
+        print("참조 없는 객체가 없다")
+        return
+    for sha in orphans:
+        record = catalog["objects"][sha]
+        desc = record.get("alt") or record.get("visualSubject") or "(설명 없음)"
+        print(f"  {record.get('sourcePost', '?')}  {desc[:60]}")
+    if not apply:
+        print(f"참조 없는 객체 {len(orphans)}개. 실제로 지우려면 --apply 를 붙인다")
+        return
+    next_catalog = deepcopy(catalog)
+    for sha in orphans:
+        del next_catalog["objects"][sha]
+    save_json(CATALOG_PATH, next_catalog)
+    print(f"참조 없는 객체 {len(orphans)}개를 catalog 에서 지웠다")
+    print(f"Hugging Face 의 실제 바이트는 그대로다. {catalog['repo']} 에서 따로 지운다")
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="블로그 이미지를 Hugging Face에 발행한다")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--asset", help="plan.json의 <post id>/<assetKey>")
     group.add_argument("--verify", action="store_true", help="catalog의 HF 원격 객체를 전부 확인")
+    group.add_argument("--find", help="설명으로 다시 쓸 이미지를 찾는다")
+    group.add_argument(
+        "--prune-objects",
+        action="store_true",
+        help="참조가 끊긴 객체 레코드를 정리한다. 기본은 보여 주기만 한다",
+    )
+    parser.add_argument("--apply", action="store_true", help="--prune-objects 를 실제로 실행")
     parser.add_argument("--file", help="저장소 밖 staging 이미지 경로")
     parser.add_argument("--dry-run", action="store_true", help="업로드와 파일 수정 없이 계약만 확인")
     parser.add_argument("--create-repo", action="store_true", help="HF 데이터셋이 없으면 공개 저장소 생성")
@@ -556,6 +628,10 @@ def main() -> None:
     try:
         if args.verify:
             verify_remote()
+        elif args.find:
+            find_objects(args.find)
+        elif args.prune_objects:
+            prune_objects(args.apply)
         else:
             publish(args.asset, args.file, args.dry_run, args.create_repo, args.reviewed)
     except (OSError, RuntimeError, ValueError) as exc:

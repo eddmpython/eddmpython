@@ -28,7 +28,7 @@ status: observed
 ## 정본은 한 곳이다
 
 ```
-blog/<category-slug>/NNN-kebab.md
+blog/content/<category-slug>/NNN-kebab.md
 ```
 
 여기가 글의 정본이다. `NNN` 은 저장소 전체에서 `001` 부터 빈 번호 없이 늘어나는 고정 발행
@@ -40,7 +40,7 @@ blog/<category-slug>/NNN-kebab.md
 frontmatter 도 본문도 예외가 아니다. 설계 메모와 내부 판단을 글 파일에 넣지 않는 이유다.
 
 파일 순번은 발행 뒤 바꾸지 않는다. 발행일과 수정일은 저장하지 않고 구조화 데이터, sitemap,
-RSS 에도 넣지 않는다. 사이트가 읽는 것은 `site/src/posts.ts` 의 `blog/*/???-*.md` glob 이라
+RSS 에도 넣지 않는다. 사이트가 읽는 것은 `site/src/posts.ts` 의 `blog/content/*/???-*.md` glob 이라
 **세 자리 숫자로 시작하지 않는 파일은 글 목록에 아예 들어가지 않는다.** 대소문자와 무관하다.
 
 파일 하나를 넣으면 빌드가 함께 만든다.
@@ -99,6 +99,10 @@ frontmatter 파서는 `^([A-Za-z][A-Za-z0-9]*):\s*(.*)$` 한 줄 정규식이다
 
 **공개 URL 에 카테고리를 넣지 않는다.** 카테고리는 `/blog` 목록에서 묶어 보여 주는 데만 쓴다.
 
+**카테고리 하나가 세트 하나다.** 4~6편이고, 그 세트만 읽어도 독자의 일 하나가 실제로 돌아야
+한다. 준비만 하는 세트는 만들지 않는다. 편당 2,000자 근처이므로 세트 하나가 1만자 안팎이고
+한 자리에서 읽힌다. 큰 카테고리 하나에 40편을 넣던 앞 구조를 2026-08-19 에 이렇게 바꿨다.
+
 순서는 두 가지뿐이고 서로 독립이다.
 
 - **파일 순번** `NNN`: 저장소와 미디어에서 글을 구분하는 고정 번호
@@ -113,7 +117,7 @@ frontmatter 파서는 `^([A-Za-z][A-Za-z0-9]*):\s*(.*)$` 한 줄 정규식이다
 
 ### 새 카테고리를 열 때
 
-1. 폴더를 만든다. 예: `blog/work-automation/`
+1. 폴더를 만든다. 예: `blog/content/work-automation/`
 2. 그 안에 `README.md` 와 `원장.md` 를 둔다. **원장은 추적하지 않는다.** 커리큘럼 설계와
    내부 판단이 들어 있어서다
 3. `order.json` 의 `categories` 에 같은 slug 를 넣는다
@@ -230,7 +234,7 @@ Web Run 링크에서 쓸 수 있다고 정확히 적는다.
    패키징 게이트는 제목을 확정하기 전에 본다.** 주제 선택은
    [contentStrategy.md](contentStrategy.md), 제품 맥락은
    [productMarketing.md](productMarketing.md) 다
-2. 다음 세 자리 순번으로 `blog/<category-slug>/NNN-slug.md` 를 쓴다
+2. 다음 세 자리 순번으로 `blog/content/<category-slug>/NNN-slug.md` 를 쓴다
 3. 이미지가 있으면 [blogMedia.md](blogMedia.md) 의 순서로 계획하고 Hugging Face 에 올린다
 4. `cd site && npm run check:post -- <파일 경로>` 로 한 편을 검사한다
 5. `npm test` 로 전체 계약과 타입을 확인한다
@@ -254,6 +258,18 @@ Web Run 링크에서 쓸 수 있다고 정확히 적는다.
 스크린샷을 직접 읽고 제목 줄바꿈, 본문 폭, 이미지 크기와 캡션, 표와 코드의 가로 넘침을 확인한
 뒤 그 run id 를 승인한다. **승인 뒤 빌드가 바뀌면 `deploy` 는 중단된다.** 자세한 것은
 [visualVerification.md](visualVerification.md) 다.
+
+## 옛 글은 저장소 밖에 있다
+
+2026-08-19 에 커리큘럼을 다시 열면서 옛 글 39편을 저장소에서 내렸다. 지운 것이 아니라 옮겼다.
+
+```text
+../eddmpython.out/blog-archive/     옛 글 39편, old-plan.json, old-catalog.json
+```
+
+**참고용이다. 공개 표면이 아니다.** 새 글을 쓸 때 그때 뭘 어떻게 설명했는지 보고, 쓸 만한
+이미지가 있으면 `--find` 로 찾아 다시 쓴다. 저장소로 되돌리지 않는다. Git 이력의
+`e937827^` 에도 그대로 있다.
 
 ## 롤백
 

@@ -4,9 +4,10 @@ import { join, resolve } from "node:path";
 const origin = "https://eddmpython.com";
 const repoRoot = resolve(process.cwd(), "..");
 const blogRoot = resolve(repoRoot, "blog");
+const contentRoot = resolve(blogRoot, "content");
 const distRoot = resolve(repoRoot, "../eddmpython.out/site-dist");
 const postName = /^(\d{3}-[a-z0-9]+(?:-[a-z0-9]+)*)\.md$/;
-const skipDirs = new Set(["media", "scripts", "embeds"]);
+// 글은 blog/content 아래에만 있다. 나머지 폴더는 기계라 아예 들어가지 않는다.
 const adsenseClient = "ca-pub-6438440376456212";
 const adsenseScript = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
 
@@ -93,7 +94,6 @@ async function collectPosts(dir, rel = "") {
     const relPath = rel ? `${rel}/${entry.name}` : entry.name;
     const abs = join(dir, entry.name);
     if (entry.isDirectory()) {
-      if (skipDirs.has(entry.name)) continue;
       posts.push(...(await collectPosts(abs, relPath)));
       continue;
     }
@@ -163,7 +163,7 @@ function checkShared(html, path) {
   return { ogTitle, ogImage, ogImageAlt, imageWidth, imageHeight, structured };
 }
 
-const postFiles = await collectPosts(blogRoot);
+const postFiles = await collectPosts(contentRoot);
 const postRoutes = [];
 for (const post of postFiles) {
   const frontmatter = parseFrontmatter(post.file, await readFile(post.abs, "utf8"));

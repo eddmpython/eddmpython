@@ -23,16 +23,21 @@
 | `media/` | 이미지 계획 (`plan.json`) 과 HF 객체 대응 (`catalog.json`) |
 | `embeds/` | 본문에 붙는 실행 칸 (`codaro-cells.json`) |
 | `scripts/` | 미디어 발행 스크립트와 원장 대조 도구 |
-| `<category-slug>/` | 카테고리 한 묶음의 글과 원장 |
+| **`content/<category-slug>/`** | **카테고리 한 묶음의 글과 원장. 글은 여기에만 있다** |
 
-글 파일은 `blog/<category-slug>/NNN-kebab.md` 다. 공개 URL 은 frontmatter `slug` 이고
+`content/` 아래만 글이다. 나머지는 기계다. 검사기가 `content` 만 걷고 나머지는 아예 들어가지
+않는다. 새 기계 폴더를 만들어도 검사기를 고칠 필요가 없다.
+
+글 파일은 `blog/content/<category-slug>/NNN-kebab.md` 다. 공개 URL 은 frontmatter `slug` 이고
 `/blog/{slug}` 한 형태다. 카테고리를 URL 에 넣지 않는다.
 
 ## 카테고리 폴더
 
+**카테고리 하나가 세트 하나다.** 4~6편이고 그 세트만 읽어도 일 하나가 실제로 돈다.
+
 | 폴더 | 목록 제목 | 원장 |
 |---|---|---|
-| `work-automation/` | 업무자동화 | `work-automation/원장.md` (추적하지 않음) |
+| `content/automation-start/` | 자동화 시작하기 | `content/automation-start/원장.md` (추적하지 않음) |
 
 **원장은 추적하지 않는다.** 커리큘럼 설계와 내부 판단이 들어 있고, 사이트가 글 파일 원문 전체를
 공개 JS 번들로 굽기 때문에 설계 메모를 글 파일 안에 둘 수도 없다.

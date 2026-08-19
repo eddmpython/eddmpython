@@ -189,19 +189,34 @@ python -X utf8 blog/scripts/publish_media.py --asset 20260808-example/hero --rev
 3. `objects/sha256/<앞 두 글자>/<전체 해시>.<확장자>` 에 올린다
 4. 원격 객체가 실제로 존재하는지 다시 확인한다
 5. catalog 에 바이트 수, MIME, 너비, 높이를 기록하고 본문의 `media://` 를 Hugging Face URL 로 바꾼다
-6. 교체 뒤 어떤 asset 도 가리키지 않는 예전 객체 레코드를 catalog 에서 정리한다
-7. 성공한 로컬 작업본과 빈 staging 폴더를 삭제한다
+6. 성공한 로컬 작업본과 빈 staging 폴더를 삭제한다
+
+**참조가 끊긴 객체를 자동으로 지우지 않는다.** 글을 갈아엎어도 이미지는 남는다.
 
 **업로드나 원격 확인이 실패하면 본문과 catalog 를 바꾸지 않는다.** 원격 검증 전에 공개 참조를
 바꾸지 않고, catalog 갱신 전에 로컬 원본을 지우지 않는다.
 
-**`catalog.objects` 의 참조 없는 레코드는 발행할 때마다 지워진다.** `publish_media.py` 가
-`save_json` 직전에 `assets` 가 가리키지 않는 객체를 조건 없이 전부 삭제한다. 위 6단계가 그것이다.
+## 보존하고 찾아 쓰고 나중에 지운다
 
-2026-08-19 실측으로 `assets` 19개, `objects` 279개, **참조 없는 객체 260개**다. 다음 발행 한 번에
-그 260개 레코드가 사라진다. Hugging Face 의 실제 바이트는 콘텐츠 주소라 남지만 어떤 이미지가
-있는지 찾을 색인이 없어진다. 004 가 옛 글의 이미지 여덟 장을 재활용할 수 있었던 것이 그 색인
-덕분이었다. **보존할지는 운영자가 정한다. 정하기 전에는 새 이미지를 발행하지 않는다.**
+**`catalog.objects` 는 지금 글이 안 쓰는 이미지도 그대로 들고 있는다.** 2026-08-19 까지는
+`publish_media.py` 가 발행할 때마다 참조 없는 객체를 조건 없이 지웠다. 그 시점에 참조 없는
+객체가 260개였고 한 번만 발행하면 전부 사라질 참이었다. 004 가 옛 글 이미지 여덟 장을 다시 쓸
+수 있었던 것이 이 색인 덕분이라 자동 삭제를 없앴다.
+
+객체 레코드는 자기 설명을 함께 가진다. `alt`, `visualSubject`, `sourcePost` 다. 글이 사라져도
+무엇이 그려진 이미지인지 남는다.
+
+```bash
+python -X utf8 blog/scripts/publish_media.py --find 전표      다시 쓸 이미지를 설명으로 찾는다
+python -X utf8 blog/scripts/publish_media.py --prune-objects  참조 없는 것을 보여만 준다
+python -X utf8 blog/scripts/publish_media.py --prune-objects --apply   실제로 정리한다
+```
+
+`--find` 는 지금 쓰는 것과 안 쓰는 것을 함께 보여 준다. 찾은 객체를 다시 쓰려면 새 글의
+`plan.json` 에 항목을 만들고 같은 `sha256` 을 catalog 에 이어 준다.
+
+`--prune-objects` 는 **catalog 레코드만** 지운다. Hugging Face 의 실제 바이트는 그대로 남으므로
+이미 배포된 글의 이미지가 깨지지 않는다. 원격까지 지우는 것은 되돌릴 수 없으니 따로 한다.
 
 발행 스크립트는 이미 설정된 셸 환경변수를 먼저 쓰고, 없으면 eddmpython 루트 `.env`,
 형제 DartLab `.env` 순서로 읽는다. **`HF_TOKEN` 은 이 로컬 저장소에만 두고 Git, 문서, 로그에

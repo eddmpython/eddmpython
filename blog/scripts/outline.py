@@ -20,6 +20,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 BLOG_DIR = Path(__file__).resolve().parent.parent
+# 글과 원장은 blog/content 아래에만 있다. media, embeds, scripts 는 기계다.
+CONTENT_DIR = BLOG_DIR / "content"
 LEDGER_NAME = "원장.md"
 
 VERDICTS = ("이어짐", "예고", "나열", "끊김")
@@ -271,14 +273,14 @@ def main() -> int:
     args = parser.parse_args()
 
     if args.category:
-        target = BLOG_DIR / args.category
+        target = CONTENT_DIR / args.category
         if not target.is_dir():
             print(f"{args.category} 폴더가 없다")
             return 2
         categories = [target]
     else:
         categories = sorted(
-            path for path in BLOG_DIR.iterdir() if path.is_dir() and (path / LEDGER_NAME).exists()
+            path for path in CONTENT_DIR.iterdir() if path.is_dir() and (path / LEDGER_NAME).exists()
         )
 
     if not categories:

@@ -25,8 +25,9 @@ export type Post = {
   body: string;
 };
 
-/* 글의 SSOT 는 blog/<category-slug>/NNN-kebab.md 다. 빌드 타임에 읽고 런타임 fetch 는 없다. */
-const files = import.meta.glob("../../blog/*/???-*.md", {
+/* 글의 SSOT 는 blog/content/<category-slug>/NNN-kebab.md 다. 빌드 타임에 읽고 런타임 fetch 는 없다.
+   content 아래만 굽는다. media, embeds, scripts 는 글이 아니라 기계다. */
+const files = import.meta.glob("../../blog/content/*/???-*.md", {
   query: "?raw",
   import: "default",
   eager: true,

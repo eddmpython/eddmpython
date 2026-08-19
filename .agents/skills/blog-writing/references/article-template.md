@@ -3,7 +3,7 @@
 **이 파일은 모양 본보기다. 규칙이 아니다.** 집필 규칙의 정본은 `memory/blogWriter.md`,
 발행 계약의 정본은 `skills/specs/operation/blogPublishing.md`다. 어긋나면 그쪽이 이긴다.
 
-파일명은 `blog/<category-slug>/NNN-kebab.md`로 쓴다. `NNN`은 발행할 때 한 번 부여하는 세 자리 고정 순번이며,
+파일명은 `blog/content/<category-slug>/NNN-kebab.md`로 쓴다. `NNN`은 발행할 때 한 번 부여하는 세 자리 고정 순번이며,
 공개 읽기 순서를 뜻하지 않는다. 날짜는 저장하지 않고 공개 읽기 순서는 `blog/order.json`에 둔다.
 
 블로그 한 편은 강의 차시 요약이 아니다. 검색으로 이 글만 연 독자가 정의, 원리, 예제, 실패와 검증을
