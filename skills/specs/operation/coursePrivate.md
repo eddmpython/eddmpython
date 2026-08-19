@@ -24,10 +24,17 @@ verify:
 `LEGACY_BLOG` 가 `/blog` 로 넘겨 죽은 링크만 막는다. 본문은 어디에도 공개하지 않는다.
 
 ```text
-course/curriculum/
-  원장.md                  카테고리 순서와 글 사슬의 정본
-  01-automation-start/     카테고리 01. 글 4편과 실행 칸 예제
+course/
+  README.local.md          작업 공간 안내
+  curriculum/
+    원장.md                카테고리 순서와 글 사슬의 정본
+    01-automation-start/   카테고리 01. 글 4편과 실행 칸 예제
+  _archive/                안 쓰는 것. docx 기획서 네 판과 그 도구들
 ```
+
+2026-08-19 에 docx 기획서 시대의 산출물 18개를 `_archive/` 로 내렸다. v6 가 마지막 판이었다.
+그 파이프라인은 교안을 docx 로 쓰고 공개 블로그를 차시에 맞추는 구조였는데, 커리큘럼을 닫고
+블로그를 단편으로 되돌리면서 맞출 slug 가 없어졌다. 지금은 마크다운으로 직접 쓴다.
 
 **카테고리 폴더는 두 자리 번호로 시작한다.** `NN-kebab` 이고 번호가 읽는 순서다.
 실행 칸 예제도 여기 둔다. `blog/embeds/codaro-cells.json` 에 넣으면 공개 번들에 구워져
