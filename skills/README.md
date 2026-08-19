@@ -63,6 +63,7 @@ dartlab 은 `engines` 와 `recipes` 를 더 두지만 이 저장소에는 그 �
 | [`operation.brandAssets`](specs/operation/brandAssets.md) | 심볼 정본과 파비콘, og 이미지 생성 |
 | [`operation.blogPublishing`](specs/operation/blogPublishing.md) | 글을 어디에 두고 무엇이 자동으로 만들어지나 |
 | [`operation.blogMedia`](specs/operation/blogMedia.md) | 이미지와 영상의 의미 계약, 색상, Hugging Face 발행 |
+| [`operation.classroom`](specs/operation/classroom.md) | 강의장을 열고 닫고 카테고리를 푸는 방법 |
 | [`operation.productMarketing`](specs/operation/productMarketing.md) | 제품 마케팅 맥락 문서 유지 |
 | [`operation.blogCopy`](specs/operation/blogCopy.md) | 블로그 제목, summary, 도입 카피 |
 | [`operation.contentStrategy`](specs/operation/contentStrategy.md) | 다음에 쓸 글 주제와 각도 |
