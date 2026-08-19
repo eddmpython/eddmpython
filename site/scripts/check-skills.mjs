@@ -25,6 +25,18 @@ const BANNED = [
 const errors = [];
 const seen = new Map();
 
+/** 펜스가 안 닫히면 그 뒤 링크 검사가 통째로 꺼진다. 그것부터 막는다. */
+function unclosedFence(text) {
+  let fence = null;
+  for (const line of text.split(/\r?\n/)) {
+    const open = line.match(/^\s*(`{3,}|~{3,})/);
+    if (!open) continue;
+    if (!fence) fence = open[1];
+    else if (open[1][0] === fence[0] && open[1].length >= fence.length) fence = null;
+  }
+  return fence !== null;
+}
+
 /** 펜스 코드 블록을 걷어낸다. 그 안의 `](...)` 는 링크가 아니라 예시다. */
 function stripFencedCode(text) {
   const out = [];
@@ -130,7 +142,9 @@ for (const file of files) {
   }
 
   // 저장소 안 상대 링크가 실제 파일을 가리키는지 확인한다.
-  const body = stripFencedCode(text.slice(text.indexOf("---", 3) + 3));
+  const rawBody = text.slice(text.indexOf("---", 3) + 3);
+  if (unclosedFence(rawBody)) errors.push(`${rel}: 코드 펜스가 닫히지 않았다`);
+  const body = stripFencedCode(rawBody);
   for (const [, target] of body.matchAll(/\]\(([^)]+)\)/g)) {
     if (/^(https?:|mailto:|#)/.test(target)) continue;
     const clean = target.split("#")[0];
@@ -198,7 +212,9 @@ for (const entry of agentSkillDirs) {
     }
   }
 
-  const body = stripFencedCode(text.slice(match[0].length));
+  const rawBody = text.slice(match[0].length);
+  if (unclosedFence(rawBody)) errors.push(`${rel}: 코드 펜스가 닫히지 않았다`);
+  const body = stripFencedCode(rawBody);
   for (const [, target] of body.matchAll(/\]\(([^)]+)\)/g)) {
     if (/^(https?:|mailto:|#)/.test(target)) continue;
     const clean = target.split("#")[0];

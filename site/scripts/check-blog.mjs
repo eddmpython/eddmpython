@@ -11,8 +11,9 @@ import {
 } from "./blog-package.mjs";
 
 // 인자로 파일을 주면 그 한 편만 검사한다. 글을 쓰는 동안 도는 게이트다.
-// 인자가 없으면 여러 글 사이의 관계만 검사한다. 한 편 고칠 때 39편을 다시 재지 않는다.
-const targetPost = process.argv[2] ? process.argv[2].split(/[\/]/).pop() : null;
+// 인자가 없으면 전편을 검사한다. STRICT 로 꺼지는 다섯 개만 빠지고 문장 품질도 함께 잰다.
+// 경로를 통째로 받아도 되게 슬래시와 역슬래시 둘 다 자른다. PowerShell 이 역슬래시를 준다.
+const targetPost = process.argv[2] ? process.argv[2].split(/[\\/]/).pop() : null;
 const STRICT = Boolean(targetPost);
 
 const blogDir = resolve(process.cwd(), "../blog");

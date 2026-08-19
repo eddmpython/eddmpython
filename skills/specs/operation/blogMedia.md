@@ -48,14 +48,20 @@ PNG, JPG, GIF 도 지원하지만 새 래스터는 용량과 품질을 확인한
 
 ## plan.json 계약
 
-`version: 2`, `promptContract: section-grounded-v2` 를 쓴다. 키는 `<post id>/<assetKey>` 이고
-post id 는 파일 stem 이라 공개 slug 와 다를 수 있다.
+**최상위에 `version` 과 `promptContract` 가 있고 자산은 `assets` 아래에 들어간다.**
+`check-blog.mjs` 와 `publish_media.py` 가 둘 다 이 래퍼를 요구한다.
+
+asset id 는 `<post id>/<영문 kebab 키>` 이고 post id 는 `NNN-kebab` 파일 stem 이다.
+`publish_media.py` 의 `ASSET_ID_RE` 가 `\d{3}-kebab/kebab` 만 받는다. 날짜형 이름은 거부된다.
 
 ```json
 {
-  "20260808-example/hero": {
-    "post": "20260808-example",
-    "assetKey": "hero",
+  "version": 2,
+  "promptContract": "section-grounded-v2",
+  "assets": {
+    "004-python-basic-syntax/variables-values": {
+      "post": "004-python-basic-syntax",
+      "assetKey": "variables-values",
     "role": "section",
     "sectionHeading": "이 이미지가 바로 뒤따르는 H2 원문",
     "sectionSubtitle": "본문 H3와 같은 한 줄 부제",
@@ -69,7 +75,8 @@ post id 는 파일 stem 이라 공개 slug 와 다를 수 있다.
     "narrativeUse": "독자가 글의 문제 장면을 한눈에 이해한다",
     "sourcePolicy": "auto",
     "sourceKind": "imagegen",
-    "prompt": "구도, 재질, 조명처럼 의미를 바꾸지 않는 장면 지시"
+      "prompt": "구도, 재질, 조명처럼 의미를 바꾸지 않는 장면 지시"
+    }
   }
 }
 ```
@@ -81,9 +88,21 @@ post id 는 파일 stem 이라 공개 slug 와 다를 수 있다.
 `check:post` 가 대조하는 것이 셋이다.
 
 - `sectionHeading` 이 본문 H2 원문과 **정확히** 같은가
-- 부제를 쓴 절이면 `sectionSubtitle` 이 H3 원문과 같은가. 부제가 없으면 이 필드를 적지 않고
-  `placement` 에 `H2 제목 바로 뒤` 를 적는다
+- 부제를 쓴 절이면 `sectionSubtitle` 이 H3 원문과 같은가
 - `contentAnchor` 가 그 절의 설명에 **실제로 있는 문장**인가
+
+### `role: section` 은 부제를 요구한다
+
+`check-blog.mjs` 와 `publish_media.py` 가 다르다. **엄격한 쪽은 발행 스크립트다.**
+
+| 무엇 | `check-blog.mjs` | `publish_media.py` |
+|---|---|---|
+| `sectionSubtitle` | 선택 | **필수** (필드가 비면 발행 실패) |
+| `placement` | `H3 부제 바로 뒤` 와 `H2 제목 바로 뒤` 둘 다 허용 | `role: section` 이면 **반드시** `H3 부제 바로 뒤` |
+
+따라서 **본문 이미지를 붙일 절에는 H3 부제를 쓴다.** 부제 없이 `section` 이미지를 계획하면
+`npm test` 는 통과하고 발행 단계에서 막힌다. 부제는 15자 이상 80자 이하다.
+부제를 안 쓸 절이라면 이미지 대신 영상이나 실행 칸을 시각물로 쓴다.
 
 **본문을 먼저 쓰고 그 뒤에 plan 을 적는다.** 그 절의 서술 문단이 없으면 `contentAnchor` 를
 지어내게 된다. `generate_flux.py` 는 이 값들을 자유 장면 프롬프트보다 높은 우선순위로 붙인다.
@@ -176,8 +195,13 @@ python -X utf8 blog/scripts/publish_media.py --asset 20260808-example/hero --rev
 **업로드나 원격 확인이 실패하면 본문과 catalog 를 바꾸지 않는다.** 원격 검증 전에 공개 참조를
 바꾸지 않고, catalog 갱신 전에 로컬 원본을 지우지 않는다.
 
-`catalog.objects` 는 참조되지 않는 객체를 가지고 있어도 된다. 지운 글의 이미지를 나중에 다시
-쓰기 위해서다. `catalog.assets` 는 전부 참조되어야 한다.
+**`catalog.objects` 의 참조 없는 레코드는 발행할 때마다 지워진다.** `publish_media.py` 가
+`save_json` 직전에 `assets` 가 가리키지 않는 객체를 조건 없이 전부 삭제한다. 위 6단계가 그것이다.
+
+2026-08-19 실측으로 `assets` 19개, `objects` 279개, **참조 없는 객체 260개**다. 다음 발행 한 번에
+그 260개 레코드가 사라진다. Hugging Face 의 실제 바이트는 콘텐츠 주소라 남지만 어떤 이미지가
+있는지 찾을 색인이 없어진다. 004 가 옛 글의 이미지 여덟 장을 재활용할 수 있었던 것이 그 색인
+덕분이었다. **보존할지는 운영자가 정한다. 정하기 전에는 새 이미지를 발행하지 않는다.**
 
 발행 스크립트는 이미 설정된 셸 환경변수를 먼저 쓰고, 없으면 eddmpython 루트 `.env`,
 형제 DartLab `.env` 순서로 읽는다. **`HF_TOKEN` 은 이 로컬 저장소에만 두고 Git, 문서, 로그에

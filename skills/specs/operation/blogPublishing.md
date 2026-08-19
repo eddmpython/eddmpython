@@ -40,7 +40,8 @@ blog/<category-slug>/NNN-kebab.md
 frontmatter 도 본문도 예외가 아니다. 설계 메모와 내부 판단을 글 파일에 넣지 않는 이유다.
 
 파일 순번은 발행 뒤 바꾸지 않는다. 발행일과 수정일은 저장하지 않고 구조화 데이터, sitemap,
-RSS 에도 넣지 않는다. 대문자 영문 운영 문서는 사이트 글 목록에서 제외한다.
+RSS 에도 넣지 않는다. 사이트가 읽는 것은 `site/src/posts.ts` 의 `blog/*/???-*.md` glob 이라
+**세 자리 숫자로 시작하지 않는 파일은 글 목록에 아예 들어가지 않는다.** 대소문자와 무관하다.
 
 파일 하나를 넣으면 빌드가 함께 만든다.
 
@@ -59,7 +60,7 @@ RSS 에도 넣지 않는다. 대문자 영문 운영 문서는 사이트 글 목
 
 | 필드 | 설명 |
 |---|---|
-| `title` | 질문이거나 주장. 명사 나열 금지. 인지도 없는 제품명을 앞에 두지 않는다. **10자 이상 70자 이하** |
+| `title` | 질문이거나 주장. 명사 나열 금지. 인지도 없는 제품명을 앞에 두지 않는다. **15자 이상 60자 이하** |
 | `slug` | 공개 URL `/blog/{slug}`. 짧은 소문자 kebab, 날짜 금지 |
 | `author` | 화면과 구조화 데이터에 함께 표시할 글쓴이 |
 | `section` | 글 하나의 소주제. 카테고리와 층이 다르다 |
@@ -171,16 +172,30 @@ sitemap 은 그대로 둔다.** 검색에 색인된 글을 실제로 내리면 �
 문장 단위 추상 검사, 서술 문단 줄바꿈, 절의 제목과 부제와 이미지 순서, H4 보조자료 라벨,
 코드 앞뒤 설명 길이, `sectionHeading` 과 `contentAnchor` 가 본문과 같은지를 검사한다.
 
-**`npm run check:blog`** 는 여러 글 사이의 관계만 본다. 파일 순번, slug 중복, `order.json` 정합,
-미디어 catalog 참조 무결성, SHA-256 경로, `blog/` 아래 로컬 이미지 차단, em dash, 명령형 뒤
-마침표를 검사한다. **한 편의 문장 품질은 여기서 재지 않는다.**
+**`npm run check:blog`** 는 인자 없이 같은 스크립트를 돌린다. 여러 글 사이의 관계 (파일 순번,
+slug 중복, `order.json` 정합, 미디어 catalog 참조 무결성, SHA-256 경로, `blog/` 아래 로컬 이미지
+차단, em dash, 명령형 뒤 마침표) 에 더해 **모든 글의 문장 품질도 함께 잰다.**
+
+`STRICT = Boolean(targetPost)` 이므로 전체 검사에서 꺼지는 것은 다섯 개뿐이다. `lintProseTexture`,
+`requireCodeLabels`, `openLabels`, `checkLabels`, `strictAnchor` 다. 나머지는 전편에 그대로 돈다.
+title 길이, 부제 길이, 절 첫 블록, 절 설명 길이, beginner 한도, 빈 관용구, 이미지 대조가 전부
+포함된다. 한 편만 고쳤어도 다른 글이 깨져 있으면 `npm test` 가 실패한다.
+
+`strictLead` 는 두 모드 모두 `false` 로 고정되어 있다. **절의 제목과 부제와 이미지 순서를 강제하는
+검사는 지금 한 번도 돌지 않는다.**
 
 기계가 강제하는 형식은 이렇다.
 
 - 서술 문단은 소스에서도 한 줄이다. 하드 줄바꿈은 `check:post` 가 막는다
 - 추상어를 쓴 문장에는 **그 문장 안에** 파일, 화면, 명령, 값, 오류 중 하나가 있어야 한다.
   이웃 문장에 있는 것으로는 인정하지 않는다
+- `title` 은 15자 이상 60자 이하다. `check-blog.mjs` 는 10~70 으로 재고 `blog-package.mjs` 는
+  15~60 으로 잰다. 둘 다 항상 돌므로 **실효 게이트는 좁은 쪽인 15~60** 이다
+- H3 부제를 쓴 절이면 부제는 **15자 이상 80자 이하**다
+- **절의 첫 블록은 코드나 목록이 아닌 60자 이상의 서술 문단**이다
+- **절 전체 설명은 120자를 넘는다.** 이미지가 있는 절만이 아니라 모든 절에 적용된다
 - `beginner` 글은 H2 32자, 일반 문단 220자, 한 문장 160자를 넘기지 않는다
+- 본문에 `지난편`, `이전편`, `다음편`, `이전 글`, `다음 글` 을 쓰지 않는다
 - 코드 블록은 `#### 예시 코드: 금액 문자열을 숫자로 바꾸기` 처럼 역할과 개념이 함께 보이는
   H4 아래에 둔다. `코드`, `예시`, `참고`, `내용`, `정리`, `설명`, `기타`, `자료` 처럼 그 자체로
   아무것도 알려 주지 않는 역할어는 막는다. 같은 H4 범위에 입력, 핵심 줄이 바꾸는 값, 예상 결과를
@@ -188,8 +203,9 @@ sitemap 은 그대로 둔다.** 검색에 색인된 글을 실제로 내리면 �
 - 핵심어는 제목과 summary 와 H2 하나에만 요구한다. 도입 두 문단에도 핵심어 전체를 넣게 하던
   규칙은 뺐다. 그 규칙이 발행 40편 중 29편의 첫 문장을 `핵심어 + 을 또는 를` 로 시작하게 만들었다
 
-검사 규칙은 `site/scripts/blog-style.mjs`, 오탐과 누락을 막는 표본은
-`site/scripts/test-blog-style.mjs` 에 있다.
+검사 규칙은 두 파일에 나뉘어 있다. 문장 단위 어투와 금지어는 `site/scripts/blog-style.mjs`,
+title 과 부제와 절 구조와 H4 라벨은 `site/scripts/blog-package.mjs` 다. 오탐과 누락을 막는
+표본은 각각 `test-blog-style.mjs` 와 `test-blog-package.mjs` 에 있다.
 
 **글자 수 하한은 쓰지 않는다.** 2026-08-17 에 발행 40편을 실측해 없앴다. 까닭은
 `memory/blogWriter.md` 에 있다.
@@ -210,9 +226,10 @@ Web Run 링크에서 쓸 수 있다고 정확히 적는다.
 
 ## 글 하나 발행하는 순서
 
-1. `memory/blogWriter.md` 의 작가 파이프라인을 통과한다. 카피 판단은
-   [blogCopy.md](blogCopy.md), 주제 선택은 [contentStrategy.md](contentStrategy.md),
-   제품 맥락은 [productMarketing.md](productMarketing.md) 를 본다
+1. `memory/blogWriter.md` 의 작가 파이프라인을 통과한다. **[blogCopy.md](blogCopy.md) 의 유입
+   패키징 게이트는 제목을 확정하기 전에 본다.** 주제 선택은
+   [contentStrategy.md](contentStrategy.md), 제품 맥락은
+   [productMarketing.md](productMarketing.md) 다
 2. 다음 세 자리 순번으로 `blog/<category-slug>/NNN-slug.md` 를 쓴다
 3. 이미지가 있으면 [blogMedia.md](blogMedia.md) 의 순서로 계획하고 Hugging Face 에 올린다
 4. `cd site && npm run check:post -- <파일 경로>` 로 한 편을 검사한다
