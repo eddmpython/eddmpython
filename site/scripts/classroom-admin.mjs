@@ -203,6 +203,7 @@ h3 { font-size:.95rem; margin:0 0 .8rem; color:#f5f3eecc; }
 </div>
 </div><script>
 const TARGETS = TARGETS_JSON;
+const KEY = CR_KEY;
 let target = TARGETS.find((t) => t.ready)?.id ?? TARGETS[0].id;
 let rooms = [];
 let categories = [];
@@ -213,7 +214,7 @@ async function send(body) {
   $("err").textContent = "";
   const res = await fetch("/api", {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: { "content-type": "application/json", "x-cr-key": KEY },
     body: JSON.stringify({ target, ...body }),
   });
   const data = await res.json();
@@ -305,8 +306,43 @@ send({ action: "list" });
 setInterval(() => { if (!document.hidden) send({ action: "list" }); }, 5000);
 </script></body></html>`;
 
+/**
+ * 이 프로세스가 운영 토큰을 들고 있다. 루프백에 묶는 것만으로는 부족하다.
+ *
+ * 운영자가 이 화면을 띄워 둔 채 아무 웹페이지나 열면, 그 페이지가 폼 하나로
+ * `127.0.0.1` 에 POST 를 보낼 수 있다. 브라우저는 그것을 막지 않는다. 토큰은 우리가
+ * 알아서 얹어 주므로 남의 페이지가 강의장을 만들고 지우고 비밀번호를 바꾼다.
+ *
+ * 그래서 네 겹으로 막는다. 하나만으로는 안 된다.
+ *   1. 이 프로세스가 뽑은 한 회용 열쇠를 헤더로 요구한다. 폼은 헤더를 못 붙이고
+ *      fetch 로 붙이려면 preflight 가 뜨는데 우리는 그것을 허락하지 않는다
+ *   2. content-type 이 JSON 이어야 한다. 폼이 낼 수 있는 세 가지에 JSON 은 없다
+ *   3. Origin 이 있으면 우리 것이어야 한다
+ *   4. Host 가 루프백이어야 한다. 남의 도메인을 127.0.0.1 로 돌려놓는 수법을 막는다
+ */
+const KEY = randomBytes(24).toString("hex");
+const SELF = new Set([`http://127.0.0.1:${PORT}`, `http://localhost:${PORT}`]);
+const HOSTS = new Set([`127.0.0.1:${PORT}`, `localhost:${PORT}`]);
+
+function refuse(req) {
+  if (!HOSTS.has(req.headers.host ?? "")) return "이 주소로는 받지 않습니다";
+  const origin = req.headers.origin;
+  if (origin && !SELF.has(origin)) return "다른 곳에서 온 요청입니다";
+  if (!(req.headers["content-type"] ?? "").startsWith("application/json")) {
+    return "JSON 요청만 받습니다";
+  }
+  if (req.headers["x-cr-key"] !== KEY) return "운영 화면에서 온 요청이 아닙니다";
+  return null;
+}
+
 const server = createServer(async (req, res) => {
   if (req.method === "POST" && req.url === "/api") {
+    const bad = refuse(req);
+    if (bad) {
+      res.writeHead(403, { "content-type": "application/json; charset=utf-8" });
+      res.end(JSON.stringify({ error: bad }));
+      return;
+    }
     const chunks = [];
     for await (const chunk of req) chunks.push(chunk);
     let body;
@@ -324,8 +360,20 @@ const server = createServer(async (req, res) => {
     return;
   }
   if (req.method === "GET" && (req.url === "/" || req.url.startsWith("/?"))) {
-    res.writeHead(200, { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" });
-    res.end(PAGE.replace("TARGETS_JSON", JSON.stringify(TARGETS)));
+    if (!HOSTS.has(req.headers.host ?? "")) {
+      res.writeHead(403).end("이 주소로는 받지 않습니다");
+      return;
+    }
+    res.writeHead(200, {
+      "content-type": "text/html; charset=utf-8",
+      "cache-control": "no-store",
+      // 이 화면이 바깥으로 무엇도 부르지 않게 한다
+      "content-security-policy":
+        "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; form-action 'none'; frame-ancestors 'none'",
+    });
+    res.end(
+      PAGE.replace("TARGETS_JSON", JSON.stringify(TARGETS)).replace("CR_KEY", JSON.stringify(KEY)),
+    );
     return;
   }
   res.writeHead(404).end("not found");

@@ -27,6 +27,8 @@ export type Room = {
   unlocked: string[];
   salt: string;
   hash: string;
+  /** 세션 세대. 비밀번호를 바꾸면 새로 뽑아 그 전에 들어온 사람을 전부 내보낸다. */
+  gen: string;
   created: number;
   fails: number;
   lockedUntil: number;
@@ -38,6 +40,7 @@ export type PublicRoom = {
   title: string;
   open: boolean;
   unlocked: string[];
+  gen: string;
   created: number;
   lockedUntil: number;
 };
@@ -102,6 +105,7 @@ function publicRoom(room: Room): PublicRoom {
     title: room.title,
     open: room.open,
     unlocked: room.unlocked,
+    gen: room.gen,
     created: room.created,
     lockedUntil: room.lockedUntil,
   };
@@ -176,6 +180,7 @@ export class Classroom {
         unlocked: [],
         salt,
         hash: await stretch(password, salt),
+        gen: randomHex(8),
         created: now,
         fails: 0,
         lockedUntil: 0,
@@ -198,6 +203,8 @@ export class Classroom {
       }
       room.salt = randomHex(16);
       room.hash = await stretch(password, room.salt);
+      // 세대를 새로 뽑아 앞의 세션을 전부 끊는다. 안 그러면 이미 들어온 사람이 그대로 남는다.
+      room.gen = randomHex(8);
       room.fails = 0;
       room.lockedUntil = 0;
       await this.put(room);
@@ -258,15 +265,25 @@ async function call(env: Env, body: Record<string, unknown>): Promise<Call> {
 
 /* 세션 ------------------------------------------------------------------ */
 
-async function issueSession(env: Env, slug: string): Promise<string> {
+async function signKey(env: Env): Promise<string> {
   const { data } = await call(env, { action: "signKey" });
-  const expires = Math.floor(Date.now() / 1000) + SESSION_TTL_SEC;
-  const payload = `${slug}.${expires}`;
-  return `${payload}.${await hmac(data.key, payload)}`;
+  return data.key as string;
 }
 
-/** 쿠키가 이 방의 것이고 아직 살아 있는지 본다. 다른 방의 쿠키로는 못 들어온다. */
-async function hasSession(env: Env, request: Request, slug: string): Promise<boolean> {
+function issueSession(key: string, room: PublicRoom): Promise<string> {
+  const expires = Math.floor(Date.now() / 1000) + SESSION_TTL_SEC;
+  const payload = `${room.slug}.${room.gen}.${expires}`;
+  return hmac(key, payload).then((sig) => `${payload}.${sig}`);
+}
+
+/**
+ * 쿠키가 이 방의 것이고 아직 살아 있는지 본다.
+ *
+ * 방 이름만이 아니라 **세대**까지 본다. 비밀번호를 바꾸거나 방을 지웠다 다시 만들면 세대가
+ * 바뀌고 앞의 쿠키가 전부 죽는다. 비밀번호를 바꾸는 이유는 그것이 샜기 때문인데 세대를
+ * 안 보면 이미 들어와 있는 사람은 12시간을 그대로 남는다.
+ */
+async function hasSession(key: string, request: Request, room: PublicRoom): Promise<boolean> {
   const raw = request.headers.get("cookie") ?? "";
   let token: string | null = null;
   for (const part of raw.split(";")) {
@@ -275,13 +292,13 @@ async function hasSession(env: Env, request: Request, slug: string): Promise<boo
   }
   if (!token) return false;
   const parts = token.split(".");
-  if (parts.length !== 3) return false;
-  const [got, expiresRaw, sig] = parts;
-  if (got !== slug) return false;
+  if (parts.length !== 4) return false;
+  const [got, gen, expiresRaw, sig] = parts;
+  if (got !== room.slug) return false;
+  if (!room.gen || gen !== room.gen) return false;
   const expires = Number(expiresRaw);
   if (!Number.isFinite(expires) || expires * 1000 < Date.now()) return false;
-  const { data } = await call(env, { action: "signKey" });
-  return safeEqual(sig, await hmac(data.key, `${got}.${expiresRaw}`));
+  return safeEqual(sig, await hmac(key, `${got}.${gen}.${expiresRaw}`));
 }
 
 function sessionCookie(token: string, slug: string, url: URL): string {
@@ -434,13 +451,23 @@ function visible(unlocked: string[]): CourseCategory[] {
 const poll = (slug: string) => `
 setInterval(async () => {
   const r = await fetch("/cr/${slug}/state", { cache: "no-store" });
+  // 세션이 끊겼으면(비밀번호가 바뀌었거나 방이 지워졌다) 그 자리에 머물지 않고 나간다
+  if (r.status === 401 || r.status === 404) { location.reload(); return; }
   if (!r.ok) return;
   const s = await r.json();
   if (s.stamp !== window.__stamp) location.reload();
 }, 3000);`;
 
-function stampOf(room: PublicRoom): string {
-  return `${room.open ? 1 : 0}:${[...room.unlocked].sort().join(",")}`;
+/**
+ * 상태 지문. 무엇이 열렸는지가 **읽히지 않는** 값이어야 한다.
+ *
+ * 처음에는 열린 카테고리 슬러그를 그대로 이어 붙였다. 그것은 지문이 아니라 커리큘럼
+ * 폴더 이름 목록이고 진도까지 같이 새어 나간다. 이 저장소는 커리큘럼 공개를 금지한다.
+ * 서명 키로 눌러서 밖에서는 바뀌었다는 것만 알게 한다.
+ */
+async function stampOf(key: string, room: PublicRoom): Promise<string> {
+  const raw = `${room.gen}:${room.open ? 1 : 0}:${[...room.unlocked].sort().join(",")}`;
+  return (await hmac(key, raw)).slice(0, 16);
 }
 
 /** 로컬 운영 화면이 부르는 유일한 조종 통로다. 공개 서버에 운영자 페이지는 없다. */
@@ -504,19 +531,30 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
       status: 303,
       headers: {
         location: `/cr/${slug}`,
-        "set-cookie": sessionCookie(await issueSession(env, slug), slug, url),
+        "set-cookie": sessionCookie(await issueSession(await signKey(env), room), slug, url),
       },
     });
   }
 
-  if (parts[1] === "state" && parts.length === 2) {
-    // 상태 지문만 준다. 본문도 카테고리 목록도 여기서 안 내려간다.
-    return Response.json({ stamp: stampOf(room) }, { headers: { "cache-control": "no-store" } });
+  const key = await signKey(env);
+
+  // 폴링도 들어온 사람만 한다. 앞에 두면 비밀번호 없이 방 상태를 감시할 수 있다.
+  if (!(await hasSession(key, request, room))) {
+    if (parts[1] === "state" && parts.length === 2) {
+      return Response.json({ error: "로그인이 필요합니다" }, { status: 401 });
+    }
+    return loginPage(slug, room.title);
   }
 
-  if (!(await hasSession(env, request, slug))) return loginPage(slug, room.title);
+  if (parts[1] === "state" && parts.length === 2) {
+    // 지문만 준다. 본문도 카테고리 목록도 여기서 안 내려간다.
+    return Response.json(
+      { stamp: await stampOf(key, room) },
+      { headers: { "cache-control": "no-store" } },
+    );
+  }
 
-  const stamp = `window.__stamp=${JSON.stringify(stampOf(room))};${poll(slug)}`;
+  const stamp = `window.__stamp=${JSON.stringify(await stampOf(key, room))};${poll(slug)}`;
 
   if (!room.open) {
     return page(

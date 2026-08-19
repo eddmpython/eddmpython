@@ -46,5 +46,11 @@ Write-Host '  Ctrl+C 로 끕니다' -ForegroundColor DarkGray
 Write-Host ''
 
 Write-Host '  4/4  wrangler dev 시작' -ForegroundColor DarkGray
-# 상태는 저장소 밖에 둔다. 저장소 안에 .wrangler 를 만들지 않는다.
-npx wrangler dev --port 8787 --persist-to ../../eddmpython.out/wrangler-state
+# 상태는 저장소 밖에 둔다. 다만 --persist-to 는 스토리지만 옮기고 번들과 임시 파일은
+# 여전히 site/.wrangler 에 생긴다. wrangler 가 그 경로를 바꾸는 방법을 주지 않으므로
+# 끝나는 자리에서 지운다.
+try {
+    npx wrangler dev --port 8787 --persist-to ../../eddmpython.out/wrangler-state
+} finally {
+    node scripts/clean-wrangler.mjs
+}
