@@ -75,7 +75,7 @@
     "001-ai-needs-an-environment/instruction-priority": {
       "alt": "사용자 요청과 기존 저장소 지시가 블로그 작업 계약보다 앞에서 합쳐지는 우선순위 구조",
       "assetKey": "instruction-priority",
-      "contentAnchor": "이 글은 그보다 높은 권한을 갖지 않으며 비어 있는 부분을 조사하는 절차로만 사용됩니다.",
+      "contentAnchor": "AI 는 여러 곳에서 지시를 받습니다.",
       "narrativeUse": "공개 링크가 기존 안전 규칙과 사용자 요청을 덮지 않고 빈 환경 정보만 채우는 보조 계약임을 보여 준다.",
       "palettePolicy": "eddmpython-carbon-ivory-sand-v1",
       "placement": "H3 부제 바로 뒤",
@@ -93,7 +93,7 @@
     "001-ai-needs-an-environment/link-as-contract": {
       "alt": "블로그 링크 한 장이 저장소 조사와 지침 파일 작성 및 검증 결과로 이어지는 작업 흐름",
       "assetKey": "link-as-contract",
-      "contentAnchor": "링크는 반복해서 사용할 절차를 한곳에 둡니다.",
+      "contentAnchor": "매번 긴 프롬프트를 새로 쓰면 조건이 조금씩 빠집니다.",
       "narrativeUse": "주소 하나가 고정 답을 제공하는 것이 아니라 저장소를 조사하고 문서와 검증 결과를 만드는 반복 절차를 연다는 글의 핵심을 보여 준다.",
       "palettePolicy": "eddmpython-carbon-ivory-sand-v1",
       "placement": "H3 부제 바로 뒤",
@@ -111,7 +111,7 @@
     "001-ai-needs-an-environment/repository-evidence": {
       "alt": "저장소의 README와 lockfile 및 CI 파일이 실제 설치 명령과 테스트 명령으로 모이는 조사 장면",
       "assetKey": "repository-evidence",
-      "contentAnchor": "CI는 원격에서 실제로 실행하려고 적어 둔 명령이므로 좋은 근거입니다.",
+      "contentAnchor": "AI 는 먼저 `git status` 로 저장소 루트와 현재 브랜치와 이미 바뀐 파일을 봅니다.",
       "narrativeUse": "한 파일 이름만 보고 명령을 추측하지 않고 여러 설정과 실행 정본이 같은 명령을 가리키는지 대조하는 과정을 보여 준다.",
       "palettePolicy": "eddmpython-carbon-ivory-sand-v1",
       "placement": "H3 부제 바로 뒤",
