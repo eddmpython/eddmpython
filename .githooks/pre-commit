@@ -17,7 +17,10 @@ blocked=""
 # 1. 비공개 경로
 for path in $staged; do
   case "$path" in
-    course/*|*/course/*|private/*|*/private/*|memory/*|*/memory/*)
+    # 맨 이름도 막는다. course 는 형제 비공개 저장소를 가리키는 연결이라 `git add -f course`
+    # 로 gitlink 하나가 스테이징될 수 있다. 교안 바이트는 안 새지만 비공개 저장소의 HEAD 와
+    # 그 경로의 존재가 공개 이력에 남는다.
+    course|private|memory|course/*|*/course/*|private/*|*/private/*|memory/*|*/memory/*)
       blocked="$blocked\n  경로: $path"
       ;;
   esac

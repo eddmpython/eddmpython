@@ -10,7 +10,7 @@ whenToUse:
   - 로컬에서 강의장 테스트
   - 교안이 공개 번들에 새는지
 verify:
-  - cd site && node scripts/build-course.mjs
+  - cd ../eddmpython-course && npm test
   - cd site && npm run check:leak
   - cd site && node scripts/classroom-shot.mjs
 status: observed
@@ -80,14 +80,12 @@ site\scripts\classroom-admin.ps1     # 바탕화면 "eddmpython 강의장 운영
 
 ## 교안 본문은 Worker 번들에만 있다
 
-`site/scripts/build-course.mjs` 가 `course/curriculum/` 을 읽어
-`site/course-content.generated.ts` 를 만든다. **그 파일은 Worker 에서만 import 한다.**
+**교안은 이 저장소에 없다.** 형제 비공개 저장소 `eddmpython-course` 가 Cloudflare KV 로
+발행하고 강의장 Worker 가 요청마다 읽는다. 빌드는 교안을 읽지 않는다.
 
-클라이언트 번들(`site-dist/assets/*.js`)에 넣으면 비밀번호를 걸어도 본문이 이미 공개된 상태가
-된다. Worker 코드는 브라우저로 내려가지 않으므로 거기에만 둔다.
-
-- 생성물은 추적하지 않는다. `.gitignore` 가 막는다
-- `course/` 가 없는 체크아웃에서는 빈 모듈을 쓴다. 빌드가 깨지지 않는다
+- 묶음의 모양은 두 저장소 사이의 계약이다. 바꾸면 `schema` 를 올리고 양쪽을 같은 날 고친다
+- **묶음이 깨져도 강의장이 죽지 않는다.** 교안이 없는 것으로 보고 운영 화면은 계속 돈다.
+  거기서 던지면 강의 중에 운영자가 방 목록조차 못 본다
 - **`npm run check:leak` 이 계속 0건이어야 한다.** 어떤 구현으로 바꾸든 이 조건이 먼저다
 
 ## 상태 보관
@@ -97,6 +95,10 @@ site\scripts\classroom-admin.ps1     # 바탕화면 "eddmpython 강의장 운영
 
 수강생 화면은 3초마다 `/cr/<방>/state` 를 읽는다. **들어온 사람만 읽는다.** 쿠키가 없으면
 401 이다.
+
+지문에는 **교안의 판 번호도 들어간다.** 안 넣으면 교안을 다시 발행해도 이미 화면을 열고 있는
+수강생이 모르고 새로 들어오는 사람만 새 내용을 본다. 교안이 Worker 번들에 있던 때는 재배포가
+강제 새로고침 노릇을 했는데 KV 로 옮기면서 그 효과가 사라졌다.
 
 지문은 서명 키로 누른 값이라 **무엇이 열렸는지 읽히지 않는다.** 처음에는 열린 카테고리
 슬러그를 그대로 이어 붙였는데 그것은 지문이 아니라 커리큘럼 폴더 이름 목록이었다. 비밀번호

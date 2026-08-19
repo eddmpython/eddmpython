@@ -45,7 +45,21 @@ const TEXT_EXT = new Set([".md", ".txt", ".json", ".mdx", ".html"]);
 
 /** 너무 흔해서 우연히 겹치는 문장은 제외한다. */
 const MIN_PHRASE = 18;
-const MAX_PHRASES_PER_FILE = 40;
+
+/**
+ * 파일 하나에서 뽑을 문장 수의 상한.
+ *
+ * 예전에는 40 이었고 앞에서부터 40개만 잘라 썼다. 그래서 **긴 글의 뒷부분이 검사에서 통째로
+ * 빠졌다.** 001 은 후보 60개 중 20개가, 004 는 51개 중 11개가 대상 밖이었다. 뒤쪽 문장을
+ * 공개 산출물에 심어도 게이트가 초록불을 냈다.
+ *
+ * 상한을 크게 올리고, 그래도 넘치면 앞에서 자르지 않고 **고르게 솎는다.** 글의 어느 자리도
+ * 구조적으로 안전지대가 되지 않게 하는 것이 요점이다.
+ */
+const MAX_PHRASES_PER_FILE = 400;
+
+/** 검사할 원본이 있는데 문장이 이보다 적으면 뽑기가 고장 난 것이다. */
+const MIN_TOTAL_PHRASES = 100;
 
 function walk(dir) {
   if (!existsSync(dir)) return [];
@@ -58,10 +72,32 @@ function walk(dir) {
   return out;
 }
 
+/**
+ * JSON 원본의 문자열 값을 줄로 펼친다.
+ *
+ * 안 하면 JSON 은 문장을 한 개도 못 낸다. 아래 줄머리 필터가 `{`, `[`, `"` 로 시작하는 줄을
+ * 전부 걷어내기 때문이다. 실제로 `plan.json`, `codaro-cells.json` 을 비롯한 다섯 파일이
+ * 0문장이었다. 확장자 목록에만 있고 실효가 없었다.
+ */
+function unpackJson(text) {
+  const out = [];
+  const walkValue = (value) => {
+    if (typeof value === "string") out.push(value);
+    else if (Array.isArray(value)) value.forEach(walkValue);
+    else if (value && typeof value === "object") Object.values(value).forEach(walkValue);
+  };
+  try {
+    walkValue(JSON.parse(text));
+  } catch {
+    return text;
+  }
+  return out.join("\n");
+}
+
 /** 비공개 원본에서 검색할 만큼 긴 문장만 뽑는다. */
-function phrasesFrom(text) {
+function phrasesFrom(text, isJson = false) {
   const found = [];
-  for (const raw of text.split(/\r?\n/)) {
+  for (const raw of (isJson ? unpackJson(text) : text).split(/\r?\n/)) {
     const line = raw.trim();
     if (line.length < MIN_PHRASE) continue;
     if (/^[#>\-*|`{}\[\]"',:]/.test(line)) continue;
@@ -73,7 +109,11 @@ function phrasesFrom(text) {
       if (phrase.length >= MIN_PHRASE && /[가-힣A-Za-z]/.test(phrase)) found.push(phrase);
     }
   }
-  return [...new Set(found)].slice(0, MAX_PHRASES_PER_FILE);
+  const unique = [...new Set(found)];
+  if (unique.length <= MAX_PHRASES_PER_FILE) return unique;
+  // 앞에서 자르면 글 뒷부분이 안전지대가 된다. 처음부터 끝까지 같은 간격으로 고른다.
+  const step = unique.length / MAX_PHRASES_PER_FILE;
+  return Array.from({ length: MAX_PHRASES_PER_FILE }, (_, i) => unique[Math.floor(i * step)]);
 }
 
 PRIVATE_DIRS.forEach(requireCourseCheckout);
@@ -86,9 +126,16 @@ for (const path of privateFiles) {
   } catch {
     continue;
   }
-  for (const phrase of phrasesFrom(text)) {
+  for (const phrase of phrasesFrom(text, extname(path).toLowerCase() === ".json")) {
     if (!phrases.has(phrase)) phrases.set(phrase, relative(REPO, path).replace(/\\/g, "/"));
   }
+}
+
+// 원본은 있는데 문장이 거의 없으면 뽑기가 고장 난 것이다. 그 상태의 초록불은 거짓이다.
+if (phrases.size < MIN_TOTAL_PHRASES) {
+  console.error(`비공개 문장이 ${phrases.size}개뿐입니다. 원본 ${privateFiles.length}개를 읽었습니다`);
+  console.error("이렇게 적으면 통과는 증거가 아닙니다. 문장을 뽑는 규칙을 확인합니다");
+  process.exit(1);
 }
 
 if (!existsSync(DIST)) {

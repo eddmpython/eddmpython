@@ -19,6 +19,22 @@ Write-Host ''
 Write-Host '  강의장 로컬 테스트' -ForegroundColor Cyan
 Write-Host '  ------------------'
 
+# 8787 을 이미 누가 잡고 있으면 새로 띄운 것이 아니라 그쪽이 응답한다. 두 번 당했다.
+# 옛 코드가 답하는데 새 코드를 시험하고 있다고 믿는 것이 제일 나쁘다.
+$busy = Get-NetTCPConnection -LocalPort 8787 -State Listen -ErrorAction SilentlyContinue
+if ($busy) {
+    Write-Host ''
+    Write-Host '  8787 을 이미 다른 프로세스가 쓰고 있습니다' -ForegroundColor Red
+    foreach ($c in $busy) {
+        $p = Get-Process -Id $c.OwningProcess -ErrorAction SilentlyContinue
+        Write-Host "    PID $($c.OwningProcess)  $($p.ProcessName)  시작 $($p.StartTime)"
+    }
+    Write-Host ''
+    Write-Host '  그대로 두면 새 코드가 아니라 그쪽이 응답합니다. 먼저 끄세요' -ForegroundColor Yellow
+    Read-Host '  엔터를 누르면 닫습니다'
+    exit 1
+}
+
 Write-Host '  1/4  교안을 로컬 강의장에 넣는 중...' -ForegroundColor DarkGray
 $course = Join-Path $repo '..\eddmpython-course'
 if (Test-Path $course) {

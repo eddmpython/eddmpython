@@ -27,6 +27,14 @@ type CourseBundle = { schema: number; categories: CourseCategory[] };
 /** 묶음의 모양은 eddmpython-course 와의 계약이다. 바꾸면 양쪽을 같은 날 같이 고친다. */
 const COURSE_SCHEMA = 1;
 
+export type CourseState = { ok: boolean; categories: CourseCategory[] };
+
+const isPost = (p: unknown): p is CoursePost =>
+  !!p &&
+  typeof (p as CoursePost).id === "string" &&
+  typeof (p as CoursePost).title === "string" &&
+  typeof (p as CoursePost).body === "string";
+
 /**
  * 교안을 KV 에서 읽는다.
  *
@@ -36,11 +44,44 @@ const COURSE_SCHEMA = 1;
  *
  * 이제 교안은 비공개 저장소가 KV 로 따로 발행한다. 사이트 배포와 교안 발행이 서로를
  * 기다리지 않는다.
+ *
+ * **무슨 일이 있어도 던지지 않는다.** 묶음이 깨졌을 때 던지면 강의장만이 아니라 운영
+ * 화면까지 같이 죽는다. 그러면 강의 중에 운영자가 방 목록조차 못 본다.
  */
-async function course(env: Env): Promise<CourseCategory[]> {
-  const bundle = await env.COURSE.get<CourseBundle>("bundle", { type: "json", cacheTtl: 60 });
-  if (!bundle || bundle.schema !== COURSE_SCHEMA) return [];
-  return [...bundle.categories].sort((a, b) => a.order - b.order);
+async function course(env: Env): Promise<CourseState> {
+  let bundle: CourseBundle | null = null;
+  try {
+    const raw = await env.COURSE.get("bundle", { cacheTtl: 60 });
+    if (raw === null) return { ok: true, categories: [] };
+    bundle = JSON.parse(raw) as CourseBundle;
+  } catch {
+    // 묶음이 깨졌으면 교안이 없는 것으로 본다. 여기서 던지면 강의장만이 아니라 운영 화면도
+    // 같이 죽는다. 강의 중에 운영자가 방 목록조차 못 보게 되는 것이 제일 나쁜 결과다.
+    return { ok: false, categories: [] };
+  }
+  if (!bundle || bundle.schema !== COURSE_SCHEMA || !Array.isArray(bundle.categories)) {
+    return { ok: false, categories: [] };
+  }
+  const categories = bundle.categories
+    .filter((c) => c && typeof c.slug === "string" && Array.isArray(c.posts))
+    .map((c) => ({ ...c, order: Number(c.order) || 0, posts: c.posts.filter(isPost) }))
+    .sort((a, b) => a.order - b.order);
+  return { ok: true, categories };
+}
+
+/**
+ * 교안의 판 번호. 발행할 때마다 바뀐다.
+ *
+ * 상태 지문에 이것을 넣지 않으면 교안을 다시 발행해도 **이미 화면을 열고 있는 수강생이
+ * 모른다.** 새로 들어오는 사람만 새 내용을 본다. 예전에는 교안이 Worker 번들에 있어서
+ * 재배포가 강제 새로고침 노릇을 했는데 KV 로 옮기면서 그 효과가 사라졌다.
+ */
+async function courseVersion(env: Env): Promise<string> {
+  try {
+    return (await env.COURSE.get("version", { cacheTtl: 60 })) ?? "";
+  } catch {
+    return "";
+  }
 }
 
 /** 방 하나. 비밀번호는 원문을 두지 않고 salt 를 섞어 늘린 해시만 둔다. */
@@ -489,8 +530,8 @@ setInterval(async () => {
  * 폴더 이름 목록이고 진도까지 같이 새어 나간다. 이 저장소는 커리큘럼 공개를 금지한다.
  * 서명 키로 눌러서 밖에서는 바뀌었다는 것만 알게 한다.
  */
-async function stampOf(key: string, room: PublicRoom): Promise<string> {
-  const raw = `${room.gen}:${room.open ? 1 : 0}:${[...room.unlocked].sort().join(",")}`;
+async function stampOf(key: string, room: PublicRoom, version: string): Promise<string> {
+  const raw = `${room.gen}:${room.open ? 1 : 0}:${[...room.unlocked].sort().join(",")}:${version}`;
   return (await hmac(key, raw)).slice(0, 16);
 }
 
@@ -506,11 +547,14 @@ async function admin(request: Request, env: Env): Promise<Response> {
   if (status >= 400) return Response.json(data, { status });
   // 무엇을 했든 전체 상태를 돌려준다. 운영 화면이 늘 실물을 그린다.
   const { data: listed } = await call(env, { action: "list" });
+  const found = await course(env);
   return Response.json({
     ok: true,
     result: data,
     rooms: listed.rooms,
-    categories: (await course(env)).map((c) => ({
+    // 교안을 못 읽어도 방 조종은 계속된다. 운영자에게 상태만 알려 준다.
+    courseOk: found.ok,
+    categories: found.categories.map((c) => ({
       slug: c.slug,
       title: c.title,
       posts: c.posts.length,
@@ -575,12 +619,13 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
   if (parts[1] === "state" && parts.length === 2) {
     // 지문만 준다. 본문도 카테고리 목록도 여기서 안 내려간다.
     return Response.json(
-      { stamp: await stampOf(key, room) },
+      { stamp: await stampOf(key, room, await courseVersion(env)) },
       { headers: { "cache-control": "no-store" } },
     );
   }
 
-  const stamp = `window.__stamp=${JSON.stringify(await stampOf(key, room))};${poll(slug)}`;
+  const mark = await stampOf(key, room, await courseVersion(env));
+  const stamp = `window.__stamp=${JSON.stringify(mark)};${poll(slug)}`;
 
   if (!room.open) {
     return page(
@@ -590,7 +635,7 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
     );
   }
 
-  const open = visible(await course(env), room.unlocked);
+  const open = visible((await course(env)).categories, room.unlocked);
 
   if (parts.length === 1) {
     const cards = open.length

@@ -43,7 +43,11 @@ async function admin(body) {
 await admin({ action: "remove", slug: ROOM }).catch(() => {});
 const made = await admin({ action: "create", slug: ROOM, title: "검수용 강의장", password: PASSWORD });
 const category = made.categories[0];
-if (!category) throw new Error("교안 카테고리가 없다. build-course.mjs 를 먼저 돌려라");
+if (!category) {
+  throw new Error(
+    "교안 카테고리가 없다. ../eddmpython-course 에서 npm run publish:local 을 먼저 돌려라",
+  );
+}
 await admin({ action: "toggle", slug: ROOM, category: category.slug });
 const listed = await admin({ action: "list" });
 const posts = listed.categories.find((c) => c.slug === category.slug);
