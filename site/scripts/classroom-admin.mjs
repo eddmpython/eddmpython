@@ -1,0 +1,316 @@
+/**
+ * 강의장 운영 화면. 운영자 노트북에서만 돈다.
+ *
+ * 공개 서버에는 운영자 페이지가 없다. 이 서버가 로컬호스트에서 화면을 그리고, 토큰을 얹어
+ * 대상 Worker 의 /cr/api/admin 하나만 두드린다. 토큰은 브라우저로 내려가지 않는다.
+ *
+ * 방을 만들면 그 자리에서 /cr/<이름> 주소가 살아난다. 배포도 secret 설정도 필요 없다.
+ * 비밀번호도 여기서 건다.
+ *
+ * 사용: node scripts/classroom-admin.mjs [--port 8799] [--open]
+ */
+import { createServer } from "node:http";
+import { randomBytes } from "node:crypto";
+import { readFile, writeFile, access } from "node:fs/promises";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { spawn } from "node:child_process";
+
+const HERE = dirname(fileURLToPath(import.meta.url));
+const SITE = resolve(HERE, "..");
+const CONFIG = join(SITE, ".classroom-admin.json");
+const DEV_VARS = join(SITE, ".dev.vars");
+
+const argv = process.argv.slice(2);
+const flag = (name, fallback) => {
+  const at = argv.indexOf(name);
+  return at >= 0 && argv[at + 1] ? argv[at + 1] : fallback;
+};
+const PORT = Number(flag("--port", "8799"));
+const OPEN = argv.includes("--open");
+
+async function exists(path) {
+  try {
+    await access(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * 설정이 없으면 만든다. 로컬 토큰은 여기서 뽑아 .dev.vars 와 맞춰 둔다.
+ * 운영 토큰은 비워 둔다. wrangler secret put CR_ADMIN_TOKEN 으로 넣은 값을 옮겨 적는다.
+ */
+async function loadConfig() {
+  if (!(await exists(CONFIG))) {
+    const localToken = randomBytes(24).toString("hex");
+    const made = {
+      targets: [
+        { id: "local", label: "로컬", base: "http://localhost:8787", token: localToken },
+        { id: "production", label: "운영", base: "https://eddmpython.com", token: "" },
+      ],
+    };
+    await writeFile(CONFIG, `${JSON.stringify(made, null, 2)}\n`, "utf8");
+    console.log(`  설정을 만들었습니다: ${CONFIG}`);
+  }
+  const config = JSON.parse(await readFile(CONFIG, "utf8"));
+
+  // 로컬 wrangler dev 가 같은 토큰을 보게 맞춘다. 안 맞으면 로컬 조종이 401 로 막힌다.
+  const local = config.targets.find((t) => t.id === "local");
+  if (local?.token) {
+    const current = (await exists(DEV_VARS)) ? await readFile(DEV_VARS, "utf8") : "";
+    if (!current.includes(`CR_ADMIN_TOKEN=${local.token}`)) {
+      const kept = current
+        .split(/\r?\n/)
+        .filter((l) => l.trim() && !/^CR_ADMIN_TOKEN=/.test(l))
+        .join("\n");
+      await writeFile(DEV_VARS, `${kept ? `${kept}\n` : ""}CR_ADMIN_TOKEN=${local.token}\n`, "utf8");
+      console.log("  .dev.vars 의 CR_ADMIN_TOKEN 을 설정과 맞췄습니다");
+    }
+  }
+  return config;
+}
+
+const config = await loadConfig();
+
+// 설정과 .dev.vars 만 맞추고 끝낸다. wrangler dev 를 띄우기 전에 부른다.
+if (argv.includes("--sync-only")) {
+  console.log("  강의장 설정 준비 완료");
+  process.exit(0);
+}
+
+/** 대상 Worker 를 두드린다. 토큰은 이 프로세스 밖으로 나가지 않는다. */
+async function drive(targetId, body) {
+  const target = config.targets.find((t) => t.id === targetId);
+  if (!target) return { status: 400, data: { error: "모르는 대상입니다" } };
+  if (!target.token) {
+    return {
+      status: 400,
+      data: { error: `${target.label} 토큰이 비어 있습니다. ${CONFIG} 에 채워 주세요` },
+    };
+  }
+  try {
+    const res = await fetch(`${target.base.replace(/\/$/, "")}/cr/api/admin`, {
+      method: "POST",
+      headers: { authorization: `Bearer ${target.token}`, "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { error: `응답을 못 읽었습니다 (${res.status})` };
+    }
+    return { status: res.status, data };
+  } catch (err) {
+    return { status: 502, data: { error: `${target.label} 에 닿지 않습니다: ${err.message}` } };
+  }
+}
+
+const TARGETS = config.targets.map((t) => ({
+  id: t.id,
+  label: t.label,
+  base: t.base.replace(/\/$/, ""),
+  ready: Boolean(t.token),
+}));
+
+const PAGE = `<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>강의장 운영</title><style>
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin:0; background:#0d1211; color:#f5f3ee; line-height:1.6;
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif; }
+.wrap { max-width:64rem; margin:0 auto; padding:1.75rem 1.25rem 6rem; }
+h1 { font-size:1.35rem; margin:0 0 1.25rem; }
+.targets { display:flex; gap:.5rem; margin-bottom:1.75rem; flex-wrap:wrap; }
+.targets button { flex:0 0 auto; }
+.t-on[data-id="production"] { background:#e0552d; border-color:#e0552d; color:#fff; }
+.t-on[data-id="local"] { background:#d8be91; border-color:#d8be91; color:#161a19; }
+button { padding:.55rem .95rem; border-radius:.55rem; border:1px solid #ffffff2b;
+  background:#ffffff0f; color:#f5f3ee; font-size:.92rem; cursor:pointer; font-family:inherit; }
+button:hover { background:#ffffff1c; }
+button.go { border-color:#d8be9166; color:#d8be91; }
+button.danger { border-color:#e0552d55; color:#f0a58c; }
+input { padding:.55rem .7rem; border-radius:.55rem; border:1px solid #ffffff26;
+  background:#ffffff0d; color:inherit; font-size:.92rem; font-family:inherit; min-width:0; }
+.card { border:1px solid #ffffff1c; border-radius:.85rem; padding:1.1rem 1.25rem; margin:0 0 1rem; }
+.card.live { border-color:#d8be9140; }
+.head { display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap; }
+.head h2 { margin:0; font-size:1.05rem; }
+.addr { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.85rem; color:#d8be91;
+  text-decoration:none; }
+.addr:hover { text-decoration:underline; }
+.state { font-size:.75rem; letter-spacing:.06em; padding:.1rem .5rem; border-radius:99px; }
+.state.on { background:#d8be9124; color:#d8be91; }
+.state.off { background:#ffffff12; color:#f5f3ee66; }
+.row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; margin-top:.9rem; }
+.cats { display:flex; flex-direction:column; gap:.4rem; margin-top:1rem;
+  border-top:1px solid #ffffff14; padding-top:.9rem; }
+.cat { display:flex; gap:.7rem; align-items:center; justify-content:space-between; }
+.cat span { font-size:.92rem; }
+.cat .right { display:flex; gap:.6rem; align-items:center; flex:0 0 auto; }
+.cat .num { color:#f5f3ee55; font-size:.8rem; }
+.note { color:#f5f3ee66; font-size:.86rem; margin:.35rem 0 0; }
+.err { color:#f0a58c; font-size:.9rem; min-height:1.4em; margin:0 0 1rem; }
+.new { border:1px dashed #ffffff26; border-radius:.85rem; padding:1.1rem 1.25rem; margin-top:2rem; }
+.new .row { margin-top:0; }
+h3 { font-size:.95rem; margin:0 0 .8rem; color:#f5f3eecc; }
+</style></head><body><div class="wrap">
+<h1>강의장 운영</h1>
+<div class="targets" id="targets"></div>
+<p class="err" id="err"></p>
+<div id="rooms"></div>
+<div class="new">
+  <h3>강의장 만들기</h3>
+  <div class="row">
+    <input id="n-slug" placeholder="주소 이름 (예: 0820)" style="flex:0 1 12rem">
+    <input id="n-title" placeholder="강의장 이름" style="flex:1 1 14rem">
+    <input id="n-pw" placeholder="비밀번호" style="flex:0 1 10rem">
+    <button class="go" id="n-go">만들기</button>
+  </div>
+  <p class="note">만드는 즉시 주소가 살아납니다. 배포하지 않습니다</p>
+</div>
+</div><script>
+const TARGETS = TARGETS_JSON;
+let target = TARGETS.find((t) => t.ready)?.id ?? TARGETS[0].id;
+let rooms = [];
+let categories = [];
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+async function send(body) {
+  $("err").textContent = "";
+  const res = await fetch("/api", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ target, ...body }),
+  });
+  const data = await res.json();
+  if (!res.ok) { $("err").textContent = data.error ?? "실패했습니다"; return null; }
+  rooms = data.rooms ?? [];
+  categories = data.categories ?? [];
+  draw();
+  return data;
+}
+
+function drawTargets() {
+  $("targets").innerHTML = TARGETS.map((t) =>
+    '<button data-id="' + t.id + '" class="' + (t.id === target ? "t-on" : "") + '">' +
+    esc(t.label) + (t.ready ? "" : " (토큰 없음)") + "</button>").join("");
+  [...$("targets").children].forEach((b) => {
+    b.onclick = () => { target = b.dataset.id; send({ action: "list" }); };
+  });
+}
+
+function drawRooms() {
+  if (!rooms.length) {
+    $("rooms").innerHTML = '<p class="note">아직 강의장이 없습니다. 아래에서 만드세요</p>';
+    return;
+  }
+  const base = TARGETS.find((t) => t.id === target).base;
+  $("rooms").innerHTML = rooms.map((r) => {
+    const url = base + "/cr/" + r.slug;
+    const cats = categories.map((c) => {
+      const on = r.unlocked.includes(c.slug);
+      // 단추 글자는 할 일이고 칩은 지금 상태다. 강의 중에 둘을 헷갈리면 안 열 것을 연다.
+      return '<div class="cat"><span>' + esc(c.title) +
+        ' <span class="num">' + c.posts + "편</span></span>" +
+        '<span class="right"><span class="state ' + (on ? "on" : "off") + '">' +
+        (on ? "수강생에게 보임" : "잠김") + "</span>" +
+        '<button data-act="toggle" data-slug="' + r.slug + '" data-cat="' + c.slug + '">' +
+        (on ? "닫기" : "열기") + "</button></span></div>";
+    }).join("");
+    return '<div class="card' + (r.open ? " live" : "") + '">' +
+      '<div class="head"><h2>' + esc(r.title) + "</h2>" +
+      '<span class="state ' + (r.open ? "on" : "off") + '">' + (r.open ? "열림" : "닫힘") + "</span>" +
+      '<a class="addr" href="' + url + '" target="_blank" rel="noreferrer">' + esc(url) + "</a></div>" +
+      '<div class="row">' +
+      '<button class="go" data-act="open" data-slug="' + r.slug + '" data-open="' + (r.open ? "0" : "1") + '">' +
+      (r.open ? "강의장 닫기" : "강의장 열기") + "</button>" +
+      '<button data-act="copy" data-url="' + url + '">주소 복사</button>' +
+      '<input data-pw="' + r.slug + '" placeholder="새 비밀번호" style="flex:0 1 9rem">' +
+      '<button data-act="password" data-slug="' + r.slug + '">바꾸기</button>' +
+      '<button class="danger" data-act="remove" data-slug="' + r.slug + '">삭제</button></div>' +
+      (r.open ? '<div class="cats">' + (cats || '<p class="note">교안 카테고리가 없습니다</p>') + "</div>"
+              : '<p class="note">닫으면 열어 둔 카테고리도 처음으로 돌아갑니다</p>') +
+      "</div>";
+  }).join("");
+
+  $("rooms").querySelectorAll("[data-act]").forEach((b) => {
+    b.onclick = async () => {
+      const { act, slug } = b.dataset;
+      if (act === "copy") { await navigator.clipboard.writeText(b.dataset.url); b.textContent = "복사함"; return; }
+      if (act === "open") return send({ action: "open", slug, open: b.dataset.open === "1" });
+      if (act === "toggle") return send({ action: "toggle", slug, category: b.dataset.cat });
+      if (act === "password") {
+        const input = $("rooms").querySelector('[data-pw="' + slug + '"]');
+        if (!input.value) { $("err").textContent = "새 비밀번호를 적어 주세요"; return; }
+        const done = await send({ action: "password", slug, password: input.value });
+        if (done) $("err").textContent = "비밀번호를 바꿨습니다";
+        return;
+      }
+      if (act === "remove") {
+        if (!confirm(slug + " 강의장을 지웁니다. 주소가 사라집니다")) return;
+        return send({ action: "remove", slug });
+      }
+    };
+  });
+}
+
+function draw() { drawTargets(); drawRooms(); }
+
+$("n-go").onclick = async () => {
+  const slug = $("n-slug").value.trim();
+  const title = $("n-title").value.trim() || slug;
+  const password = $("n-pw").value;
+  if (!slug || !password) { $("err").textContent = "주소 이름과 비밀번호가 있어야 합니다"; return; }
+  const done = await send({ action: "create", slug, title, password });
+  if (done) { $("n-slug").value = ""; $("n-title").value = ""; $("n-pw").value = ""; }
+};
+
+draw();
+send({ action: "list" });
+// 다른 창에서 바꾼 것도 따라온다. 강의 중에 화면이 실물과 어긋나지 않게 한다.
+setInterval(() => { if (!document.hidden) send({ action: "list" }); }, 5000);
+</script></body></html>`;
+
+const server = createServer(async (req, res) => {
+  if (req.method === "POST" && req.url === "/api") {
+    const chunks = [];
+    for await (const chunk of req) chunks.push(chunk);
+    let body;
+    try {
+      body = JSON.parse(Buffer.concat(chunks).toString("utf8"));
+    } catch {
+      res.writeHead(400, { "content-type": "application/json" });
+      res.end(JSON.stringify({ error: "요청을 못 읽었습니다" }));
+      return;
+    }
+    const { target, ...rest } = body;
+    const { status, data } = await drive(target, rest);
+    res.writeHead(status, { "content-type": "application/json; charset=utf-8" });
+    res.end(JSON.stringify(data));
+    return;
+  }
+  if (req.method === "GET" && (req.url === "/" || req.url.startsWith("/?"))) {
+    res.writeHead(200, { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" });
+    res.end(PAGE.replace("TARGETS_JSON", JSON.stringify(TARGETS)));
+    return;
+  }
+  res.writeHead(404).end("not found");
+});
+
+// 루프백에만 묶는다. 이 프로세스가 운영 토큰을 들고 있으므로 강의장 와이파이에 노출하지 않는다.
+server.listen(PORT, "127.0.0.1", () => {
+  const url = `http://127.0.0.1:${PORT}`;
+  console.log("");
+  console.log(`  강의장 운영 화면  ${url}`);
+  for (const t of TARGETS) {
+    console.log(`    ${t.label}  ${t.base}${t.ready ? "" : "  (토큰 없음)"}`);
+  }
+  console.log("");
+  if (OPEN) spawn("cmd", ["/c", "start", "", url], { detached: true, stdio: "ignore" }).unref();
+});

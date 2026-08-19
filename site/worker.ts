@@ -89,7 +89,11 @@ function isAdSenseArticle(pathname: string): boolean {
 function withHeaders(res: Response, isHtml: boolean, adsense = false): Response {
   const headers = new Headers(res.headers);
   for (const [k, v] of Object.entries(SECURITY_HEADERS)) headers.set(k, v);
-  if (isHtml) headers.set("content-security-policy", adsense ? ADSENSE_CSP : CSP);
+  // 응답이 자기 CSP 를 이미 달고 왔으면 덮어쓰지 않는다. 강의장은 인라인 스크립트에
+  // nonce 를 붙여 자기 정책을 낸다. 여기서 덮으면 확대와 실시간 동기화가 죽는다.
+  if (isHtml && !headers.has("content-security-policy")) {
+    headers.set("content-security-policy", adsense ? ADSENSE_CSP : CSP);
+  }
   return new Response(res.body, {
     status: res.status,
     statusText: res.statusText,

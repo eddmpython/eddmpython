@@ -1,10 +1,11 @@
-# 강의장 로컬 테스트. 바탕화면 바로가기가 이 파일을 부른다.
+# 강의장 로컬 테스트. 바탕화면 바로가기 "eddmpython 강의장 테스트" 가 이 파일을 부른다.
 #
-# 하는 일 넷이다.
+# 하는 일 다섯이다.
 #   1. course/curriculum 을 Worker 번들용 모듈로 다시 굽는다
-#   2. 클라이언트 빌드 산출물이 없으면 만든다 (강의장만 볼 거면 없어도 되지만 /blog 가 깨진다)
-#   3. wrangler dev 를 띄운다
-#   4. 브라우저로 운영자 화면과 강의장을 연다
+#   2. 운영 설정과 .dev.vars 의 토큰을 맞춘다
+#   3. 클라이언트 빌드 산출물이 없으면 만든다 (강의장만 볼 거면 없어도 되지만 /blog 가 깨진다)
+#   4. 운영 화면을 따로 띄운다. 로컬 대상으로 잡혀 있다
+#   5. wrangler dev 를 띄운다
 #
 # 교안을 고친 뒤 다시 실행하면 1번이 최신 내용을 반영한다.
 
@@ -17,41 +18,33 @@ Write-Host ''
 Write-Host '  강의장 로컬 테스트' -ForegroundColor Cyan
 Write-Host '  ------------------'
 
-if (-not (Test-Path (Join-Path $site '.dev.vars'))) {
-    Write-Host '  .dev.vars 가 없습니다. site/.dev.vars.example 를 복사해서 값을 채우세요' -ForegroundColor Yellow
-    Read-Host '  엔터를 누르면 닫습니다'
-    exit 1
-}
-
-Write-Host '  1/3  교안을 다시 굽는 중...' -ForegroundColor DarkGray
+Write-Host '  1/4  교안을 다시 굽는 중...' -ForegroundColor DarkGray
 node scripts/build-course.mjs
+
+Write-Host '  2/4  운영 토큰을 맞추는 중...' -ForegroundColor DarkGray
+node scripts/classroom-admin.mjs --sync-only
 
 $dist = Join-Path $repo '..\eddmpython.out\site-dist'
 if (-not (Test-Path $dist)) {
-    Write-Host '  2/3  사이트 빌드가 없어 새로 만드는 중... (처음 한 번만 오래 걸립니다)' -ForegroundColor DarkGray
+    Write-Host '  3/4  사이트 빌드가 없어 새로 만드는 중... (처음 한 번만 오래 걸립니다)' -ForegroundColor DarkGray
     npx vite build
 } else {
-    Write-Host '  2/3  사이트 빌드 있음. 건너뜁니다' -ForegroundColor DarkGray
+    Write-Host '  3/4  사이트 빌드 있음. 건너뜁니다' -ForegroundColor DarkGray
 }
 
-$vars = Get-Content (Join-Path $site '.dev.vars') | Where-Object { $_ -match '^CR_(PASSWORD|ADMIN_KEY)=' }
+Start-Process powershell -ArgumentList @(
+    '-NoExit', '-ExecutionPolicy', 'Bypass', '-Command',
+    "Set-Location '$site'; node scripts/classroom-admin.mjs --open"
+)
+
 Write-Host ''
-Write-Host '  들어가는 곳' -ForegroundColor Cyan
-Write-Host '    수강생   http://localhost:8787/cr'
-Write-Host '    운영자   http://localhost:8787/cr/admin'
-foreach ($v in $vars) {
-    $parts = $v -split '=', 2
-    $label = if ($parts[0] -eq 'CR_PASSWORD') { '강의장 비밀번호' } else { '운영자 키    ' }
-    Write-Host "    $label  $($parts[1])" -ForegroundColor DarkGray
-}
+Write-Host '  운영 화면   http://127.0.0.1:8799  (따로 열린 창)' -ForegroundColor Cyan
+Write-Host '  수강생      http://localhost:8787/cr/<만든 이름>' -ForegroundColor Cyan
 Write-Host ''
+Write-Host '  운영 화면에서 강의장을 만들면 그 주소가 바로 생깁니다' -ForegroundColor DarkGray
 Write-Host '  Ctrl+C 로 끕니다' -ForegroundColor DarkGray
 Write-Host ''
 
-Start-Job -ScriptBlock {
-    Start-Sleep -Seconds 4
-    Start-Process 'http://localhost:8787/cr/admin'
-} | Out-Null
-
-Write-Host '  3/3  wrangler dev 시작' -ForegroundColor DarkGray
-npx wrangler dev --port 8787
+Write-Host '  4/4  wrangler dev 시작' -ForegroundColor DarkGray
+# 상태는 저장소 밖에 둔다. 저장소 안에 .wrangler 를 만들지 않는다.
+npx wrangler dev --port 8787 --persist-to ../../eddmpython.out/wrangler-state

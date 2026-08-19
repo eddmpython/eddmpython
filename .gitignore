@@ -5,6 +5,8 @@
 .dev.vars
 .dev.vars.*
 !.dev.vars.example
+# 강의장 운영 화면의 대상과 토큰. 로컬에만 둔다.
+site/.classroom-admin.json
 credentials/
 secrets/
 .secrets/
