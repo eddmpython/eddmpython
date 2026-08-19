@@ -1,27 +1,35 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown, { defaultUrlTransform } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { decodeHashId } from "../hashNavigation";
 import { CodaroCellEmbed } from "./CodaroCellEmbed";
 
 const THREADS = /^https?:\/\/(?:www\.)?threads\.(?:net|com)\/@[\w.]+\/post\/[\w-]+/;
 const IMAGE = /\.(png|jpe?g|gif|webp|avif|svg)(\?.*)?$/i;
+/** 아직 발행하지 않은 시각물 자리다. 교안은 본문에 이 자리를 먼저 넣고 나중에 채운다. */
+const MEDIA_PENDING = /^media:\/\/([a-z0-9-]+)$/i;
 const VIDEO = /\.(mp4|webm)(\?.*)?$/i;
 const CODARO_CELL =
   /^https:\/\/eddmpython\.com\/codaro\/run\/\?example=([a-z0-9]+(?:-[a-z0-9]+)*)$/;
 
-function onlyUrl(children: ReactNode): string | null {
+type ParagraphLink = { href: string; label: string; title: string };
+
+/** 링크 하나로만 이루어진 문단을 집는다. 라벨과 title 은 캡션 후보로 함께 돌려준다. */
+function onlyLink(children: ReactNode): ParagraphLink | null {
   const list = Array.isArray(children) ? children : [children];
   const items = list.filter((c) => c !== "\n" && c !== "");
   if (items.length !== 1) return null;
-  const node = items[0] as { props?: { href?: string; children?: ReactNode } };
+  const node = items[0] as {
+    props?: { href?: string; title?: string; children?: ReactNode };
+  };
   const href = node?.props?.href;
   if (!href) return null;
   const label = node.props?.children;
-  const text = typeof label === "string" ? label : "";
-  // 라벨을 따로 붙인 링크는 그대로 링크로 둔다.
-  if (text && text !== href) return null;
-  return href;
+  return {
+    href,
+    label: typeof label === "string" ? label : "",
+    title: typeof node.props?.title === "string" ? node.props.title : "",
+  };
 }
 
 function onlyImage(node: unknown): { src: string; alt: string; title: string } | null {
@@ -44,6 +52,34 @@ function onlyImage(node: unknown): { src: string; alt: string; title: string } |
     alt: typeof properties.alt === "string" ? properties.alt : "",
     title: typeof properties.title === "string" ? properties.title : "",
   };
+}
+
+/** 발행 전 자리표시자. 빈 src 로 두면 브라우저가 페이지 전체를 다시 내려받는다. */
+function PendingMedia({
+  assetKey,
+  alt,
+  caption,
+}: {
+  assetKey: string;
+  alt: string;
+  caption: string;
+}) {
+  return (
+    <span className="my-7 block overflow-hidden rounded-xl border border-dashed border-white/15 bg-white/[0.02]">
+      <span className="flex aspect-[3/2] w-full flex-col items-center justify-center gap-2 px-6 text-center">
+        <span className="font-mono text-[11px] tracking-[0.14em] text-ivory/38 uppercase">
+          시각물 준비 중
+        </span>
+        <span className="text-sm leading-relaxed text-ivory/50">{alt}</span>
+        <span className="font-mono text-[11px] text-ivory/28">{assetKey}</span>
+      </span>
+      {caption && (
+        <span className="block border-t border-white/8 px-4 py-3 text-left text-sm leading-relaxed text-ivory/48">
+          {caption}
+        </span>
+      )}
+    </span>
+  );
 }
 
 function ArticleVideo({
@@ -97,9 +133,18 @@ function parseYouTube(url: string): YouTubeVideo | null {
   }
 }
 
-function YouTube({ id, vertical }: YouTubeVideo) {
+function YouTube({
+  id,
+  vertical,
+  caption,
+}: YouTubeVideo & { caption: string }) {
   const [playing, setPlaying] = useState(false);
-  const watchUrl = `https://www.youtube.com/shorts/${id}`;
+  const [thumb, setThumb] = useState(
+    `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`,
+  );
+  const watchUrl = vertical
+    ? `https://www.youtube.com/shorts/${id}`
+    : `https://www.youtube.com/watch?v=${id}`;
   return (
     <span
       data-youtube-player={id}
@@ -122,17 +167,24 @@ function YouTube({ id, vertical }: YouTubeVideo) {
             type="button"
             aria-label="YouTube 영상 재생"
             onClick={() => setPlaying(true)}
-            className="group flex h-full w-full items-center justify-center bg-cover bg-center"
-            style={{ backgroundImage: `url(https://i.ytimg.com/vi/${id}/maxresdefault.jpg)` }}
+            className="group relative flex h-full w-full items-center justify-center overflow-hidden bg-black"
           >
-            <span className="flex size-16 items-center justify-center rounded-full border border-white/25 bg-black/75 shadow-xl transition-transform group-hover:scale-105">
+            <img
+              src={thumb}
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              onError={() => setThumb(`https://i.ytimg.com/vi/${id}/hqdefault.jpg`)}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <span className="relative flex size-16 items-center justify-center rounded-full border border-white/25 bg-black/75 shadow-xl transition-transform group-hover:scale-105">
               <span className="ml-1 block h-0 w-0 border-y-[10px] border-y-transparent border-l-[16px] border-l-white" />
             </span>
           </button>
         )}
       </span>
       <span className="flex items-center justify-between gap-4 border-t border-white/8 bg-white/[0.02] px-4 py-3 text-sm text-ivory/52">
-        <span>파이썬 필수 기초 1분 영상</span>
+        <span className="text-left leading-relaxed">{caption}</span>
         <a
           href={watchUrl}
           target="_blank"
@@ -298,10 +350,23 @@ export function Markdown({ children }: { children: string }) {
       <ArticleToc headings={headings} />
       <ReactMarkdown
       remarkPlugins={[remarkGfm]}
+      urlTransform={(url) =>
+        MEDIA_PENDING.test(url) ? url : defaultUrlTransform(url)
+      }
       components={{
         p({ children: kids, node }) {
           const picture = onlyImage(node);
           if (picture) {
+            const pending = picture.src.match(MEDIA_PENDING);
+            if (pending) {
+              return (
+                <PendingMedia
+                  assetKey={pending[1]}
+                  alt={picture.alt}
+                  caption={picture.title}
+                />
+              );
+            }
             if (VIDEO.test(picture.src)) {
               return (
                 <ArticleVideo src={picture.src} alt={picture.alt} caption={picture.title} />
@@ -324,24 +389,32 @@ export function Markdown({ children }: { children: string }) {
               </figure>
             );
           }
-          const url = onlyUrl(kids);
-          if (url) {
-            const codaroCell = url.match(CODARO_CELL);
-            if (codaroCell) {
-              return <CodaroCellEmbed exampleId={codaroCell[1]} />;
+          const link = onlyLink(kids);
+          if (link) {
+            const youtube = parseYouTube(link.href);
+            if (youtube) {
+              const caption =
+                link.title || (link.label !== link.href ? link.label : "");
+              return <YouTube {...youtube} caption={caption} />;
             }
-            const youtube = parseYouTube(url);
-            if (youtube) return <YouTube {...youtube} />;
-            if (THREADS.test(url)) return <Threads url={url} />;
-            if (IMAGE.test(url)) {
-              return (
-                <span className="my-7 block overflow-hidden rounded-xl border border-white/10">
-                  <img src={url} alt="" loading="lazy" className="block w-full" />
-                </span>
-              );
-            }
-            if (VIDEO.test(url)) {
-              return <ArticleVideo src={url} alt="본문 영상" caption="" />;
+            // 라벨을 따로 붙인 링크는 그대로 링크로 둔다.
+            if (!link.label || link.label === link.href) {
+              const url = link.href;
+              const codaroCell = url.match(CODARO_CELL);
+              if (codaroCell) {
+                return <CodaroCellEmbed exampleId={codaroCell[1]} />;
+              }
+              if (THREADS.test(url)) return <Threads url={url} />;
+              if (IMAGE.test(url)) {
+                return (
+                  <span className="my-7 block overflow-hidden rounded-xl border border-white/10">
+                    <img src={url} alt="" loading="lazy" className="block w-full" />
+                  </span>
+                );
+              }
+              if (VIDEO.test(url)) {
+                return <ArticleVideo src={url} alt="본문 영상" caption="" />;
+              }
             }
           }
           return <p className="my-5 leading-[1.85] text-ivory/75">{kids}</p>;
@@ -398,7 +471,13 @@ export function Markdown({ children }: { children: string }) {
           </pre>
         ),
         img: ({ src, alt, title }) =>
-          typeof src === "string" && VIDEO.test(src) ? (
+          typeof src === "string" && MEDIA_PENDING.test(src) ? (
+            <PendingMedia
+              assetKey={src.replace("media://", "")}
+              alt={alt ?? ""}
+              caption={typeof title === "string" ? title : ""}
+            />
+          ) : typeof src === "string" && VIDEO.test(src) ? (
             <ArticleVideo src={src} alt={alt ?? ""} caption={typeof title === "string" ? title : ""} />
           ) : (
             <img

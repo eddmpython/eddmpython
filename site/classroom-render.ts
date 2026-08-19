@@ -5,7 +5,8 @@
  * import 하지 않으므로 교안 번들 없이도 테스트가 돈다.
  *
  * 다루는 것은 교안이 실제로 쓰는 것뿐이다. h2, h4, 문단, 목록, 링크, 코드, 이미지, 영상.
- * 연속된 이미지는 슬라이더가 되고 영상은 재생기가 된다.
+ * 연속된 이미지는 슬라이더가 되고 영상은 재생기가 된다. 바깥 영상은 유튜브 자리가 되고
+ * 아직 발행하지 않은 시각물은 준비 중 자리가 된다.
  */
 
 const ESCAPES: Record<string, string> = {
@@ -29,6 +30,44 @@ export function inline(text: string): string {
 
 const IMAGE = /^!\[([^\]]*)\]\(([^\s)]+)(?:\s+"([^"]*)")?\)$/;
 const VIDEO = /\.(mp4|webm|mov)$/i;
+/** 링크 하나로만 이루어진 문단. 라벨을 캡션으로 쓴다. */
+const SOLO_LINK = /^\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)$/;
+/** 아직 발행하지 않은 시각물 자리. 그대로 두면 깨진 그림이 강의 화면에 뜬다. */
+const PENDING = /^media:\/\/([a-z0-9-]+)$/i;
+const YOUTUBE =
+  /^https?:\/\/(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)([\w-]{6,})|youtube\.com\/shorts\/([\w-]{6,})|youtu\.be\/([\w-]{6,}))(?:[&?#]\S*)?$/;
+
+/** 유튜브 주소 하나를 집는다. shorts 는 세로 영상이라 틀도 세로로 잡는다. */
+export function youtube(url: string): { id: string; tall: boolean } | null {
+  const m = url.match(YOUTUBE);
+  if (!m) return null;
+  return { id: m[1] ?? m[2] ?? m[3], tall: Boolean(m[2]) };
+}
+
+/**
+ * 썸네일만 깔고 누를 때 유튜브를 부른다. 미리 부르면 강의 화면에 검은 칸이 먼저 뜨고
+ * 열지도 않은 영상 때문에 바깥 요청이 나간다. 썸네일은 img 가 아니라 배경으로 넣는다.
+ * article 안의 img 는 누르면 확대가 열리므로 그 자리와 겹치면 안 된다.
+ */
+function youtubeFigure(video: { id: string; tall: boolean }, label: string): string {
+  const watch = video.tall
+    ? `https://www.youtube.com/shorts/${video.id}`
+    : `https://www.youtube.com/watch?v=${video.id}`;
+  const thumb = `url(https://i.ytimg.com/vi/${video.id}/maxresdefault.jpg), url(https://i.ytimg.com/vi/${video.id}/hqdefault.jpg)`;
+  return `<figure class="yt${video.tall ? " tall" : ""}"><div class="frame"><button type="button" class="ytplay" style="background-image:${esc(
+    thumb,
+  )}" data-yt="${esc(video.id)}" data-label="${esc(label)}" aria-label="${esc(
+    label || "YouTube 영상",
+  )} 재생"><span></span></button></div><figcaption><span>${esc(
+    label,
+  )}</span><a href="${esc(watch)}" target="_blank" rel="noreferrer">YouTube에서 열기</a></figcaption></figure>`;
+}
+
+function pendingMedia(key: string, alt: string, caption: string): string {
+  return `<div class="pending"><b>시각물 준비 중</b><span>${esc(alt)}</span>${
+    caption ? `<i>${esc(caption)}</i>` : ""
+  }<i>${esc(key)}</i></div>`;
+}
 
 /** 코드가 아닌 구간을 빈 줄로 갈라 블록마다 태그를 붙인다. */
 function blocks(text: string): string[] {
@@ -44,6 +83,11 @@ function blocks(text: string): string[] {
     if (!b) continue;
     const img = b.match(IMAGE);
     if (img) {
+      const waiting = img[2].match(PENDING);
+      if (waiting) {
+        images.push(pendingMedia(waiting[1], img[1], img[3] ?? ""));
+        continue;
+      }
       // 영상도 시각 자산이다. 확장자로 갈라 태그를 바꾼다.
       if (VIDEO.test(img[2])) {
         flush();
@@ -60,8 +104,14 @@ function blocks(text: string): string[] {
     else if (/^[-*]\s/m.test(b)) {
       const items = b.split("\n").filter((l) => /^[-*]\s/.test(l.trim()));
       out.push(`<ul>${items.map((l) => `<li>${inline(l.trim().slice(2))}</li>`).join("")}</ul>`);
-    } else if (/^https?:\/\/\S+$/.test(b)) out.push(`<p><a href="${esc(b)}">${esc(b)}</a></p>`);
-    else out.push(`<p>${inline(b)}</p>`);
+    } else if (/^https?:\/\/\S+$/.test(b)) {
+      const video = youtube(b);
+      out.push(video ? youtubeFigure(video, "") : `<p><a href="${esc(b)}">${esc(b)}</a></p>`);
+    } else {
+      const solo = b.match(SOLO_LINK);
+      const video = solo ? youtube(solo[2]) : null;
+      out.push(video ? youtubeFigure(video, solo![1]) : `<p>${inline(b)}</p>`);
+    }
   }
   flush();
   return out;

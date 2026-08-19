@@ -85,6 +85,39 @@ check("따옴표와 꺾쇠가 escape 된다", () => {
   assert.equal(esc(`<a href="x">'&`), "&lt;a href=&quot;x&quot;&gt;&#39;&amp;");
 });
 
+check("바깥 영상은 눌러야 부르는 유튜브 자리가 된다", () => {
+  const html = renderMarkdown("[초밥 게임 봇](https://www.youtube.com/watch?v=lfk_T6VKhTE)");
+  assert.ok(html.includes('class="yt"'));
+  assert.ok(html.includes('data-yt="lfk_T6VKhTE"'));
+  assert.ok(html.includes("초밥 게임 봇"));
+  // 미리 부르면 강의 화면에 검은 칸이 먼저 뜨고 열지도 않은 영상이 바깥 요청을 만든다
+  assert.ok(!html.includes("<iframe"));
+  // 썸네일이 img 면 눌렀을 때 영상이 아니라 사진 확대가 열린다
+  assert.ok(!html.includes("<img"));
+});
+
+check("shorts 는 세로 틀로 나간다", () => {
+  const html = renderMarkdown("[엑셀은 zip](https://www.youtube.com/shorts/l4J3QvePJtQ)");
+  assert.ok(html.includes('class="yt tall"'));
+  assert.ok(html.includes("/shorts/l4J3QvePJtQ"));
+});
+
+check("문장 안의 유튜브 링크는 그대로 링크로 둔다", () => {
+  const html = renderMarkdown("먼저 [영상](https://youtu.be/priwCYZJ8h4)을 보시기 바랍니다");
+  assert.ok(html.startsWith("<p>"));
+  assert.ok(!html.includes('class="yt'));
+});
+
+check("발행 전 시각물은 깨진 그림 대신 준비 중 자리가 된다", () => {
+  const html = renderMarkdown('![빈 사무실 모습](media://scheduled-run "캡션")');
+  assert.ok(html.includes('class="pending"'));
+  assert.ok(html.includes("scheduled-run"));
+  assert.ok(html.includes("빈 사무실 모습"));
+  // 자리표시자가 src 로 나가면 브라우저가 페이지를 통째로 다시 내려받는다
+  assert.ok(!html.includes("media://"));
+  assert.ok(!html.includes("<img"));
+});
+
 check("CRLF 교안도 같게 나온다", () => {
   const lf = renderMarkdown("## 제목\n\n본문");
   const crlf = renderMarkdown("## 제목\r\n\r\n본문");
