@@ -22,7 +22,7 @@
     "og": "node --experimental-strip-types scripts/og.mjs",
     "preview": "vite preview",
     "test": "npm run test:blog-style && npm run test:blog-package && npm run test:blog-env && npm run test:hash-navigation && npm run test:visual-plan && npm run test:classroom-render && npm run check:blog && npm run check:skills && tsc --noEmit",
-    "deploy": "npm run build && node scripts/build-course.mjs && npm run check:leak && npm run check:visual && wrangler deploy",
+    "deploy": "npm run build && npm run check:leak && npm run check:visual && wrangler deploy",
     "check:post": "node scripts/check-blog.mjs",
     "check:leak": "node scripts/check-leak.mjs",
     "cr": "node scripts/classroom-admin.mjs --open",

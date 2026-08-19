@@ -9,6 +9,11 @@
  *
  * 방법은 단순하다. 비공개 원본에서 특징적인 문장을 뽑아 공개 산출물에서 찾는다.
  * 하나라도 나오면 실패다.
+ *
+ * 교안은 2026-08-20 에 형제 비공개 저장소 `eddmpython-course` 로 옮겼다. 이 저장소는
+ * 이제 교안을 빌드에 넣지 않으므로 새어 나갈 경로가 구조적으로 없다. 그래도 이 검사를
+ * 남기는 이유는 **블로그가 교안 문장을 옮겨 적는 것**은 여전히 가능하기 때문이다.
+ * 구조가 막는 것과 사람이 옮겨 적는 것은 다른 문제다.
  */
 import { readdirSync, readFileSync, statSync, existsSync } from "node:fs";
 import { join, resolve, relative, extname } from "node:path";
@@ -17,8 +22,23 @@ const SITE = resolve(process.cwd());
 const REPO = resolve(SITE, "..");
 const DIST = resolve(REPO, "..", "eddmpython.out", "site-dist");
 
+/**
+ * 교안 체크아웃이 없으면 검사할 원본이 없다. 그때 조용히 통과하면 이 게이트는 초록불만
+ * 찍는 장식이 된다. 배포는 형제 저장소가 있는 기계에서만 하므로 없으면 멈춘다.
+ */
+function requireCourseCheckout(path) {
+  if (existsSync(path)) return;
+  console.error("교안 체크아웃이 없어 누출을 검사할 수 없습니다.");
+  console.error(`  기대한 곳: ${path}`);
+  console.error("  git clone https://github.com/eddmpython/eddmpython-course ../../eddmpython-course");
+  process.exit(1);
+}
+
 /** 비공개로 취급하는 원본 경로. 여기 있는 글은 공개 산출물에 나오면 안 된다. */
-const PRIVATE_DIRS = [join(REPO, "course")];
+const COURSE_REPO = resolve(REPO, "..", "eddmpython-course");
+// _archive 의 옛 강의 계획도 파는 물건의 일부다. 저장소 자기 문서는 넣지 않는다.
+// 그것은 공개 사이트와 같은 낱말을 쓰므로 우연히 겹친다.
+const PRIVATE_DIRS = [join(COURSE_REPO, "curriculum"), join(COURSE_REPO, "_archive")];
 
 /** 본문을 읽을 확장자. 이미지와 문서 바이너리는 문자열 비교 대상이 아니다. */
 const TEXT_EXT = new Set([".md", ".txt", ".json", ".mdx", ".html"]);
@@ -56,6 +76,7 @@ function phrasesFrom(text) {
   return [...new Set(found)].slice(0, MAX_PHRASES_PER_FILE);
 }
 
+PRIVATE_DIRS.forEach(requireCourseCheckout);
 const privateFiles = PRIVATE_DIRS.flatMap(walk).filter((path) => TEXT_EXT.has(extname(path).toLowerCase()));
 const phrases = new Map();
 for (const path of privateFiles) {

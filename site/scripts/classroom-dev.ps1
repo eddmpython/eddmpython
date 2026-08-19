@@ -1,13 +1,14 @@
 # 강의장 로컬 테스트. 바탕화면 바로가기 "eddmpython 강의장 테스트" 가 이 파일을 부른다.
 #
 # 하는 일 다섯이다.
-#   1. course/curriculum 을 Worker 번들용 모듈로 다시 굽는다
+#   1. 형제 저장소 eddmpython-course 의 교안을 로컬 KV 에 넣는다
 #   2. 운영 설정과 .dev.vars 의 토큰을 맞춘다
 #   3. 클라이언트 빌드 산출물이 없으면 만든다 (강의장만 볼 거면 없어도 되지만 /blog 가 깨진다)
 #   4. 운영 화면을 따로 띄운다. 로컬 대상으로 잡혀 있다
 #   5. wrangler dev 를 띄운다
 #
 # 교안을 고친 뒤 다시 실행하면 1번이 최신 내용을 반영한다.
+# 교안만 바꿨으면 eddmpython-course 에서 npm run publish:local 만 해도 된다.
 
 $ErrorActionPreference = 'Stop'
 $site = Split-Path -Parent $PSScriptRoot
@@ -18,8 +19,16 @@ Write-Host ''
 Write-Host '  강의장 로컬 테스트' -ForegroundColor Cyan
 Write-Host '  ------------------'
 
-Write-Host '  1/4  교안을 다시 굽는 중...' -ForegroundColor DarkGray
-node scripts/build-course.mjs
+Write-Host '  1/4  교안을 로컬 강의장에 넣는 중...' -ForegroundColor DarkGray
+$course = Join-Path $repo '..\eddmpython-course'
+if (Test-Path $course) {
+    Push-Location $course
+    node scripts/publish.mjs --local
+    Pop-Location
+} else {
+    Write-Host '  교안 저장소가 없습니다. 강의장이 빈 채로 뜹니다' -ForegroundColor Yellow
+    Write-Host '  git clone https://github.com/eddmpython/eddmpython-course ..\..\eddmpython-course' -ForegroundColor DarkGray
+}
 
 Write-Host '  2/4  운영 토큰을 맞추는 중...' -ForegroundColor DarkGray
 node scripts/classroom-admin.mjs --sync-only

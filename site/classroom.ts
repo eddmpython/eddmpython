@@ -10,14 +10,38 @@
  *
  * 4번이 이 파일이 존재하는 이유다. 클라이언트에서 거르면 개발자 도구로 앞 내용을 먼저 본다.
  */
-import { COURSE, type CourseCategory } from "./course-content.generated";
 import { esc, renderMarkdown } from "./classroom-render";
 
 export type Env = {
   CLASSROOM: DurableObjectNamespace;
+  /** 교안 묶음이 들어 있다. eddmpython-course 저장소가 발행한다. */
+  COURSE: KVNamespace;
   /** 로컬 운영 화면이 이 Worker 를 조종할 때 쓰는 토큰. 배포 때 한 번 넣는 유일한 비밀값이다. */
   CR_ADMIN_TOKEN?: string;
 };
+
+export type CoursePost = { id: string; title: string; summary: string; body: string };
+export type CourseCategory = { slug: string; order: number; title: string; posts: CoursePost[] };
+type CourseBundle = { schema: number; categories: CourseCategory[] };
+
+/** 묶음의 모양은 eddmpython-course 와의 계약이다. 바꾸면 양쪽을 같은 날 같이 고친다. */
+const COURSE_SCHEMA = 1;
+
+/**
+ * 교안을 KV 에서 읽는다.
+ *
+ * **이 저장소에는 교안 글자가 한 자도 없다.** 예전에는 빌드 때 교안 폴더를 읽어 Worker
+ * 번들에 구웠다. 그러면 교안을 한 줄 고칠 때마다 공개 사이트를 통째로 배포해야 했고,
+ * 공개 저장소 옆에 파는 물건을 두고 훅과 누출 검사로 지켜야 했다.
+ *
+ * 이제 교안은 비공개 저장소가 KV 로 따로 발행한다. 사이트 배포와 교안 발행이 서로를
+ * 기다리지 않는다.
+ */
+async function course(env: Env): Promise<CourseCategory[]> {
+  const bundle = await env.COURSE.get<CourseBundle>("bundle", { type: "json", cacheTtl: 60 });
+  if (!bundle || bundle.schema !== COURSE_SCHEMA) return [];
+  return [...bundle.categories].sort((a, b) => a.order - b.order);
+}
 
 /** 방 하나. 비밀번호는 원문을 두지 않고 salt 를 섞어 늘린 해시만 둔다. */
 export type Room = {
@@ -444,8 +468,8 @@ function loginPage(slug: string, title: string, message = ""): Response {
 
 /* 라우팅 ---------------------------------------------------------------- */
 
-function visible(unlocked: string[]): CourseCategory[] {
-  return COURSE.filter((c) => unlocked.includes(c.slug)).sort((a, b) => a.order - b.order);
+function visible(categories: CourseCategory[], unlocked: string[]): CourseCategory[] {
+  return categories.filter((c) => unlocked.includes(c.slug));
 }
 
 const poll = (slug: string) => `
@@ -486,9 +510,11 @@ async function admin(request: Request, env: Env): Promise<Response> {
     ok: true,
     result: data,
     rooms: listed.rooms,
-    categories: [...COURSE]
-      .sort((a, b) => a.order - b.order)
-      .map((c) => ({ slug: c.slug, title: c.title, posts: c.posts.length })),
+    categories: (await course(env)).map((c) => ({
+      slug: c.slug,
+      title: c.title,
+      posts: c.posts.length,
+    })),
   });
 }
 
@@ -564,7 +590,7 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
     );
   }
 
-  const open = visible(room.unlocked);
+  const open = visible(await course(env), room.unlocked);
 
   if (parts.length === 1) {
     const cards = open.length
