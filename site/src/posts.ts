@@ -35,8 +35,10 @@ const files = import.meta.glob("../../blog/*/???-*.md", {
 const slugPattern = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const readingOrderBySlug = new Map(blogOrder.posts.map((entry) => [entry.slug, entry.order]));
 const categoryBySlug = new Map(blogOrder.posts.map((entry) => [entry.slug, entry.category]));
-/* 아카이브한 글은 /blog 목록에서만 빠진다. URL 과 sitemap 은 그대로 두어 검색 유입을 지킨다. */
-const archivedSlugs = new Set(blogOrder.archived.map((entry) => entry.slug));
+/* 아카이브한 글은 /blog 목록에서만 빠진다. URL 과 sitemap 은 그대로 두어 검색 유입을 지킨다.
+   비어 있으면 JSON import 가 never[] 로 추론되므로 원소 모양을 직접 적는다. */
+const archivedEntries = blogOrder.archived as { slug: string; note?: string }[];
+const archivedSlugs = new Set(archivedEntries.map((entry) => entry.slug));
 
 export type Category = {
   slug: string;

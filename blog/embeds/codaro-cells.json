@@ -4,85 +4,8 @@
     "python-bungeoppang-order": {
       "title": "붕어빵 수량과 가격 계산하기",
       "description": "팥 수량을 2에서 5로 바꾸고 실행해서 전체 개수와 가격이 함께 달라지는지 확인합니다.",
-      "code": "menu = {\"팥\": 2, \"슈크림\": 1}\nprice = 1000\n\ncount = sum(menu.values())\ntotal = count * price\n\nf\"붕어빵 {count}개, {total:,}원\"",
+      "code": "red_bean = 2\ncustard = 1\nprice = 1000\n\ncount = red_bean + custard\ntotal = count * price\n\nprint(f\"붕어빵 {count}개, {total:,}원\")",
       "hint": "가입 없이 브라우저 안에서 실행됩니다",
-      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
-    },
-    "city-sales-ranking": {
-      "title": "도시별 매출을 합쳐 1위 찾기",
-      "description": "금액을 바꾸거나 도시를 추가한 뒤 실행해서 집계 결과가 어떻게 달라지는지 확인합니다.",
-      "code": "sales = [(\"서울\", 120), (\"부산\", 85), (\"대구\", 64), (\"서울\", 40)]\n\ntotals = {}\nfor city, amount in sales:\n    totals[city] = totals.get(city, 0) + amount\n\nranking = sorted(totals.items(), key=lambda row: row[1], reverse=True)\nf\"합계: {totals}\\n1위: {ranking[0][0]} ({ranking[0][1]:,}만원)\"",
-      "hint": "가입 없이 브라우저 안에서 실행됩니다",
-      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
-    },
-    "expense-variables": {
-      "title": "부서와 기준금액 바꾸기",
-      "description": "department와 amount_limit 값을 바꾼 뒤 실행해서 마지막 문장이 함께 달라지는지 확인합니다.",
-      "code": "department = \"영업팀\"\namount = 120000\namount_limit = 100000\n\nf\"{department}: {amount:,}원, 기준 {amount_limit:,}원\"",
-      "hint": "영업팀을 관리팀으로, 100000을 150000으로 바꿔봅니다",
-      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
-    },
-    "expense-list-total": {
-      "title": "거래 세 건의 개수와 합계 구하기",
-      "description": "amounts에 금액을 하나 추가한 뒤 실행해서 거래 건수와 합계가 같이 늘어나는지 확인합니다.",
-      "code": "amounts = [50000, 120000, 80000]\n\ncount = len(amounts)\ntotal = sum(amounts)\n\nf\"{count}건, 합계 {total:,}원\"",
-      "hint": "목록 끝에 30000을 추가하고 다시 실행합니다",
-      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
-    },
-    "expense-column-map": {
-      "title": "서로 다른 열 이름 연결하기",
-      "description": "column_name을 다른 키로 바꾸고 실행해서 표준 열 이름이 어떻게 선택되는지 확인합니다.",
-      "code": "column_map = {\n    \"사용일\": \"일자\",\n    \"조직\": \"부서\",\n    \"사용금액\": \"금액\",\n}\n\ncolumn_name = \"사용금액\"\nstandard_name = column_map[column_name]\n\nf\"{column_name} -> {standard_name}\"",
-      "hint": "사용금액을 조직으로 바꾸고 다시 실행합니다",
-      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
-    },
-    "expense-condition": {
-      "title": "기준금액으로 거래 분류하기",
-      "description": "amount나 amount_limit 값을 바꾼 뒤 실행해서 정상과 확인필요가 어느 지점에서 바뀌는지 확인합니다.",
-      "code": "amount = 100000\namount_limit = 100000\n\nif amount >= amount_limit:\n    result = \"확인필요\"\nelse:\n    result = \"정상\"\n\nf\"{amount:,}원: {result}\"",
-      "hint": "amount를 99999와 100000으로 각각 실행합니다",
-      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
-    },
-    "expense-loop": {
-      "title": "여러 금액을 차례로 분류하기",
-      "description": "amounts의 값을 바꾼 뒤 실행해서 목록의 모든 금액이 한 줄씩 분류되는지 확인합니다.",
-      "code": "amounts = [50000, 120000, 80000]\namount_limit = 100000\nresults = []\n\nfor amount in amounts:\n    if amount >= amount_limit:\n        label = \"확인필요\"\n    else:\n        label = \"정상\"\n    results.append(f\"{amount:,}원: {label}\")\n\n\"\\n\".join(results)",
-      "hint": "목록에 100000을 추가하고 네 줄이 나오는지 확인합니다",
-      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
-    },
-    "expense-function": {
-      "title": "분류 규칙을 세 번 다시 사용하기",
-      "description": "classify_expense의 기준을 바꾸거나 samples에 금액을 추가해서 같은 규칙이 다시 적용되는지 확인합니다.",
-      "code": "def classify_expense(amount, amount_limit=100000):\n    if amount >= amount_limit:\n        return \"확인필요\"\n    return \"정상\"\n\nsamples = [50000, 120000, 80000]\nresults = [classify_expense(amount) for amount in samples]\n\nlist(zip(samples, results))",
-      "hint": "기준 100000을 50000으로 바꾸고 결과 세 개를 비교합니다",
-      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
-    },
-    "expense-syntax-together": {
-      "title": "여섯 문법으로 지출내역 처리하기",
-      "description": "부서별 거래 목록을 읽어 기준금액 이상을 표시하고 전체 합계를 계산하는 작은 업무 흐름입니다.",
-      "code": "column_map = {\"조직\": \"부서\", \"사용금액\": \"금액\"}\nrecords = [\n    {\"조직\": \"영업팀\", \"사용금액\": 50000},\n    {\"조직\": \"관리팀\", \"사용금액\": 120000},\n    {\"조직\": \"영업팀\", \"사용금액\": 80000},\n]\namount_limit = 100000\n\ndef classify_expense(amount, limit):\n    if amount >= limit:\n        return \"확인필요\"\n    return \"정상\"\n\nresults = []\ntotal = 0\nflagged_count = 0\n\nfor record in records:\n    amount = record[\"사용금액\"]\n    label = classify_expense(amount, amount_limit)\n    results.append({\n        column_map[\"조직\"]: record[\"조직\"],\n        column_map[\"사용금액\"]: amount,\n        \"결과\": label,\n    })\n    total = total + amount\n    if label == \"확인필요\":\n        flagged_count = flagged_count + 1\n\nprint(f\"합계 {total:,}원\")\nprint(f\"확인필요 {flagged_count}건\")\nfor result in results:\n    print(f\"{result['부서']}: {result['금액']:,}원, {result['결과']}\")",
-      "hint": "120000을 90000으로 바꾸고 확인필요 항목이 사라지는지 봅니다",
-      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
-    },
-    "expense-execution-order": {
-      "title": "금액을 저장한 순서대로 계산하기",
-      "description": "금액과 배송비를 먼저 저장한 뒤 합계를 계산해 각 줄의 결과가 아래 줄에서 사용되는지 확인합니다.",
-      "code": "amount = 120000\nfee = 30000\ntotal = amount + fee\n\nf\"합계 {total:,}원\"",
-      "hint": "amount나 fee를 바꾸고 마지막 합계를 다시 확인합니다",
-      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
-    },
-    "expense-number-text": {
-      "title": "숫자 덧셈과 문자 덧셈 비교하기",
-      "description": "따옴표가 없는 금액과 따옴표가 있는 금액을 각각 더해 자료형에 따라 결과가 달라지는지 확인합니다.",
-      "code": "number_total = 120000 + 30000\ntext_total = \"120000\" + \"30000\"\n\nf\"숫자 덧셈: {number_total}\\n문자 덧셈: {text_total}\"",
-      "hint": "각 값에서 따옴표를 넣거나 빼고 결과를 비교합니다",
-      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
-    },
-    "expense-amount-conversion": {
-      "title": "문자 금액을 계산 가능한 숫자로 바꾸기",
-      "description": "앞뒤 공백과 쉼표 및 마지막 원 표시를 정리하고 빈칸을 거부한 뒤 배송비를 더해 숫자 합계를 확인합니다.",
-      "code": "def parse_won(raw):\n    if isinstance(raw, bool):\n        raise TypeError(\"참거짓은 금액이 아님\")\n    if isinstance(raw, int):\n        return raw\n    if not isinstance(raw, str):\n        raise TypeError(\"문자열이나 정수가 아님\")\n\n    cleaned = raw.strip().replace(\",\", \"\")\n    if cleaned.endswith(\"원\"):\n        cleaned = cleaned[:-1].strip()\n    if cleaned == \"\":\n        raise ValueError(\"빈 금액\")\n\n    try:\n        return int(cleaned)\n    except ValueError as error:\n        raise ValueError(\"숫자가 아닌 금액\") from error\n\nraw_amount = \"120,000원\"\namount = parse_won(raw_amount)\nfee = 30000\ntotal = amount + fee\n\nf\"원문 {raw_amount} -> 합계 {total:,}원\"",
-      "hint": "120,000원을 85,000원으로 바꾸고 합계가 115,000원이 되는지 봅니다",
       "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
     }
   }

@@ -10,7 +10,7 @@
 | `product-marketing.md` | 제품 카피 맥락 |
 | `order.json` | `/blog` 목록의 카테고리와 읽기 순서 |
 | `media/` | 이미지 계획과 HF 객체 대응 |
-| `scripts/` | 미디어 발행 스크립트 |
+| `scripts/` | 미디어 발행 스크립트와 원장 대조 도구 |
 | `embeds/` | 본문에 붙는 실행 셀 |
 | `<category-slug>/` | 카테고리 한 묶음의 글과 원장 |
 
@@ -24,7 +24,20 @@
 4. 글 파일은 `blog/<category-slug>/NNN-kebab.md`다. `NNN`은 저장소 전체에서 001부터 빈 번호 없이 이어진다.
 5. 목록에 올릴 글만 `order.json`의 `posts`에 넣는다. 나머지는 `archived`에 두고 URL은 살린다.
 
-새 카테고리의 글 제목 사슬은 그 폴더의 `원장.md`가 정본이다. 이 파일은 폴더 규칙만 적는다.
+새 카테고리의 글 제목 사슬과 글마다의 절 사슬은 그 폴더의 `원장.md`가 정본이다.
+이 파일은 폴더 규칙만 적는다.
+
+## 절 사슬을 볼 때
+
+설계 메모는 글 파일 안에 두지 않는다. 사이트가 글 원문 전체를 공개 JS 번들로 굽기 때문이다.
+까닭과 절 판정 어휘는 `PIPELINE.md`의 `예고는 이음이 아니다` 항에 있다.
+
+```text
+python blog/scripts/outline.py                 원장과 본문 H2 를 대조한다
+python blog/scripts/outline.py --chain          절 사슬을 한 화면에 편다
+```
+
+이 도구는 게이트가 아니다. `npm test`에 걸지 않는다. 글을 고치는 동안 쓴다.
 
 ## 지금 있는 카테고리
 
