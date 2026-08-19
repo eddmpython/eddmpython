@@ -1,6 +1,19 @@
 {
   "version": 3,
-  "categories": [],
-  "posts": [],
+  "categories": [
+    {
+      "slug": "ai-workflow",
+      "title": "AI와 일하기",
+      "order": 1,
+      "summary": "AI 코딩 도구가 이 저장소의 명령과 경계를 스스로 조사하고 문서로 남기게 만드는 방법을 다룹니다."
+    }
+  ],
+  "posts": [
+    {
+      "order": 1,
+      "slug": "ai-environment",
+      "category": "ai-workflow"
+    }
+  ],
   "archived": []
 }

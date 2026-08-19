@@ -145,13 +145,24 @@ function redirect(to: string, requestUrl: URL): Response {
   });
 }
 
+import { handleClassroom, type Env as ClassroomEnv } from "./classroom";
+
+export { Classroom } from "./classroom";
+
 export default {
-  async fetch(request: Request, env: { ASSETS: Fetcher }): Promise<Response> {
+  async fetch(request: Request, env: { ASSETS: Fetcher } & ClassroomEnv): Promise<Response> {
     const url = new URL(request.url);
     const pathname = url.pathname.replace(/\/$/, "") || "/";
 
     const legacy = LEGACY_BLOG[pathname] ?? LEGACY_BLOG[url.pathname];
     if (legacy) return redirect(legacy, url);
+
+    // 강의장. 교안 본문은 Worker 안에만 있고 인증을 통과한 요청에만 내려간다.
+    // 정적 자산보다 먼저 잡아야 /cr 이 index.html 로 새지 않는다.
+    if (pathname === "/cr" || pathname.startsWith("/cr/")) {
+      const res = await handleClassroom(request, env as unknown as ClassroomEnv, url);
+      return withHeaders(res, (res.headers.get("content-type") ?? "").includes("text/html"));
+    }
 
     const first = url.pathname.split("/")[1] ?? "";
     const upstream = PROXIED[first];

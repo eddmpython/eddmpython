@@ -20,5 +20,10 @@
     // 보안 헤더를 모든 응답에 붙이려면 Worker 가 먼저 돌아야 한다.
     "run_worker_first": true
   },
+  // 강의장 열림 상태. 수강생 여럿이 같은 인스턴스를 보고 운영자 클릭이 즉시 반영된다.
+  "durable_objects": {
+    "bindings": [{ "name": "CLASSROOM", "class_name": "Classroom" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Classroom"] }],
   "observability": { "enabled": true }
 }

@@ -45,6 +45,9 @@ function phrasesFrom(text) {
     const line = raw.trim();
     if (line.length < MIN_PHRASE) continue;
     if (/^[#>\-*|`{}\[\]"',:]/.test(line)) continue;
+    // frontmatter 는 어느 글에나 같은 줄이 있다. author 나 ogImageWidth 같은 것이 공개 글에서
+    // 발견되는 것은 누출이 아니라 같은 계약을 쓴다는 뜻이다. 본문만 센다.
+    if (/^[A-Za-z][A-Za-z0-9]*:\s/.test(line)) continue;
     for (const sentence of line.split(/(?<=[.!?])\s+/)) {
       const phrase = sentence.trim();
       if (phrase.length >= MIN_PHRASE && /[가-힣A-Za-z]/.test(phrase)) found.push(phrase);

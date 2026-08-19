@@ -66,3 +66,13 @@ Thumbs.db
 Desktop.ini
 
 원장.md
+
+# 강의장 교안 번들. 유료 자료라 추적하지 않는다. build-course.mjs 가 만든다.
+site/course-content.generated.ts
+
+# 파이썬 도구 찌꺼기
+.pytest_cache/
+.benchmarks/
+__pycache__/
+.ruff_cache/
+.mypy_cache/

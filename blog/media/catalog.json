@@ -1,5 +1,48 @@
 {
-  "assets": {},
+  "assets": {
+    "001-ai-needs-an-environment/authority-guardrails": {
+      "assetKey": "authority-guardrails",
+      "path": "objects/sha256/22/224f77ce7c9528b75c42653dfc4bcaf96ff50057765096fdb5db81ce568767a0.png",
+      "post": "001-ai-needs-an-environment",
+      "sha256": "224f77ce7c9528b75c42653dfc4bcaf96ff50057765096fdb5db81ce568767a0"
+    },
+    "001-ai-needs-an-environment/clean-session": {
+      "assetKey": "clean-session",
+      "path": "objects/sha256/e7/e73d4c46c9f28f6baeb7f7ea09433ca25fe59858416f9280899289784c47d09e.png",
+      "post": "001-ai-needs-an-environment",
+      "sha256": "e73d4c46c9f28f6baeb7f7ea09433ca25fe59858416f9280899289784c47d09e"
+    },
+    "001-ai-needs-an-environment/command-proof": {
+      "assetKey": "command-proof",
+      "path": "objects/sha256/39/399fba52cdd484055106cfa88c8685f42755cdf44fc6783b96b3364b49f55427.png",
+      "post": "001-ai-needs-an-environment",
+      "sha256": "399fba52cdd484055106cfa88c8685f42755cdf44fc6783b96b3364b49f55427"
+    },
+    "001-ai-needs-an-environment/instruction-files": {
+      "assetKey": "instruction-files",
+      "path": "objects/sha256/f3/f3e10a5d91b6ab8315e0cf92c2221462ebc8c81bf2e4b04e5018da6eca3f7bb1.png",
+      "post": "001-ai-needs-an-environment",
+      "sha256": "f3e10a5d91b6ab8315e0cf92c2221462ebc8c81bf2e4b04e5018da6eca3f7bb1"
+    },
+    "001-ai-needs-an-environment/instruction-priority": {
+      "assetKey": "instruction-priority",
+      "path": "objects/sha256/9e/9ec099a01c225754a9858ee09900021d41029f455c545e2bf592e88e4eb3cebb.png",
+      "post": "001-ai-needs-an-environment",
+      "sha256": "9ec099a01c225754a9858ee09900021d41029f455c545e2bf592e88e4eb3cebb"
+    },
+    "001-ai-needs-an-environment/link-as-contract": {
+      "assetKey": "link-as-contract",
+      "path": "objects/sha256/a0/a0c462b2c0a8e3ae2613698435f23c9eaa57e030b10e9c4cc38fa9fcc9f1316a.png",
+      "post": "001-ai-needs-an-environment",
+      "sha256": "a0c462b2c0a8e3ae2613698435f23c9eaa57e030b10e9c4cc38fa9fcc9f1316a"
+    },
+    "001-ai-needs-an-environment/repository-evidence": {
+      "assetKey": "repository-evidence",
+      "path": "objects/sha256/5b/5b147cfff2b937f6ec69165c7d43e5a97c96d8febc2e782ff0507fc4fff00673.png",
+      "post": "001-ai-needs-an-environment",
+      "sha256": "5b147cfff2b937f6ec69165c7d43e5a97c96d8febc2e782ff0507fc4fff00673"
+    }
+  },
   "objectPrefix": "objects/sha256",
   "objects": {
     "020528bc20cee60f70fda075614478b8b0a538fecc60a685e2ecf70a0ddf1ab7": {
