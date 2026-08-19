@@ -46,7 +46,6 @@ const STRICT_MARKUP_ANCHOR = /`[^`]+`|\[[^\]]+\]\([^)]+\)/u;
 const DEFINITION_OPENER =
   /^\S{2,12}(?:은|는)\s[^.]{0,45}(?:입니다|말입니다|일입니다|뜻입니다|성질입니다|규칙입니다|순서입니다)\./u;
 const DEFINITION_RATIO_MAX = 0.1;
-const LENGTH_VARIATION_MIN = 0.25;
 const CONCRETE_OBJECT =
   /(?:화면|버튼|메뉴|명령|코드|파일|폴더|URL|링크|오류|에러|로그|테스트|값|숫자|터미널|브라우저|표|줄)/u;
 const OBSERVABLE_ACTION =
@@ -107,21 +106,12 @@ function narrativeParagraphs(body) {
 export function lintProseTexture(body) {
   const issues = [];
   const paragraphs = narrativeParagraphs(body);
-  if (paragraphs.length < 6) return issues;
-
-  const lengths = paragraphs.map((paragraph) => paragraph.replace(/\s/g, "").length);
-  const mean = lengths.reduce((sum, value) => sum + value, 0) / lengths.length;
-  const deviation = Math.sqrt(
-    lengths.reduce((sum, value) => sum + (value - mean) ** 2, 0) / lengths.length,
-  );
-  const variation = mean ? deviation / mean : 0;
-  if (variation < LENGTH_VARIATION_MIN) {
-    issues.push({
-      location: "본문 리듬",
-      message: `문단 길이가 너무 고릅니다. 길이 변동계수 ${variation.toFixed(3)}이 ${LENGTH_VARIATION_MIN} 미만입니다`,
-      excerpt: `문단 ${lengths.length}개, 최단 ${Math.min(...lengths)}자, 최장 ${Math.max(...lengths)}자`,
-    });
-  }
+  
+  // 문단 길이 변동계수 검사를 2026-08-19 에 뺐다. 운영자 네이버 글에서 뽑은 수치였는데
+  // 그 문단 2,011개의 52퍼센트가 종결 없이 끝난다. 네이버의 짧은 블록은 줄바꿈이지 문단이
+  // 아니어서 마크다운으로 옮기면 단위가 다르다. 이 검사가 실제로는 절 하나의 설명을 여러
+  // 문단으로 쪼개게 만들었고 화면에서 고립된 줄이 쌓였다. 리듬은 문단이 아니라 절이 만든다.
+  // 대신 lintSectionPackages 가 절마다 설명 문단이 하나인지 검사한다.
 
   // 문장 하나가 추상어를 쓰면 그 문장 안에 실물이 있어야 한다. 문단 단위로 재던
   // 검사는 추상 문장 하나가 구체적인 이웃 문장에 묻어가는 것을 막지 못했다.

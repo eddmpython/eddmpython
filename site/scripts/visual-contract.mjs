@@ -131,7 +131,7 @@ const ROUTE_RULES = [
     match: (path) => path === "/blog/what-automation-does",
     id: "what-automation-does",
     checks: [
-      TEXT("article#content h2", "화면을 대신 눌러 줍니다"),
+      TEXT("article#content h2", "마우스를 사람이 안 잡아도 그림이 그려집니다"),
       COUNT("article#content video", { exact: 5 }),
       COUNT('article#content source[src$=".mp4"]', { exact: 5 }),
     ],

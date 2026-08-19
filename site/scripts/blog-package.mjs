@@ -153,6 +153,40 @@ export function lintSeoPackage(meta, body, sections) {
   return issues;
 }
 
+/** 서술 문단이 아닌 블록. 이걸로 갈린 자리는 설명이 쪼개진 것으로 보지 않는다. */
+function isNonProse(block) {
+  return (
+    !block ||
+    /^(?:```|~~~|#{1,6}\s|!\[|[-*+]\s|\d+[.)]\s|>|\||https?:\/\/)/u.test(block) ||
+    block.split("|").every((part) => /^:?-+:?$/.test(part.trim()))
+  );
+}
+
+/** 절 본문에서 연달아 붙어 있는 서술 문단 묶음만 뽑는다. */
+export function consecutiveProseRuns(remainder) {
+  const runs = [];
+  let run = [];
+  let inFence = false;
+  for (const raw of String(remainder ?? "").split(/(?:\r?\n){2,}/)) {
+    const block = raw.trim();
+    const fences = (block.match(/^(?:```|~~~)/gmu) ?? []).length;
+    if (inFence || fences % 2 === 1) {
+      inFence = fences % 2 === 1 ? !inFence : inFence;
+      if (run.length) runs.push(run);
+      run = [];
+      continue;
+    }
+    if (isNonProse(block)) {
+      if (run.length) runs.push(run);
+      run = [];
+      continue;
+    }
+    run.push(block.replace(/\s+/gu, " "));
+  }
+  if (run.length) runs.push(run);
+  return runs;
+}
+
 export function lintSectionPackages(
   sections,
   { requireCodeLabels = false, strictLead = true, openLabels = false, checkLabels = true } = {},
@@ -182,6 +216,20 @@ export function lintSectionPackages(
       (parsed.subtitle.length < 15 || parsed.subtitle.length > 80 || VAGUE_SUBTITLE.test(parsed.subtitle))
     ) {
       issues.push(issue(`H2 ${section.heading}`, "부제는 15자 이상 80자 이하의 구체적인 한 문장으로 씁니다", parsed.subtitle));
+    }
+    // 한 절의 설명글은 한 문단이다. 설명이 길어지거나 두 덩어리가 되면 절을 나눈다.
+    // 2026-08-19 에 운영자가 정했다. 빈 줄 하나가 화면에서 1.25em 여백이라 설명을 쪼개면
+    // 고립된 줄이 쌓여 안 읽힌다. 시각물, 코드, 실행 칸, 목록, 표로 갈린 것은 세지 않고
+    // 붙어 있는 서술 문단만 센다.
+    for (const run of consecutiveProseRuns(parsed.remainder)) {
+      if (run.length < 2) continue;
+      issues.push(
+        issue(
+          `H2 ${section.heading}`,
+          `설명글이 ${run.length}문단으로 갈렸습니다. 한 절의 설명은 한 문단이고, 두 덩어리면 절을 나눕니다`,
+          run.map((block) => block.slice(0, 18)).join(" / "),
+        ),
+      );
     }
     if (/^(?:```|#{1,6}\s|[-*+]\s|\d+[.)]\s|>|\|)/u.test(parsed.firstBlock)) {
       issues.push(issue(`H2 ${section.heading}`, "이미지 다음에는 코드나 목록보다 쉬운 서술형 설명을 먼저 씁니다", parsed.firstBlock));
