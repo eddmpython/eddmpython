@@ -162,6 +162,37 @@ const ROUTE_RULES = [
     ],
   },
   {
+    match: (path) => path === "/blog/python-basic-syntax",
+    id: "python-basic-syntax",
+    checks: [
+      TEXT("article#content h2", "파이썬 기초문법, 1분이면 된다고 하면 믿기시나요"),
+      COUNT("article#content img", { exact: 8 }),
+      COUNT('a[href="https://www.youtube.com/shorts/priwCYZJ8h4"]', { min: 1 }),
+      COUNT('aside[aria-label^="Codaro 실습 셀:"]', { exact: 7 }),
+      VISIBLE('aside[aria-label="Codaro 실습 셀: 기준금액으로 거래 분류하기"] textarea'),
+    ],
+    captures: [
+      {
+        id: "syntax-learning-map",
+        selector: "article#content figure:first-of-type",
+      },
+      {
+        id: "condition-cell",
+        selector: 'aside[aria-label="Codaro 실습 셀: 기준금액으로 거래 분류하기"]',
+      },
+    ],
+    interactions: [
+      {
+        id: "run-condition-example",
+        type: "click-until-text",
+        click: 'aside[aria-label="Codaro 실습 셀: 기준금액으로 거래 분류하기"] button',
+        target: 'aside[aria-label="Codaro 실습 셀: 기준금액으로 거래 분류하기"] output',
+        includes: "100,000원: 확인필요",
+        timeoutMs: 120_000,
+      },
+    ],
+  },
+  {
     match: (path) => path === "/blog/first-python-code",
     id: "first-python-code",
     checks: [
