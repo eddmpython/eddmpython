@@ -153,6 +153,11 @@ def compare(post: LedgerPost, category: Path) -> list[str]:
         return problems
 
     target = category / post.filename
+    if not target.exists():
+        # 교안은 원장 하나가 여러 카테고리 폴더를 덮는다. 한 단계 아래까지 찾는다.
+        nested = sorted(category.glob(f"*/{post.filename}"))
+        if len(nested) == 1:
+            target = nested[0]
     parked = category / "temp" / post.filename
 
     if not target.exists():
@@ -270,21 +275,34 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="원장의 절 사슬과 글의 H2를 대조한다")
     parser.add_argument("--category", help="카테고리 폴더 이름. 없으면 전부 본다")
     parser.add_argument("--chain", action="store_true", help="절 사슬을 한 화면에 편다")
+    parser.add_argument(
+        "--root",
+        default="",
+        help="카테고리를 찾을 폴더. 교안은 course/curriculum 을 준다",
+    )
     args = parser.parse_args()
 
+    root_dir = Path(args.root).resolve() if args.root else CONTENT_DIR
+    if not root_dir.is_dir():
+        print(f"{root_dir} 폴더가 없다")
+        return 2
+
     if args.category:
-        target = CONTENT_DIR / args.category
+        target = root_dir / args.category
         if not target.is_dir():
             print(f"{args.category} 폴더가 없다")
             return 2
         categories = [target]
     else:
         categories = sorted(
-            path for path in CONTENT_DIR.iterdir() if path.is_dir() and (path / LEDGER_NAME).exists()
+            path for path in root_dir.iterdir() if path.is_dir() and (path / LEDGER_NAME).exists()
         )
+        # 교안처럼 원장이 root 에 하나만 있는 배치도 받는다.
+        if not categories and (root_dir / LEDGER_NAME).exists():
+            categories = [root_dir]
 
     if not categories:
-        print("원장을 가진 카테고리가 없다")
+        print(f"{root_dir} 아래에 원장을 가진 카테고리가 없다")
         return 2
 
     return run(categories, args.chain)

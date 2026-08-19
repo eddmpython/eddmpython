@@ -546,8 +546,41 @@ def verify_remote() -> None:
     print(f"블로그 미디어 원격 검증: 객체 {len(paths)}개")
 
 
+def course_referenced_sha() -> set[str]:
+    """교안이 쓰는 객체 sha 를 모은다.
+
+    교안 plan 은 course 아래에 있고 공개 catalog 의 assets 에 등록되지 않는다. 그래서
+    catalog 만 보면 교안이 쓰는 객체가 전부 참조 없음으로 보인다. 2026-08-19 에 실제로
+    279개 전부가 삭제 대상으로 잡혔다. 교안 plan 과 교안 본문을 함께 세어 그것을 막는다.
+    """
+    referenced: set[str] = set()
+    course_root = REPO_ROOT / "course" / "curriculum"
+    if not course_root.is_dir():
+        return referenced
+    for plan_path in course_root.rglob("plan.json"):
+        try:
+            plan = json.loads(plan_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        for bucket in ("inventory", "assets"):
+            entries = plan.get(bucket)
+            if not isinstance(entries, dict):
+                continue
+            for record in entries.values():
+                if isinstance(record, dict) and record.get("sha256"):
+                    referenced.add(str(record["sha256"]))
+    # 본문이 URL 로 직접 참조하는 것도 센다. plan 에 없을 수 있다.
+    for md in course_root.rglob("*.md"):
+        try:
+            text = md.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        referenced.update(SHA256_RE.findall(text))
+    return referenced
+
+
 def unreferenced_objects(catalog: dict) -> list[str]:
-    """assets 가 가리키지 않는 객체 sha 목록을 돌려준다."""
+    """어디서도 가리키지 않는 객체 sha 목록을 돌려준다. 교안 참조를 함께 센다."""
     objects = catalog.get("objects") or {}
     assets = catalog.get("assets") or {}
     referenced = {
@@ -555,6 +588,7 @@ def unreferenced_objects(catalog: dict) -> list[str]:
         for record in assets.values()
         if isinstance(record, dict) and record.get("sha256")
     }
+    referenced |= course_referenced_sha()
     return sorted(sha for sha in objects if sha not in referenced)
 
 

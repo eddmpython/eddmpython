@@ -1,7 +1,9 @@
-"""plan.json의 섹션 근거와 imagegen 장면을 합쳐 FLUX 1.1 Pro로 생성한다.
+"""plan의 섹션 근거와 imagegen 장면을 합쳐 FLUX 1.1 Pro로 생성한다.
 
-사용: python -X utf8 blog/scripts/generate_flux.py <post-id> [--only key1,key2] [--force]
-- 계약: skills/specs/operation/blogMedia.md. 프롬프트와 의미의 정본은 blog/media/plan.json이다.
+사용: python -X utf8 blog/scripts/generate_flux.py <post-id> [--only key1,key2] [--force] [--plan 경로]
+- 계약: skills/specs/operation/blogMedia.md. 블로그는 blog/media/plan.json이 정본이다.
+- 교안은 --plan course/curriculum/<카테고리>/plan.json 을 준다. 본문 문장이 공개 저장소로
+  새지 않게 plan만 갈라 두었고 이미지와 catalog는 블로그와 공유한다.
 - 출력: ../eddmpython.out/blog-media/<post-id>/<assetKey>.webp (Git 밖, 검수 후 publish_media.py로 HF 발행)
 - 키: 저장소 루트 .env의 REPLICATE_API_TOKEN. 값은 어디에도 출력하지 않는다.
 - 속도: Replicate 계정 분당 제한을 고려해 생성 사이 12초 간격.
@@ -145,7 +147,7 @@ def main() -> None:
         and (not onlyKeys or a.get("assetKey") in onlyKeys)
     ]
     if not targets:
-        sys.exit(f"plan.json에 {args.post}의 imagegen 자산이 없다.")
+        sys.exit(f"{plan_path}에 {args.post}의 imagegen 자산이 없다.")
 
     headers = {"Authorization": f"Token {loadToken()}", "Content-Type": "application/json"}
     outDir = STAGING_ROOT / args.post

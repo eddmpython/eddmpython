@@ -34,8 +34,28 @@ status: observed
 | 무엇 | 어디 | 추적 |
 |---|---|---|
 | 의미와 출처 계획 | `blog/media/plan.json` | Git |
+| 교안의 의미와 출처 계획 | `course/curriculum/<카테고리>/plan.json` | 추적 안 함 |
 | 글과 원격 객체의 대응 | `blog/media/catalog.json` | Git |
 | 실제 바이트 | Hugging Face `eddmpython/eddmpython-media` | 원격만 |
+
+### plan 을 둘로 나눈 이유
+
+`plan.json` 은 자산마다 `sectionHeading` 과 `contentAnchor` 를 들고 있고 그 둘은 본문 문장
+그대로다. `contentAnchor` 는 `check:post` 가 본문에 실제로 있는 문장인지 대조하는 필드라서
+정의상 본문에서 복사한 것이다.
+
+교안은 유료 자료이므로 그 문장이 공개 저장소에 올라가면 안 된다. 그래서 **plan 만 갈랐다.**
+이미지 바이트와 `catalog.json` 은 블로그와 그대로 공유한다. catalog 에는 `alt` 와
+`visualSubject` 와 `sourcePost` 만 들어가고 그것은 이미지 설명이다.
+
+```bash
+python -X utf8 blog/scripts/generate_flux.py <post-id> --plan course/curriculum/01-automation-start/plan.json
+python -X utf8 blog/scripts/publish_media.py --asset <post-id>/<key> --plan course/curriculum/01-automation-start/plan.json --reviewed
+```
+
+**`--plan` 을 주면 글 파일을 그 plan 이 있는 폴더 아래에서 찾는다.** 교안 글이 plan 옆에
+있기 때문이다. 블로그는 plan 이 `blog/media/` 이고 글이 `blog/content/` 라 배치가 다르므로
+블로그 자산에는 `--plan` 을 주지 않는다. 주면 글을 못 찾는다.
 
 **바이트는 저장소에 커밋하지 않는다.** SVG 를 포함해 `blog/` 아래에 이미지 파일을 두지 않는다.
 `check:blog` 가 막는다. 작업본은 저장소 밖에 둔다.
@@ -214,6 +234,11 @@ python -X utf8 blog/scripts/publish_media.py --prune-objects --apply   실제로
 
 `--find` 는 지금 쓰는 것과 안 쓰는 것을 함께 보여 준다. 찾은 객체를 다시 쓰려면 새 글의
 `plan.json` 에 항목을 만들고 같은 `sha256` 을 catalog 에 이어 준다.
+
+**`--prune-objects` 는 교안 참조를 함께 센다.** 교안 plan 은 공개 catalog 의 `assets` 에
+등록되지 않으므로 catalog 만 보면 교안이 쓰는 객체가 전부 참조 없음으로 보인다.
+2026-08-19 에 실제로 279개 전부가 삭제 대상으로 잡혔다. `course_referenced_sha()` 가
+교안 plan 의 `inventory` 와 `assets`, 그리고 교안 본문의 sha 를 모아 그것을 막는다.
 
 `--prune-objects` 는 **catalog 레코드만** 지운다. Hugging Face 의 실제 바이트는 그대로 남으므로
 이미 배포된 글의 이미지가 깨지지 않는다. 원격까지 지우는 것은 되돌릴 수 없으니 따로 한다.
