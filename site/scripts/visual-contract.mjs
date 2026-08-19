@@ -128,10 +128,10 @@ const ROUTE_RULES = [
     ],
   },
   {
-    match: (path) => path === "/blog/what-is-python",
-    id: "what-is-python",
+    match: (path) => path === "/blog/what-automation-does",
+    id: "what-automation-does",
     checks: [
-      TEXT("article#content h2", "그림판에 선이 혼자 그려집니다"),
+      TEXT("article#content h2", "화면을 대신 눌러 줍니다"),
       COUNT("article#content video", { exact: 5 }),
       COUNT('article#content source[src$=".mp4"]', { exact: 5 }),
     ],
@@ -147,35 +147,32 @@ const ROUTE_RULES = [
     ],
   },
   {
-    match: (path) => path === "/blog/python-basic-syntax",
-    id: "python-basic-syntax",
+    match: (path) => path === "/blog/what-is-python",
+    id: "what-is-python",
     checks: [
-      TEXT("article#content h1", "Python 기초문법 배우는 방법: 지출내역 하나로 6가지 연결하기"),
-      COUNT("article#content figure", { exact: 8 }),
-      COUNT('a[href="https://www.youtube.com/shorts/priwCYZJ8h4"]', { exact: 1 }),
-      COUNT('aside[aria-label^="Codaro 실습 셀:"]', { exact: 7 }),
-      VISIBLE('aside[aria-label="Codaro 실습 셀: 기준금액으로 거래 분류하기"] textarea'),
+      TEXT("article#content h2", "남이 만들어 둔 코드를 불러 씁니다"),
+      COUNT("article#content img", { exact: 3 }),
+      COUNT("article#content video", { exact: 0 }),
     ],
     captures: [
       {
-        id: "syntax-learning-map",
+        id: "readable-syntax",
         selector: "article#content figure:first-of-type",
       },
-      {
-        id: "condition-cell",
-        selector: 'aside[aria-label="Codaro 실습 셀: 기준금액으로 거래 분류하기"]',
-      },
     ],
-    interactions: [
+  },
+  {
+    match: (path) => path === "/blog/first-python-code",
+    id: "first-python-code",
+    checks: [
+      TEXT("article#content h2", "첫 코드는 여섯 줄이면 됩니다"),
+      COUNT("article#content img", { exact: 2 }),
+      COUNT('aside[aria-label^="Codaro 실습 셀:"]', { exact: 1 }),
+    ],
+    captures: [
       {
-        id: "run-condition-example",
-        type: "click-until-text",
-        click:
-          'aside[aria-label="Codaro 실습 셀: 기준금액으로 거래 분류하기"] button',
-        target:
-          'aside[aria-label="Codaro 실습 셀: 기준금액으로 거래 분류하기"] output',
-        includes: "100,000원: 확인필요",
-        timeoutMs: 120_000,
+        id: "python-is-instructions",
+        selector: "article#content figure:first-of-type",
       },
     ],
   },
