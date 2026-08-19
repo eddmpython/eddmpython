@@ -25,6 +25,30 @@ const BANNED = [
 const errors = [];
 const seen = new Map();
 
+/** 펜스 코드 블록을 걷어낸다. 그 안의 `](...)` 는 링크가 아니라 예시다. */
+function stripFencedCode(text) {
+  const out = [];
+  let fence = null;
+  for (const line of text.split(/\r?\n/)) {
+    const open = line.match(/^\s*(`{3,}|~{3,})/);
+    if (fence) {
+      if (open && open[1][0] === fence[0] && open[1].length >= fence.length) fence = null;
+      continue;
+    }
+    if (open) {
+      fence = open[1];
+      continue;
+    }
+    out.push(line);
+  }
+  return stripInlineCode(out.join("\n"));
+}
+
+/** 인라인 코드 스팬도 걷어낸다. `![x](media://y)` 는 링크가 아니라 예시다. */
+function stripInlineCode(text) {
+  return text.replace(/`+[^`\n]*`+/g, "");
+}
+
 function walk(dir) {
   const out = [];
   for (const name of readdirSync(dir)) {
@@ -106,7 +130,7 @@ for (const file of files) {
   }
 
   // 저장소 안 상대 링크가 실제 파일을 가리키는지 확인한다.
-  const body = text.slice(text.indexOf("---", 3) + 3);
+  const body = stripFencedCode(text.slice(text.indexOf("---", 3) + 3));
   for (const [, target] of body.matchAll(/\]\(([^)]+)\)/g)) {
     if (/^(https?:|mailto:|#)/.test(target)) continue;
     const clean = target.split("#")[0];
@@ -174,7 +198,7 @@ for (const entry of agentSkillDirs) {
     }
   }
 
-  const body = text.slice(match[0].length);
+  const body = stripFencedCode(text.slice(match[0].length));
   for (const [, target] of body.matchAll(/\]\(([^)]+)\)/g)) {
     if (/^(https?:|mailto:|#)/.test(target)) continue;
     const clean = target.split("#")[0];

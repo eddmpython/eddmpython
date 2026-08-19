@@ -34,7 +34,7 @@ const requiredMeta = [
 ];
 const readerLevels = new Set(["beginner", "working", "advanced"]);
 const skipDirs = new Set(["media", "scripts", "embeds"]);
-const rootDocs = new Set(["PIPELINE.md", "product-marketing.md", "README.md"]);
+const rootDocs = new Set(["README.md"]);
 const categoryDocs = new Set(["README.md", "원장.md"]);
 const publicSlug = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const mediaSuffixes = new Set([
@@ -414,7 +414,13 @@ const titles = new Map();
 const slugs = new Map();
 const referencedMedia = new Set();
 const referencedCodaroEmbeds = new Set();
-for (const post of targetPost ? posts.filter((entry) => entry.name === targetPost) : posts) {
+const targetPosts = targetPost ? posts.filter((entry) => entry.name === targetPost) : posts;
+if (targetPost && targetPosts.length === 0) {
+  console.error(`post check: ${targetPost} 라는 글 파일이 없습니다`);
+  console.error(`  있는 글: ${posts.map((entry) => entry.name).join(", ")}`);
+  process.exit(1);
+}
+for (const post of targetPosts) {
   const file = post.relPath;
   const raw = await readFile(post.abs, "utf8");
   const { meta, body } = parseFrontmatter(file, raw);

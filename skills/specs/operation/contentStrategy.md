@@ -19,7 +19,7 @@ status: curated
 
 ## 먼저 읽을 것
 
-- `blog/product-marketing.md`
+- [productMarketing.md](productMarketing.md)
 - 최근 발행 글 `blog/*/[0-9][0-9][0-9]-*.md`
 - 해당 카테고리 `원장.md`의 제목 사슬
 - 지금 확인된 제품 변경, 실패, 화면

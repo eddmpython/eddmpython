@@ -24,15 +24,20 @@ status: curated
 `$eddmpython-operations` 스킬을 사용한다. 파일은 `.agents/skills/eddmpython-operations/SKILL.md`에
 있고, 이 문서와 아래 운영 계약으로 작업을 연결하는 얇은 라우터다.
 
-## 정보 3층
+## 정보 4층
 
 같은 사실을 두 곳에 쓰지 않는다.
 
 | 층 | 내용 | 위치 |
 |---|---|---|
 | 강행규칙 | 위반하면 사고가 나는 것 | 루트 `CLAUDE.md` (추적하지 않음) |
-| 계약 | 지금 실제로 도는 구조와 절차 | **`skills/specs/`** |
+| 운영 계약 | 지금 실제로 도는 구조와 절차. 기계가 강제하는 것 | **`skills/specs/`** |
+| 우리 규칙 | 운영자와 에이전트가 정한 판단과 작법 | `memory/` (추적하지 않음). 인덱스는 `memory/MEMORY.md` |
 | 예정 | 아직 짓지 않은 설계와 진행 | 커밋 메시지와 이슈 |
+
+**규칙 문서를 다른 폴더에 새로 만들지 않는다.** 운영 계약은 여기, 판단과 작법은 `memory/` 다.
+2026-08-19 에 집필 규칙 문서가 여섯 곳으로 갈라져 서로 어긋난 뒤 정한 규칙이다. 그중 하나는
+글 파일 경로와 카테고리 정책을, 다른 하나는 폐기된 글자 수 하한을 그대로 들고 있었다.
 
 `README.md` 는 바깥을 향한 소개다. 운영 절차를 거기에 복제하지 않는다.
 
@@ -57,6 +62,7 @@ dartlab 은 `engines` 와 `recipes` 를 더 두지만 이 저장소에는 그 �
 | [`operation.adsense`](specs/operation/adsense.md) | 글 상세 광고 코드, CSP, ads.txt 계약 |
 | [`operation.brandAssets`](specs/operation/brandAssets.md) | 심볼 정본과 파비콘, og 이미지 생성 |
 | [`operation.blogPublishing`](specs/operation/blogPublishing.md) | 글을 어디에 두고 무엇이 자동으로 만들어지나 |
+| [`operation.blogMedia`](specs/operation/blogMedia.md) | 이미지와 영상의 의미 계약, 색상, Hugging Face 발행 |
 | [`operation.productMarketing`](specs/operation/productMarketing.md) | 제품 마케팅 맥락 문서 유지 |
 | [`operation.blogCopy`](specs/operation/blogCopy.md) | 블로그 제목, summary, 도입 카피 |
 | [`operation.contentStrategy`](specs/operation/contentStrategy.md) | 다음에 쓸 글 주제와 각도 |

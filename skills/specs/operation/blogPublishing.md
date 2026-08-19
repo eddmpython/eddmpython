@@ -2,13 +2,15 @@
 id: operation.blogPublishing
 title: 블로그 발행
 category: operation
-purpose: 글을 어디에 두면 무엇이 자동으로 만들어지고 이미지는 어디에 두는지 정한다.
+purpose: 글 파일을 어디에 두면 무엇이 자동으로 만들어지고 어떤 검사를 지나 어떻게 배포되는지 정한다.
 whenToUse:
   - 글 추가하기
   - frontmatter 필드
-  - 글 이미지 어디에 두나
+  - 카테고리 만들기
+  - slug 규칙
   - sitemap 에 글이 안 들어간다
   - 발행 전 검사
+  - 글 내리기
 verify:
   - cd site && npm run check:blog
   - cd site && npm run verify:media
@@ -19,20 +21,26 @@ status: observed
 
 # 블로그 발행
 
+이 문서는 **기계 계약**이다. 파일 이름, frontmatter, 검사, 배포 순서를 정한다.
+**글을 어떻게 쓰는지는 여기 없다.** 작가 파이프라인은 `memory/blogWriter.md` 이고
+추적하지 않는다. 규칙 문서 전체 인덱스는 `memory/MEMORY.md` 다.
+
 ## 정본은 한 곳이다
 
 ```
 blog/<category-slug>/NNN-kebab.md
 ```
 
-여기가 글의 정본이다. 카테고리 폴더 이름과 `order.json`의 category slug는 같다. 그 폴더의
-`원장.md`가 글 제목 사슬의 정본이다. `NNN`은 저장소 전체에서 `001`부터 빈 번호 없이 늘어나는
-고정 발행 순번이다. 새 글은 현재 가장 큰 번호에 1을 더한다. 파일 stem 전체는 post id이자 미디어
-키다. 공개 경로는 frontmatter `slug`다. 사이트는 빌드 타임에 카테고리 폴더를 읽는다
-(`site/src/posts.ts`의 `import.meta.glob`). 런타임 fetch도 CMS도 없다.
+여기가 글의 정본이다. `NNN` 은 저장소 전체에서 `001` 부터 빈 번호 없이 늘어나는 고정 발행
+순번이다. 새 글은 현재 가장 큰 번호에 1을 더한다. 파일 stem 전체가 post id 이자 미디어 키다.
+공개 경로는 frontmatter `slug` 이고 `/blog/{slug}` 한 형태다.
 
-파일 순번은 발행 뒤 바꾸지 않는다. 발행일과 수정일은 저장하지 않는다. `/blog`의 공개 읽기 순서는
-`blog/order.json`의 `order`로만 관리한다. 이 파일에는 강의 시간표와 차시 메타데이터를 넣지 않는다.
+사이트는 빌드 타임에 카테고리 폴더를 읽는다 (`site/src/posts.ts` 의 `import.meta.glob`).
+런타임 fetch 도 CMS 도 없다. **글 파일 원문 전체가 공개 JS 번들에 문자열로 구워진다.**
+frontmatter 도 본문도 예외가 아니다. 설계 메모와 내부 판단을 글 파일에 넣지 않는 이유다.
+
+파일 순번은 발행 뒤 바꾸지 않는다. 발행일과 수정일은 저장하지 않고 구조화 데이터, sitemap,
+RSS 에도 넣지 않는다. 대문자 영문 운영 문서는 사이트 글 목록에서 제외한다.
 
 파일 하나를 넣으면 빌드가 함께 만든다.
 
@@ -42,143 +50,199 @@ blog/<category-slug>/NNN-kebab.md
 - `rss.xml` 항목
 - 페이지별 title, description, og, canonical, `BlogPosting` 구조화 데이터
 
-예전에 날짜가 들어간 URL은 Worker가 301로 새 slug로 보낸다.
+예전에 날짜가 들어간 URL 은 Worker 의 `LEGACY_BLOG` 가 301 로 새 slug 로 보낸다.
 
 ## frontmatter 계약
 
-`site/scripts/check-blog.mjs` 가 검사한다. 빠지면 `npm test` 가 실패하고 배포까지 못 간다.
+`site/scripts/check-blog.mjs` 의 `requiredMeta` 가 검사한다. 빠지면 `npm test` 가 실패하고
+배포까지 못 간다. **필수 11개다.**
 
 | 필드 | 설명 |
 |---|---|
-| `title` | 질문이거나 주장. 명사 나열 금지. 인지도 없는 제품명을 앞에 두지 않음 (`blog/PIPELINE.md` 1.5절) |
-| `slug` | 공개 URL `/blog/{slug}`. 짧은 소문자 kebab, 날짜 금지. 예: `no-install` |
-| `author` | 글쓴이 |
-| `section` | 글의 갈래 |
-| `summary` | 목록과 검색 결과에 나가는 한두 문장 |
-| `readerQuestion` | 이 글이 답하는 독자 질문 하나 |
-| `readerTakeaway` | 독자가 들고 나가는 한 문장 |
-| `readerLevel` | `beginner`, `working`, `advanced` 중 하나 |
-| `readerStartingPoint` | 독자가 이미 아는 것과 아직 모르는 것을 적은 문장 |
-| `primaryKeyword` | 제목, summary, 도입에서 함께 답할 두 단어 이상의 검색어 |
+| `title` | 질문이거나 주장. 명사 나열 금지. 인지도 없는 제품명을 앞에 두지 않는다. **10자 이상 70자 이하** |
+| `slug` | 공개 URL `/blog/{slug}`. 짧은 소문자 kebab, 날짜 금지 |
+| `author` | 화면과 구조화 데이터에 함께 표시할 글쓴이 |
+| `section` | 글 하나의 소주제. 카테고리와 층이 다르다 |
+| `summary` | 목록과 검색 결과에서 글을 열 이유를 설명하는 한두 문장 |
+| `readerQuestion` | 이 글이 끝까지 답할 질문 하나 |
+| `readerTakeaway` | 독자가 글을 덮고 기억할 한 문장 |
+| `readerLevel` | `beginner`, `working`, `advanced` 중 하나. 지시 없으면 `beginner` |
+| `readerStartingPoint` | 독자가 이미 아는 것과 아직 모르는 것 |
+| `primaryKeyword` | 제목과 summary 와 H2 하나에 함께 쓸 두 단어 이상의 검색어 |
 | `searchIntent` | `explanation`, `how-to`, `troubleshooting`, `comparison` 중 하나 |
-| `depthContract` | 일반 글은 `standalone-deep-v1`, 프로젝트와 문제 해결 글은 `standalone-project-v1` |
-| `ogImage` | 공유 이미지 URL. Hugging Face 콘텐츠 주소 객체 |
-| `ogImageAlt` | 이미지 설명 |
-| `ogImageWidth` / `ogImageHeight` / `ogImageType` | 이미지 규격 |
 
-`readerQuestion` 과 `readerTakeaway` 가 없으면 글이 기능 나열로 흐르기 쉽다.
-`readerStartingPoint` 가 없으면 글쓴이가 아는 말을 독자도 안다고 착각하기 쉽다. 별도 지시가
-없으면 `readerLevel`은 `beginner`로 쓴다. 자세한 작성 방법은 `blog/PIPELINE.md`를 본다.
+이미지를 붙이면 다섯 개가 더 필수가 된다. `ogImage`, `ogImageAlt`, `ogImageWidth`,
+`ogImageHeight`, `ogImageType` 이다. 발행 전에는 `media://asset-key`, 발행 뒤에는 Hugging Face
+객체 URL 이다. 자세한 것은 [blogMedia.md](blogMedia.md) 를 본다.
 
-041번 이후 새 글에는 `depthContract`가 필수다. 기존 글을 전면 교정할 때도 알맞은 계약을 추가한다.
+`readerStartingPoint` 에 `초보자` 라고만 쓰지 않는다. `파이썬을 설치해 본 적이 없고 셀과 .py 의
+뜻을 모른다` 처럼 독자가 모르는 말을 적는다.
 
-깊이 계약 글의 모든 코드 블록은 `예시 코드:`, `실행 명령:`, `예상 결과:`, `실패 예시:`처럼 역할과
-개념이 보이는 H4 아래에 둔다. 코드와 같은 H4 범위에서 입력, 핵심 동작, 예상 결과를 합쳐 80자 이상
-설명한다. `코드`나 `예시`만 적은 H4와 설명 없는 코드 블록은 `check:blog`가 거부한다.
+frontmatter 파서는 `^([A-Za-z][A-Za-z0-9]*):\s*(.*)$` 한 줄 정규식이다. **여러 줄 배열을 넣으면
+그 줄에서 실패한다.** 목록형 메타데이터를 추가하려면 파서를 먼저 고친다.
+
+## 카테고리와 공개 읽기 순서
+
+`blog/order.json` 이 카테고리와 목록 순서의 정본이다. 카테고리 하나가 강의 한 묶음이며
+폴더 이름과 category slug 는 같다.
+
+```json
+{
+  "version": 3,
+  "categories": [
+    { "slug": "work-automation", "title": "업무자동화", "order": 1, "summary": "..." }
+  ],
+  "posts": [{ "order": 1, "slug": "what-is-python", "category": "work-automation" }]
+}
+```
+
+**공개 URL 에 카테고리를 넣지 않는다.** 카테고리는 `/blog` 목록에서 묶어 보여 주는 데만 쓴다.
+
+순서는 두 가지뿐이고 서로 독립이다.
+
+- **파일 순번** `NNN`: 저장소와 미디어에서 글을 구분하는 고정 번호
+- **`order.json` 의 `order`**: `/blog` 에서 쓰는 공개 읽기 순서. 1부터 빈 번호 없이
+
+`order.json` 에 강의 시간, 차시, 선수 단계, 학습 성과를 넣지 않는다. 공개 읽기 순서는 처음
+방문한 사람이 목록을 훑기 좋은 편집 순서일 뿐 시간표도 선수 관계도 아니다. 중간에 새 주제가
+필요하면 `order` 만 다시 정렬하고 이미 발행한 파일 순번과 slug 는 바꾸지 않는다.
+
+`check:blog` 가 카테고리 slug 형식과 중복, order 연속성, summary 길이, 모든 글의 `category` 가
+실제로 존재하는지 검사한다.
+
+### 새 카테고리를 열 때
+
+1. 폴더를 만든다. 예: `blog/work-automation/`
+2. 그 안에 `README.md` 와 `원장.md` 를 둔다. **원장은 추적하지 않는다.** 커리큘럼 설계와
+   내부 판단이 들어 있어서다
+3. `order.json` 의 `categories` 에 같은 slug 를 넣는다
+4. 목록에 올릴 글만 `posts` 에 넣는다
+
+## 공개 slug 규칙
+
+| 규칙 | 내용 |
+|---|---|
+| 문자 | 소문자 영문, 숫자, 하이픈만. 날짜로 시작 금지 |
+| 길이 | 4자 이상 40자 이하. 보통 2~4 단어 |
+| 뜻 | 제목 전체를 옮기지 말고 독자가 주제를 바로 읽게 짧게 |
+| 제품명 | 인지도가 약한 제품명을 slug 앞에 두지 않는다 |
+| 고정 | 한 번 공개한 slug 는 바꾸지 않는다. 바꾸면 Worker `LEGACY_BLOG` 에 301 을 남긴다 |
+
+좋은 예: `no-install`, `ai-environment`
+나쁜 예: `2026-08-09-codaro-guide` (날짜), `run-python-without-install` (제목 나열로 김),
+`codaro_guide` (밑줄)
+
+미디어 plan 과 catalog 키의 `post` 필드는 파일 stem 을 유지한다. 공개 slug 와 달라도 된다.
+
+## 아카이브
+
+`order.json` 의 `archived` 에 넣은 글은 `/blog` 목록에서만 빠진다. **글 파일과 공개 URL 과
+sitemap 은 그대로 둔다.** 검색에 색인된 글을 실제로 내리면 유입이 죽고 되돌릴 수 없다.
+
+```json
+{ "archived": [{ "slug": "no-install", "note": "목록에서 뺀 이유" }] }
+```
+
+모든 글 파일은 `posts` 또는 `archived` 중 정확히 한 곳에 있어야 한다. `check:blog` 가 양쪽에
+동시에 있거나 어느 쪽에도 없는 경우를 막고 `note` 가 비면 실패시킨다. 왜 뺐는지 적지 않으면
+나중에 되돌릴 근거가 사라진다.
+
+커리큘럼을 다시 짤 때는 글을 지우지 않고 아카이브로 내린 뒤 새 순서로 다시 쓴 것부터 한 편씩
+`posts` 에 올린다.
 
 ## 블로그가 원문이고 강의가 참조한다
 
-블로그는 강의 차시를 길게 풀어 쓴 자료가 아니다. 검색이나 공유 링크로 한 편만 연 독자가 정의,
-원리, 실제 예제, 실패와 검증을 모두 이해할 수 있는 독립 원문이다. 강의 시간, 차시 범위, 슬라이드
-장수는 글의 목차와 분량을 줄이는 근거로 쓰지 않는다.
+방향은 항상 `독립 블로그 원문 -> 강의 슬라이드의 요약과 참조 링크` 다. 슬라이드는 수업에 필요한
+행동과 핵심 그림만 압축하고, 정의의 전체 설명, 원리, 전체 코드, 실패 사례, 추가 근거는 블로그
+링크에서 읽게 한다. **교안이 짧아졌다고 블로그를 줄이지 않는다.**
 
-새 글과 전면 교정 글은 의미 있는 H2 여섯 개와 공백을 뺀 서술 본문 3,000자 이상을 기본 출발선으로
-삼는다. 프로젝트와 문제 해결 글은 H2 일곱 개와 서술 본문 4,000자 이상을 출발선으로 삼는다. 숫자는
-정의, 작동 원리, 완성 예제, 다른 선택지, 실패와 복구, 검증, 적용 범위를 너무 일찍 생략하지 않게 하는
-하한선이며 반복 문장으로 채울 목표가 아니다.
+강의 구성, 수업 시간, 슬라이드 순서, 실습 결과, 완료 기준, 분 단위 진행, 개입 기준, 수행평가
+배점은 비공개 `course/` 에서 관리한다. 공개 블로그에 강의용 stage id 를 만들지 않는다. 강의가
+참조 대상을 찾는 키는 공개 slug `/blog/{slug}` 다. 여러 슬라이드가 같은 글을 참조할 수 있고
+한 슬라이드도 여러 글을 참조할 수 있다.
 
-강의 슬라이드는 공개 `/blog/{slug}`를 깊이 읽기 링크로 사용한다. 여러 슬라이드가 같은 글을 참조할 수
-있고, 한 슬라이드도 여러 글을 참조할 수 있다. 슬라이드는 수업에 필요한 행동과 핵심 그림을 압축하지만
-블로그 원문을 강의 시간에 맞춰 줄이거나 차시 요약으로 바꾸지 않는다.
+## 게이트는 두 개다
 
-## 초보자가 읽을 수 있는지 확인한다
+예전에는 한 편을 고칠 때마다 `check:blog` 가 40편을 전부 다시 쟀다. 규칙 하나를 넣으려면 기존
+40편이 모두 통과해야 했고, 통과시키려고 `v1` 과 `v2` 같은 계약 버전을 만들어 붙였다. 그 복잡함은
+전부 게이트가 전역이라서 생긴 것이었다.
 
-사용법 글은 제품 구조가 아니라 독자가 움직이는 순서로 쓴다. 어디를 여는지, 무엇을 누르는지,
-무엇을 바꾸는지, 성공하면 무엇이 보이는지, 다음 기능은 언제 필요한지 순서대로 설명한다.
+**`npm run check:post -- <파일 경로>`** 는 그 한 편만 본다. 글을 쓰는 동안 도는 게이트다.
+문장 단위 추상 검사, 서술 문단 줄바꿈, 절의 제목과 부제와 이미지 순서, H4 보조자료 라벨,
+코드 앞뒤 설명 길이, `sectionHeading` 과 `contentAnchor` 가 본문과 같은지를 검사한다.
 
-`beginner` 글에는 다음 제한을 적용한다.
+**`npm run check:blog`** 는 여러 글 사이의 관계만 본다. 파일 순번, slug 중복, `order.json` 정합,
+미디어 catalog 참조 무결성, SHA-256 경로, `blog/` 아래 로컬 이미지 차단, em dash, 명령형 뒤
+마침표를 검사한다. **한 편의 문장 품질은 여기서 재지 않는다.**
 
-- H2는 32자를 넘기지 않는다
-- 일반 문단은 220자를 넘기지 않는다
-- 한 문장은 160자를 넘기지 않는다
-- 처음 나오는 기술 용어는 같은 자리에서 쉬운 말로 설명한다
+기계가 강제하는 형식은 이렇다.
 
-길이 검사는 `site/scripts/check-blog.mjs`가 맡는다. 용어 설명과 문단 사이의 순서는 사람이
-데스크톱과 모바일 화면을 읽으면서 확인한다.
+- 서술 문단은 소스에서도 한 줄이다. 하드 줄바꿈은 `check:post` 가 막는다
+- 추상어를 쓴 문장에는 **그 문장 안에** 파일, 화면, 명령, 값, 오류 중 하나가 있어야 한다.
+  이웃 문장에 있는 것으로는 인정하지 않는다
+- `beginner` 글은 H2 32자, 일반 문단 220자, 한 문장 160자를 넘기지 않는다
+- 코드 블록은 `#### 예시 코드: 금액 문자열을 숫자로 바꾸기` 처럼 역할과 개념이 함께 보이는
+  H4 아래에 둔다. `코드`, `예시`, `참고`, `내용`, `정리`, `설명`, `기타`, `자료` 처럼 그 자체로
+  아무것도 알려 주지 않는 역할어는 막는다. 같은 H4 범위에 입력, 핵심 줄이 바꾸는 값, 예상 결과를
+  합쳐 80자 이상 서술한다
+- 핵심어는 제목과 summary 와 H2 하나에만 요구한다. 도입 두 문단에도 핵심어 전체를 넣게 하던
+  규칙은 뺐다. 그 규칙이 발행 40편 중 29편의 첫 문장을 `핵심어 + 을 또는 를` 로 시작하게 만들었다
 
-같은 검사는 내용 없는 관용구, 추상어만 이어지는 문단, 실제 예가 없는 H2도 막는다. 검사 규칙은
-`site/scripts/blog-style.mjs`, 오탐과 누락을 막는 표본은 `site/scripts/test-blog-style.mjs`에 있다.
-기계 검사는 자연스러운 말투를 완전히 판정하지 못하므로 새 글과 전체 교정에는 `$blog-writing` 스킬을
-함께 사용한다.
+검사 규칙은 `site/scripts/blog-style.mjs`, 오탐과 누락을 막는 표본은
+`site/scripts/test-blog-style.mjs` 에 있다.
 
-## 섹션은 제목, 부제, 이미지, 설명으로 읽힌다
+**글자 수 하한은 쓰지 않는다.** 2026-08-17 에 발행 40편을 실측해 없앴다. 까닭은
+`memory/blogWriter.md` 에 있다.
 
-모든 H2는 아래 순서를 지킨다.
+## 실행 칸
 
-1. 독자의 다음 궁금증을 여는 H2
-2. 이 절에서 얻을 결과를 쉬운 말로 적은 H3 한 줄 부제
-3. 고유한 섹션 이미지와 캡션
-4. 코드와 목록보다 먼저 나오는 쉬운 서술형 설명
-5. 선택 사항인 코드, 실제 예시, 설명 목록이나 표
+제품을 직접 실행해야 이해되는 글은 정적 코드 블록에서 멈추지 않는다. 예제를
+`blog/embeds/codaro-cells.json` 에 제목, 설명, 실행 코드, 전체 Web Run URL 로 등록하고 본문에
+아래 주소를 다른 내용 없는 한 줄로 둔다.
 
-섹션 이미지는 `blog/media/plan.json`에서 `role: section`, 실제 H2와 H3에 맞는 `sectionHeading`,
-`sectionSubtitle`, 본문 원문 `contentAnchor`, 실제 피사체 `visualSubject`, 설명할 관계
-`visualRelationship`을 가진다. 다른 H2의 이미지를 재사용하지 않는다.
-
-새로 만들거나 교체하는 생성 이미지는 `visualProfile: eddmpython-dark-v2`와
-`palettePolicy: eddmpython-carbon-ivory-sand-v1`을 쓴다. 배경 `#101514`, 주요 밝은 면 `#f5f3ee`,
-작은 강조 `#d8be91`, 저채도 중성색만 허용한다. 파랑, 청록, 초록, 보라, 분홍, 빨강, 금색, 네온은
-쓰지 않고 성공과 실패는 모양, 명암, 선 굵기, 위치로 구분한다. `dark-editorial-v1`은 이전 자산을 찾는
-값일 뿐 새 작업에 사용하지 않는다. 실제 제품 스크린샷은 원래 화면 색을 보존한다. 글자, 숫자, 코드,
-로고는 생성 이미지 바이트 안에 굽지 않는다. 제목과 캡션은 HTML로 렌더해야 모바일, 검색, 접근성
-표면에서 같은 문장을 유지할 수 있다.
-
-DartLab 카드뉴스의 원칙 중 이미지와 큰 문장을 분리하고, 각 이미지가 그 문장이 말하는 장면을 맡는
-부분을 가져왔다. 세로 카드 비율과 화려한 SNS 장식은 가져오지 않는다. 블로그 본문에는 3:2 가로형과
-충분한 설명이 맞다. 구체적인 프롬프트와 눈검수 기준은 `blog/PIPELINE.md`가 정본이다.
-
-## 이미지는 Git 에 넣지 않는다
-
-본문 이미지, 본문 영상, 글별 공유 이미지의 **바이트는 저장소에 커밋하지 않는다.**
-
-| 무엇 | 어디 |
-|---|---|
-| 의미와 출처 계획 | `blog/media/plan.json` |
-| 글과 원격 객체의 대응 | `blog/media/catalog.json` |
-| 실제 파일 | Hugging Face `eddmpython/eddmpython-media` 콘텐츠 주소 객체 |
-
-발행 전에 원격에 실제로 있는지 확인한다.
-
-```bash
-cd site && npm run verify:media
+```text
+https://eddmpython.com/codaro/run/?example=<example-id>
 ```
+
+사이트가 이 줄을 브라우저에서 실행할 수 있는 코드 입력칸으로 바꾼다. 블로그 안에서는 코드를
+바꾸고 결과를 보는 기능만 제공한다. 답 검사, 학습 기록 저장, 다음 레슨 이동은 셀 아래의 전체
+Web Run 링크에서 쓸 수 있다고 정확히 적는다.
 
 ## 글 하나 발행하는 순서
 
-1. 독자의 출발점과 첫 행동을 정하고, 직접 답, 정의, 원리, 완성 예제, 다른 선택지, 실패와 복구,
-   검증, 적용 범위를 채운 깊이 설계표를 만든다. `blog/PIPELINE.md` 1.5절 유입 패키징 게이트를 통과한
-   뒤 다음 세 자리 순번으로 `blog/<category-slug>/NNN-slug.md`를 쓰고 모든 H2의 이미지 자리를 함께 정한다. 카피 판단은
-   `operation.blogCopy`, 주제 선택은 `operation.contentStrategy`, 제품 맥락은
-   `blog/product-marketing.md`를 본다.
-2. 섹션별 쉬운 설명을 먼저 쓴 뒤 `blog/media/plan.json`에 H2, H3, 본문 원문, 피사체, 관계, 출처,
-   장면 프롬프트를 남긴다
-3. 실제 픽셀을 본문과 대조하고 `publish_media.py --reviewed`로 Hugging Face에 올린 뒤
-   `catalog.json`을 갱신한다
-4. `cd site && npm test` 로 문장 품질 표본, frontmatter 와 타입을 확인한다
-5. `npm run verify:media` 로 원격 객체를 확인한다
-6. `npm run verify:visual`로 모든 페이지의 데스크톱과 모바일 화면을 만들고 실제로 확인한다
-7. `npm run approve:visual -- --run=<run-id>`로 확인한 빌드를 승인한다
-8. `npm run deploy`
-9. 캐시버스터를 붙인 글 페이지에서 H2별 본문 이미지 수와 URL, `og:image`, `twitter:image`를
-   plan과 catalog의 기대값에 대조한다
-10. `/blog`, `rss.xml`, `sitemap.xml`의 반영과 홈, favicon, 404, `xlpod.eddmpython.com`의 상태를
-   확인한다
+1. `memory/blogWriter.md` 의 작가 파이프라인을 통과한다. 카피 판단은
+   [blogCopy.md](blogCopy.md), 주제 선택은 [contentStrategy.md](contentStrategy.md),
+   제품 맥락은 [productMarketing.md](productMarketing.md) 를 본다
+2. 다음 세 자리 순번으로 `blog/<category-slug>/NNN-slug.md` 를 쓴다
+3. 이미지가 있으면 [blogMedia.md](blogMedia.md) 의 순서로 계획하고 Hugging Face 에 올린다
+4. `cd site && npm run check:post -- <파일 경로>` 로 한 편을 검사한다
+5. `npm test` 로 전체 계약과 타입을 확인한다
+6. `npm run verify:media` 로 원격 객체를 확인한다
+7. `npm run build`
+8. `npm run verify:visual` 로 모든 페이지의 데스크톱과 모바일 화면을 만들고 **직접 읽는다**
+9. `npm run approve:visual -- --run=<run-id>` 로 확인한 빌드를 승인한다
+10. `npm run deploy`
+11. 캐시버스터를 붙인 글 페이지에서 H2별 본문 이미지 수와 URL, `og:image`, `twitter:image` 를
+    plan 과 catalog 의 기대값에 대조한다
+12. `/blog`, `rss.xml`, `sitemap.xml` 의 반영과 홈, favicon, 404, `xlpod.eddmpython.com` 의
+    상태를 확인한다
 
-1단계부터 10단계까지가 한 번의 발행이다. Git push, HF 업로드, 빌드 성공 중 하나에서 멈추지 않는다.
-메인 사이트는 Cloudflare Worker이므로 Git push만으로는 공개 화면이 바뀌지 않는다. 초안이나 검토만
-요청받은 경우를 제외하고 공개 글을 수정하거나 발행했다면 별도 지시를 기다리지 않고 이 절차를 끝낸다.
+**1단계부터 12단계까지가 한 번의 발행이다.** Git push, Hugging Face 업로드, 빌드 성공은 각각
+중간 단계다. 메인 사이트는 Cloudflare Worker 이므로 Git push 만으로는 공개 화면이 바뀌지 않는다.
+초안이나 검토만 요청받은 경우를 빼고, 공개 글을 고쳤거나 발행했다면 별도 지시를 기다리지 않고
+이 절차를 끝낸다.
 
-## 글을 지울 때
+`verify:visual` 은 sitemap 의 모든 페이지를 데스크톱과 모바일 폭으로 렌더하고 가로 넘침, 깨진
+이미지, 브라우저 오류, H2 와 이미지 수를 검사한다. 저장소 밖에 생성된 두 화면 폭의 전체
+스크린샷을 직접 읽고 제목 줄바꿈, 본문 폭, 이미지 크기와 캡션, 표와 코드의 가로 넘침을 확인한
+뒤 그 run id 를 승인한다. **승인 뒤 빌드가 바뀌면 `deploy` 는 중단된다.** 자세한 것은
+[visualVerification.md](visualVerification.md) 다.
 
-파일을 지우고 다시 빌드하면 페이지, sitemap, RSS 에서 함께 빠진다.
-다만 **이미 배포된 주소는 엣지 캐시에 잠시 남는다.** 캐시버스터로 404 를 확인한다.
+## 롤백
+
+| 무엇 | 어떻게 |
+|---|---|
+| 글 내용 | 글 파일을 이전 커밋으로 되돌리고 발행 순서를 다시 돈다. 수정 날짜를 저장하지 않으므로 흔적이 남지 않는다 |
+| 목록에서 빼기 | 파일을 지우지 않고 `order.json` 의 `archived` 로 옮긴다. URL 과 sitemap 은 산다 |
+| 글 삭제 | 파일을 지우고 다시 빌드하면 페이지, sitemap, RSS 에서 함께 빠진다. **이미 배포된 주소는 엣지 캐시에 잠시 남는다.** 캐시버스터로 404 를 확인한다 |
+| 배포 | [deploy.md](deploy.md) 의 Worker 롤백을 따른다 |

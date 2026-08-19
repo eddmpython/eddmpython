@@ -24,9 +24,25 @@ status: curated
 
 ## 먼저 읽을 것
 
-1. `blog/product-marketing.md`
+1. [productMarketing.md](productMarketing.md) 의 제품 표와 쓰지 말 말
 2. 해당 글의 `readerStartingPoint`, `readerQuestion`
-3. `blog/PIPELINE.md` 1.5절 유입 패키징 게이트
+3. 아래 유입 패키징 게이트 세 문항
+
+## 유입 패키징 게이트
+
+제목과 summary 를 쓰기 전에 세 문항을 모두 통과해야 한다. 하나라도 실패하면 제목을 고친다.
+**제품 이름보다 독자의 문제나 결과가 먼저 나와야 한다.**
+
+1. **브랜드 지움 테스트.** 제목에서 Codaro, xlpod, DartLab, pyproc, eddmpython 이름을 지워도
+   검색 의도가 남는가. 남는 것이 없으면 브랜드 사용법 제목이다
+2. **인지도 테스트.** `readerStartingPoint` 에 그 제품 이름을 처음 본다고 적혀 있으면, 제목과
+   summary 가 제품 사용법을 전제하지 않아야 한다. 먼저 무엇을 할 수 있는지가 나와야 한다
+3. **결과 선행 테스트.** summary 첫 절이 제품명으로 시작하지 않고, 독자가 얻는 결과나 피하려는
+   문제로 시작하는가
+
+통과한 뒤에만 `title`, `summary`, `readerQuestion` 을 확정한다. 본문 초입에서 제품 이름은
+문제를 말한 뒤 한두 문장으로 소개한다. `Codaro 사용법` 처럼 인지도 없는 브랜드를 제목 앞에
+두지 않는다.
 
 ## 제목 규칙
 
@@ -61,10 +77,11 @@ status: curated
 - 기능보다 독자 행동과 화면에 보이는 결과.
 - 모호한 말(`최적화`, `효율적`, `강력한`) 대신 구체적 행동.
 - 수동태와 수식어를 줄인다.
-- beginner 글은 `PIPELINE.md` 길이 한도를 지킨다.
+- beginner 글은 [blogPublishing.md](blogPublishing.md) 의 길이 한도를 지킨다.
 
 본문을 새로 쓰거나 전체 교정할 때는 저장소용 `$blog-writing` 스킬을 사용한다. 스킬 파일은
-포인터일 뿐이고 집필 규칙의 정본은 `memory/blogWriter.md`이며 발행 계약은 `blog/PIPELINE.md`다.
+포인터일 뿐이고 집필 규칙의 정본은 `memory/blogWriter.md` 이며 발행 계약은
+[blogPublishing.md](blogPublishing.md) 다.
 `cd site && npm run test:blog-style`과 `npm run test:blog-package`로 검사 규칙 표본을 먼저 확인하고
 `npm run check:blog`로 실제 글을 검사한다.
 
@@ -72,7 +89,7 @@ status: curated
 
 초안이 있으면 아래만 고친다.
 
-1. 제목과 summary에 1.5절 세 문항 적용
+1. 제목과 summary 에 위 유입 패키징 게이트 세 문항 적용
 2. 첫 두 문단에서 브랜드 선행 제거
 3. CTA를 `시작하기` 대신 열 화면과 누를 버튼으로 바꿈
 4. 사실과 다른 약속 삭제

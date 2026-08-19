@@ -16,8 +16,10 @@ description: eddmpython의 한국어 블로그를 주제 조사부터 SEO 제목
    절마다 하는 일 네 가지, 한 문장으로 남는 것, 다른 눈이 보는 네 가지, 닫는 법, 함정
 2. **`memory/writingVoice.md`** 문체 작법
 3. **카테고리 폴더의 `원장.md`** 커리큘럼과 절 사슬
-4. **`blog/PIPELINE.md`** 발행 계약. frontmatter, SEO 필드, 이미지 브리프, 팔레트, 검사 명령
-5. `blog/product-marketing.md` 제품 카피 맥락
+4. **`skills/specs/operation/blogPublishing.md`** 발행 계약. 파일 이름, frontmatter, 검사, 배포
+5. `skills/specs/operation/blogMedia.md` 이미지 계약. plan.json, 색상, Hugging Face
+6. `skills/specs/operation/blogCopy.md` 제목과 summary. 유입 패키징 게이트
+7. `skills/specs/operation/productMarketing.md` 제품 맥락과 쓰지 말 말
 
 규칙 문서의 전체 인덱스는 `memory/MEMORY.md` 다.
 

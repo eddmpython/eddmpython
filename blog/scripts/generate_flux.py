@@ -1,7 +1,7 @@
 """plan.json의 섹션 근거와 imagegen 장면을 합쳐 FLUX 1.1 Pro로 생성한다.
 
 사용: python -X utf8 blog/scripts/generate_flux.py <post-id> [--only key1,key2] [--force]
-- 계약: blog/PIPELINE.md 5절. 프롬프트·의미의 정본은 blog/media/plan.json이다.
+- 계약: skills/specs/operation/blogMedia.md. 프롬프트와 의미의 정본은 blog/media/plan.json이다.
 - 출력: ../eddmpython.out/blog-media/<post-id>/<assetKey>.webp (Git 밖, 검수 후 publish_media.py로 HF 발행)
 - 키: 저장소 루트 .env의 REPLICATE_API_TOKEN. 값은 어디에도 출력하지 않는다.
 - 속도: Replicate 계정 분당 제한을 고려해 생성 사이 12초 간격.

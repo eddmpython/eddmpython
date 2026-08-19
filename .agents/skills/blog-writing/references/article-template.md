@@ -1,5 +1,8 @@
 # 블로그 한 편 양식
 
+**이 파일은 모양 본보기다. 규칙이 아니다.** 집필 규칙의 정본은 `memory/blogWriter.md`,
+발행 계약의 정본은 `skills/specs/operation/blogPublishing.md`다. 어긋나면 그쪽이 이긴다.
+
 파일명은 `blog/<category-slug>/NNN-kebab.md`로 쓴다. `NNN`은 발행할 때 한 번 부여하는 세 자리 고정 순번이며,
 공개 읽기 순서를 뜻하지 않는다. 날짜는 저장하지 않고 공개 읽기 순서는 `blog/order.json`에 둔다.
 
@@ -20,13 +23,11 @@ readerLevel: beginner
 readerStartingPoint: 독자가 아직 모르는 화면, 행동, 용어
 primaryKeyword: 두 단어 이상의 핵심 검색어
 searchIntent: explanation
-depthContract: standalone-deep-v1
 ```
 
 `searchIntent`는 explanation, how-to, troubleshooting, comparison 중 하나를 쓴다.
-일반 독립 글은 `depthContract: standalone-deep-v1`, 프로젝트와 문제 해결 글은
-`depthContract: standalone-project-v1`을 쓴다. 041번부터 이 값이 없거나 하한선에 못 미치면 발행
-검사가 실패한다. 기존 글을 전면 교정할 때도 알맞은 계약을 추가한다.
+필수 필드와 검사 내용의 정본은 `skills/specs/operation/blogPublishing.md`다.
+`depthContract`는 쓰지 않는다. 어느 글도 쓰지 않고 `check-blog.mjs`도 요구하지 않는다.
 
 ## 깊이 설계
 
@@ -41,9 +42,8 @@ depthContract: standalone-deep-v1
 7. 결과 검증 방법
 8. 적용 범위와 한계
 
-새 글과 전면 교정 글은 의미 있는 H2 여섯 개와 공백을 뺀 서술 본문 3,000자 이상을 기본 출발선으로
-삼는다. 프로젝트와 문제 해결 글은 H2 일곱 개와 4,000자 이상을 출발선으로 삼는다. 이 하한선을
-반복 문장으로 채우지 않는다.
+**글자 수 하한은 쓰지 않는다.** 2026-08-17에 발행 40편을 실측해 없앴다. 하한에 미달할 때 가장 싼
+해가 새 사실이 아니라 같은 사실의 재진술이기 때문이다. 주제 하나를 끝까지 답했으면 짧아도 된다.
 
 ## 도입
 
