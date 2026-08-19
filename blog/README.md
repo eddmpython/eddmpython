@@ -6,7 +6,8 @@
 
 | 경로 | 역할 |
 |---|---|
-| `PIPELINE.md` | 한 편을 쓰는 규칙 |
+| **`WRITER.md`** | **작가 파이프라인. 글을 쓰기 전에 이것부터 연다** |
+| `PIPELINE.md` | 발행 계약과 이미지 규칙. 다 쓴 뒤에 본다 |
 | `product-marketing.md` | 제품 카피 맥락 |
 | `order.json` | `/blog` 목록의 카테고리와 읽기 순서 |
 | `media/` | 이미지 계획과 HF 객체 대응 |
