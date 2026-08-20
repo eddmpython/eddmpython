@@ -102,6 +102,31 @@ check("shorts 는 세로 틀로 나간다", () => {
   assert.ok(html.includes("/shorts/l4J3QvePJtQ"));
 });
 
+check("시연 구간 시작 초를 버리지 않는다", () => {
+  // 바깥 사례 영상은 앞부분이 인사와 얼굴인 것이 많다. 초를 떨어뜨리면 도입부가 먼저 뜬다.
+  const html = renderMarkdown("[상장 자동제작](https://www.youtube.com/watch?v=1pC_UXhiJH8&t=590s)");
+  assert.ok(html.includes('data-start="590"'));
+  // 새 탭으로 나가는 사람도 같은 자리에서 봐야 한다. 속성 안이므로 & 는 &amp; 로 나간다
+  assert.ok(html.includes("watch?v=1pC_UXhiJH8&amp;t=590"));
+});
+
+check("시작 초가 없으면 data-start 를 붙이지 않는다", () => {
+  const html = renderMarkdown("[초밥 게임 봇](https://www.youtube.com/watch?v=lfk_T6VKhTE)");
+  assert.ok(!html.includes("data-start"));
+});
+
+check("1m30s 꼴의 시작 초도 읽는다", () => {
+  const html = renderMarkdown("[사례](https://www.youtube.com/watch?v=lfk_T6VKhTE&t=1m30s)");
+  assert.ok(html.includes('data-start="90"'));
+});
+
+check("shorts 의 시작 초는 물음표로 붙인다", () => {
+  // shorts 주소에는 아직 쿼리가 없으므로 & 로 붙이면 깨진 주소가 된다
+  const html = renderMarkdown("[세로 사례](https://www.youtube.com/shorts/l4J3QvePJtQ?t=12)");
+  assert.ok(html.includes('data-start="12"'));
+  assert.ok(html.includes("/shorts/l4J3QvePJtQ?t=12"));
+});
+
 check("문장 안의 유튜브 링크는 그대로 링크로 둔다", () => {
   const html = renderMarkdown("먼저 [영상](https://youtu.be/priwCYZJ8h4)을 보시기 바랍니다");
   assert.ok(html.startsWith("<p>"));

@@ -37,11 +37,27 @@ const PENDING = /^media:\/\/([a-z0-9-]+)$/i;
 const YOUTUBE =
   /^https?:\/\/(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)([\w-]{6,})|youtube\.com\/shorts\/([\w-]{6,})|youtu\.be\/([\w-]{6,}))(?:[&?#]\S*)?$/;
 
-/** 유튜브 주소 하나를 집는다. shorts 는 세로 영상이라 틀도 세로로 잡는다. */
-export function youtube(url: string): { id: string; tall: boolean } | null {
+/** `&t=150s` 또는 `?start=150` 에서 시작 초를 집는다. `1m30s` 꼴도 받는다. */
+function startSeconds(url: string): number {
+  const m = url.match(/[&?](?:t|start)=([^&#]+)/);
+  if (!m) return 0;
+  const raw = m[1];
+  if (/^\d+$/.test(raw)) return Number(raw);
+  const hms = raw.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?$/i);
+  if (!hms || (!hms[1] && !hms[2] && !hms[3])) return 0;
+  return Number(hms[1] ?? 0) * 3600 + Number(hms[2] ?? 0) * 60 + Number(hms[3] ?? 0);
+}
+
+/**
+ * 유튜브 주소 하나를 집는다. shorts 는 세로 영상이라 틀도 세로로 잡는다.
+ *
+ * **시작 초를 버리지 않는다.** 바깥 사례 영상은 앞부분이 인사와 얼굴인 경우가 많아서
+ * 시연 구간을 초로 지목해 건다. 그것을 떨어뜨리면 강의 화면에 도입부가 먼저 뜬다.
+ */
+export function youtube(url: string): { id: string; tall: boolean; start: number } | null {
   const m = url.match(YOUTUBE);
   if (!m) return null;
-  return { id: m[1] ?? m[2] ?? m[3], tall: Boolean(m[2]) };
+  return { id: m[1] ?? m[2] ?? m[3], tall: Boolean(m[2]), start: startSeconds(url) };
 }
 
 /**
@@ -49,14 +65,21 @@ export function youtube(url: string): { id: string; tall: boolean } | null {
  * 열지도 않은 영상 때문에 바깥 요청이 나간다. 썸네일은 img 가 아니라 배경으로 넣는다.
  * article 안의 img 는 누르면 확대가 열리므로 그 자리와 겹치면 안 된다.
  */
-function youtubeFigure(video: { id: string; tall: boolean }, label: string): string {
-  const watch = video.tall
+function youtubeFigure(
+  video: { id: string; tall: boolean; start: number },
+  label: string,
+): string {
+  const base = video.tall
     ? `https://www.youtube.com/shorts/${video.id}`
     : `https://www.youtube.com/watch?v=${video.id}`;
+  // 새 탭으로 여는 주소에도 시작 초를 남긴다. 눌러서 나가는 사람도 같은 자리에서 봐야 한다.
+  const watch = video.start ? `${base}${video.tall ? "?" : "&"}t=${video.start}` : base;
   const thumb = `url(https://i.ytimg.com/vi/${video.id}/maxresdefault.jpg), url(https://i.ytimg.com/vi/${video.id}/hqdefault.jpg)`;
   return `<figure class="yt${video.tall ? " tall" : ""}"><div class="frame"><button type="button" class="ytplay" style="background-image:${esc(
     thumb,
-  )}" data-yt="${esc(video.id)}" data-label="${esc(label)}" aria-label="${esc(
+  )}" data-yt="${esc(video.id)}"${
+    video.start ? ` data-start="${video.start}"` : ""
+  } data-label="${esc(label)}" aria-label="${esc(
     label || "YouTube 영상",
   )} 재생"><span></span></button></div><figcaption><span>${esc(
     label,

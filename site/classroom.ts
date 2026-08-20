@@ -450,7 +450,8 @@ document.addEventListener("click", (e) => {
   const play = t.closest ? t.closest("button.ytplay") : null;
   if (play) {
     const f = document.createElement("iframe");
-    f.src = "https://www.youtube-nocookie.com/embed/" + play.dataset.yt + "?autoplay=1&rel=0&playsinline=1";
+    const at = play.dataset.start ? "&start=" + play.dataset.start : "";
+    f.src = "https://www.youtube-nocookie.com/embed/" + play.dataset.yt + "?autoplay=1&rel=0&playsinline=1" + at;
     f.title = play.dataset.label || "YouTube 영상";
     f.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
     f.referrerPolicy = "strict-origin-when-cross-origin";
