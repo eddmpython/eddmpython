@@ -52,6 +52,52 @@ function leadOut(html: string): string {
 }
 /** 아직 발행하지 않은 시각물 자리. 그대로 두면 깨진 그림이 강의 화면에 뜬다. */
 const PENDING = /^media:\/\/([a-z0-9-]+)$/i;
+
+/**
+ * 실행 칸 주소. 교안이 링크 하나짜리 문단으로 적는다.
+ *
+ * **모양은 공개 블로그의 `src/components/Markdown.tsx` 의 `CODARO_CELL` 과 같아야 한다.**
+ * 한쪽을 고치면 다른 쪽도 같은 날 고친다.
+ */
+const CODARO =
+  /^https:\/\/eddmpython\.com\/codaro\/run\/\?example=([a-z0-9]+(?:-[a-z0-9]+)*)$/;
+
+export type CourseCell = {
+  title?: string;
+  description?: string;
+  code: string;
+  hint?: string;
+};
+export type Cells = Record<string, CourseCell>;
+
+/**
+ * 실행 칸을 그린다.
+ *
+ * 2026-08-20 까지 이 자리가 없었다. 렌더러가 codaro 주소를 못 알아봐서 생 주소가 그대로
+ * 보이는 링크로 나갔고, 003 과 004 가 `값을 바꿔 실행해 보세요` 라고 말하는데 수강생
+ * 화면에는 바꿀 칸도 코드도 없었다. 여덟 곳이 그랬다.
+ */
+function cellCard(id: string, cell: CourseCell): string {
+  const rows = Math.max(6, cell.code.split("\n").length + 1);
+  return `<div class="cell" data-cell="${esc(id)}">
+<div class="cell-h"><span class="cell-dot"></span><span class="cell-k">실습</span><span class="cell-s" data-state aria-live="polite">실행 준비됨</span></div>
+${cell.title ? `<p class="cell-t">${esc(cell.title)}</p>` : ""}
+${cell.description ? `<p class="cell-d">${esc(cell.description)}</p>` : ""}
+<textarea class="cell-c" data-code spellcheck="false" wrap="off" rows="${rows}" aria-label="Python 코드">${esc(cell.code)}</textarea>
+<div class="cell-b"><button type="button" data-run>실행</button><button type="button" data-reset>처음으로</button><span class="cell-hint">${esc(cell.hint ?? "브라우저 안에서 실행됩니다")}</span></div>
+<pre class="cell-o" data-out>실행을 누르면 결과가 여기에 나옵니다</pre>
+</div>`;
+}
+
+/**
+ * 셀 이름은 있는데 묶음에 그 셀이 없을 때.
+ *
+ * 조용히 링크로 흘려보내면 2026-08-20 의 결함이 그대로 재발한다. 화면에 드러내야
+ * 발행한 사람이 안다.
+ */
+function missingCell(id: string): string {
+  return `<div class="cell cell-miss"><b>실행 칸을 묶음에서 찾지 못했습니다</b><i>${esc(id)}</i></div>`;
+}
 const YOUTUBE =
   /^https?:\/\/(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)([\w-]{6,})|youtube\.com\/shorts\/([\w-]{6,})|youtu\.be\/([\w-]{6,}))(?:[&?#]\S*)?$/;
 
@@ -122,7 +168,7 @@ function pendingMedia(key: string, alt: string, caption: string): string {
 }
 
 /** 코드가 아닌 구간을 빈 줄로 갈라 블록마다 태그를 붙인다. */
-function blocks(text: string, headings: string[]): string[] {
+function blocks(text: string, headings: string[], cells: Cells): string[] {
   const out: string[] = [];
   let images: string[] = [];
   const flush = () => {
@@ -165,6 +211,13 @@ function blocks(text: string, headings: string[]): string[] {
       const items = b.split("\n").filter((l) => /^[-*]\s/.test(l.trim()));
       out.push(`<ul>${items.map((l) => `<li>${inline(l.trim().slice(2))}</li>`).join("")}</ul>`);
     } else if (/^https?:\/\/\S+$/.test(b)) {
+      // 실행 칸이 먼저다. 못 알아보면 생 주소가 그대로 강의 화면에 찍힌다.
+      const run = b.match(CODARO);
+      if (run) {
+        const cell = cells[run[1]];
+        out.push(cell && typeof cell.code === "string" ? cellCard(run[1], cell) : missingCell(run[1]));
+        continue;
+      }
       const video = youtube(b);
       out.push(video ? youtubeFigure(video, "") : `<p><a href="${esc(b)}">${esc(b)}</a></p>`);
     } else {
@@ -192,18 +245,22 @@ function blocks(text: string, headings: string[]): string[] {
  * 문단이 되어 수강생 화면에 코드가 부서져 나온다. 강의장에서 그대로 따라 치는 것이라
  * 부서지면 그 시간이 통째로 날아간다.
  */
-export function renderMarkdown(body: string, headings: string[] = []): string {
+export function renderMarkdown(
+  body: string,
+  headings: string[] = [],
+  cells: Cells = {},
+): string {
   const text = body.replace(/\r\n/g, "\n");
   const out: string[] = [];
   const fence = /^```[^\n]*\n([\s\S]*?)^```[ \t]*$/gm;
   let at = 0;
   let m: RegExpExecArray | null;
   while ((m = fence.exec(text)) !== null) {
-    out.push(...blocks(text.slice(at, m.index), headings));
+    out.push(...blocks(text.slice(at, m.index), headings, cells));
     out.push(`<pre>${esc(m[1].replace(/\n$/, ""))}</pre>`);
     at = m.index + m[0].length;
   }
-  out.push(...blocks(text.slice(at), headings));
+  out.push(...blocks(text.slice(at), headings, cells));
   return out.join("\n");
 }
 
@@ -213,8 +270,12 @@ export function renderMarkdown(body: string, headings: string[] = []): string {
  * 강의장은 강사가 화면을 띄워 놓고 "이제 OCR 부분 봅시다" 하고 건너뛰는 자리다.
  * 절이 스물 몇 개인 글에서 목차 없이 스크롤로 찾으면 그 시간이 통째로 버려진다.
  */
-export function renderPost(body: string): { html: string; headings: string[] } {
+export function renderPost(
+  body: string,
+  cells: Cells = {},
+): { html: string; headings: string[]; hasCells: boolean } {
   const headings: string[] = [];
-  const html = renderMarkdown(body, headings);
-  return { html, headings };
+  const html = renderMarkdown(body, headings, cells);
+  // 실행 칸이 없는 글에는 파이썬 런타임 스크립트를 붙이지 않는다.
+  return { html, headings, hasCells: html.includes('data-cell="') };
 }

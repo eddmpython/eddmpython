@@ -216,4 +216,88 @@ check("문단 전체가 질문이면 감싸지 않는다", () => {
   assert.ok(!html.includes('class="q"'));
 });
 
+/*
+ * 실행 칸.
+ *
+ * 2026-08-20 까지 codaro 주소가 생 링크로 나갔다. 003 과 004 가 `값을 바꿔 실행해 보세요`
+ * 라고 말하는데 수강생 화면에는 바꿀 칸도 코드도 없었다. 여덟 곳이 그랬고 아무도 몰랐다.
+ * 아래가 그 재발을 막는 자리다.
+ */
+const CELL_URL = "https://eddmpython.com/codaro/run/?example=expense-variables";
+const CELLS = {
+  "expense-variables": {
+    title: "부서와 기준금액 바꾸기",
+    description: "값을 바꾼 뒤 실행해 봅니다.",
+    code: 'department = "영업팀"\namount = 120000',
+    hint: "영업팀을 관리팀으로 바꿔봅니다",
+  },
+};
+
+check("실행 칸 주소가 링크가 아니라 실행 칸이 된다", () => {
+  const html = renderMarkdown(CELL_URL, [], CELLS);
+  assert.ok(html.includes('data-cell="expense-variables"'));
+  assert.ok(html.includes("data-run"));
+  assert.ok(html.includes("data-out"));
+  // 생 주소가 화면에 찍히면 안 된다. 그것이 고치기 전의 증상이다.
+  assert.ok(!html.includes("<a href"));
+  assert.ok(!html.includes("codaro/run"));
+});
+
+check("실행 칸에 코드와 설명이 실린다", () => {
+  const html = renderMarkdown(CELL_URL, [], CELLS);
+  assert.ok(html.includes("부서와 기준금액 바꾸기"));
+  assert.ok(html.includes("영업팀"));
+  assert.ok(html.includes("amount = 120000"));
+  assert.ok(html.includes("영업팀을 관리팀으로 바꿔봅니다"));
+});
+
+check("코드가 escape 되어 들어간다", () => {
+  const html = renderMarkdown(CELL_URL, [], {
+    "expense-variables": { code: 'x = "<script>alert(1)</script>"' },
+  });
+  assert.ok(!html.includes("<script>"));
+  assert.ok(html.includes("&lt;script&gt;"));
+});
+
+check("묶음에 없는 실행 칸은 화면에 드러낸다", () => {
+  // 조용히 링크로 흘려보내면 발행한 사람이 못 본다
+  const html = renderMarkdown(CELL_URL, [], {});
+  assert.ok(html.includes("cell-miss"));
+  assert.ok(html.includes("expense-variables"));
+  assert.ok(!html.includes("<a href"));
+});
+
+check("셀을 안 주면 옛 판처럼 링크로 남지 않고 드러난다", () => {
+  // schema 2 묶음이 남아 있을 때도 강의장이 죽지 않아야 한다
+  const html = renderMarkdown(CELL_URL);
+  assert.ok(html.includes("cell-miss"));
+});
+
+check("renderPost 가 실행 칸 유무를 알려 준다", () => {
+  const withCell = renderPost(CELL_URL, CELLS);
+  assert.equal(withCell.hasCells, true);
+  const without = renderPost("## 제목\n\n본문입니다.");
+  assert.equal(without.hasCells, false);
+});
+
+check("실행 칸이 여러 개면 각각 자기 이름을 갖는다", () => {
+  const body = [
+    CELL_URL,
+    "",
+    "https://eddmpython.com/codaro/run/?example=expense-loop",
+  ].join("\n");
+  const html = renderMarkdown(body, [], {
+    ...CELLS,
+    "expense-loop": { code: "for a in [1,2]:\n    print(a)" },
+  });
+  assert.ok(html.includes('data-cell="expense-variables"'));
+  assert.ok(html.includes('data-cell="expense-loop"'));
+  assert.equal(html.match(/data-cell=/g)?.length, 2);
+});
+
+check("codaro 가 아닌 주소는 그대로 링크다", () => {
+  const html = renderMarkdown("https://example.com/a");
+  assert.ok(html.includes('<a href="https://example.com/a"'));
+});
+
 console.log(`classroom render: 코드 분할과 escape 등 ${count} cases`);

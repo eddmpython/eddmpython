@@ -243,6 +243,69 @@ for (const viewport of VIEWPORTS) {
     const zoomState = value(zoomed);
     record(`${viewport.id} 시각 자산 확대`, zoomState === "on", zoomState);
     if (zoomState === "on") await save(session, "04-zoom");
+
+    /*
+     * 5) 실행 칸.
+     *
+     * 003 과 004 가 `값을 바꾸고 실행해 보시기 바랍니다` 라고 말하는 자리다.
+     * **2026-08-20 까지 여기가 생 주소가 그대로 보이는 링크였다.** 렌더러가 codaro 주소를
+     * 못 알아봤고, 교안 검사도 공개 저장소 검사도 그것을 볼 자리가 없어서 아무도 몰랐다.
+     * 그림만 찍고 넘어가면 같은 일이 또 난다. 그래서 눌러서 파이썬을 돌려 본다.
+     */
+    const cellPost = value(
+      await evaluate(
+        session,
+        `(() => {
+          const links = [...document.querySelectorAll('a.nav-post')];
+          return links.length ? links[links.length - 1].getAttribute('href') : null;
+        })()`,
+      ),
+    );
+    if (cellPost) {
+      opened = await client.openTarget(`${base}${cellPost}`, {
+        expectedRisk: "externalEffect",
+        waitUntil: "load",
+        timeoutMs: 30000,
+      });
+      session = (await client.attachSession(opened.output.targetRef, { timeoutMs: 30000 })).output;
+
+      const cells = Number(
+        value(await evaluate(session, `document.querySelectorAll('[data-cell]').length`)),
+      );
+      record(`${viewport.id} 실행 칸이 그려짐`, cells > 0, String(cells));
+
+      const rawLink = value(
+        await evaluate(session, `document.body.innerHTML.includes('codaro/run')`),
+      );
+      record(`${viewport.id} 생 주소가 화면에 안 보임`, rawLink === false, String(rawLink));
+
+      // 파이썬을 실제로 돌리는 것은 데스크톱에서 한 번이면 된다. 뷰포트와 무관한 검사다.
+      if (cells > 0 && viewport.id === "desktop") {
+        const ran = String(
+          value(
+            await evaluate(
+              session,
+              `(async () => {
+                const cell = document.querySelector('[data-cell]');
+                cell.querySelector('[data-run]').click();
+                const st = cell.querySelector('[data-state]');
+                const out = cell.querySelector('[data-out]');
+                for (let i = 0; i < 200; i++) {
+                  await new Promise((r) => setTimeout(r, 500));
+                  const s = st.textContent;
+                  if (s === '완료' || s === '오류') break;
+                }
+                return st.textContent + ' :: ' + out.textContent.slice(0, 160);
+              })()`,
+            ),
+          ),
+        );
+        record(`${viewport.id} 실행 칸이 실제로 파이썬을 돌림`, ran.startsWith("완료"), ran);
+        await save(session, "05-cell");
+      } else if (cells > 0) {
+        await save(session, "05-cell");
+      }
+    }
   } finally {
     await client.stop?.({ timeoutMs: 30000 });
   }

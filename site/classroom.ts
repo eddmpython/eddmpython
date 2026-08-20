@@ -10,7 +10,7 @@
  *
  * 4번이 이 파일이 존재하는 이유다. 클라이언트에서 거르면 개발자 도구로 앞 내용을 먼저 본다.
  */
-import { esc, renderPost } from "./classroom-render";
+import { esc, renderPost, type Cells } from "./classroom-render";
 // 심볼 좌표와 SNS 주소는 랜딩과 같은 정본을 읽는다. brand.ts 는 React 를 부르지 않는다.
 import { SYMBOL, BRAND, TOKENS, cssVars } from "./src/brand";
 import { SOCIAL } from "./src/social";
@@ -30,6 +30,8 @@ export type CourseCategory = {
   title: string;
   /** 이 카테고리를 덮을 때 독자의 일 하나가 무엇이 되는지. schema 2 부터 온다 */
   goal?: string;
+  /** 실행 칸 예제. schema 3 부터 온다. 교안이 링크로 부르고 렌더러가 칸으로 그린다 */
+  cells?: Cells;
   posts: CoursePost[];
 };
 type CourseBundle = { schema: number; categories: CourseCategory[] };
@@ -41,7 +43,7 @@ type CourseBundle = { schema: number; categories: CourseCategory[] };
  * 어느 쪽을 먼저 하든 그 틈이 생기고, 하필 강의 직전이면 그것이 사고다.
  * 2 는 카테고리 성과(goal)가 붙은 판이고 1 은 그 전 판이다.
  */
-const COURSE_SCHEMA = new Set([1, 2]);
+const COURSE_SCHEMA = new Set([1, 2, 3]);
 
 export type CourseState = { ok: boolean; categories: CourseCategory[] };
 
@@ -550,6 +552,33 @@ article li { margin:.5rem 0; }
 article li::marker { color:var(--eddm-accent-dim); }
 article pre { overflow-x:auto; background:#00000055; padding:1rem; border-radius:.6rem; }
 article table { display:block; overflow-x:auto; border-collapse:collapse; }
+.cell { margin:1.9rem 0; border:1px solid var(--eddm-accent-line); border-radius:.85rem; overflow:hidden;
+  background:var(--eddm-raise); }
+.cell.bad { border-color:#e0908a66; }
+.cell-h { display:flex; align-items:center; gap:.5rem; padding:.7rem 1rem;
+  border-bottom:1px solid var(--eddm-line-base); background:var(--eddm-accent-bg); }
+.cell-dot { width:6px; height:6px; border-radius:50%; background:var(--eddm-sand); flex:0 0 auto; }
+.cell-k { font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--eddm-sand); }
+.cell-s { margin-left:auto; font-size:.78rem; color:var(--eddm-text-faint); }
+.cell-t { margin:.9rem 1rem .2rem; font-size:.98rem; color:var(--eddm-text); font-weight:500; }
+.cell-d { margin:.2rem 1rem .8rem; font-size:.88rem; line-height:1.7; color:var(--eddm-text-muted); }
+.cell-c { display:block; width:100%; box-sizing:border-box; resize:vertical; border:0; outline:0;
+  background:#00000055; color:var(--eddm-text); padding:.9rem 1rem; line-height:1.65;
+  font-family:inherit; font-size:.86rem; white-space:pre; overflow-x:auto; }
+.cell-c:focus { background:#00000077; }
+.cell-b { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem; padding:.75rem 1rem;
+  border-top:1px solid var(--eddm-line-base); }
+.cell-b button { border-radius:.5rem; padding:.4rem .9rem; font-size:.86rem; cursor:pointer;
+  border:1px solid var(--eddm-line-strong); background:transparent; color:var(--eddm-text); }
+.cell-b button[data-run] { background:var(--eddm-ivory); color:var(--eddm-carbon); border-color:transparent; font-weight:500; }
+.cell-b button:disabled { opacity:.5; cursor:default; }
+.cell-hint { font-size:.78rem; color:var(--eddm-text-faint); }
+.cell-o { margin:0; padding:.9rem 1rem; border-top:1px solid var(--eddm-line-base);
+  background:transparent; border-radius:0; max-height:18rem; overflow:auto; font-size:.82rem;
+  line-height:1.6; color:var(--eddm-text-muted); white-space:pre-wrap; word-break:break-word; }
+.cell.bad .cell-o { color:#e0908a; }
+.cell-miss { padding:1rem; color:#e0908a; font-size:.88rem; }
+.cell-miss i { display:block; margin-top:.3rem; font-style:normal; color:var(--eddm-text-faint); }
 .slider { display:flex; gap:.75rem; overflow-x:auto; scroll-snap-type:x mandatory; margin:1.2rem 0; }
 .slider img { scroll-snap-align:center; flex:0 0 88%; margin:0; }
 .zoom { position:fixed; inset:0; background:#000000e8; display:none; align-items:center;
@@ -684,6 +713,70 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape") z.classLis
 `;
 
 /**
+ * pyproc 이 고정한 Pyodide 배포판. `site/src/pymachine.ts` 와 **같은 판이어야 한다.**
+ * 블로그 실행 칸과 강의장 실행 칸이 다른 파이썬을 돌리면 같은 코드가 다르게 동작한다.
+ */
+const ENGINE = "https://cdn.jsdelivr.net/pyodide/v314.0.2/full/";
+
+/**
+ * 실행 칸을 살린다.
+ *
+ * **페이지 전체가 파이썬 머신 하나를 나눠 쓴다.** 004 는 실행 칸이 일곱 개인데 칸마다
+ * 부팅하면 강의가 멈춘다. 처음 실행을 누를 때만 받아 오고 그 뒤로는 즉시 돈다.
+ *
+ * 미리 부팅하지 않는 것도 일부러다. 수강생이 글만 읽고 지나가는 편이 훨씬 많은데
+ * 페이지를 열자마자 수십 MB 를 받으면 강의장 전체가 느려진다.
+ */
+const CELL_SCRIPT = `
+(() => {
+  const cells = document.querySelectorAll("[data-cell]");
+  if (!cells.length) return;
+  let booting = null;
+  const boot = () => {
+    if (!booting) {
+      booting = import("${ENGINE}pyodide.mjs")
+        .then((m) => m.loadPyodide({ indexURL: "${ENGINE}" }))
+        .catch((e) => { booting = null; throw e; });
+    }
+    return booting;
+  };
+  cells.forEach((cell) => {
+    const ta = cell.querySelector("[data-code]");
+    const out = cell.querySelector("[data-out]");
+    const st = cell.querySelector("[data-state]");
+    const run = cell.querySelector("[data-run]");
+    const reset = cell.querySelector("[data-reset]");
+    if (!ta || !out || !st || !run) return;
+    const first = ta.value;
+    if (reset) reset.addEventListener("click", () => { ta.value = first; ta.focus(); });
+    run.addEventListener("click", async () => {
+      run.disabled = true;
+      cell.classList.remove("bad");
+      out.textContent = "";
+      st.textContent = booting ? "실행 중" : "파이썬을 처음 받는 중입니다";
+      try {
+        const py = await boot();
+        st.textContent = "실행 중";
+        const lines = [];
+        py.setStdout({ batched: (s) => lines.push(s) });
+        py.setStderr({ batched: (s) => lines.push(s) });
+        const value = await py.runPythonAsync(ta.value);
+        if (value !== undefined && value !== null) lines.push(String(value));
+        out.textContent = lines.length ? lines.join("\\n") : "(나온 값이 없습니다)";
+        st.textContent = "완료";
+      } catch (e) {
+        out.textContent = e && e.message ? e.message : String(e);
+        st.textContent = "오류";
+        cell.classList.add("bad");
+      } finally {
+        run.disabled = false;
+      }
+    });
+  });
+})();
+`;
+
+/**
  * 인라인 스크립트를 쓰므로 이 응답만 nonce 를 붙인 CSP 를 직접 단다.
  * worker.ts 의 기본 CSP 는 script-src 'self' 라 인라인이 막힌다. 확대와 실시간 동기화가
  * 둘 다 스크립트라서 nonce 없이는 강의장이 죽은 화면이 된다.
@@ -759,7 +852,19 @@ function header(): string {
 </nav>`;
 }
 
-function page(title: string, inner: string, extraScript = "", wide = false): Response {
+/**
+ * `cells` 는 이 페이지에 실행 칸이 있는지다.
+ *
+ * 실행 칸이 있는 글에만 파이썬 배포판 출처를 연다. 목록 화면과 실행 칸 없는 글까지
+ * 열어 둘 이유가 없다. CSP 는 좁을수록 좋다.
+ */
+function page(
+  title: string,
+  inner: string,
+  extraScript = "",
+  wide = false,
+  cells = false,
+): Response {
   const nonce = randomHex(16);
   const html = `<!doctype html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -786,9 +891,11 @@ function page(title: string, inner: string, extraScript = "", wide = false): Res
         // 랜딩과 같은 글꼴을 쓰려고 연다. 글꼴이 다르면 같은 화면이 아니다.
         "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
         "font-src 'self' https://cdn.jsdelivr.net",
-        `script-src 'nonce-${nonce}'`,
-        "connect-src 'self'",
+        // 실행 칸이 있는 글만 파이썬 배포판을 받아 온다. wasm 을 컴파일하므로 그 권한도 같이 연다.
+        `script-src 'nonce-${nonce}'${cells ? " 'wasm-unsafe-eval' https://cdn.jsdelivr.net" : ""}`,
+        `connect-src 'self'${cells ? " https://cdn.jsdelivr.net" : ""}`,
         "frame-src https://www.youtube-nocookie.com",
+        ...(cells ? ["worker-src 'self' blob:"] : []),
       ].join("; "),
     },
   });
@@ -1005,7 +1112,7 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
     const at = category.posts.findIndex((p) => p.id === parts[2]);
     const post = category.posts[at];
     if (!post) return new Response("없는 글입니다.", { status: 404 });
-    const { html, headings } = renderPost(post.body);
+    const { html, headings, hasCells } = renderPost(post.body, category.cells ?? {});
 
     // 왼쪽. 같은 과정의 글을 오간다. 강의 중에 앞 편으로 되돌아가는 일이 잦다.
     const nav = category.posts
@@ -1066,8 +1173,9 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
          </main>
          ${toc}
        </div>`,
-      stamp + TOC_SCRIPT,
+      stamp + TOC_SCRIPT + (hasCells ? CELL_SCRIPT : ""),
       true,
+      hasCells,
     );
   }
 
