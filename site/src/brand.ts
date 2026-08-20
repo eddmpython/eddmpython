@@ -51,6 +51,78 @@ export const BRAND = {
 } as const;
 
 /**
+ * 브랜드 토큰 정본.
+ *
+ * **같은 값을 두 번 적지 않는다.** 랜딩(styles.css), 강의장(classroom.ts), 운영 화면
+ * (scripts/classroom-admin.mjs)이 각자 색을 적고 있었고 그래서 배경이 미묘하게 달랐다
+ * (강의장 #101514, 운영 화면 #0d1211). 같은 브랜드인데 화면을 옮기면 이상했다.
+ *
+ * CSS 를 쓰는 쪽은 `cssVars()` 로 변수를 깔고 `var(--eddm-*)` 를 참조한다. Tailwind 를
+ * 쓰는 랜딩은 styles.css 의 `:root` 가 같은 값을 들고 있고 `scripts/check-brand.mjs` 가
+ * 그 둘이 어긋나면 막는다.
+ *
+ * 알파 단계에 이름을 준 이유는 `#f5f3ee8c` 같은 값이 화면마다 제각각 나오던 것을 막기
+ * 위해서다. 글자는 네 단계, 선은 세 단계면 충분하다.
+ */
+export const TOKENS = {
+  color: {
+    /** 바탕. 모든 표면이 같은 검정을 쓴다 */
+    carbon: BRAND.carbon,
+    /** carbon 보다 한 단 어두운 면. 화면 프레임 받침 */
+    ink: "#0c0f0e",
+    /** 글자 기본 */
+    ivory: BRAND.ivory,
+    /** 강조. 브랜드에서 유일하게 색이 있는 자리 */
+    sand: BRAND.eye,
+    /** 운영 화면에서 프로덕션을 가리키는 경고색. 다른 자리에 쓰지 않는다 */
+    alert: "#e0552d",
+    dartlab: "#7da2e8",
+    codaro: "#dfa14e",
+    xlpod: "#57b98a",
+    pyproc: "#ff5a36",
+  },
+  /** 글자 밝기 네 단계. 본문, 보조, 흐림, 라벨 */
+  text: {
+    body: "rgba(245,243,238,.75)",
+    muted: "rgba(245,243,238,.55)",
+    dim: "rgba(245,243,238,.45)",
+    faint: "rgba(245,243,238,.35)",
+  },
+  /** 선 세 단계. 구분선, 테두리, 눈에 띄는 테두리 */
+  line: {
+    soft: "rgba(255,255,255,.08)",
+    base: "rgba(255,255,255,.11)",
+    strong: "rgba(255,255,255,.17)",
+  },
+  /** 살짝 뜬 면. 카드 배경과 hover */
+  surface: {
+    raise: "rgba(255,255,255,.04)",
+    hover: "rgba(255,255,255,.08)",
+  },
+  /** 강조색을 옅게 쓰는 자리. 선택된 항목의 배경과 테두리 */
+  accent: {
+    line: "rgba(216,190,145,.35)",
+    bg: "rgba(216,190,145,.1)",
+    dim: "rgba(216,190,145,.6)",
+  },
+  radius: { sm: ".45rem", md: ".7rem", lg: ".85rem", xl: "1rem" },
+  font: {
+    sans: '"Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
+    mono: '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+  },
+  /** 랜딩이 CDN 에서 받는 글꼴. 강의장과 운영 화면도 같은 것을 받아야 자간이 같다 */
+  fontHref:
+    "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css",
+} as const;
+
+/** `:root` 에 깔 CSS 변수. CSS 를 직접 쓰는 표면이 이걸로 시작한다. */
+export function cssVars(): string {
+  const c = TOKENS.color;
+  const t = TOKENS;
+  return `:root{--eddm-carbon:${c.carbon};--eddm-ink:${c.ink};--eddm-ivory:${c.ivory};--eddm-sand:${c.sand};--eddm-alert:${c.alert};--eddm-text:${t.text.body};--eddm-text-muted:${t.text.muted};--eddm-text-dim:${t.text.dim};--eddm-text-faint:${t.text.faint};--eddm-line:${t.line.soft};--eddm-line-base:${t.line.base};--eddm-line-strong:${t.line.strong};--eddm-raise:${t.surface.raise};--eddm-hover:${t.surface.hover};--eddm-accent-line:${t.accent.line};--eddm-accent-bg:${t.accent.bg};--eddm-accent-dim:${t.accent.dim}}`;
+}
+
+/**
  * 브라우저 탭 아이콘 본문. 파비콘에는 로고가 아니라 심볼만 넣는다.
  * 16px 짜리 정사각에 글자를 넣으면 읽히지 않는다.
  *

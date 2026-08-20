@@ -32,6 +32,8 @@ const IMAGE = /^!\[([^\]]*)\]\(([^\s)]+)(?:\s+"([^"]*)")?\)$/;
 const VIDEO = /\.(mp4|webm|mov)$/i;
 /** 링크 하나로만 이루어진 문단. 라벨을 캡션으로 쓴다. */
 const SOLO_LINK = /^\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)$/;
+/** 굵은 글씨 한 줄만 있는 문단. 섹션 안에서 사례를 가르는 라벨이다. */
+const LABEL = /^\*\*[^*\n]+\*\*$/;
 /** 아직 발행하지 않은 시각물 자리. 그대로 두면 깨진 그림이 강의 화면에 뜬다. */
 const PENDING = /^media:\/\/([a-z0-9-]+)$/i;
 const YOUTUBE =
@@ -125,7 +127,11 @@ function blocks(text: string, headings: string[]): string[] {
       // 목차가 여기로 뛴다. 번호로 거는 이유는 제목이 한글이라 slug 를 만들면 깨지기 때문이다.
       const title = b.slice(3);
       headings.push(title);
-      out.push(`<h2 id="s${headings.length}">${esc(title)}</h2>`);
+      const n = String(headings.length).padStart(2, "0");
+      // 번호는 목차의 번호와 같다. 지금 몇 번째를 보는지 세지 않고 알 수 있다.
+      out.push(
+        `<h2 id="s${headings.length}"><span class="sn" aria-hidden="true">${n}</span>${esc(title)}</h2>`,
+      );
     } else if (b.startsWith("### ")) out.push(`<h3>${esc(b.slice(4))}</h3>`);
     else if (b.startsWith("#### ")) out.push(`<h4>${esc(b.slice(5))}</h4>`);
     else if (/^[-*]\s/m.test(b)) {
@@ -137,7 +143,15 @@ function blocks(text: string, headings: string[]): string[] {
     } else {
       const solo = b.match(SOLO_LINK);
       const video = solo ? youtube(solo[2]) : null;
-      out.push(video ? youtubeFigure(video, solo![1]) : `<p>${inline(b)}</p>`);
+      if (video) {
+        out.push(youtubeFigure(video, solo![1]));
+      } else if (LABEL.test(b)) {
+        // 한 섹션에 화면이 여럿일 때 어느 화면 이야기인지 짚는 라벨이다.
+        // 굵은 글씨만으로는 본문과 안 갈려서 자기 태그를 준다.
+        out.push(`<p class="lb">${inline(b)}</p>`);
+      } else {
+        out.push(`<p>${inline(b)}</p>`);
+      }
     }
   }
   flush();

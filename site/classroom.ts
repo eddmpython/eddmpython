@@ -11,6 +11,9 @@
  * 4번이 이 파일이 존재하는 이유다. 클라이언트에서 거르면 개발자 도구로 앞 내용을 먼저 본다.
  */
 import { esc, renderPost } from "./classroom-render";
+// 심볼 좌표와 SNS 주소는 랜딩과 같은 정본을 읽는다. brand.ts 는 React 를 부르지 않는다.
+import { SYMBOL, BRAND, TOKENS, cssVars } from "./src/brand";
+import { SOCIAL } from "./src/social";
 
 export type Env = {
   CLASSROOM: DurableObjectNamespace;
@@ -381,93 +384,115 @@ function sessionCookie(token: string, slug: string, url: URL): string {
 
 /* 화면 ------------------------------------------------------------------ */
 
+// 브랜드 값은 여기서 만들지 않는다. src/brand.ts 의 TOKENS 가 정본이고 그것이 변수를 깐다.
+// scripts/check-brand.mjs 가 이 파일에 hex 가 다시 나타나면 막는다.
 const STYLE = `
+${cssVars()}
 :root { color-scheme: dark; }
 * { box-sizing: border-box; }
-body { margin:0; background:#101514; color:#f5f3ee; font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+body { margin:0; background:var(--eddm-carbon); color:var(--eddm-ivory); font-family:${TOKENS.font.sans}; word-break:keep-all; -webkit-font-smoothing:antialiased;
   line-height:1.7; -webkit-text-size-adjust:100%; }
 .wrap { max-width:56rem; margin:0 auto; padding:2.5rem 1.25rem 5rem; }
 .wrap.wide { max-width:88rem; }
 
-/* 머리띠. 랜딩과 같은 마크를 쓴다 */
-.hd { display:flex; align-items:center; gap:.85rem; padding:0 0 1.75rem;
-  border-bottom:1px solid #ffffff12; margin-bottom:2.25rem; }
-.hd-brand { font-size:.95rem; letter-spacing:-.02em; color:#f5f3ee; }
-.hd-brand b { font-weight:600; }
-.hd-sep { width:1px; height:.9rem; background:#ffffff26; }
-.hd-room { font-size:.9rem; color:#f5f3ee8c; text-decoration:none; }
-a.hd-room:hover { color:#d8be91; }
+/* 머리띠. 랜딩 Nav.tsx 의 실측값 그대로다. 값을 바꾸면 두 화면이 어긋난다 */
+.hd { display:flex; flex-direction:column; align-items:center; gap:20px; margin-bottom:56px; }
+.hd-logo { display:flex; align-items:center; gap:10px; text-decoration:none; border:0; color:inherit; }
+.hd-symbol { height:21px; width:auto; color:var(--eddm-ivory); display:block; }
+.hd-word { font-size:15px; letter-spacing:-.025em; line-height:1.5; color:var(--eddm-ivory); }
+.hd-word b { font-weight:700; }
+.hd-word i { font-style:normal; font-weight:400; color:rgba(245,243,238,.8); }
+.hd-right { display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
+  column-gap:20px; row-gap:10px; font-size:14px; line-height:1.4285714; color:rgba(245,243,238,.7); }
+.hd .nav-link { color:inherit; text-decoration:none; border:0; transition:color .15s cubic-bezier(.4,0,.2,1); }
+.hd .nav-link:hover { color:var(--eddm-ivory); }
+.hd-icons { display:flex; align-items:center; gap:14px; }
+.hd .nav-icon { color:rgba(245,243,238,.6); border:0; transition:color .15s cubic-bezier(.4,0,.2,1); }
+.hd .nav-icon:hover { color:var(--eddm-ivory); }
+.hd .nav-icon svg { height:18px; width:18px; display:block; }
+@media (min-width:768px) {
+  .hd { flex-direction:row; justify-content:space-between; gap:0; margin-bottom:64px; }
+}
 
 .eyebrow { font-size:.72rem; letter-spacing:.14em; text-transform:uppercase;
-  color:#d8be91; margin:0 0 .6rem; }
+  color:var(--eddm-sand); margin:0 0 .6rem; }
 .hero { margin-bottom:2.5rem; }
 .hero h1 { margin:0 0 .6rem; font-size:1.9rem; letter-spacing:-.02em; line-height:1.25; }
-.hero .sub { margin:0; color:#f5f3ee8c; }
+.hero .sub { margin:0; color:var(--eddm-text-muted); }
 
 /* 글 화면. 왼쪽 과정 이동, 가운데 본문, 오른쪽 목차 */
 .lay { display:grid; grid-template-columns:15rem minmax(0,1fr) 15rem; gap:3rem; align-items:start; }
 .side, .toc { position:sticky; top:2rem; max-height:calc(100vh - 4rem); overflow-y:auto;
   font-size:.85rem; scrollbar-width:thin; }
 .side-h, .toc-h { margin:1.25rem 0 .6rem; font-size:.72rem; letter-spacing:.12em;
-  text-transform:uppercase; color:#f5f3ee66; }
+  text-transform:uppercase; color:var(--eddm-text-dim); }
 .nav-post { display:flex; gap:.6rem; padding:.5rem .6rem; border-radius:.45rem;
-  color:#f5f3ee99; text-decoration:none; line-height:1.5; }
-.nav-post b { color:#f5f3ee4d; font-weight:500; font-variant-numeric:tabular-nums; }
-.nav-post:hover { background:#ffffff0a; color:#f5f3ee; }
-.nav-post.on { background:#d8be9114; color:#d8be91; }
-.nav-post.on b { color:#d8be9199; }
-.toc a { display:block; padding:.4rem .7rem; border-left:2px solid #ffffff14;
-  color:#f5f3ee80; text-decoration:none; line-height:1.5; }
-.toc a:hover { color:#f5f3ee; border-left-color:#ffffff3d; }
-.toc a.on { color:#d8be91; border-left-color:#d8be91; }
+  color:var(--eddm-text-muted); text-decoration:none; line-height:1.5; }
+.nav-post b { color:var(--eddm-text-faint); font-weight:500; font-variant-numeric:tabular-nums; }
+.nav-post:hover { background:var(--eddm-raise); color:var(--eddm-ivory); }
+.nav-post.on { background:var(--eddm-accent-bg); color:var(--eddm-sand); }
+.nav-post.on b { color:var(--eddm-accent-dim); }
+.toc a { display:block; padding:.4rem .7rem; border-left:2px solid var(--eddm-line);
+  color:var(--eddm-text-muted); text-decoration:none; line-height:1.5; }
+.toc a:hover { color:var(--eddm-ivory); border-left-color:var(--eddm-line-strong); }
+.toc a.on { color:var(--eddm-sand); border-left-color:var(--eddm-sand); }
 .body h1 { margin:0 0 .7rem; font-size:1.75rem; letter-spacing:-.02em; line-height:1.3; }
-.body .sub { margin:0 0 2.5rem; color:#f5f3ee8c; line-height:1.7; }
+.body .sub { margin:0 0 2.5rem; color:var(--eddm-text-muted); line-height:1.7; }
 
 /* 이전 다음 */
-.pager { display:flex; gap:1rem; margin-top:4rem; padding-top:2rem; border-top:1px solid #ffffff12; }
-.pager a { flex:1; padding:1rem 1.1rem; border:1px solid #ffffff1a; border-radius:.7rem;
+.pager { display:flex; gap:1rem; margin-top:4rem; padding-top:2rem; border-top:1px solid var(--eddm-line); }
+.pager a { flex:1; padding:1rem 1.1rem; border:1px solid var(--eddm-line-base); border-radius:.7rem;
   text-decoration:none; color:inherit; display:block; }
-.pager a:hover { border-color:#d8be9155; }
+.pager a:hover { border-color:var(--eddm-accent-line); }
 .pager .nx { text-align:right; }
 .pager span { display:block; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;
-  color:#d8be91; margin-bottom:.35rem; }
-.pager b { font-weight:400; font-size:.9rem; color:#f5f3eebf; line-height:1.5; }
+  color:var(--eddm-sand); margin-bottom:.35rem; }
+.pager b { font-weight:400; font-size:.9rem; color:var(--eddm-text); line-height:1.5; }
 .pager i { flex:1; }
 
 @media (max-width:1100px) {
   .lay { grid-template-columns:minmax(0,1fr); gap:2rem; }
   .side, .toc { position:static; max-height:none; }
-  .toc { order:-1; border:1px solid #ffffff14; border-radius:.7rem; padding:.5rem 1rem 1rem; }
+  .toc { order:-1; border:1px solid var(--eddm-line); border-radius:.7rem; padding:.5rem 1rem 1rem; }
   .side { display:flex; flex-wrap:wrap; gap:.4rem; align-items:center; }
   .side .side-h { width:100%; margin:.5rem 0 0; }
 }
 h1 { font-size:1.6rem; letter-spacing:-0.01em; margin:0 0 .35rem; }
-.sub { color:#f5f3eeaa; font-size:.95rem; margin:0 0 2rem; }
+.sub { color:var(--eddm-text); font-size:.95rem; margin:0 0 2rem; }
 form { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:1.5rem; }
 input[type=password] { flex:1 1 14rem; min-width:0; padding:.7rem .9rem; border-radius:.6rem;
-  border:1px solid #ffffff26; background:#ffffff0d; color:inherit; font-size:1rem; }
-button { padding:.7rem 1.1rem; border-radius:.6rem; border:1px solid #d8be9155; background:#d8be911a;
-  color:#d8be91; font-size:.95rem; cursor:pointer; }
-button:hover { background:#d8be9130; }
+  border:1px solid var(--eddm-line-strong); background:var(--eddm-raise); color:inherit; font-size:1rem; }
+button { padding:.7rem 1.1rem; border-radius:.6rem; border:1px solid var(--eddm-accent-line); background:var(--eddm-accent-bg);
+  color:var(--eddm-sand); font-size:.95rem; cursor:pointer; }
+button:hover { background:var(--eddm-accent-bg); }
 .err { color:#f5b3a0; margin-top:1rem; font-size:.92rem; }
-.cat { border:1px solid #ffffff1f; border-radius:.8rem; padding:1.1rem 1.25rem; margin:0 0 .9rem; }
+.cat { border:1px solid var(--eddm-line-base); border-radius:.8rem; padding:1.1rem 1.25rem; margin:0 0 .9rem; }
 .cat h2 { margin:0 0 .2rem; font-size:1.05rem; }
-.tag { font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:#d8be91; }
-a.post { display:block; padding:.55rem 0; border-bottom:1px solid #ffffff14; color:inherit; text-decoration:none; }
+.tag { font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--eddm-sand); }
+a.post { display:block; padding:.55rem 0; border-bottom:1px solid var(--eddm-line); color:inherit; text-decoration:none; }
 a.post:last-child { border-bottom:0; }
-a.post:hover { color:#d8be91; }
-.wait { color:#f5f3ee77; }
+a.post:hover { color:var(--eddm-sand); }
+.wait { color:var(--eddm-text-dim); }
 article img, article video { max-width:100%; height:auto; border-radius:.6rem; display:block; margin:1.75rem 0; }
 article img { cursor:zoom-in; }
-/* 절과 절 사이를 벌린다. 블로그 본문(Markdown.tsx)의 h2 mt-12 mb-2 와 같은 리듬이다.
+/* 섹션과 섹션 사이를 벌리고 윗선으로 가른다. 스크롤할 때 경계가 눈에 보여야 한다.
    h3 는 h2 를 풀어 쓴 부제라 h2 에 붙여 두고 본문 색보다 흐리게 둔다. */
-article h2 { margin:3.5rem 0 .5rem; font-size:1.3rem; font-weight:500; letter-spacing:-.01em; line-height:1.4; }
-article h2:first-child { margin-top:0; }
-article h3 { margin:0 0 1.25rem; font-size:.95rem; font-weight:400; line-height:1.65; color:#f5f3ee8c; }
-article p { margin:1.25rem 0; line-height:1.85; color:#f5f3eebf; }
-article ul, article ol { margin:1.25rem 0; padding-left:1.25rem; line-height:1.85; color:#f5f3eebf; }
+article h2 { margin:4rem 0 .5rem; padding-top:1.75rem; border-top:1px solid var(--eddm-line);
+  font-size:1.3rem; font-weight:500; letter-spacing:-.01em; line-height:1.4;
+  display:flex; gap:1.25rem; align-items:baseline; }
+article h2:first-child { margin-top:0; padding-top:0; border-top:0; }
+/* 섹션 번호. 목차의 번호와 같아서 지금 몇 번째인지 세지 않고 안다. */
+article h2 .sn { flex:0 0 auto; font-size:.82rem; font-weight:500; letter-spacing:.04em;
+  color:var(--eddm-accent-dim); font-variant-numeric:tabular-nums; }
+article h3 { margin:0 0 1.5rem 2.1rem; font-size:.95rem; font-weight:400; line-height:1.65; color:var(--eddm-text-muted); }
+article p { margin:1.25rem 0; line-height:1.85; color:var(--eddm-text); }
+/* 사례 라벨. 앞의 점 하나로 본문과 갈린다. 굵은 글씨만으로는 안 갈렸다. */
+article p.lb { display:flex; align-items:center; gap:.55rem; margin:2rem 0 .85rem; color:var(--eddm-ivory); }
+article p.lb::before { content:""; flex:0 0 auto; width:5px; height:5px; border-radius:50%; background:var(--eddm-sand); }
+article p.lb strong { font-weight:500; font-size:.95rem; }
+article ul, article ol { margin:1.25rem 0; padding-left:1.25rem; line-height:1.85; color:var(--eddm-text); }
 article li { margin:.5rem 0; }
-article li::marker { color:#d8be9188; }
+article li::marker { color:var(--eddm-accent-dim); }
 article pre { overflow-x:auto; background:#00000055; padding:1rem; border-radius:.6rem; }
 article table { display:block; overflow-x:auto; border-collapse:collapse; }
 .slider { display:flex; gap:.75rem; overflow-x:auto; scroll-snap-type:x mandatory; margin:1.2rem 0; }
@@ -476,12 +501,12 @@ article table { display:block; overflow-x:auto; border-collapse:collapse; }
   justify-content:center; z-index:50; padding:1rem; cursor:zoom-out; }
 .zoom.on { display:flex; }
 .zoom img { max-width:100%; max-height:100%; border-radius:.4rem; }
-.back { color:#f5f3ee88; text-decoration:none; font-size:.9rem; }
-article a { color:#d8be91; text-decoration:none; border-bottom:1px solid #d8be9155; }
-article a:hover { border-bottom-color:#d8be91; }
+.back { color:var(--eddm-text-muted); text-decoration:none; font-size:.9rem; }
+article a { color:var(--eddm-sand); text-decoration:none; border-bottom:1px solid var(--eddm-accent-line); }
+article a:hover { border-bottom-color:var(--eddm-sand); }
 .yt { margin:1.75rem 0; }
 .yt figcaption { margin-top:.6rem; display:flex; gap:.75rem; align-items:baseline;
-  justify-content:space-between; font-size:.85rem; color:#f5f3ee8c; line-height:1.6; }
+  justify-content:space-between; font-size:.85rem; color:var(--eddm-text-muted); line-height:1.6; }
 .yt figcaption a { font-size:.8rem; white-space:nowrap; }
 .yt .frame { position:relative; width:100%; padding-top:56.25%; border-radius:.6rem;
   overflow:hidden; background:#000; }
@@ -490,21 +515,21 @@ article a:hover { border-bottom-color:#d8be91; }
 .yt .ytplay { background-color:#000; background-size:cover; background-position:center;
   cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; }
 .yt .ytplay span { width:4rem; height:4rem; border-radius:50%; background:#000000bf;
-  border:1px solid #ffffff40; display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--eddm-line-strong); display:flex; align-items:center; justify-content:center;
   transition:transform .15s; }
 .yt .ytplay span::after { content:""; margin-left:.28rem; border-style:solid;
-  border-width:.62rem 0 .62rem 1rem; border-color:transparent transparent transparent #f5f3ee; }
+  border-width:.62rem 0 .62rem 1rem; border-color:transparent transparent transparent var(--eddm-ivory); }
 .yt .ytplay:hover span { transform:scale(1.06); }
 .yt.tall iframe { position:static; aspect-ratio:9/16; }
 .yt figcaption { display:flex; flex-wrap:wrap; justify-content:space-between; gap:.35rem 1rem;
-  align-items:baseline; margin-top:.5rem; font-size:.88rem; color:#f5f3ee85; }
-.yt figcaption a { color:#f5f3eeb8; white-space:nowrap; }
-.pending { border:1px dashed #ffffff26; border-radius:.6rem; margin:1.2rem 0; padding:2.4rem 1.5rem;
-  text-align:center; background:#ffffff08; }
-.pending b { display:block; font-size:.72rem; letter-spacing:.14em; color:#f5f3ee60;
+  align-items:baseline; margin-top:.5rem; font-size:.88rem; color:var(--eddm-text-muted); }
+.yt figcaption a { color:var(--eddm-text); white-space:nowrap; }
+.pending { border:1px dashed var(--eddm-line-strong); border-radius:.6rem; margin:1.2rem 0; padding:2.4rem 1.5rem;
+  text-align:center; background:var(--eddm-raise); }
+.pending b { display:block; font-size:.72rem; letter-spacing:.14em; color:var(--eddm-text-dim);
   text-transform:uppercase; margin-bottom:.6rem; font-weight:500; }
-.pending span { display:block; font-size:.9rem; color:#f5f3ee85; line-height:1.7; }
-.pending i { display:block; margin-top:.5rem; font-size:.75rem; color:#f5f3ee48; font-style:normal; }
+.pending span { display:block; font-size:.9rem; color:var(--eddm-text-muted); line-height:1.7; }
+.pending i { display:block; margin-top:.5rem; font-size:.75rem; color:var(--eddm-text-faint); font-style:normal; }
 .slider .pending { flex:0 0 88%; margin:0; scroll-snap-align:center; }
 `;
 
@@ -575,17 +600,75 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape") z.classLis
  * worker.ts 의 기본 CSP 는 script-src 'self' 라 인라인이 막힌다. 확대와 실시간 동기화가
  * 둘 다 스크립트라서 nonce 없이는 강의장이 죽은 화면이 된다.
  */
+const SITE = "https://eddmpython.com";
+
+/** 랜딩 `Nav.tsx` 의 링크 그대로. 강의장은 다른 출처라 절대 주소로 건다. */
+const NAV_LINKS = [
+  { label: "제품", href: `${SITE}/#products` },
+  { label: "데이터", href: `${SITE}/#data` },
+  { label: "블로그", href: `${SITE}/blog` },
+  { label: "FAQ", href: `${SITE}/#faq` },
+];
+
 /**
- * 브랜드 머리띠.
+ * SNS 아이콘. `src/components/icons.tsx` 의 path 를 옮겨 왔다.
  *
- * 랜딩의 `Nav.tsx` 와 같은 마크를 쓰되 React 를 부르지 않는다. 강의장은 Worker 가 HTML
- * 문자열로 뽑는 화면이라 컴포넌트를 import 할 수 없다. 모양만 같게 맞춘다.
+ * 심볼과 주소는 `src/brand.ts` 와 `src/social.ts` 에서 그대로 import 하는데 아이콘만
+ * 옮겨 적는 이유는 그쪽이 React 컴포넌트라서다. 랜딩에서 아이콘을 고치면 여기도 고친다.
  */
-function header(roomTitle: string, roomHref?: string): string {
-  const home = roomHref
-    ? `<a class="hd-room" href="${esc(roomHref)}">${esc(roomTitle)}</a>`
-    : `<span class="hd-room">${esc(roomTitle)}</span>`;
-  return `<header class="hd"><span class="hd-brand"><b>eddm</b>python</span><span class="hd-sep"></span>${home}</header>`;
+const NAV_ICONS = [
+  {
+    label: "GitHub",
+    href: SOCIAL.github,
+    svg: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12Z"/></svg>`,
+  },
+  {
+    label: "Threads",
+    href: SOCIAL.threads,
+    svg: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.27 11.13a6.9 6.9 0 0 0-.26-.12c-.15-2.82-1.7-4.44-4.29-4.46h-.04c-1.55 0-2.84.66-3.63 1.87l1.43.98c.6-.9 1.53-1.1 2.2-1.1h.03c.83 0 1.46.25 1.86.72.3.35.5.83.6 1.44a10.9 10.9 0 0 0-2.4-.12c-2.42.14-3.98 1.55-3.87 3.51.05 1 .55 1.85 1.4 2.4.72.47 1.65.7 2.62.65 1.28-.07 2.28-.56 2.98-1.45.53-.68.87-1.56 1.02-2.66.62.37 1.07.87 1.32 1.46.43 1.01.46 2.68-.9 4.03-1.19 1.19-2.62 1.7-4.78 1.72-2.4-.02-4.21-.79-5.39-2.28C4.98 16.3 4.42 14.36 4.4 12c.02-2.36.58-4.3 1.67-5.72C7.25 4.79 9.06 4.02 11.46 4c2.42.02 4.26.79 5.48 2.29.6.73 1.05 1.66 1.35 2.73l1.68-.45c-.36-1.32-.93-2.46-1.7-3.4C16.7 3.24 14.4 2.24 11.47 2.22h-.01c-2.93.02-5.2 1.02-6.75 2.97C3.33 6.92 2.62 9.2 2.6 11.99v.02c.02 2.79.73 5.07 2.11 6.8 1.55 1.95 3.82 2.95 6.75 2.97h.01c2.6-.02 4.44-.7 5.95-2.21 1.98-1.98 1.92-4.46 1.27-5.98-.47-1.1-1.36-1.99-2.57-2.58Zm-4.44 4.06c-1.07.06-2.19-.42-2.24-1.42-.04-.74.53-1.57 2.3-1.67l.4-.01c.64 0 1.24.06 1.79.18-.2 2.54-1.4 2.86-2.25 2.92Z"/></svg>`,
+  },
+  {
+    label: "YouTube",
+    href: SOCIAL.youtube,
+    svg: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.14C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.51A3.02 3.02 0 0 0 .5 6.2C0 8.09 0 12 0 12s0 3.91.5 5.8a3.02 3.02 0 0 0 2.12 2.14c1.88.51 9.38.51 9.38.51s7.5 0 9.38-.51a3.02 3.02 0 0 0 2.12-2.14C24 15.91 24 12 24 12s0-3.91-.5-5.8ZM9.55 15.57V8.43L15.82 12l-6.27 3.57Z"/></svg>`,
+  },
+  {
+    label: "메일",
+    href: SOCIAL.mail,
+    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3.5 6.5 8.5 6 8.5-6"/></svg>`,
+  },
+];
+
+/**
+ * 브랜드 머리띠. 랜딩 `Nav.tsx` 와 같은 것을 낸다.
+ *
+ * 강의장은 Worker 가 HTML 문자열로 뽑는 화면이라 React 컴포넌트를 부를 수 없다. 대신
+ * 심볼 좌표(`src/brand.ts`)와 주소(`src/social.ts`)는 정본을 그대로 import 한다.
+ * 복사해 두면 한쪽을 고칠 때 다른 쪽이 조용히 어긋난다.
+ *
+ * 링크는 새 탭으로 연다. 강의 중에 수강생이 눌러 강의 화면을 잃으면 안 된다.
+ */
+function header(): string {
+  const links = NAV_LINKS.map(
+    (l) => `<a class="nav-link" href="${esc(l.href)}" target="_blank" rel="noreferrer">${esc(l.label)}</a>`,
+  ).join("");
+  const icons = NAV_ICONS.map(
+    (i) =>
+      `<a class="nav-icon" href="${esc(i.href)}"${
+        i.href.startsWith("mailto:") ? "" : ' target="_blank"'
+      } rel="noreferrer" aria-label="${esc(i.label)}">${i.svg}</a>`,
+  ).join("");
+  return `<nav class="hd">
+  <a class="hd-logo" href="${esc(SITE)}" target="_blank" rel="noreferrer" aria-label="eddmpython 홈">
+    <svg class="hd-symbol" viewBox="${esc(SYMBOL.viewBox)}" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="${esc(
+      SYMBOL.shape,
+    )}"/><ellipse cx="${SYMBOL.eye.cx}" cy="${SYMBOL.eye.cy}" rx="${SYMBOL.eye.rx}" ry="${
+    SYMBOL.eye.ry
+  }" fill="${esc(BRAND.eye)}"/></svg>
+    <span class="hd-word"><b>eddm</b><i>python</i></span>
+  </a>
+  <div class="hd-right">${links}<span class="hd-icons">${icons}</span></div>
+</nav>`;
 }
 
 function page(title: string, inner: string, extraScript = "", wide = false): Response {
@@ -593,7 +676,10 @@ function page(title: string, inner: string, extraScript = "", wide = false): Res
   const html = `<!doctype html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>${esc(title)}</title><style>${STYLE}</style></head>
+<title>${esc(title)}</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="${TOKENS.fontHref}">
+<style>${STYLE}</style></head>
 <body><div class="wrap${wide ? " wide" : ""}">${inner}</div>
 <div class="zoom" id="zoom"><img alt=""></div>
 <script nonce="${nonce}">${ZOOM_SCRIPT}${extraScript}</script></body></html>`;
@@ -609,7 +695,9 @@ function page(title: string, inner: string, extraScript = "", wide = false): Res
         "form-action 'self'",
         "img-src 'self' data: https:",
         "media-src 'self' https:",
-        "style-src 'self' 'unsafe-inline'",
+        // 랜딩과 같은 글꼴을 쓰려고 연다. 글꼴이 다르면 같은 화면이 아니다.
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+        "font-src 'self' https://cdn.jsdelivr.net",
         `script-src 'nonce-${nonce}'`,
         "connect-src 'self'",
         "frame-src https://www.youtube-nocookie.com",
@@ -778,7 +866,7 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
     const total = open.reduce((n, c) => n + c.posts.length, 0);
     return page(
       room.title,
-      `${header(room.title)}
+      `${header()}
        <section class="hero">
          <p class="eyebrow">파이썬 업무자동화</p>
          <h1>${esc(room.title)}</h1>
@@ -835,10 +923,10 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
 
     return page(
       post.title,
-      `${header(room.title, `/cr/${esc(slug)}`)}
+      `${header()}
        <div class="lay">
          <aside class="side">
-           <a class="back" href="/cr/${esc(slug)}">← 전체 과정</a>
+           <a class="back" href="/cr/${esc(slug)}">← ${esc(room.title)}</a>
            <p class="side-h">${esc(category.title)}</p>
            ${nav}
          </aside>

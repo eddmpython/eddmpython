@@ -15,6 +15,8 @@ import { readFile, writeFile, access } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
+// 브랜드 값은 랜딩과 같은 정본을 읽는다. 여기서 색을 다시 적지 않는다.
+import { TOKENS, cssVars } from "../src/brand.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SITE = resolve(HERE, "..");
@@ -146,46 +148,49 @@ const TARGETS = config.targets.map((t) => ({
 
 const PAGE = `<!doctype html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>강의장 운영</title><style>
+<title>강의장 운영</title>
+<link rel="stylesheet" href="${TOKENS.fontHref}">
+<style>
+${cssVars()}
 :root { color-scheme: dark; }
 * { box-sizing: border-box; }
-body { margin:0; background:#0d1211; color:#f5f3ee; line-height:1.6;
-  font-family:system-ui,-apple-system,"Segoe UI",sans-serif; }
+body { margin:0; background:var(--eddm-carbon); color:var(--eddm-ivory); line-height:1.6;
+  word-break:keep-all; font-family:${TOKENS.font.sans}; }
 .wrap { max-width:64rem; margin:0 auto; padding:1.75rem 1.25rem 6rem; }
 h1 { font-size:1.35rem; margin:0 0 1.25rem; }
 .targets { display:flex; gap:.5rem; margin-bottom:1.75rem; flex-wrap:wrap; }
 .targets button { flex:0 0 auto; }
-.t-on[data-id="production"] { background:#e0552d; border-color:#e0552d; color:#fff; }
-.t-on[data-id="local"] { background:#d8be91; border-color:#d8be91; color:#161a19; }
-button { padding:.55rem .95rem; border-radius:.55rem; border:1px solid #ffffff2b;
-  background:#ffffff0f; color:#f5f3ee; font-size:.92rem; cursor:pointer; font-family:inherit; }
-button:hover { background:#ffffff1c; }
-button.go { border-color:#d8be9166; color:#d8be91; }
-button.danger { border-color:#e0552d55; color:#f0a58c; }
-input { padding:.55rem .7rem; border-radius:.55rem; border:1px solid #ffffff26;
-  background:#ffffff0d; color:inherit; font-size:.92rem; font-family:inherit; min-width:0; }
-.card { border:1px solid #ffffff1c; border-radius:.85rem; padding:1.1rem 1.25rem; margin:0 0 1rem; }
-.card.live { border-color:#d8be9140; }
+.t-on[data-id="production"] { background:var(--eddm-alert); border-color:var(--eddm-alert); color:#fff; }
+.t-on[data-id="local"] { background:var(--eddm-sand); border-color:var(--eddm-sand); color:#161a19; }
+button { padding:.55rem .95rem; border-radius:.55rem; border:1px solid var(--eddm-line-strong);
+  background:var(--eddm-hover); color:var(--eddm-ivory); font-size:.92rem; cursor:pointer; font-family:inherit; }
+button:hover { background:var(--eddm-line-base); }
+button.go { border-color:var(--eddm-accent-line); color:var(--eddm-sand); }
+button.danger { border-color:rgba(224,85,45,.45); color:#f0a58c; }
+input { padding:.55rem .7rem; border-radius:.55rem; border:1px solid var(--eddm-line-strong);
+  background:var(--eddm-raise); color:inherit; font-size:.92rem; font-family:inherit; min-width:0; }
+.card { border:1px solid var(--eddm-line-base); border-radius:.85rem; padding:1.1rem 1.25rem; margin:0 0 1rem; }
+.card.live { border-color:var(--eddm-accent-line); }
 .head { display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap; }
 .head h2 { margin:0; font-size:1.05rem; }
-.addr { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.85rem; color:#d8be91;
+.addr { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.85rem; color:var(--eddm-sand);
   text-decoration:none; }
 .addr:hover { text-decoration:underline; }
 .state { font-size:.75rem; letter-spacing:.06em; padding:.1rem .5rem; border-radius:99px; }
-.state.on { background:#d8be9124; color:#d8be91; }
-.state.off { background:#ffffff12; color:#f5f3ee66; }
+.state.on { background:var(--eddm-accent-bg); color:var(--eddm-sand); }
+.state.off { background:var(--eddm-line); color:var(--eddm-text-dim); }
 .row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; margin-top:.9rem; }
 .cats { display:flex; flex-direction:column; gap:.4rem; margin-top:1rem;
-  border-top:1px solid #ffffff14; padding-top:.9rem; }
+  border-top:1px solid var(--eddm-line); padding-top:.9rem; }
 .cat { display:flex; gap:.7rem; align-items:center; justify-content:space-between; }
 .cat span { font-size:.92rem; }
 .cat .right { display:flex; gap:.6rem; align-items:center; flex:0 0 auto; }
-.cat .num { color:#f5f3ee55; font-size:.8rem; }
-.note { color:#f5f3ee66; font-size:.86rem; margin:.35rem 0 0; }
+.cat .num { color:var(--eddm-text-muted); font-size:.8rem; }
+.note { color:var(--eddm-text-dim); font-size:.86rem; margin:.35rem 0 0; }
 .err { color:#f0a58c; font-size:.9rem; min-height:1.4em; margin:0 0 1rem; }
-.new { border:1px dashed #ffffff26; border-radius:.85rem; padding:1.1rem 1.25rem; margin-top:2rem; }
+.new { border:1px dashed var(--eddm-line-strong); border-radius:.85rem; padding:1.1rem 1.25rem; margin-top:2rem; }
 .new .row { margin-top:0; }
-h3 { font-size:.95rem; margin:0 0 .8rem; color:#f5f3eecc; }
+h3 { font-size:.95rem; margin:0 0 .8rem; color:var(--eddm-text); }
 </style></head><body><div class="wrap">
 <h1>강의장 운영</h1>
 <div class="targets" id="targets"></div>

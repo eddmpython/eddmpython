@@ -70,8 +70,9 @@ check("영상은 슬라이더에 섞이지 않는다", () => {
 
 check("제목과 목록이 제 태그로 나간다", () => {
   const html = renderMarkdown(["## 큰 제목", "", "#### 작은 제목", "", "- 하나", "- 둘"].join("\n"));
-  // 목차가 뛰어갈 자리라 h2 에는 번호 앵커가 붙는다
-  assert.ok(html.includes('<h2 id="s1">큰 제목</h2>'));
+  // 목차가 뛰어갈 자리라 h2 에는 번호 앵커가 붙고, 섹션 번호가 앞에 온다
+  assert.ok(html.includes('<h2 id="s1">'));
+  assert.ok(html.includes('<span class="sn" aria-hidden="true">01</span>큰 제목</h2>'));
   assert.ok(html.includes("<h4>작은 제목</h4>"));
   assert.equal(html.match(/<li>/g)?.length, 2);
 });
@@ -163,6 +164,26 @@ check("본문과 목차를 같이 낸다", () => {
 check("코드 블록 안의 ## 은 목차에 오르지 않는다", () => {
   const { headings } = renderPost(["## 진짜 절", "", "```", "## 주석입니다", "```"].join("\n"));
   assert.deepEqual(headings, ["진짜 절"]);
+});
+
+
+check("섹션 번호는 두 자리로 이어 붙는다", () => {
+  const { html } = renderPost(["## 첫 절", "", "본문", "", "## 둘째 절", "", "본문"].join("\n"));
+  assert.ok(html.includes('class="sn" aria-hidden="true">01</span>첫 절'));
+  assert.ok(html.includes('class="sn" aria-hidden="true">02</span>둘째 절'));
+});
+
+check("굵은 글씨 한 줄은 사례 라벨이 된다", () => {
+  // 한 섹션에 화면이 여럿일 때 어느 화면 이야기인지 짚는 자리다
+  const html = renderMarkdown("**엑셀 세 열이 되는 커피 영수증**");
+  assert.ok(html.includes('<p class="lb">'));
+  assert.ok(html.includes("<strong>엑셀 세 열이 되는 커피 영수증</strong>"));
+});
+
+check("굵은 글씨가 섞인 문단은 라벨이 아니다", () => {
+  const html = renderMarkdown("앞말 **굵게** 뒷말");
+  assert.ok(html.startsWith("<p>"));
+  assert.ok(!html.includes('class="lb"'));
 });
 
 console.log(`classroom render: 코드 분할과 escape 등 ${count} cases`);
