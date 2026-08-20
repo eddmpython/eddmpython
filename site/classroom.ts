@@ -300,6 +300,20 @@ export class Classroom {
       return Response.json({ ok: true });
     }
 
+    /**
+     * 로그인 잠금을 푼다.
+     *
+     * 수강생이 여덟 번 틀리면 5분 막힌다. 강의 중의 5분은 길고, 그 사이 그 사람은 아무것도
+     * 못 본다. 비밀번호를 바꾸면 풀리기는 하지만 세대가 돌아 **이미 들어와 있는 사람이 전부
+     * 튕긴다.** 한 사람 때문에 강의실 전체를 내보내지 않으려고 따로 둔다.
+     */
+    if (action === "unlock") {
+      room.fails = 0;
+      room.lockedUntil = 0;
+      await this.put(room);
+      return Response.json({ ok: true });
+    }
+
     if (action === "open") {
       room.open = Boolean(body.open);
       // 방을 닫으면 잠금도 처음으로 되돌린다. 다음 강의가 앞 강의 상태를 물려받지 않는다.
@@ -819,6 +833,16 @@ async function stampOf(key: string, room: PublicRoom, version: string): Promise<
   return (await hmac(key, raw)).slice(0, 16);
 }
 
+/**
+ * 운영 화면이 부를 수 있는 동작. 여기 없는 것은 토큰이 맞아도 안 넘긴다.
+ *
+ * 예전에는 받은 몸통을 그대로 DO 에 넘겼다. 그래서 `signKey` 도 넘어갔다. 그 열쇠가 나가면
+ * **모든 방의 세션 쿠키를 조용히 위조**할 수 있고, 열쇠는 한 번 만들면 바뀌지 않으므로
+ * 비밀번호를 아무리 바꿔도 소용이 없다. 방을 만들고 지우는 것은 화면에 보이지만 이것은
+ * 안 보인다. 토큰은 노트북의 평문 JSON 에 있다. 새는 날을 전제로 좁혀 둔다.
+ */
+const ADMIN_ACTIONS = new Set(["list", "create", "remove", "password", "open", "toggle", "unlock"]);
+
 /** 로컬 운영 화면이 부르는 유일한 조종 통로다. 공개 서버에 운영자 페이지는 없다. */
 async function admin(request: Request, env: Env): Promise<Response> {
   if (request.method !== "POST") return new Response("not found", { status: 404 });
@@ -827,6 +851,9 @@ async function admin(request: Request, env: Env): Promise<Response> {
     return Response.json({ error: "운영 토큰이 맞지 않습니다" }, { status: 401 });
   }
   const body = (await request.json()) as Record<string, unknown>;
+  if (!ADMIN_ACTIONS.has(String(body.action ?? ""))) {
+    return Response.json({ error: "운영 화면이 부르지 않는 동작입니다" }, { status: 400 });
+  }
   const { status, data } = await call(env, body);
   if (status >= 400) return Response.json(data, { status });
   // 무엇을 했든 전체 상태를 돌려준다. 운영 화면이 늘 실물을 그린다.

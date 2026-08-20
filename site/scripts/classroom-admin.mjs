@@ -31,6 +31,10 @@ const flag = (name, fallback) => {
 const PORT = Number(flag("--port", "8799"));
 const OPEN = argv.includes("--open");
 
+// 글꼴 출처는 브랜드 정본에서 뽑는다. 정본이 CDN 을 옮기면 아래 CSP 도 같이 따라간다.
+// 손으로 적어 두면 글꼴 주소만 바뀌고 정책이 남아 링크가 조용히 죽는다. 실제로 그랬다.
+const FONT_ORIGIN = new URL(TOKENS.fontHref).origin;
+
 async function exists(path) {
   try {
     await access(path);
@@ -163,6 +167,9 @@ h1 { font-size:1.35rem; margin:0 0 1.25rem; }
 .warn { display:flex; align-items:center; gap:.6rem; padding:.75rem 1rem; margin:0 0 1.5rem;
   border-radius:.7rem; background:rgba(224,85,45,.1); border:1px solid rgba(224,85,45,.3);
   font-size:.88rem; color:var(--eddm-text); }
+/* display 를 주는 규칙이 [hidden] 을 이긴다. 이 한 줄이 없으면 경고가 늘 떠 있고,
+   늘 떠 있는 경고는 아무도 안 읽는다. 로컬인데 운영이라고 말하는 화면이 그 꼴이었다. */
+.warn[hidden] { display:none; }
 .warn svg { flex:0 0 auto; color:var(--eddm-alert); }
 .warn b { color:var(--eddm-alert); font-weight:600; }
 .t-on[data-id="production"] { background:var(--eddm-alert); border-color:var(--eddm-alert); color:#fff; }
@@ -184,6 +191,8 @@ input { padding:.55rem .7rem; border-radius:.55rem; border:1px solid var(--eddm-
 .state { font-size:.75rem; letter-spacing:.06em; padding:.1rem .5rem; border-radius:99px; }
 .state.on { background:var(--eddm-accent-bg); color:var(--eddm-sand); }
 .state.off { background:var(--eddm-line); color:var(--eddm-text-dim); }
+.state.lock { background:rgba(224,85,45,.14); color:var(--eddm-alert); }
+.made { font-size:.78rem; color:var(--eddm-text-faint); }
 .row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; margin-top:.9rem; }
 .cats { display:flex; flex-direction:column; gap:.4rem; margin-top:1rem;
   border-top:1px solid var(--eddm-line); padding-top:.9rem; }
@@ -203,6 +212,10 @@ h3 { font-size:.95rem; margin:0 0 .8rem; color:var(--eddm-text); }
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
   <span>지금 조종하는 곳은 <b>운영</b>입니다. 여기서 만든 방은 수강생에게 바로 열립니다</span>
 </div>
+<div class="warn" id="cwarn" hidden>
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8"/><path d="M2 3h20v5H2z"/><path d="M10 12h4"/></svg>
+  <span><b>교안 묶음을 읽지 못했습니다.</b> 방 조종은 그대로 됩니다. eddmpython-course 에서 npm run publish:course 를 다시 해 주세요</span>
+</div>
 <p class="err" id="err"></p>
 <div id="rooms"></div>
 <div class="new">
@@ -221,8 +234,11 @@ const KEY = CR_KEY;
 let target = TARGETS.find((t) => t.ready)?.id ?? TARGETS[0].id;
 let rooms = [];
 let categories = [];
+// 서버가 교안을 못 읽어도 방 조종은 계속된다. 그 사실을 운영자에게 말해 주는 값이다.
+let courseOk = true;
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const day = (ms) => { const d = new Date(ms); return (d.getMonth() + 1) + "월 " + d.getDate() + "일"; };
 
 async function send(body) {
   $("err").textContent = "";
@@ -235,6 +251,7 @@ async function send(body) {
   if (!res.ok) { $("err").textContent = data.error ?? "실패했습니다"; return null; }
   rooms = data.rooms ?? [];
   categories = data.categories ?? [];
+  courseOk = data.courseOk !== false;
   draw();
   return data;
 }
@@ -248,6 +265,8 @@ function drawTargets() {
   });
   // 운영과 로컬을 헷갈리면 수강생 화면이 강의 중에 바뀐다. 버튼 색만으로는 놓친다.
   $("warn").hidden = target !== "production";
+  // 교안을 못 읽으면 카테고리가 빈 목록으로 온다. 아무 말이 없으면 아직 안 만든 것처럼 보인다.
+  $("cwarn").hidden = courseOk;
 }
 
 function drawRooms() {
@@ -268,13 +287,19 @@ function drawRooms() {
         '<button data-act="toggle" data-slug="' + r.slug + '" data-cat="' + c.slug + '">' +
         (on ? "닫기" : "열기") + "</button></span></div>";
     }).join("");
+    // 여덟 번 틀리면 5분 막힌다. 수강생은 "안 들어가져요" 라고만 말하고 이유를 모른다.
+    // 이 칩이 없으면 운영자도 모르고, 결국 비밀번호를 바꿔서 강의실 전체를 튕기게 된다.
+    const left = r.lockedUntil > Date.now() ? Math.ceil((r.lockedUntil - Date.now()) / 60000) : 0;
     return '<div class="card' + (r.open ? " live" : "") + '">' +
       '<div class="head"><h2>' + esc(r.title) + "</h2>" +
       '<span class="state ' + (r.open ? "on" : "off") + '">' + (r.open ? "열림" : "닫힘") + "</span>" +
-      '<a class="addr" href="' + url + '" target="_blank" rel="noreferrer">' + esc(url) + "</a></div>" +
+      (left ? '<span class="state lock">로그인 잠김 · ' + left + "분 남음</span>" : "") +
+      '<a class="addr" href="' + url + '" target="_blank" rel="noreferrer">' + esc(url) + "</a>" +
+      '<span class="made">' + day(r.created) + " 만듦</span></div>" +
       '<div class="row">' +
       '<button class="go" data-act="open" data-slug="' + r.slug + '" data-open="' + (r.open ? "0" : "1") + '">' +
       (r.open ? "강의장 닫기" : "강의장 열기") + "</button>" +
+      (left ? '<button data-act="unlock" data-slug="' + r.slug + '">잠김 풀기</button>' : "") +
       '<button data-act="copy" data-url="' + url + '">주소 복사</button>' +
       '<input data-pw="' + r.slug + '" placeholder="새 비밀번호" style="flex:0 1 9rem">' +
       '<button data-act="password" data-slug="' + r.slug + '">바꾸기</button>' +
@@ -290,6 +315,11 @@ function drawRooms() {
       if (act === "copy") { await navigator.clipboard.writeText(b.dataset.url); b.textContent = "복사함"; return; }
       if (act === "open") return send({ action: "open", slug, open: b.dataset.open === "1" });
       if (act === "toggle") return send({ action: "toggle", slug, category: b.dataset.cat });
+      if (act === "unlock") {
+        const done = await send({ action: "unlock", slug });
+        if (done) $("err").textContent = "잠김을 풀었습니다. 다시 비밀번호를 넣어 보라고 하세요";
+        return;
+      }
       if (act === "password") {
         const input = $("rooms").querySelector('[data-pw="' + slug + '"]');
         if (!input.value) { $("err").textContent = "새 비밀번호를 적어 주세요"; return; }
@@ -383,9 +413,18 @@ const server = createServer(async (req, res) => {
     res.writeHead(200, {
       "content-type": "text/html; charset=utf-8",
       "cache-control": "no-store",
-      // 이 화면이 바깥으로 무엇도 부르지 않게 한다
-      "content-security-policy":
-        "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; form-action 'none'; frame-ancestors 'none'",
+      // 이 화면이 바깥으로 부르는 것은 브랜드 글꼴 하나뿐이다. 랜딩이 이미 같은 출처를
+      // style-src 와 font-src 에 두고 있으므로 새로 트는 신뢰가 아니다.
+      // 조종은 connect-src 'self' 안에서만 돈다. 폼도 프레임도 막힌 채다.
+      "content-security-policy": [
+        "default-src 'none'",
+        `style-src 'unsafe-inline' ${FONT_ORIGIN}`,
+        `font-src ${FONT_ORIGIN}`,
+        "script-src 'unsafe-inline'",
+        "connect-src 'self'",
+        "form-action 'none'",
+        "frame-ancestors 'none'",
+      ].join("; "),
     });
     res.end(
       PAGE.replace("TARGETS_JSON", JSON.stringify(TARGETS)).replace("CR_KEY", JSON.stringify(KEY)),
