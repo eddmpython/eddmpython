@@ -32,7 +32,7 @@ status: curated
 |---|---|---|
 | 강행규칙 | 위반하면 사고가 나는 것 | 루트 `CLAUDE.md` (추적하지 않음) |
 | 운영 계약 | 지금 실제로 도는 구조와 절차. 기계가 강제하는 것 | **`skills/specs/`** |
-| 우리 규칙 | 운영자와 에이전트가 정한 판단과 작법 | `../eddmpython-course/memory/` (비공개 형제 저장소, 그쪽에서 Git 추적). 인덱스는 `../eddmpython-course/memory/MEMORY.md` |
+| 우리 규칙 | 운영자와 에이전트가 정한 판단과 작법 | `../eddmpython-course/memory/` (비공개 형제 저장소, 추적 안 함). 인덱스는 `../eddmpython-course/memory/MEMORY.md` |
 | 예정 | 아직 짓지 않은 설계와 진행 | 커밋 메시지와 이슈 |
 
 **규칙 문서를 다른 폴더에 새로 만들지 않는다.** 운영 계약은 여기, 판단과 작법은 `../eddmpython-course/memory/` 다.

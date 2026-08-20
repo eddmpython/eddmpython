@@ -4,9 +4,9 @@
 
 | 무엇 | 어디 |
 |---|---|
-| 글을 쓰기 전에 여는 작가 파이프라인 | `../eddmpython-course/memory/blogWriter.md` (비공개 형제 저장소) |
-| 문체 작법 | `../eddmpython-course/memory/writingVoice.md` (비공개 형제 저장소) |
-| 규칙 문서 전체 인덱스 | `../eddmpython-course/memory/MEMORY.md` (비공개 형제 저장소) |
+| 글을 쓰기 전에 여는 작가 파이프라인 | `../eddmpython-course/memory/blogWriter.md` (비공개 형제 저장소, 추적 안 함) |
+| 문체 작법 | `../eddmpython-course/memory/writingVoice.md` (비공개 형제 저장소, 추적 안 함) |
+| 규칙 문서 전체 인덱스 | `../eddmpython-course/memory/MEMORY.md` (비공개 형제 저장소, 추적 안 함) |
 | 파일 이름, frontmatter, 카테고리, 검사, 배포 | `skills/specs/operation/blogPublishing.md` |
 | 이미지와 영상 계약 | `skills/specs/operation/blogMedia.md` |
 | 제목과 summary | `skills/specs/operation/blogCopy.md` |
