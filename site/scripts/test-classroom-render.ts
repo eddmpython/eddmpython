@@ -5,7 +5,7 @@
  * 교안에 들어 있는 HTML 이 그대로 실행되지 않을 것, 시각 자산이 제 태그로 나갈 것.
  */
 import assert from "node:assert/strict";
-import { renderMarkdown, inline, esc } from "../classroom-render.ts";
+import { renderMarkdown, renderPost, inline, esc } from "../classroom-render.ts";
 
 let count = 0;
 const check = (label: string, fn: () => void) => {
@@ -70,7 +70,8 @@ check("영상은 슬라이더에 섞이지 않는다", () => {
 
 check("제목과 목록이 제 태그로 나간다", () => {
   const html = renderMarkdown(["## 큰 제목", "", "#### 작은 제목", "", "- 하나", "- 둘"].join("\n"));
-  assert.ok(html.includes("<h2>큰 제목</h2>"));
+  // 목차가 뛰어갈 자리라 h2 에는 번호 앵커가 붙는다
+  assert.ok(html.includes('<h2 id="s1">큰 제목</h2>'));
   assert.ok(html.includes("<h4>작은 제목</h4>"));
   assert.equal(html.match(/<li>/g)?.length, 2);
 });
@@ -147,6 +148,21 @@ check("CRLF 교안도 같게 나온다", () => {
   const lf = renderMarkdown("## 제목\n\n본문");
   const crlf = renderMarkdown("## 제목\r\n\r\n본문");
   assert.equal(lf, crlf);
+});
+
+check("본문과 목차를 같이 낸다", () => {
+  // 절이 스물 몇 개인 글에서 목차 없이 스크롤로 찾으면 강의 시간이 버려진다
+  const { html, headings } = renderPost(
+    ["## 첫 절", "", "### 부제", "", "본문입니다", "", "## 둘째 절", "", "본문입니다"].join("\n"),
+  );
+  assert.deepEqual(headings, ["첫 절", "둘째 절"]);
+  assert.ok(html.includes('id="s1"'));
+  assert.ok(html.includes('id="s2"'));
+});
+
+check("코드 블록 안의 ## 은 목차에 오르지 않는다", () => {
+  const { headings } = renderPost(["## 진짜 절", "", "```", "## 주석입니다", "```"].join("\n"));
+  assert.deepEqual(headings, ["진짜 절"]);
 });
 
 console.log(`classroom render: 코드 분할과 escape 등 ${count} cases`);

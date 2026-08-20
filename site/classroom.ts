@@ -10,7 +10,7 @@
  *
  * 4번이 이 파일이 존재하는 이유다. 클라이언트에서 거르면 개발자 도구로 앞 내용을 먼저 본다.
  */
-import { esc, renderMarkdown } from "./classroom-render";
+import { esc, renderPost } from "./classroom-render";
 
 export type Env = {
   CLASSROOM: DurableObjectNamespace;
@@ -387,6 +387,60 @@ const STYLE = `
 body { margin:0; background:#101514; color:#f5f3ee; font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
   line-height:1.7; -webkit-text-size-adjust:100%; }
 .wrap { max-width:56rem; margin:0 auto; padding:2.5rem 1.25rem 5rem; }
+.wrap.wide { max-width:88rem; }
+
+/* 머리띠. 랜딩과 같은 마크를 쓴다 */
+.hd { display:flex; align-items:center; gap:.85rem; padding:0 0 1.75rem;
+  border-bottom:1px solid #ffffff12; margin-bottom:2.25rem; }
+.hd-brand { font-size:.95rem; letter-spacing:-.02em; color:#f5f3ee; }
+.hd-brand b { font-weight:600; }
+.hd-sep { width:1px; height:.9rem; background:#ffffff26; }
+.hd-room { font-size:.9rem; color:#f5f3ee8c; text-decoration:none; }
+a.hd-room:hover { color:#d8be91; }
+
+.eyebrow { font-size:.72rem; letter-spacing:.14em; text-transform:uppercase;
+  color:#d8be91; margin:0 0 .6rem; }
+.hero { margin-bottom:2.5rem; }
+.hero h1 { margin:0 0 .6rem; font-size:1.9rem; letter-spacing:-.02em; line-height:1.25; }
+.hero .sub { margin:0; color:#f5f3ee8c; }
+
+/* 글 화면. 왼쪽 과정 이동, 가운데 본문, 오른쪽 목차 */
+.lay { display:grid; grid-template-columns:15rem minmax(0,1fr) 15rem; gap:3rem; align-items:start; }
+.side, .toc { position:sticky; top:2rem; max-height:calc(100vh - 4rem); overflow-y:auto;
+  font-size:.85rem; scrollbar-width:thin; }
+.side-h, .toc-h { margin:1.25rem 0 .6rem; font-size:.72rem; letter-spacing:.12em;
+  text-transform:uppercase; color:#f5f3ee66; }
+.nav-post { display:flex; gap:.6rem; padding:.5rem .6rem; border-radius:.45rem;
+  color:#f5f3ee99; text-decoration:none; line-height:1.5; }
+.nav-post b { color:#f5f3ee4d; font-weight:500; font-variant-numeric:tabular-nums; }
+.nav-post:hover { background:#ffffff0a; color:#f5f3ee; }
+.nav-post.on { background:#d8be9114; color:#d8be91; }
+.nav-post.on b { color:#d8be9199; }
+.toc a { display:block; padding:.4rem .7rem; border-left:2px solid #ffffff14;
+  color:#f5f3ee80; text-decoration:none; line-height:1.5; }
+.toc a:hover { color:#f5f3ee; border-left-color:#ffffff3d; }
+.toc a.on { color:#d8be91; border-left-color:#d8be91; }
+.body h1 { margin:0 0 .7rem; font-size:1.75rem; letter-spacing:-.02em; line-height:1.3; }
+.body .sub { margin:0 0 2.5rem; color:#f5f3ee8c; line-height:1.7; }
+
+/* 이전 다음 */
+.pager { display:flex; gap:1rem; margin-top:4rem; padding-top:2rem; border-top:1px solid #ffffff12; }
+.pager a { flex:1; padding:1rem 1.1rem; border:1px solid #ffffff1a; border-radius:.7rem;
+  text-decoration:none; color:inherit; display:block; }
+.pager a:hover { border-color:#d8be9155; }
+.pager .nx { text-align:right; }
+.pager span { display:block; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;
+  color:#d8be91; margin-bottom:.35rem; }
+.pager b { font-weight:400; font-size:.9rem; color:#f5f3eebf; line-height:1.5; }
+.pager i { flex:1; }
+
+@media (max-width:1100px) {
+  .lay { grid-template-columns:minmax(0,1fr); gap:2rem; }
+  .side, .toc { position:static; max-height:none; }
+  .toc { order:-1; border:1px solid #ffffff14; border-radius:.7rem; padding:.5rem 1rem 1rem; }
+  .side { display:flex; flex-wrap:wrap; gap:.4rem; align-items:center; }
+  .side .side-h { width:100%; margin:.5rem 0 0; }
+}
 h1 { font-size:1.6rem; letter-spacing:-0.01em; margin:0 0 .35rem; }
 .sub { color:#f5f3eeaa; font-size:.95rem; margin:0 0 2rem; }
 form { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:1.5rem; }
@@ -403,9 +457,17 @@ a.post { display:block; padding:.55rem 0; border-bottom:1px solid #ffffff14; col
 a.post:last-child { border-bottom:0; }
 a.post:hover { color:#d8be91; }
 .wait { color:#f5f3ee77; }
-article img, article video { max-width:100%; height:auto; border-radius:.6rem; display:block; margin:1.2rem 0; }
+article img, article video { max-width:100%; height:auto; border-radius:.6rem; display:block; margin:1.75rem 0; }
 article img { cursor:zoom-in; }
-article h2 { margin-top:2.4rem; font-size:1.25rem; }
+/* 절과 절 사이를 벌린다. 블로그 본문(Markdown.tsx)의 h2 mt-12 mb-2 와 같은 리듬이다.
+   h3 는 h2 를 풀어 쓴 부제라 h2 에 붙여 두고 본문 색보다 흐리게 둔다. */
+article h2 { margin:3.5rem 0 .5rem; font-size:1.3rem; font-weight:500; letter-spacing:-.01em; line-height:1.4; }
+article h2:first-child { margin-top:0; }
+article h3 { margin:0 0 1.25rem; font-size:.95rem; font-weight:400; line-height:1.65; color:#f5f3ee8c; }
+article p { margin:1.25rem 0; line-height:1.85; color:#f5f3eebf; }
+article ul, article ol { margin:1.25rem 0; padding-left:1.25rem; line-height:1.85; color:#f5f3eebf; }
+article li { margin:.5rem 0; }
+article li::marker { color:#d8be9188; }
 article pre { overflow-x:auto; background:#00000055; padding:1rem; border-radius:.6rem; }
 article table { display:block; overflow-x:auto; border-collapse:collapse; }
 .slider { display:flex; gap:.75rem; overflow-x:auto; scroll-snap-type:x mandatory; margin:1.2rem 0; }
@@ -417,7 +479,10 @@ article table { display:block; overflow-x:auto; border-collapse:collapse; }
 .back { color:#f5f3ee88; text-decoration:none; font-size:.9rem; }
 article a { color:#d8be91; text-decoration:none; border-bottom:1px solid #d8be9155; }
 article a:hover { border-bottom-color:#d8be91; }
-.yt { margin:1.2rem 0; }
+.yt { margin:1.75rem 0; }
+.yt figcaption { margin-top:.6rem; display:flex; gap:.75rem; align-items:baseline;
+  justify-content:space-between; font-size:.85rem; color:#f5f3ee8c; line-height:1.6; }
+.yt figcaption a { font-size:.8rem; white-space:nowrap; }
 .yt .frame { position:relative; width:100%; padding-top:56.25%; border-radius:.6rem;
   overflow:hidden; background:#000; }
 .yt.tall .frame { padding-top:0; aspect-ratio:9/16; max-width:22rem; margin-inline:auto; }
@@ -441,6 +506,41 @@ article a:hover { border-bottom-color:#d8be91; }
 .pending span { display:block; font-size:.9rem; color:#f5f3ee85; line-height:1.7; }
 .pending i { display:block; margin-top:.5rem; font-size:.75rem; color:#f5f3ee48; font-style:normal; }
 .slider .pending { flex:0 0 88%; margin:0; scroll-snap-align:center; }
+`;
+
+/**
+ * 목차가 지금 보는 절을 따라간다.
+ *
+ * 강사가 화면을 띄워 놓고 설명하는 동안 수강생이 "지금 어디" 를 놓치면 따라오지 못한다.
+ * IntersectionObserver 로 화면에 든 절을 잡아 목차에 표시만 한다.
+ */
+const TOC_SCRIPT = `
+(() => {
+  const toc = document.querySelector(".toc");
+  if (!toc || !("IntersectionObserver" in window)) return;
+  const links = new Map();
+  toc.querySelectorAll("a[data-to]").forEach((a) => links.set(a.dataset.to, a));
+  const seen = new Set();
+  const mark = () => {
+    let top = null;
+    for (const id of links.keys()) if (seen.has(id)) { top = id; break; }
+    links.forEach((a, id) => a.classList.toggle("on", id === top));
+    if (top) {
+      const a = links.get(top);
+      const box = toc.getBoundingClientRect();
+      const r = a.getBoundingClientRect();
+      if (r.top < box.top || r.bottom > box.bottom) a.scrollIntoView({ block: "nearest" });
+    }
+  };
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) seen.add(e.target.id);
+      else seen.delete(e.target.id);
+    }
+    mark();
+  }, { rootMargin: "-72px 0px -65% 0px" });
+  document.querySelectorAll("article h2[id]").forEach((h) => io.observe(h));
+})();
 `;
 
 const ZOOM_SCRIPT = `
@@ -475,13 +575,26 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape") z.classLis
  * worker.ts 의 기본 CSP 는 script-src 'self' 라 인라인이 막힌다. 확대와 실시간 동기화가
  * 둘 다 스크립트라서 nonce 없이는 강의장이 죽은 화면이 된다.
  */
-function page(title: string, inner: string, extraScript = ""): Response {
+/**
+ * 브랜드 머리띠.
+ *
+ * 랜딩의 `Nav.tsx` 와 같은 마크를 쓰되 React 를 부르지 않는다. 강의장은 Worker 가 HTML
+ * 문자열로 뽑는 화면이라 컴포넌트를 import 할 수 없다. 모양만 같게 맞춘다.
+ */
+function header(roomTitle: string, roomHref?: string): string {
+  const home = roomHref
+    ? `<a class="hd-room" href="${esc(roomHref)}">${esc(roomTitle)}</a>`
+    : `<span class="hd-room">${esc(roomTitle)}</span>`;
+  return `<header class="hd"><span class="hd-brand"><b>eddm</b>python</span><span class="hd-sep"></span>${home}</header>`;
+}
+
+function page(title: string, inner: string, extraScript = "", wide = false): Response {
   const nonce = randomHex(16);
   const html = `<!doctype html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>${esc(title)}</title><style>${STYLE}</style></head>
-<body><div class="wrap">${inner}</div>
+<body><div class="wrap${wide ? " wide" : ""}">${inner}</div>
 <div class="zoom" id="zoom"><img alt=""></div>
 <script nonce="${nonce}">${ZOOM_SCRIPT}${extraScript}</script></body></html>`;
   return new Response(html, {
@@ -662,9 +775,19 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
           )
           .join("")
       : '<p class="wait">강사가 카테고리를 열면 여기에 나타납니다.</p>';
+    const total = open.reduce((n, c) => n + c.posts.length, 0);
     return page(
       room.title,
-      `<h1>${esc(room.title)}</h1><p class="sub">강사가 연 것만 보입니다.</p>${cards}`,
+      `${header(room.title)}
+       <section class="hero">
+         <p class="eyebrow">파이썬 업무자동화</p>
+         <h1>${esc(room.title)}</h1>
+         <p class="sub">${
+           total
+             ? `${open.length}개 과정 ${total}편이 열려 있습니다. 순서대로 따라오시면 됩니다.`
+             : "곧 시작합니다. 이 화면을 열어 두고 기다리시면 됩니다."
+         }</p>
+       </section>${cards}`,
       stamp,
     );
   }
@@ -673,15 +796,63 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
     const category = open.find((c) => c.slug === parts[1]);
     // 잠긴 카테고리는 본문을 만들지도 않는다. 여기서 막는 것이 이 설계의 요점이다.
     if (!category) return new Response("아직 열리지 않았습니다.", { status: 404 });
-    const post = category.posts.find((p) => p.id === parts[2]);
+    const at = category.posts.findIndex((p) => p.id === parts[2]);
+    const post = category.posts[at];
     if (!post) return new Response("없는 글입니다.", { status: 404 });
+    const { html, headings } = renderPost(post.body);
+
+    // 왼쪽. 같은 과정의 글을 오간다. 강의 중에 앞 편으로 되돌아가는 일이 잦다.
+    const nav = category.posts
+      .map(
+        (p, i) =>
+          `<a class="nav-post${p.id === post.id ? " on" : ""}" href="/cr/${esc(slug)}/${esc(
+            category.slug,
+          )}/${esc(p.id)}"><b>${String(i + 1).padStart(2, "0")}</b><span>${esc(p.title)}</span></a>`,
+      )
+      .join("");
+
+    // 오른쪽. 절이 스물 몇 개라 목차 없이는 강사가 원하는 자리를 스크롤로 찾아야 한다.
+    const toc = headings.length
+      ? `<nav class="toc" aria-label="이 강의의 목차"><p class="toc-h">목차</p>${headings
+          .map((h: string, i: number) => `<a href="#s${i + 1}" data-to="s${i + 1}">${esc(h)}</a>`)
+          .join("")}</nav>`
+      : "";
+
+    const prev = category.posts[at - 1];
+    const next = category.posts[at + 1];
+    const foot =
+      prev || next
+        ? `<div class="pager">${
+            prev
+              ? `<a href="/cr/${esc(slug)}/${esc(category.slug)}/${esc(prev.id)}"><span>이전</span><b>${esc(prev.title)}</b></a>`
+              : "<i></i>"
+          }${
+            next
+              ? `<a class="nx" href="/cr/${esc(slug)}/${esc(category.slug)}/${esc(next.id)}"><span>다음</span><b>${esc(next.title)}</b></a>`
+              : "<i></i>"
+          }</div>`
+        : "";
+
     return page(
       post.title,
-      `<a class="back" href="/cr/${esc(slug)}">← ${esc(category.title)}</a>
-       <h1 style="margin-top:1rem">${esc(post.title)}</h1>
-       <p class="sub">${esc(post.summary)}</p>
-       <article>${renderMarkdown(post.body)}</article>`,
-      stamp,
+      `${header(room.title, `/cr/${esc(slug)}`)}
+       <div class="lay">
+         <aside class="side">
+           <a class="back" href="/cr/${esc(slug)}">← 전체 과정</a>
+           <p class="side-h">${esc(category.title)}</p>
+           ${nav}
+         </aside>
+         <main class="body">
+           <p class="eyebrow">${esc(category.title)} · ${at + 1}편</p>
+           <h1>${esc(post.title)}</h1>
+           <p class="sub">${esc(post.summary)}</p>
+           <article>${html}</article>
+           ${foot}
+         </main>
+         ${toc}
+       </div>`,
+      stamp + TOC_SCRIPT,
+      true,
     );
   }
 

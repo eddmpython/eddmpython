@@ -93,7 +93,7 @@ function pendingMedia(key: string, alt: string, caption: string): string {
 }
 
 /** 코드가 아닌 구간을 빈 줄로 갈라 블록마다 태그를 붙인다. */
-function blocks(text: string): string[] {
+function blocks(text: string, headings: string[]): string[] {
   const out: string[] = [];
   let images: string[] = [];
   const flush = () => {
@@ -121,8 +121,12 @@ function blocks(text: string): string[] {
       continue;
     }
     flush();
-    if (b.startsWith("## ")) out.push(`<h2>${esc(b.slice(3))}</h2>`);
-    else if (b.startsWith("### ")) out.push(`<h3>${esc(b.slice(4))}</h3>`);
+    if (b.startsWith("## ")) {
+      // 목차가 여기로 뛴다. 번호로 거는 이유는 제목이 한글이라 slug 를 만들면 깨지기 때문이다.
+      const title = b.slice(3);
+      headings.push(title);
+      out.push(`<h2 id="s${headings.length}">${esc(title)}</h2>`);
+    } else if (b.startsWith("### ")) out.push(`<h3>${esc(b.slice(4))}</h3>`);
     else if (b.startsWith("#### ")) out.push(`<h4>${esc(b.slice(5))}</h4>`);
     else if (/^[-*]\s/m.test(b)) {
       const items = b.split("\n").filter((l) => /^[-*]\s/.test(l.trim()));
@@ -147,17 +151,29 @@ function blocks(text: string): string[] {
  * 문단이 되어 수강생 화면에 코드가 부서져 나온다. 강의장에서 그대로 따라 치는 것이라
  * 부서지면 그 시간이 통째로 날아간다.
  */
-export function renderMarkdown(body: string): string {
+export function renderMarkdown(body: string, headings: string[] = []): string {
   const text = body.replace(/\r\n/g, "\n");
   const out: string[] = [];
   const fence = /^```[^\n]*\n([\s\S]*?)^```[ \t]*$/gm;
   let at = 0;
   let m: RegExpExecArray | null;
   while ((m = fence.exec(text)) !== null) {
-    out.push(...blocks(text.slice(at, m.index)));
+    out.push(...blocks(text.slice(at, m.index), headings));
     out.push(`<pre>${esc(m[1].replace(/\n$/, ""))}</pre>`);
     at = m.index + m[0].length;
   }
-  out.push(...blocks(text.slice(at)));
+  out.push(...blocks(text.slice(at), headings));
   return out.join("\n");
+}
+
+/**
+ * 본문과 목차를 같이 낸다.
+ *
+ * 강의장은 강사가 화면을 띄워 놓고 "이제 OCR 부분 봅시다" 하고 건너뛰는 자리다.
+ * 절이 스물 몇 개인 글에서 목차 없이 스크롤로 찾으면 그 시간이 통째로 버려진다.
+ */
+export function renderPost(body: string): { html: string; headings: string[] } {
+  const headings: string[] = [];
+  const html = renderMarkdown(body, headings);
+  return { html, headings };
 }

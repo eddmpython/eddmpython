@@ -25,8 +25,13 @@ const ROOM = "shot";
 const PASSWORD = "shot-room-1234";
 
 const config = JSON.parse(await readFile(join(SITE_ROOT, ".classroom-admin.json"), "utf8"));
-const token = config.targets.find((t) => t.id === "local")?.token;
-if (!token) throw new Error(".classroom-admin.json 의 로컬 토큰이 없다");
+// 주소는 인자로 받으면서 토큰은 늘 로컬 것을 쓰고 있었다. 그래서 운영 화면은 검수가 막혔다.
+// 대상은 주소로 고른다. 루프백이 아니면 운영이다.
+const local = /^https?:\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(base);
+const targetId = local ? "local" : "production";
+const token = config.targets.find((t) => t.id === targetId)?.token;
+if (!token) throw new Error(`.classroom-admin.json 의 ${targetId} 토큰이 없다`);
+if (!local) console.log(`운영(${base}) 에 검수용 방을 만들고 끝나면 지운다`);
 
 async function admin(body) {
   const res = await fetch(`${base}/cr/api/admin`, {
