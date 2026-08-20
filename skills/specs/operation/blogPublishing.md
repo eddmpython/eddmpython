@@ -22,8 +22,8 @@ status: observed
 # 블로그 발행
 
 이 문서는 **기계 계약**이다. 파일 이름, frontmatter, 검사, 배포 순서를 정한다.
-**글을 어떻게 쓰는지는 여기 없다.** 작가 파이프라인은 `memory/blogWriter.md` 이고
-추적하지 않는다. 규칙 문서 전체 인덱스는 `memory/MEMORY.md` 다.
+**글을 어떻게 쓰는지는 여기 없다.** 작가 파이프라인은 `../eddmpython-course/memory/blogWriter.md` 이고
+비공개 형제 저장소에 있다. 규칙 문서 전체 인덱스는 `../eddmpython-course/memory/MEMORY.md` 다.
 
 ## 정본은 한 곳이다
 
@@ -222,7 +222,7 @@ title 과 부제와 절 구조와 H4 라벨은 `site/scripts/blog-package.mjs` �
 표본은 각각 `test-blog-style.mjs` 와 `test-blog-package.mjs` 에 있다.
 
 **글자 수 하한은 쓰지 않는다.** 2026-08-17 에 발행 40편을 실측해 없앴다. 까닭은
-`memory/blogWriter.md` 에 있다.
+`../eddmpython-course/memory/blogWriter.md` 에 있다.
 
 ## 실행 칸
 
@@ -240,7 +240,7 @@ Web Run 링크에서 쓸 수 있다고 정확히 적는다.
 
 ## 글 하나 발행하는 순서
 
-1. `memory/blogWriter.md` 의 작가 파이프라인을 통과한다. **[blogCopy.md](blogCopy.md) 의 유입
+1. `../eddmpython-course/memory/blogWriter.md` 의 작가 파이프라인을 통과한다. **[blogCopy.md](blogCopy.md) 의 유입
    패키징 게이트는 제목을 확정하기 전에 본다.** 주제 선택은
    [contentStrategy.md](contentStrategy.md), 제품 맥락은
    [productMarketing.md](productMarketing.md) 다

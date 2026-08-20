@@ -4,15 +4,15 @@
 
 | 무엇 | 어디 |
 |---|---|
-| 글을 쓰기 전에 여는 작가 파이프라인 | `memory/blogWriter.md` (추적하지 않음) |
-| 문체 작법 | `memory/writingVoice.md` (추적하지 않음) |
-| 규칙 문서 전체 인덱스 | `memory/MEMORY.md` (추적하지 않음) |
+| 글을 쓰기 전에 여는 작가 파이프라인 | `../eddmpython-course/memory/blogWriter.md` (비공개 형제 저장소) |
+| 문체 작법 | `../eddmpython-course/memory/writingVoice.md` (비공개 형제 저장소) |
+| 규칙 문서 전체 인덱스 | `../eddmpython-course/memory/MEMORY.md` (비공개 형제 저장소) |
 | 파일 이름, frontmatter, 카테고리, 검사, 배포 | `skills/specs/operation/blogPublishing.md` |
 | 이미지와 영상 계약 | `skills/specs/operation/blogMedia.md` |
 | 제목과 summary | `skills/specs/operation/blogCopy.md` |
 | 제품 맥락 | `skills/specs/operation/productMarketing.md` |
 
-**이 폴더에 규칙 문서를 새로 만들지 않는다.** 판단과 작법은 `memory/`, 기계가 강제하는 계약은
+**이 폴더에 규칙 문서를 새로 만들지 않는다.** 판단과 작법은 `../eddmpython-course/memory/`, 기계가 강제하는 계약은
 `skills/specs/` 다. 2026-08-19 에 집필 규칙이 다섯 곳으로 갈라져 서로 어긋난 뒤 정한 규칙이다.
 
 ## 이 폴더에 있는 것

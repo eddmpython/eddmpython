@@ -111,7 +111,7 @@ git clone https://github.com/eddmpython/eddmpython-course ../../eddmpython-cours
 ## 수강생이 교안을 보는 곳
 
 강의장이다. 2026-08-19 에 짓고 2026-08-20 에 다시 지었다. 절차의 정본은
-`skills/specs/operation/classroom.md` 이고 설계 근거는 `memory/courseRoom.md` 에 있다.
+`skills/specs/operation/classroom.md` 이고 설계 근거는 `../eddmpython-course/memory/courseRoom.md` 에 있다.
 
 - 운영 화면은 운영자 노트북에만 있다. 공개 서버에 운영자 페이지는 없다
 - 방을 만들면 그 자리에서 주소가 살아나고 비밀번호도 거기서 건다

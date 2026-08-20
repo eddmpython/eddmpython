@@ -1,6 +1,6 @@
 # 블로그 한 편 양식
 
-**이 파일은 모양 본보기다. 규칙이 아니다.** 집필 규칙의 정본은 `memory/blogWriter.md`,
+**이 파일은 모양 본보기다. 규칙이 아니다.** 집필 규칙의 정본은 `../eddmpython-course/memory/blogWriter.md`,
 발행 계약의 정본은 `skills/specs/operation/blogPublishing.md`다. 어긋나면 그쪽이 이긴다.
 
 파일명은 `blog/content/<category-slug>/NNN-kebab.md`로 쓴다. `NNN`은 발행할 때 한 번 부여하는 세 자리 고정 순번이며,

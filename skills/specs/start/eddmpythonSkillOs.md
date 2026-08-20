@@ -42,9 +42,9 @@ OAuth 를 여기에 만들지 않는다.
 | 위반하면 사고가 나는 규칙 | 루트 `CLAUDE.md` (추적하지 않음) |
 | 지금 실제로 도는 절차 | `skills/specs/operation/` |
 | 바깥을 향한 소개 | 루트 `README.md` |
-| 글 쓰는 방법 | `memory/blogWriter.md` (추적하지 않음) |
+| 글 쓰는 방법 | `../eddmpython-course/memory/blogWriter.md` (비공개 형제 저장소) |
 | 블로그 발행 계약 | `skills/specs/operation/blogPublishing.md` |
-| 규칙 문서 전체 인덱스 | `memory/MEMORY.md` (추적하지 않음) |
+| 규칙 문서 전체 인덱스 | `../eddmpython-course/memory/MEMORY.md` (비공개 형제 저장소) |
 | 제품 마케팅 맥락 | `skills/specs/operation/productMarketing.md` |
 | 다른 프로젝트에 쓸 규칙 템플릿 | `agent-template/` |
 

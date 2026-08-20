@@ -19,7 +19,7 @@ status: observed
 # 강의장
 
 오프라인 강의장에서 **운영자가 그 자리에서 만들고 여는 방**이다. 설계 근거와 아직 안 정한
-것은 `memory/courseRoom.md` 에 있다.
+것은 `../eddmpython-course/memory/courseRoom.md` 에 있다.
 
 ## 운영 화면은 로컬호스트에만 있다
 
