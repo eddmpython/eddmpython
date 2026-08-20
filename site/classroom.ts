@@ -445,7 +445,9 @@ body { margin:0; background:var(--eddm-carbon); color:var(--eddm-ivory); font-fa
 .nav-post:hover { background:var(--eddm-raise); color:var(--eddm-ivory); }
 .nav-post.on { background:var(--eddm-accent-bg); color:var(--eddm-sand); }
 .nav-post.on b { color:var(--eddm-accent-dim); }
-.toc-h { display:flex; align-items:baseline; justify-content:space-between; gap:.5rem; }
+.toc-h { display:flex; align-items:baseline; justify-content:space-between; gap:.5rem;
+  list-style:none; cursor:default; }
+.toc-h::-webkit-details-marker { display:none; }
 .toc-at { letter-spacing:0; font-variant-numeric:tabular-nums; }
 .toc a { display:flex; gap:.55rem; padding:.4rem .7rem; border-left:2px solid var(--eddm-line);
   color:var(--eddm-text-muted); text-decoration:none; line-height:1.5; }
@@ -475,7 +477,11 @@ article .q { font-style:normal; color:var(--eddm-ivory); }
 @media (max-width:1100px) {
   .lay { grid-template-columns:minmax(0,1fr); gap:2rem; }
   .side, .toc { position:static; max-height:none; }
-  .toc { order:-1; border:1px solid var(--eddm-line); border-radius:.7rem; padding:.5rem 1rem 1rem; }
+  .toc { order:-1; border:1px solid var(--eddm-line); border-radius:.7rem; padding:.5rem 1rem; }
+  .toc[open] { padding-bottom:1rem; }
+  .toc-h { cursor:pointer; padding:.5rem 0; }
+  .toc-h::after { content:"펼치기"; font-size:.7rem; color:var(--eddm-sand); letter-spacing:0; }
+  .toc[open] .toc-h::after { content:"접기"; }
   .side { display:flex; flex-wrap:wrap; gap:.4rem; align-items:center; }
   .side .side-h { width:100%; margin:.5rem 0 0; }
 }
@@ -579,7 +585,17 @@ article a:hover { border-bottom-color:var(--eddm-sand); }
 const TOC_SCRIPT = `
 (() => {
   const toc = document.querySelector(".toc");
-  if (!toc || !("IntersectionObserver" in window)) return;
+  if (!toc) return;
+  // 좁은 화면에서는 접어 둔다. 열 줄이 펼쳐지면 본문에 닿기까지 두 화면을 스크롤한다.
+  const narrow = () => matchMedia("(max-width:1100px)").matches;
+  if (narrow()) toc.removeAttribute("open");
+  // 목차에서 뛰면 그 자리에서 다시 접는다. 펼친 채로 두면 본문을 가린다.
+  toc.addEventListener("click", (e) => {
+    if (narrow() && e.target.closest && e.target.closest("a[data-to]")) {
+      setTimeout(() => toc.removeAttribute("open"), 0);
+    }
+  });
+  if (!("IntersectionObserver" in window)) return;
   const links = new Map();
   toc.querySelectorAll("a[data-to]").forEach((a) => links.set(a.dataset.to, a));
   const seen = new Set();
@@ -976,9 +992,9 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
 
     // 오른쪽. 절이 스물 몇 개라 목차 없이는 강사가 원하는 자리를 스크롤로 찾아야 한다.
     const toc = headings.length
-      ? `<nav class="toc" aria-label="이 강의의 목차"><p class="toc-h"><span>목차</span><span class="toc-at">1 / ${
+      ? `<details class="toc" open><summary class="toc-h"><span>목차</span><span class="toc-at">1 / ${
           headings.length
-        }</span></p>${headings
+        }</span></summary>${headings
           .map(
             (h: string, i: number) =>
               `<a href="#s${i + 1}" data-to="s${i + 1}"><b>${String(i + 1).padStart(
@@ -986,7 +1002,7 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
                 "0",
               )}</b><span>${esc(h)}</span></a>`,
           )
-          .join("")}</nav>`
+          .join("")}</details>`
       : "";
 
     const prev = category.posts[at - 1];
