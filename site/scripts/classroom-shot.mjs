@@ -9,6 +9,7 @@
  * 화면은 멀쩡한데 기능이 죽는다. 그래서 스크립트가 실제로 돌았는지도 같이 확인한다.
  */
 import { mkdir, writeFile, readFile } from "node:fs/promises";
+import { randomBytes } from "node:crypto";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { PyProcControlClient } from "pyproc/control";
@@ -22,7 +23,14 @@ const OUT = resolve(SITE_ROOT, "../../eddmpython.out/classroom-shots");
 const base = (process.argv[2] ?? "http://localhost:8787").replace(/\/$/, "");
 
 const ROOM = "shot";
-const PASSWORD = "shot-room-1234";
+/**
+ * 비밀번호를 소스에 적지 않는다. 매번 새로 뽑는다.
+ *
+ * 2026-08-20 에 여기 적혀 있던 `shot-room-1234` 로 **운영의 유료 교안이 통째로 열렸다.**
+ * 이 파일은 공개 저장소에 있다. 방 이름도 비밀번호도 GitHub 에서 그대로 읽혔고,
+ * 아래 정리 코드가 없어서 방은 계속 살아 있었다. 저장소를 둘로 가른 이유가 이것이다.
+ */
+const PASSWORD = randomBytes(12).toString("base64url");
 
 const config = JSON.parse(await readFile(join(SITE_ROOT, ".classroom-admin.json"), "utf8"));
 // 주소는 인자로 받으면서 토큰은 늘 로컬 것을 쓰고 있었다. 그래서 운영 화면은 검수가 막혔다.
@@ -72,6 +80,22 @@ const record = (label, ok, detail) => {
   console.log(`  ${ok ? "통과" : "실패"}  ${label}${detail && !ok ? ` (${detail})` : ""}`);
 };
 
+/**
+ * 운영에는 검수용 방을 남기지 않는다. 도중에 터져도 지운다.
+ *
+ * 로컬은 남겨 둔다. 루프백이라 아무도 못 열고, 다시 찍을 때 그대로 쓴다.
+ * 지웠다는 말로 끝내지 않고 밖에서 주소를 두드려 죽었는지 확인한다.
+ */
+async function cleanup() {
+  if (local) return;
+  await admin({ action: "remove", slug: ROOM }).catch(() => {});
+  const gone = await fetch(`${base}/cr/${ROOM}`, { redirect: "manual" }).catch(() => null);
+  const status = gone ? gone.status : "확인 못 함";
+  console.log(`  운영의 검수용 방을 지웠다 (밖에서 본 status ${status})`);
+  if (status !== 404) console.error("  경고: 아직 살아 있다. 운영 화면에서 직접 지워라");
+}
+
+try {
 for (const viewport of VIEWPORTS) {
   const manifestPath = join(OUT, `pyproc-control.${viewport.id}.json`);
   await writeFile(
@@ -224,8 +248,12 @@ for (const viewport of VIEWPORTS) {
   }
 }
 
+} finally {
+  await cleanup();
+}
+
 console.log(`
 강의장 화면, ${OUT}`);
-console.log(`검수용 강의장은 남겨 둔다. 지우려면 운영 화면에서 ${ROOM} 을 삭제한다`);
+if (local) console.log(`로컬 검수용 강의장은 남겨 둔다. 비밀번호 ${PASSWORD}`);
 // 브라우저를 붙들고 있는 핸들이 남아 프로세스가 안 끝나는 일이 있다. 명시적으로 끝낸다.
 process.exit(checks.every(Boolean) ? 0 : 1);
