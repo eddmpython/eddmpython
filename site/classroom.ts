@@ -24,11 +24,24 @@ export type Env = {
 };
 
 export type CoursePost = { id: string; title: string; summary: string; body: string };
-export type CourseCategory = { slug: string; order: number; title: string; posts: CoursePost[] };
+export type CourseCategory = {
+  slug: string;
+  order: number;
+  title: string;
+  /** 이 카테고리를 덮을 때 독자의 일 하나가 무엇이 되는지. schema 2 부터 온다 */
+  goal?: string;
+  posts: CoursePost[];
+};
 type CourseBundle = { schema: number; categories: CourseCategory[] };
 
-/** 묶음의 모양은 eddmpython-course 와의 계약이다. 바꾸면 양쪽을 같은 날 같이 고친다. */
-const COURSE_SCHEMA = 1;
+/**
+ * 묶음의 모양은 eddmpython-course 와의 계약이다. 바꾸면 양쪽을 같은 날 같이 고친다.
+ *
+ * **두 판을 같이 받는다.** 하나만 받으면 발행과 배포 사이에 강의장이 빈 목록을 낸다.
+ * 어느 쪽을 먼저 하든 그 틈이 생기고, 하필 강의 직전이면 그것이 사고다.
+ * 2 는 카테고리 성과(goal)가 붙은 판이고 1 은 그 전 판이다.
+ */
+const COURSE_SCHEMA = new Set([1, 2]);
 
 export type CourseState = { ok: boolean; categories: CourseCategory[] };
 
@@ -62,7 +75,7 @@ async function course(env: Env): Promise<CourseState> {
     // 같이 죽는다. 강의 중에 운영자가 방 목록조차 못 보게 되는 것이 제일 나쁜 결과다.
     return { ok: false, categories: [] };
   }
-  if (!bundle || bundle.schema !== COURSE_SCHEMA || !Array.isArray(bundle.categories)) {
+  if (!bundle || !COURSE_SCHEMA.has(bundle.schema) || !Array.isArray(bundle.categories)) {
     return { ok: false, categories: [] };
   }
   const categories = bundle.categories
@@ -432,10 +445,19 @@ body { margin:0; background:var(--eddm-carbon); color:var(--eddm-ivory); font-fa
 .nav-post:hover { background:var(--eddm-raise); color:var(--eddm-ivory); }
 .nav-post.on { background:var(--eddm-accent-bg); color:var(--eddm-sand); }
 .nav-post.on b { color:var(--eddm-accent-dim); }
-.toc a { display:block; padding:.4rem .7rem; border-left:2px solid var(--eddm-line);
+.toc-h { display:flex; align-items:baseline; justify-content:space-between; gap:.5rem; }
+.toc-at { letter-spacing:0; font-variant-numeric:tabular-nums; }
+.toc a { display:flex; gap:.55rem; padding:.4rem .7rem; border-left:2px solid var(--eddm-line);
   color:var(--eddm-text-muted); text-decoration:none; line-height:1.5; }
+.toc a b { flex:0 0 auto; font-weight:500; opacity:.55; font-variant-numeric:tabular-nums; }
 .toc a:hover { color:var(--eddm-ivory); border-left-color:var(--eddm-line-strong); }
 .toc a.on { color:var(--eddm-sand); border-left-color:var(--eddm-sand); }
+/* 읽은 만큼 차는 띠. 글이 길어서 어디쯤인지 감이 없으면 지친다. */
+.prog { position:fixed; top:0; left:0; right:0; height:2px; z-index:20; pointer-events:none; }
+.prog i { display:block; height:100%; width:0; background:var(--eddm-sand); opacity:.55;
+  transition:width .1s linear; }
+/* 섹션을 닫는 질문. 본문에 묻히지 않게 한 단 밝게 둔다. */
+article .q { font-style:normal; color:var(--eddm-ivory); }
 .body h1 { margin:0 0 .7rem; font-size:1.75rem; letter-spacing:-.02em; line-height:1.3; }
 .body .sub { margin:0 0 2.5rem; color:var(--eddm-text-muted); line-height:1.7; }
 
@@ -466,12 +488,25 @@ button { padding:.7rem 1.1rem; border-radius:.6rem; border:1px solid var(--eddm-
   color:var(--eddm-sand); font-size:.95rem; cursor:pointer; }
 button:hover { background:var(--eddm-accent-bg); }
 .err { color:#f5b3a0; margin-top:1rem; font-size:.92rem; }
-.cat { border:1px solid var(--eddm-line-base); border-radius:.8rem; padding:1.1rem 1.25rem; margin:0 0 .9rem; }
-.cat h2 { margin:0 0 .2rem; font-size:1.05rem; }
+.cat { border:1px solid var(--eddm-line-base); border-radius:.85rem; padding:1.4rem 1.5rem 1.1rem; margin:0 0 1rem; }
+.cat-h { display:flex; align-items:baseline; gap:.75rem; }
+.cat-n { font-size:.78rem; font-weight:500; color:var(--eddm-accent-dim); font-variant-numeric:tabular-nums; }
+.cat h2 { margin:0; font-size:1.1rem; font-weight:500; letter-spacing:-.01em; flex-grow:1; }
+.state { flex:0 0 auto; font-size:.7rem; letter-spacing:.06em; padding:.15rem .6rem; border-radius:99px; }
+.state.on { background:var(--eddm-accent-bg); color:var(--eddm-sand); }
+/* 이 카테고리를 덮으면 무엇이 되는지. 왜 듣는지가 목록에서 보여야 한다. */
+.goal { margin:.5rem 0 1rem 2.1rem; font-size:.87rem; color:var(--eddm-text-muted); line-height:1.7; }
+/* 잠긴 카테고리. 가리지 않고 이름만 보여 준다. 본문은 여전히 안 내려간다. */
+.later { border:1px solid var(--eddm-line); border-radius:.85rem; padding:1.1rem 1.5rem; opacity:.6; }
+.later-h { margin:0 0 .7rem; font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--eddm-text-faint); }
+.later-row { display:flex; justify-content:space-between; gap:1rem; padding:.4rem 0; font-size:.92rem; color:var(--eddm-text-muted); }
 .tag { font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--eddm-sand); }
-a.post { display:block; padding:.55rem 0; border-bottom:1px solid var(--eddm-line); color:inherit; text-decoration:none; }
-a.post:last-child { border-bottom:0; }
+a.post { display:flex; gap:.9rem; align-items:baseline; margin-left:2.1rem; padding:.65rem 0;
+  border-top:1px solid var(--eddm-line); color:inherit; text-decoration:none; line-height:1.6; }
+a.post b { flex:0 0 auto; font-weight:500; font-size:.78rem; color:var(--eddm-text-faint);
+  font-variant-numeric:tabular-nums; }
 a.post:hover { color:var(--eddm-sand); }
+a.post:hover b { color:var(--eddm-accent-dim); }
 .wait { color:var(--eddm-text-dim); }
 article img, article video { max-width:100%; height:auto; border-radius:.6rem; display:block; margin:1.75rem 0; }
 article img { cursor:zoom-in; }
@@ -508,6 +543,8 @@ article a:hover { border-bottom-color:var(--eddm-sand); }
 .yt figcaption { margin-top:.6rem; display:flex; gap:.75rem; align-items:baseline;
   justify-content:space-between; font-size:.85rem; color:var(--eddm-text-muted); line-height:1.6; }
 .yt figcaption a { font-size:.8rem; white-space:nowrap; }
+.yt figcaption .at { font-style:normal; margin-left:.5rem; padding:.1rem .45rem; border-radius:.35rem;
+  background:var(--eddm-accent-bg); color:var(--eddm-sand); font-size:.78rem; white-space:nowrap; }
 .yt .frame { position:relative; width:100%; padding-top:56.25%; border-radius:.6rem;
   overflow:hidden; background:#000; }
 .yt.tall .frame { padding-top:0; aspect-ratio:9/16; max-width:22rem; margin-inline:auto; }
@@ -557,14 +594,35 @@ const TOC_SCRIPT = `
       if (r.top < box.top || r.bottom > box.bottom) a.scrollIntoView({ block: "nearest" });
     }
   };
+  const at = document.querySelector(".toc-at");
   const io = new IntersectionObserver((entries) => {
     for (const e of entries) {
       if (e.isIntersecting) seen.add(e.target.id);
       else seen.delete(e.target.id);
     }
     mark();
+    // 목차 머리의 "3 / 10". 지금 몇 번째인지 숫자로도 말해 준다.
+    if (at) {
+      let n = 0;
+      let i = 0;
+      for (const id of links.keys()) { i += 1; if (seen.has(id)) { n = i; break; } }
+      if (n) at.textContent = n + " / " + links.size;
+    }
   }, { rootMargin: "-72px 0px -65% 0px" });
   document.querySelectorAll("article h2[id]").forEach((h) => io.observe(h));
+
+  // 읽은 만큼 차는 띠. 글이 길어서 어디쯤인지 감이 없으면 지친다.
+  const bar = document.querySelector(".prog i");
+  if (bar) {
+    const onScroll = () => {
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      bar.style.width = (max > 0 ? Math.min(100, (h.scrollTop / max) * 100) : 0) + "%";
+    };
+    addEventListener("scroll", onScroll, { passive: true });
+    addEventListener("resize", onScroll);
+    onScroll();
+  }
 })();
 `;
 
@@ -845,24 +903,41 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
     );
   }
 
-  const open = visible((await course(env)).categories, room.unlocked);
+  const all = (await course(env)).categories;
+  const open = visible(all, room.unlocked);
 
   if (parts.length === 1) {
+    // 잠긴 카테고리도 이름만 보여 준다. 진도가 어디까지 남았는지 알면 덜 불안하다.
+    // 본문은 여전히 안 내려간다. 그것이 이 파일이 존재하는 이유다.
+    const locked = all.filter((c: CourseCategory) => !room.unlocked.includes(c.slug));
     const cards = open.length
       ? open
-          .map(
-            (c) => `<div class="cat"><span class="tag">${esc(c.slug)}</span>
-              <h2>${esc(c.title)}</h2>
-              ${c.posts
-                .map(
-                  (p) =>
-                    `<a class="post" href="/cr/${esc(slug)}/${esc(c.slug)}/${esc(p.id)}">${esc(p.title)}</a>`,
-                )
-                .join("")}
-            </div>`,
-          )
+          .map((c, i) => {
+            const n = String(i + 1).padStart(2, "0");
+            const posts = c.posts
+              .map(
+                (p, j) =>
+                  `<a class="post" href="/cr/${esc(slug)}/${esc(c.slug)}/${esc(p.id)}"><b>${String(
+                    j + 1,
+                  ).padStart(2, "0")}</b><span>${esc(p.title)}</span></a>`,
+              )
+              .join("");
+            return `<div class="cat"><div class="cat-h"><span class="cat-n">${n}</span>
+              <h2>${esc(c.title)}</h2><span class="state on">열림</span></div>
+              ${c.goal ? `<p class="goal">이 카테고리를 덮으면 ${esc(c.goal)} 것이 됩니다.</p>` : ""}
+              ${posts}
+            </div>`;
+          })
           .join("")
-      : '<p class="wait">강사가 카테고리를 열면 여기에 나타납니다.</p>';
+      : '<p class="wait">곧 시작합니다. 이 화면을 열어 두시면 됩니다.</p>';
+    const later = locked.length
+      ? `<div class="later"><p class="later-h">다음에 열립니다</p>${locked
+          .map(
+            (c) =>
+              `<div class="later-row"><span>${esc(c.title)}</span><span>${c.posts.length}편</span></div>`,
+          )
+          .join("")}</div>`
+      : "";
     const total = open.reduce((n, c) => n + c.posts.length, 0);
     return page(
       room.title,
@@ -875,7 +950,7 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
              ? `${open.length}개 과정 ${total}편이 열려 있습니다. 순서대로 따라오시면 됩니다.`
              : "곧 시작합니다. 이 화면을 열어 두고 기다리시면 됩니다."
          }</p>
-       </section>${cards}`,
+       </section>${cards}${later}`,
       stamp,
     );
   }
@@ -901,8 +976,16 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
 
     // 오른쪽. 절이 스물 몇 개라 목차 없이는 강사가 원하는 자리를 스크롤로 찾아야 한다.
     const toc = headings.length
-      ? `<nav class="toc" aria-label="이 강의의 목차"><p class="toc-h">목차</p>${headings
-          .map((h: string, i: number) => `<a href="#s${i + 1}" data-to="s${i + 1}">${esc(h)}</a>`)
+      ? `<nav class="toc" aria-label="이 강의의 목차"><p class="toc-h"><span>목차</span><span class="toc-at">1 / ${
+          headings.length
+        }</span></p>${headings
+          .map(
+            (h: string, i: number) =>
+              `<a href="#s${i + 1}" data-to="s${i + 1}"><b>${String(i + 1).padStart(
+                2,
+                "0",
+              )}</b><span>${esc(h)}</span></a>`,
+          )
           .join("")}</nav>`
       : "";
 
@@ -923,7 +1006,8 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
 
     return page(
       post.title,
-      `${header()}
+      `<div class="prog" aria-hidden="true"><i></i></div>
+       ${header()}
        <div class="lay">
          <aside class="side">
            <a class="back" href="/cr/${esc(slug)}">← ${esc(room.title)}</a>

@@ -34,6 +34,22 @@ const VIDEO = /\.(mp4|webm|mov)$/i;
 const SOLO_LINK = /^\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)$/;
 /** 굵은 글씨 한 줄만 있는 문단. 섹션 안에서 사례를 가르는 라벨이다. */
 const LABEL = /^\*\*[^*\n]+\*\*$/;
+
+/**
+ * 섹션을 닫는 질문에 표시를 남긴다.
+ *
+ * 교안은 설명글 끝에 다음 섹션을 여는 질문을 붙인다. 그 한 문장이 본문에 묻혀 있으면
+ * 섹션이 어디서 끝나는지 눈에 안 보인다. **문단을 쪼개지 않는다.** 설명은 한 문단이라는
+ * 작성 규칙을 지키면서 마지막 질문 문장만 감싼다.
+ *
+ * 앞 문장이 있어야 감싼다. 문단 전체가 질문 하나면 그건 이음말이 아니라 도입 질문이다.
+ */
+function leadOut(html: string): string {
+  if (!html.endsWith("?")) return html;
+  const m = html.match(/^(.*[.!?]["'”]?\s+)([^.!?]{4,80}\?)$/s);
+  if (!m) return html;
+  return `${m[1]}<em class="q">${m[2]}</em>`;
+}
 /** 아직 발행하지 않은 시각물 자리. 그대로 두면 깨진 그림이 강의 화면에 뜬다. */
 const PENDING = /^media:\/\/([a-z0-9-]+)$/i;
 const YOUTUBE =
@@ -62,6 +78,14 @@ export function youtube(url: string): { id: string; tall: boolean; start: number
   return { id: m[1] ?? m[2] ?? m[3], tall: Boolean(m[2]), start: startSeconds(url) };
 }
 
+/** 초를 사람이 읽는 시각으로. 90 이면 `1분 30초`, 45 면 `45초` 다. */
+function clock(sec: number): string {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  if (!m) return `${s}초`;
+  return s ? `${m}분 ${s}초` : `${m}분`;
+}
+
 /**
  * 썸네일만 깔고 누를 때 유튜브를 부른다. 미리 부르면 강의 화면에 검은 칸이 먼저 뜨고
  * 열지도 않은 영상 때문에 바깥 요청이 나간다. 썸네일은 img 가 아니라 배경으로 넣는다.
@@ -83,9 +107,12 @@ function youtubeFigure(
     video.start ? ` data-start="${video.start}"` : ""
   } data-label="${esc(label)}" aria-label="${esc(
     label || "YouTube 영상",
-  )} 재생"><span></span></button></div><figcaption><span>${esc(
-    label,
-  )}</span><a href="${esc(watch)}" target="_blank" rel="noreferrer">YouTube에서 열기</a></figcaption></figure>`;
+  )} 재생"><span></span></button></div><figcaption><span>${esc(label)}${
+    // 어디서 시작하는지 미리 알려 준다. 긴 영상은 앞이 인사와 얼굴이라 시연 자리로 보낸다.
+    video.start ? `<i class="at">${esc(clock(video.start))}부터</i>` : ""
+  }</span><a href="${esc(
+    watch,
+  )}" target="_blank" rel="noreferrer">YouTube에서 열기</a></figcaption></figure>`;
 }
 
 function pendingMedia(key: string, alt: string, caption: string): string {
@@ -150,7 +177,7 @@ function blocks(text: string, headings: string[]): string[] {
         // 굵은 글씨만으로는 본문과 안 갈려서 자기 태그를 준다.
         out.push(`<p class="lb">${inline(b)}</p>`);
       } else {
-        out.push(`<p>${inline(b)}</p>`);
+        out.push(`<p>${leadOut(inline(b))}</p>`);
       }
     }
   }

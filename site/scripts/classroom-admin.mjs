@@ -160,6 +160,11 @@ body { margin:0; background:var(--eddm-carbon); color:var(--eddm-ivory); line-he
 h1 { font-size:1.35rem; margin:0 0 1.25rem; }
 .targets { display:flex; gap:.5rem; margin-bottom:1.75rem; flex-wrap:wrap; }
 .targets button { flex:0 0 auto; }
+.warn { display:flex; align-items:center; gap:.6rem; padding:.75rem 1rem; margin:0 0 1.5rem;
+  border-radius:.7rem; background:rgba(224,85,45,.1); border:1px solid rgba(224,85,45,.3);
+  font-size:.88rem; color:var(--eddm-text); }
+.warn svg { flex:0 0 auto; color:var(--eddm-alert); }
+.warn b { color:var(--eddm-alert); font-weight:600; }
 .t-on[data-id="production"] { background:var(--eddm-alert); border-color:var(--eddm-alert); color:#fff; }
 .t-on[data-id="local"] { background:var(--eddm-sand); border-color:var(--eddm-sand); color:#161a19; }
 button { padding:.55rem .95rem; border-radius:.55rem; border:1px solid var(--eddm-line-strong);
@@ -194,6 +199,10 @@ h3 { font-size:.95rem; margin:0 0 .8rem; color:var(--eddm-text); }
 </style></head><body><div class="wrap">
 <h1>강의장 운영</h1>
 <div class="targets" id="targets"></div>
+<div class="warn" id="warn" hidden>
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+  <span>지금 조종하는 곳은 <b>운영</b>입니다. 여기서 만든 방은 수강생에게 바로 열립니다</span>
+</div>
 <p class="err" id="err"></p>
 <div id="rooms"></div>
 <div class="new">
@@ -237,6 +246,8 @@ function drawTargets() {
   [...$("targets").children].forEach((b) => {
     b.onclick = () => { target = b.dataset.id; send({ action: "list" }); };
   });
+  // 운영과 로컬을 헷갈리면 수강생 화면이 강의 중에 바뀐다. 버튼 색만으로는 놓친다.
+  $("warn").hidden = target !== "production";
 }
 
 function drawRooms() {

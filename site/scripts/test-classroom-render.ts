@@ -186,4 +186,34 @@ check("굵은 글씨가 섞인 문단은 라벨이 아니다", () => {
   assert.ok(!html.includes('class="lb"'));
 });
 
+
+check("시작 초는 캡션에도 사람 말로 나온다", () => {
+  // 긴 영상은 앞이 인사와 얼굴이라 어디서 시작하는지 미리 알려 줘야 누른다
+  const html = renderMarkdown("[상장 자동제작](https://www.youtube.com/watch?v=1pC_UXhiJH8&t=630s)");
+  assert.ok(html.includes('<i class="at">10분 30초부터</i>'));
+});
+
+check("60초 미만은 분을 붙이지 않는다", () => {
+  const html = renderMarkdown("[사례](https://www.youtube.com/watch?v=lfk_T6VKhTE&t=45s)");
+  assert.ok(html.includes('<i class="at">45초부터</i>'));
+});
+
+check("시작 초가 없으면 캡션에 시각이 없다", () => {
+  const html = renderMarkdown("[사례](https://www.youtube.com/watch?v=lfk_T6VKhTE)");
+  assert.ok(!html.includes('class="at"'));
+});
+
+check("섹션을 닫는 질문에 표시가 붙는다", () => {
+  // 설명은 한 문단이라는 작성 규칙을 지키면서 마지막 질문만 감싼다
+  const html = renderMarkdown("앞 문장입니다. 그럼 이 일이 내 컴퓨터 안에서만 되는 걸까요?");
+  assert.ok(html.includes('<em class="q">그럼 이 일이 내 컴퓨터 안에서만 되는 걸까요?</em>'));
+  assert.ok(html.startsWith("<p>앞 문장입니다."));
+});
+
+check("문단 전체가 질문이면 감싸지 않는다", () => {
+  // 그건 이음말이 아니라 도입 질문이다
+  const html = renderMarkdown("업무 자동화란 뭘까요?");
+  assert.ok(!html.includes('class="q"'));
+});
+
 console.log(`classroom render: 코드 분할과 escape 등 ${count} cases`);

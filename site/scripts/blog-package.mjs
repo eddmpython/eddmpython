@@ -12,7 +12,7 @@ const IMAGE_LEAD =
   /^!\[([^\]]+)\]\(\s*<?([^\s)>]+)>?\s+["']([^"']+)["']\s*\)\s*(?:\r?\n|$)/u;
 const CONCRETE_VISUAL =
   /(?:화면|버튼|메뉴|코드|파일|폴더|문서|명령|터미널|브라우저|표|목록|셀|결과|오류|로그|숫자|링크|설정|검사)/u;
-const VAGUE_SUBTITLE = /^(?:핵심 내용|자세한 설명|알아둘 점|중요한 이야기|이 절의 내용)$/u;
+const VAGUE_SUBTITLE = /^(?:핵심 내용|자세한 설명|알아둘 점|중요한 이야기|이 섹션의 내용)$/u;
 const IMAGEGEN_V2 = "eddmpython-dark-v2";
 const IMAGEGEN_PALETTE = "eddmpython-carbon-ivory-sand-v1";
 const BANNED_IMAGEGEN_COLORS = /\b(?:blue|cyan|green|purple|pink|red|gold|amber|rainbow|neon)\b/iu;
@@ -90,7 +90,7 @@ export function parseSectionPackage(section) {
 }
 
 // 관대한 파서다. 부제와 이미지는 있으면 검사하고 없으면 넘어간다.
-// H2마다 부제와 고유 이미지를 강제하던 규칙이 40편 278개 절을 같은 카드로 만들었다.
+// H2마다 부제와 고유 이미지를 강제하던 규칙이 40편 278개 섹션을 같은 카드로 만들었다.
 export function parseSectionParts(section) {
   let rest = section.content;
   let subtitle = null;
@@ -162,7 +162,7 @@ function isNonProse(block) {
   );
 }
 
-/** 절 본문에서 연달아 붙어 있는 서술 문단 묶음만 뽑는다. */
+/** 섹션 본문에서 연달아 붙어 있는 서술 문단 묶음만 뽑는다. */
 export function consecutiveProseRuns(remainder) {
   const runs = [];
   let run = [];
@@ -217,7 +217,7 @@ export function lintSectionPackages(
     ) {
       issues.push(issue(`H2 ${section.heading}`, "부제는 15자 이상 80자 이하의 구체적인 한 문장으로 씁니다", parsed.subtitle));
     }
-    // 한 절의 설명글은 한 문단이다. 설명이 길어지거나 두 덩어리가 되면 절을 나눈다.
+    // 한 섹션의 설명글은 한 문단이다. 설명이 길어지거나 두 덩어리가 되면 섹션을 나눈다.
     // 2026-08-19 에 운영자가 정했다. 빈 줄 하나가 화면에서 1.25em 여백이라 설명을 쪼개면
     // 고립된 줄이 쌓여 안 읽힌다. 시각물, 코드, 실행 칸, 목록, 표로 갈린 것은 세지 않고
     // 붙어 있는 서술 문단만 센다.
@@ -226,7 +226,7 @@ export function lintSectionPackages(
       issues.push(
         issue(
           `H2 ${section.heading}`,
-          `설명글이 ${run.length}문단으로 갈렸습니다. 한 절의 설명은 한 문단이고, 두 덩어리면 절을 나눕니다`,
+          `설명글이 ${run.length}문단으로 갈렸습니다. 한 섹션의 설명은 한 문단이고, 두 덩어리면 섹션을 나눕니다`,
           run.map((block) => block.slice(0, 18)).join(" / "),
         ),
       );

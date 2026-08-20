@@ -599,7 +599,7 @@ for (const post of targetPosts) {
       .replace(/\s+/g, " ")
       .trim();
     if (prose.length < 120) {
-      fail(file, `절의 설명이 120자보다 짧습니다: ${section.heading}`);
+      fail(file, `섹션의 설명이 120자보다 짧습니다: ${section.heading}`);
     }
   }
   const refs = [];
