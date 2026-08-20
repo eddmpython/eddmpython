@@ -16,7 +16,21 @@ export function CodaroCellEmbed({ exampleId }: { exampleId: string }) {
   const example = examples[exampleId];
   const [code, setCode] = useState(example?.code ?? "");
 
-  if (!example) return null;
+  /*
+   * 등록 안 된 셀을 조용히 지우지 않는다.
+   *
+   * `check:blog` 가 발행 전에 막지만 그것은 첫 번째 층이고, 여기서 null 을 돌려주면
+   * 어쩌다 통과한 경우에 화면에서 흔적 없이 사라진다. 2026-08-21 에 강의장에서
+   * 정확히 그 일이 났다. 실습 여덟 곳이 죽었는데 아무도 몰랐던 까닭이 조용해서였다.
+   */
+  if (!example) {
+    return (
+      <aside className="my-8 rounded-2xl border border-[#e0908a]/40 bg-white/[0.025] px-4 py-4 text-sm text-[#e0908a]">
+        실행 칸을 찾지 못했습니다
+        <span className="mt-1 block font-mono text-xs text-ivory/45">{exampleId}</span>
+      </aside>
+    );
+  }
 
   return (
     <aside
