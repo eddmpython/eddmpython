@@ -1,10 +1,10 @@
-"""원장의 절 사슬과 실제 글의 H2를 대조한다.
+"""원장의 섹션 사슬과 실제 글의 H2를 대조한다.
 
 원장은 손으로 적는 설계 문서라 글을 고치면 조용히 낡는다. 이 스크립트는 두 곳이
 어긋난 자리를 찾아 준다. 글의 좋고 나쁨을 점수로 매기지 않는다.
 
     python blog/scripts/outline.py                  모든 카테고리를 대조한다
-    python blog/scripts/outline.py --chain          절 사슬을 한 화면에 편다
+    python blog/scripts/outline.py --chain          섹션 사슬을 한 화면에 편다
     python blog/scripts/outline.py --category work-automation
 
 종료 코드 1은 원장과 글이 어긋났다는 뜻이지 글이 나쁘다는 뜻이 아니다.
@@ -64,7 +64,7 @@ def split_row(line: str) -> list[str]:
 
 
 def parse_ledger(path: Path) -> list[LedgerPost]:
-    """원장에서 글마다의 절 표를 읽는다. 표 머리는 # / H2 / 판정 세 칸으로 알아본다."""
+    """원장에서 글마다의 섹션 표를 읽는다. 표 머리는 # / H2 / 판정 세 칸으로 알아본다."""
     posts: list[LedgerPost] = []
     current: LedgerPost | None = None
     in_table = False
@@ -173,7 +173,7 @@ def compare(post: LedgerPost, category: Path) -> list[str]:
             return problems
 
     if not post.sections:
-        problems.append(f"{post.number}: 원장에 절 표가 없다")
+        problems.append(f"{post.number}: 원장에 섹션 표가 없다")
         return problems
 
     actual = parse_post_headings(target)
@@ -181,28 +181,28 @@ def compare(post: LedgerPost, category: Path) -> list[str]:
 
     if len(ledger) != len(actual):
         problems.append(
-            f"{post.number}: 절 개수가 다르다. 원장 {len(ledger)}개, {post.filename} {len(actual)}개"
+            f"{post.number}: 섹션 개수가 다르다. 원장 {len(ledger)}개, {post.filename} {len(actual)}개"
         )
 
     for position, (left, right) in enumerate(zip(ledger, actual), start=1):
         if left != right:
             problems.append(
-                f"{post.number}: {position}번 절 제목이 다르다\n"
+                f"{post.number}: {position}번 섹션 제목이 다르다\n"
                 f"      원장 {left}\n"
                 f"      본문 {right}"
             )
 
     if len(actual) > len(ledger):
         for extra in actual[len(ledger):]:
-            problems.append(f"{post.number}: 원장에 없는 절이 본문에 있다. {extra}")
+            problems.append(f"{post.number}: 원장에 없는 섹션이 본문에 있다. {extra}")
     elif len(ledger) > len(actual):
         for missing in ledger[len(actual):]:
-            problems.append(f"{post.number}: 본문에 없는 절이 원장에 있다. {missing}")
+            problems.append(f"{post.number}: 본문에 없는 섹션이 원장에 있다. {missing}")
 
     for section in post.sections:
         if section.verdict not in VERDICTS:
             problems.append(
-                f"{post.number}: {section.index}번 절 판정이 {section.verdict}다. "
+                f"{post.number}: {section.index}번 섹션 판정이 {section.verdict}다. "
                 f"쓸 수 있는 말은 {', '.join(VERDICTS)}뿐이다"
             )
 
@@ -240,7 +240,7 @@ def run(category_dirs: list[Path], chain: bool) -> int:
 
         posts = parse_ledger(ledger)
         print(f"\n=== {category.name} ===")
-        print(f"원장이 절 표를 가진 글: {len(posts)}편")
+        print(f"원장이 섹션 표를 가진 글: {len(posts)}편")
 
         if chain:
             print_chain(posts)
@@ -256,12 +256,12 @@ def run(category_dirs: list[Path], chain: bool) -> int:
                 for line in problems:
                     print(f"    {line}")
             else:
-                print(f"\n[맞음] {post.number} {post.title}  절 {len(post.sections)}개")
+                print(f"\n[맞음] {post.number} {post.title}  섹션 {len(post.sections)}개")
 
             if post.sections:
                 print(f"    이음 판정: 약한 이음 {weak}, 끊김 {broken_count(post)}")
                 if weak > WEAK_LIMIT:
-                    print(f"    약한 이음이 {WEAK_LIMIT}개를 넘는다. 절을 접어서 줄일 자리다")
+                    print(f"    약한 이음이 {WEAK_LIMIT}개를 넘는다. 섹션을 접어서 줄일 자리다")
 
     if failures:
         print(f"\n원장과 본문이 어긋난 곳 {failures}건. 둘 중 무엇이 맞는지 정하고 같이 고친다.")
@@ -272,9 +272,9 @@ def run(category_dirs: list[Path], chain: bool) -> int:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="원장의 절 사슬과 글의 H2를 대조한다")
+    parser = argparse.ArgumentParser(description="원장의 섹션 사슬과 글의 H2를 대조한다")
     parser.add_argument("--category", help="카테고리 폴더 이름. 없으면 전부 본다")
-    parser.add_argument("--chain", action="store_true", help="절 사슬을 한 화면에 편다")
+    parser.add_argument("--chain", action="store_true", help="섹션 사슬을 한 화면에 편다")
     parser.add_argument(
         "--root",
         default="",
