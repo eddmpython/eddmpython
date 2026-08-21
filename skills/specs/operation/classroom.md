@@ -46,6 +46,33 @@ status: observed
 `site/src/brand.ts`의 `TOKENS.typography.sectionTitle`을 쓴다. 강의장 CSS에서 별도 수치를 만들지
 않으며 `npm run check:brand`와 `npm run cr:shot`이 토큰 소비와 실제 렌더 크기를 확인한다.
 
+## 읽기 모드와 강의 모드
+
+강의장 글은 기본으로 위에서 아래로 읽는 교안이다. 글 제목 오른쪽의 **강의 모드** 버튼을 누르면
+현재 읽던 H2부터 전체화면 장면으로 바뀐다. 별도 슬라이드 파일은 없고 같은 마크다운과 KV 묶음의
+`scenes` 계약을 사용한다.
+
+- H2 하나가 장면 하나다
+- H3는 장면 부제다
+- 본문 설명은 읽기 모드에 남고 강의 모드에서는 발표자 노트 재료가 된다
+- 이미지, SVG, GIF, 영상, 다이어그램, 코드, 표, 실행 칸, 격리된 외부 HTML 렌더러를 시각물로 쓴다
+- 클릭, Space, 오른쪽 화살표는 다음 beat다. 왼쪽 화살표는 이전 beat다
+- `N`은 발표자 노트, `Esc`는 종료다
+- URL의 `#lecture=sN.B`가 현재 장면과 보인 beat 수를 복구한다
+- Fullscreen API가 실패해도 고정 overlay에서 같은 강의 화면을 유지한다
+
+효과 이름과 작성 판단은 비공개 저장소 `memory/rules/blogWriter.md`가 사람용 정본이고,
+허용 형식과 번호 검사는 `scripts/course-scene.mjs`가 기계 정본이다. 이 저장소는
+`site/classroom.ts`에서 검사가 끝난 `enter`, `replace`, `focus`, `compare`, `annotate`,
+`run`, `simulate`만 실행한다. 교안이 임의 JavaScript나 CSS 선택자를 실행 효과로 보내지 못한다.
+
+외부 HTML 렌더러는 `course-embed`의 https 주소만 받는다. `site/classroom-render.ts`가
+`sandbox=\"allow-scripts allow-forms\"` iframe으로 만들며 raw HTML은 계속 글자로 escape한다.
+로그인, 결제, 개인정보와 장치 권한을 요구하는 외부 화면은 작성 규칙에서 금지한다.
+
+장면 수, 시각물 수, 계약 번호가 본문과 다르면 읽기 모드는 그대로 제공하고 강의 모드 버튼만
+만들지 않는다. 깨진 효과 때문에 교안 전체를 못 읽는 상태를 만들지 않는다.
+
 ## 운영 화면은 로컬호스트에만 있다
 
 **공개 서버에 운영자 페이지가 없다.** 운영 화면은 운영자 노트북에서 도는 작은 서버가 그리고,

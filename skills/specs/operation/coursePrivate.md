@@ -54,6 +54,11 @@ eddmpython-course  ──npm run publish:course──▶  KV  ──▶  강의�
 묶음의 모양은 두 저장소 사이의 계약이다. 바꾸면 `schema` 를 올리고 양쪽을 같은 날 같이 고친다.
 읽는 쪽은 `site/classroom.ts`, 쓰는 쪽은 `eddmpython-course/scripts/publish.mjs` 다.
 
+강의 장면도 같은 경계를 따른다. 비공개 저장소의 `course-scene` 펜스는 발행할 때 읽기 본문에서
+제거되고, 검사한 역할, 레이아웃, 시각물 수, beat만 `scenes`로 KV에 들어간다. 공개 저장소에는
+교안 제목, 설명, 장면별 시각물 주소를 복사하지 않는다. 강의장은 로그인하고 열린 카테고리의
+본문을 받은 요청에서만 장면 HTML을 만든다.
+
 ## 이미 공개된 이력은 그대로 둔다
 
 2026-08-19 에 운영자가 정했다. 유료로 돌린 네 편의 본문이 GitHub 공개 이력에 남아 있고 그것을

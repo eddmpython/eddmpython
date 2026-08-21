@@ -97,7 +97,10 @@ for (const id of posts) {
   const sections = (outside.match(/^## /gm) ?? []).length;
   const cells = [...outside.matchAll(/^https:\/\/eddmpython\.com\/codaro\/run\/\?example=([a-z0-9-]+)$/gm)].map((m) => m[1]);
   const pending = (outside.match(/media:\/\//g) ?? []).length;
-  const codeBlocks = (body.match(/^```/gm) ?? []).length / 2;
+  const codeBlocks = [...body.matchAll(/^```([^\r\n]*)\r?\n[\s\S]*?^```\s*$/gm)].filter((match) => {
+    const language = match[1].trim().split(/\s+/, 1)[0];
+    return language !== "course-scene" && language !== "course-embed";
+  }).length;
   const tables = (outside.match(/^\|(?:\s*:?-{3,}:?\s*\|){2,}/gm) ?? []).length;
   let imageRun = 0;
   let sliders = 0;
@@ -212,12 +215,15 @@ try {
           sliders: document.querySelectorAll('article .slider').length,
           pending: document.querySelectorAll('article .pending').length,
           rawCodaro: document.body.innerHTML.includes('codaro/run'),
-          cells: [...document.querySelectorAll('[data-cell]')].map(c => c.dataset.cell),
-          missing: document.querySelectorAll('.cell-miss').length,
+          cells: [...document.querySelectorAll('article [data-cell]')].map(c => c.dataset.cell),
+          missing: document.querySelectorAll('article .cell-miss').length,
           pre: document.querySelectorAll('article pre:not(.cell-o)').length,
           tables: document.querySelectorAll('article table').length,
           imgs: [...document.querySelectorAll('article img')].map(i => i.naturalWidth > 0).filter(Boolean).length,
           imgsAll: document.querySelectorAll('article img').length,
+          lectureButtons: document.querySelectorAll('[data-lecture-open]').length,
+          lectureDecks: document.querySelectorAll('[data-lecture-deck]').length,
+          lectureScenes: document.querySelectorAll('[data-lecture-deck] .lecture-scene').length,
         }))()`,
       ),
     );
@@ -232,6 +238,8 @@ try {
     record(`${id} 코드 블록 ${exp.codeBlocks}개`, m.pre === exp.codeBlocks, `화면 ${m.pre}`);
     record(`${id} 표 ${exp.tables}개`, m.tables === exp.tables, `화면 ${m.tables}`);
     record(`${id} 이미지가 전부 실제로 떴다`, m.imgs === m.imgsAll, `${m.imgs}/${m.imgsAll}`);
+    record(`${id} 강의 모드 진입점 1개`, m.lectureButtons === 1 && m.lectureDecks === 1, `버튼 ${m.lectureButtons}, 덱 ${m.lectureDecks}`);
+    record(`${id} 강의 장면 ${exp.sections}개`, m.lectureScenes === exp.sections, `화면 ${m.lectureScenes}`);
 
     // 실행 칸을 전부 눌러 본문이 약속한 출력을 본다
     for (const cell of m.cells) {
@@ -242,7 +250,7 @@ try {
           await evaluate(
             session,
             `(async () => {
-              const cell = document.querySelector('[data-cell="${cell}"]');
+              const cell = document.querySelector('article [data-cell="${cell}"]');
               cell.querySelector('[data-run]').click();
               const st = cell.querySelector('[data-state]');
               const out = cell.querySelector('[data-out]');

@@ -88,6 +88,19 @@ const PENDING = /^media:\/\/([a-z0-9-]+)$/i;
 const CODARO =
   /^https:\/\/eddmpython\.com\/codaro\/run\/\?example=([a-z0-9]+(?:-[a-z0-9]+)*)$/;
 
+export type CourseSceneBeat = {
+  effect: "enter" | "replace" | "focus" | "compare" | "annotate" | "run" | "simulate";
+  targets: number[];
+  note?: string;
+};
+export type CourseScene = {
+  id: string;
+  role: "open" | "explain" | "invert" | "close";
+  layout: "stage" | "sequence" | "compare" | "code" | "demo";
+  visualCount: number;
+  beats: CourseSceneBeat[];
+};
+
 export type CourseCell = {
   title?: string;
   description?: string;
@@ -193,13 +206,38 @@ function pendingMedia(key: string, alt: string, caption: string): string {
   }<i>${esc(key)}</i></div>`;
 }
 
+type RenderState = { visual: number };
+
+function visual(html: string, state: RenderState): string {
+  state.visual += 1;
+  return html.replace(/^<([a-z]+)(\s|>)/, `<$1 data-visual="${state.visual}"$2`);
+}
+
+/** 외부 HTML 렌더러와 시뮬레이션은 임의 HTML 대신 격리된 https 문서로 받는다. */
+function courseEmbed(raw: string): string | null {
+  const values: Record<string, string> = {};
+  for (const line of raw.split("\n")) {
+    if (!line.trim()) continue;
+    const match = line.match(/^(src|title|ratio):\s*(.+?)\s*$/);
+    if (!match || values[match[1]]) return null;
+    values[match[1]] = match[2];
+  }
+  if (!/^https:\/\/[^\s]+$/.test(values.src ?? "") || !values.title) return null;
+  const ratio = /^\d{1,2}\/\d{1,2}$/.test(values.ratio ?? "") ? values.ratio : "16/9";
+  return `<figure class="course-embed" style="--course-embed-ratio:${esc(ratio)}"><iframe src="${esc(
+    values.src,
+  )}" title="${esc(values.title)}" sandbox="allow-scripts allow-forms" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe><figcaption>${esc(
+    values.title,
+  )}</figcaption></figure>`;
+}
+
 /** 코드가 아닌 구간을 빈 줄로 갈라 블록마다 태그를 붙인다. */
-function blocks(text: string, headings: string[], cells: Cells): string[] {
+function blocks(text: string, headings: string[], cells: Cells, state: RenderState): string[] {
   const out: string[] = [];
   let images: string[] = [];
   const flush = () => {
     if (!images.length) return;
-    out.push(images.length > 1 ? `<div class="slider">${images.join("")}</div>` : images[0]);
+      out.push(images.length > 1 ? `<div class="slider">${images.join("")}</div>` : images[0]);
     images = [];
   };
   for (const raw of text.split(/\n{2,}/)) {
@@ -209,7 +247,7 @@ function blocks(text: string, headings: string[], cells: Cells): string[] {
     if (img) {
       const waiting = img[2].match(PENDING);
       if (waiting) {
-        images.push(pendingMedia(waiting[1], img[1], img[3] ?? ""));
+        images.push(visual(pendingMedia(waiting[1], img[1], img[3] ?? ""), state));
         continue;
       }
       // 영상도 시각 자산이다. 확장자로 갈라 태그를 바꾼다.
@@ -220,12 +258,13 @@ function blocks(text: string, headings: string[], cells: Cells): string[] {
       const caption = img[3] ? `<figcaption>${esc(img[3])}</figcaption>` : "";
       if (VIDEO.test(img[2])) {
         flush();
-        out.push(
+        out.push(visual(
           `<figure class="media"><video src="${esc(img[2])}" controls playsinline preload="metadata"></video>${caption}</figure>`,
-        );
+          state,
+        ));
       } else {
         images.push(
-          `<figure class="media"><img src="${esc(img[2])}" alt="${esc(img[1])}" loading="lazy">${caption}</figure>`,
+          visual(`<figure class="media"><img src="${esc(img[2])}" alt="${esc(img[1])}" loading="lazy">${caption}</figure>`, state),
         );
       }
       continue;
@@ -243,7 +282,7 @@ function blocks(text: string, headings: string[], cells: Cells): string[] {
       );
     } else if (b.startsWith("### ")) out.push(`<h3>${esc(b.slice(4))}</h3>`);
     else if (b.startsWith("#### ")) out.push(`<h4>${esc(b.slice(5))}</h4>`);
-    else if (table) out.push(table);
+    else if (table) out.push(visual(table, state));
     else if (/^[-*]\s/m.test(b)) {
       const items = b.split("\n").filter((l) => /^[-*]\s/.test(l.trim()));
       out.push(`<ul>${items.map((l) => `<li>${inline(l.trim().slice(2))}</li>`).join("")}</ul>`);
@@ -252,16 +291,16 @@ function blocks(text: string, headings: string[], cells: Cells): string[] {
       const run = b.match(CODARO);
       if (run) {
         const cell = cells[run[1]];
-        out.push(cell && typeof cell.code === "string" ? cellCard(run[1], cell) : missingCell(run[1]));
+        out.push(visual(cell && typeof cell.code === "string" ? cellCard(run[1], cell) : missingCell(run[1]), state));
         continue;
       }
       const video = youtube(b);
-      out.push(video ? youtubeFigure(video, "") : `<p><a href="${esc(b)}">${esc(b)}</a></p>`);
+      out.push(video ? visual(youtubeFigure(video, ""), state) : `<p><a href="${esc(b)}">${esc(b)}</a></p>`);
     } else {
       const solo = b.match(SOLO_LINK);
       const video = solo ? youtube(solo[2]) : null;
       if (video) {
-        out.push(youtubeFigure(video, solo![1]));
+        out.push(visual(youtubeFigure(video, solo![1]), state));
       } else if (LABEL.test(b)) {
         // 한 섹션에 화면이 여럿일 때 어느 화면 이야기인지 짚는 라벨이다.
         // 굵은 글씨만으로는 본문과 안 갈려서 자기 태그를 준다.
@@ -286,18 +325,26 @@ export function renderMarkdown(
   body: string,
   headings: string[] = [],
   cells: Cells = {},
+  state: RenderState = { visual: 0 },
 ): string {
   const text = body.replace(/\r\n/g, "\n");
   const out: string[] = [];
-  const fence = /^```[^\n]*\n([\s\S]*?)^```[ \t]*$/gm;
+  const fence = /^```([^\n]*)\n([\s\S]*?)^```[ \t]*$/gm;
   let at = 0;
   let m: RegExpExecArray | null;
   while ((m = fence.exec(text)) !== null) {
-    out.push(...blocks(text.slice(at, m.index), headings, cells));
-    out.push(`<pre>${esc(m[1].replace(/\n$/, ""))}</pre>`);
+    out.push(...blocks(text.slice(at, m.index), headings, cells, state));
+    const language = m[1].trim().toLowerCase();
+    const content = m[2].replace(/\n$/, "");
+    if (language === "course-embed") {
+      const embed = courseEmbed(content);
+      out.push(embed ? visual(embed, state) : `<div class="pending"><b>embed 계약 오류</b></div>`);
+    } else if (language !== "course-scene") {
+      out.push(visual(`<pre>${esc(content)}</pre>`, state));
+    }
     at = m.index + m[0].length;
   }
-  out.push(...blocks(text.slice(at), headings, cells));
+  out.push(...blocks(text.slice(at), headings, cells, state));
   return out.join("\n");
 }
 
@@ -310,9 +357,76 @@ export function renderMarkdown(
 export function renderPost(
   body: string,
   cells: Cells = {},
-): { html: string; headings: string[]; hasCells: boolean } {
+): { html: string; headings: string[]; hasCells: boolean; visuals: number } {
   const headings: string[] = [];
-  const html = renderMarkdown(body, headings, cells);
+  const state = { visual: 0 };
+  const html = renderMarkdown(body, headings, cells, state);
   // 실행 칸이 없는 글에는 파이썬 런타임 스크립트를 붙이지 않는다.
-  return { html, headings, hasCells: html.includes('data-cell="') };
+  return { html, headings, hasCells: html.includes('data-cell="'), visuals: state.visual };
+}
+
+export type CourseSection = { title: string; subtitle: string; content: string };
+
+/** 코드 펜스 안의 ##을 건드리지 않고 읽기 본문을 H2 장면으로 나눈다. */
+export function splitCourseSections(body: string): CourseSection[] {
+  const lines = body.replace(/\r\n/g, "\n").split("\n");
+  const starts: number[] = [];
+  let fenced = false;
+  for (let i = 0; i < lines.length; i += 1) {
+    if (/^```/.test(lines[i])) {
+      fenced = !fenced;
+      continue;
+    }
+    if (!fenced && /^##\s+/.test(lines[i])) starts.push(i);
+  }
+  return starts.map((start, index) => {
+    const end = starts[index + 1] ?? lines.length;
+    const title = lines[start].replace(/^##\s+/, "").trim();
+    let subtitle = "";
+    let subtitleLine = -1;
+    fenced = false;
+    for (let i = start + 1; i < end; i += 1) {
+      if (/^```/.test(lines[i])) {
+        fenced = !fenced;
+        continue;
+      }
+      if (!fenced && /^###\s+/.test(lines[i])) {
+        subtitle = lines[i].replace(/^###\s+/, "").trim();
+        subtitleLine = i;
+        break;
+      }
+    }
+    const content = lines.slice(subtitleLine >= 0 ? subtitleLine + 1 : start + 1, end).join("\n").trim();
+    return { title, subtitle, content };
+  });
+}
+
+/** 같은 본문을 강의 장면으로 투영한다. 본문 글자를 묶음에 두 번 싣지 않는다. */
+export function renderLecture(
+  body: string,
+  scenes: CourseScene[],
+  cells: Cells = {},
+): { html: string; hasCells: boolean; ok: boolean } {
+  const sections = splitCourseSections(body);
+  if (!scenes.length || sections.length !== scenes.length) return { html: "", hasCells: false, ok: false };
+  let hasCells = false;
+  const rendered: string[] = [];
+  for (let index = 0; index < scenes.length; index += 1) {
+    const scene = scenes[index];
+    const section = sections[index];
+    const state = { visual: 0 };
+    const html = renderMarkdown(section.content, [], cells, state);
+    if (state.visual !== scene.visualCount) return { html: "", hasCells: false, ok: false };
+    hasCells ||= html.includes('data-cell="');
+    rendered.push(`<section class="lecture-scene" data-scene="${esc(scene.id)}" data-role="${esc(
+      scene.role,
+    )}" data-layout="${esc(scene.layout)}" data-beats="${esc(JSON.stringify(scene.beats))}" aria-hidden="true">
+  <header class="scene-head"><span>${String(index + 1).padStart(2, "0")}</span><div><h2>${esc(
+    section.title,
+  )}</h2><p>${esc(section.subtitle)}</p></div></header>
+  <div class="scene-canvas">${html}</div>
+  <p class="scene-callout" data-scene-callout aria-live="polite"></p>
+</section>`);
+  }
+  return { html: rendered.join("\n"), hasCells, ok: true };
 }

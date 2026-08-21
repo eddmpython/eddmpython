@@ -177,11 +177,11 @@ for (const viewport of VIEWPORTS) {
     );
   };
 
-  const save = async (sessionRef, name) => {
+  const save = async (sessionRef, name, fullPage = true) => {
     await hydrate(sessionRef);
     const captured = await client.act(
       sessionRef,
-      [{ kind: "screenshot", format: "jpeg", fullPage: true, expectedRisk: "read" }],
+      [{ kind: "screenshot", format: "jpeg", fullPage, expectedRisk: "read" }],
       { timeoutMs: 60000 },
     );
     const image = captured.attachments.find((i) => i.mimeType === "image/jpeg");
@@ -289,6 +289,126 @@ for (const viewport of VIEWPORTS) {
         visualGroup.border === "2px",
       JSON.stringify(visualGroup),
     );
+
+    // 읽기 본문과 같은 H2가 전체화면 장면이 되고 클릭마다 beat가 진행되는지 본다.
+    const lectureButton = Number(
+      value(await evaluate(session, `document.querySelectorAll('[data-lecture-open]').length`)),
+    );
+    record(`${viewport.id} 강의 모드 버튼`, lectureButton === 1, String(lectureButton));
+    if (lectureButton === 1) {
+      await client.act(
+        session,
+        [{ kind: "click", selector: "[data-lecture-open]", expectedRisk: "externalEffect" }],
+        { timeoutMs: 30000 },
+      );
+      const afterLectureClick = value(await evaluate(session, `(() => ({
+        hidden: document.querySelector('[data-lecture-deck]')?.hidden,
+        active: document.querySelectorAll('.lecture-scene.on').length,
+        hash: location.hash,
+      }))()`));
+      if (afterLectureClick?.hidden !== false || afterLectureClick?.active !== 1) {
+        const lectureInit = value(await evaluate(session, `(() => {
+          const source = [...document.scripts].at(-1)?.textContent || '';
+          const at = source.lastIndexOf('(() => {\\n  const deck = document.querySelector("[data-lecture-deck]")');
+          if (at < 0) return '강의 스크립트가 응답에 없다';
+          try { new Function(source.slice(at))(); return '수동 실행 성공'; }
+          catch (error) { return error?.stack || String(error); }
+        })()`));
+        throw new Error(`강의 모드 클릭 뒤 장면이 열리지 않았다: ${JSON.stringify(afterLectureClick)} :: ${lectureInit}`);
+      }
+      await client.act(
+        session,
+        [{ kind: "waitFor", selector: ".lecture-scene.on", timeoutMs: 15000, expectedRisk: "read" }],
+        { timeoutMs: 30000 },
+      );
+      const lectureStart = value(await evaluate(session, `(() => {
+        const deck = document.querySelector('[data-lecture-deck]');
+        const scene = deck?.querySelector('.lecture-scene.on');
+        return {
+          hidden: deck?.hidden,
+          body: document.body.classList.contains('lecture-on'),
+          scenes: deck?.querySelectorAll('.lecture-scene').length,
+          title: scene?.querySelector('.scene-head h2')?.textContent.trim(),
+          visible: scene?.querySelectorAll('[data-scene-visible="true"]').length,
+          progress: deck?.querySelector('[data-lecture-progress]')?.textContent.trim(),
+        };
+      })()`));
+      record(
+        `${viewport.id} 강의 모드 첫 장면`,
+        lectureStart?.hidden === false &&
+          lectureStart?.body === true &&
+          lectureStart?.scenes > 0 &&
+          lectureStart?.title === "마우스와 키보드 자동화" &&
+          lectureStart?.visible === 0 &&
+          /· 0 \/ \d+$/.test(lectureStart?.progress ?? ""),
+        JSON.stringify(lectureStart),
+      );
+      await save(session, "06-lecture-title", false);
+
+      await client.act(
+        session,
+        [{ kind: "click", selector: "[data-lecture-next]", expectedRisk: "externalEffect" }],
+        { timeoutMs: 30000 },
+      );
+      await evaluate(session, `new Promise((resolve) => setTimeout(resolve, 350))`);
+      const firstBeat = value(await evaluate(session, `(() => {
+        const deck = document.querySelector('[data-lecture-deck]');
+        const scene = deck.querySelector('.lecture-scene.on');
+        const visual = scene.querySelector('[data-scene-visible="true"]');
+        return {
+          visible: scene.querySelectorAll('[data-scene-visible="true"]').length,
+          effect: visual?.dataset.sceneEffect,
+          width: visual ? Math.round(visual.getBoundingClientRect().width) : 0,
+          progress: deck.querySelector('[data-lecture-progress]').textContent.trim(),
+          hash: location.hash,
+        };
+      })()`));
+      record(
+        `${viewport.id} 첫 클릭 enter 효과`,
+        firstBeat?.visible === 1 &&
+          firstBeat?.effect === "enter" &&
+          firstBeat?.width >= (viewport.id === "desktop" ? 700 : 320) &&
+          /· 1 \/ \d+$/.test(firstBeat?.progress ?? "") &&
+          /^#lecture=s1\.1$/.test(firstBeat?.hash ?? ""),
+        JSON.stringify(firstBeat),
+      );
+
+      await evaluate(session, `document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowRight', bubbles:true }))`);
+      const keyboardBeat = value(await evaluate(session, `(() => {
+        const deck = document.querySelector('[data-lecture-deck]');
+        const visual = deck.querySelector('.lecture-scene.on [data-scene-visible="true"]');
+        return { effect: visual?.dataset.sceneEffect, progress: deck.querySelector('[data-lecture-progress]').textContent.trim(), hash: location.hash };
+      })()`));
+      record(
+        `${viewport.id} 키보드 beat 진행`,
+        keyboardBeat?.effect === "focus" && /· 2 \/ \d+$/.test(keyboardBeat?.progress ?? "") && keyboardBeat?.hash === "#lecture=s1.2",
+        JSON.stringify(keyboardBeat),
+      );
+      await save(session, "07-lecture-beat", false);
+
+      await client.act(
+        session,
+        [{ kind: "click", selector: "[data-lecture-notes-toggle]", expectedRisk: "externalEffect" }],
+        { timeoutMs: 30000 },
+      );
+      const noteState = value(await evaluate(session, `(() => {
+        const note = document.querySelector('[data-lecture-notes]');
+        return { hidden: note?.hidden, length: note?.textContent.trim().length ?? 0 };
+      })()`));
+      record(`${viewport.id} 발표자 노트`, noteState?.hidden === false && noteState?.length > 20, JSON.stringify(noteState));
+      await save(session, "08-lecture-notes", false);
+
+      await client.act(
+        session,
+        [{ kind: "click", selector: "[data-lecture-close]", expectedRisk: "externalEffect" }],
+        { timeoutMs: 30000 },
+      );
+      const lectureClosed = value(await evaluate(session, `(() => ({
+        hidden: document.querySelector('[data-lecture-deck]')?.hidden,
+        body: document.body.classList.contains('lecture-on'),
+      }))()`));
+      record(`${viewport.id} 강의 모드 종료`, lectureClosed?.hidden === true && lectureClosed?.body === false, JSON.stringify(lectureClosed));
+    }
 
     // 강의장 모든 상태에서 같은 아이콘 토글을 쓰고, 선택한 테마를 html과 브라우저 기본 UI에 같이 건다.
     const lightTheme = value(
@@ -436,6 +556,64 @@ for (const viewport of VIEWPORTS) {
       timeoutMs: 30000,
     });
     session = (await client.attachSession(opened.output.targetRef, { timeoutMs: 30000 })).output;
+
+    // URL로 장면과 beat를 복구하고, 실행 칸에 simulate와 run 효과가 실제로 이어지는지 본다.
+    await evaluate(session, `location.hash = '#lecture=s2.2'; location.reload()`, false);
+    await client.act(
+      session,
+      [{ kind: "waitFor", selector: ".lecture-scene.on", timeoutMs: 15000, expectedRisk: "read" }],
+      { timeoutMs: 30000 },
+    );
+    const restoredLecture = value(await evaluate(session, `(() => {
+      const deck = document.querySelector('[data-lecture-deck]');
+      const scene = deck?.querySelector('.lecture-scene.on');
+      return {
+        hidden: deck?.hidden,
+        scene: scene?.dataset.scene,
+        progress: deck?.querySelector('[data-lecture-progress]')?.textContent.trim(),
+        visual: scene?.querySelector('[data-scene-visible="true"]')?.dataset.visual,
+      };
+    })()`));
+    record(
+      `${viewport.id} 강의 위치 URL 복구`,
+      restoredLecture?.hidden === false &&
+        restoredLecture?.scene === "s2" &&
+        /02 \/ 08 · 2 \/ 4/.test(restoredLecture?.progress ?? "") &&
+        restoredLecture?.visual === "2",
+      JSON.stringify(restoredLecture),
+    );
+
+    await evaluate(session, `document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowRight', bubbles:true }))`);
+    const simulated = value(await evaluate(session, `(() => {
+      const visual = document.querySelector('.lecture-scene.on [data-scene-visible="true"]');
+      return { live: visual?.dataset.sceneLive, progress: document.querySelector('[data-lecture-progress]')?.textContent.trim() };
+    })()`));
+    record(
+      `${viewport.id} simulate 효과`,
+      simulated?.live === "true" && /· 3 \/ 4/.test(simulated?.progress ?? ""),
+      JSON.stringify(simulated),
+    );
+
+    if (viewport.id === "desktop") {
+      const lectureRun = String(value(await evaluate(session, `(async () => {
+        document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowRight', bubbles:true }));
+        const cell = document.querySelector('.lecture-scene.on [data-cell]');
+        const st = cell.querySelector('[data-state]');
+        const out = cell.querySelector('[data-out]');
+        for (let i = 0; i < 200; i++) {
+          await new Promise((r) => setTimeout(r, 500));
+          if (st.textContent === '완료' || st.textContent === '오류') break;
+        }
+        return st.textContent + ' :: ' + out.textContent.slice(0, 120);
+      })()`)));
+      record(`${viewport.id} run 효과`, lectureRun.startsWith("완료"), lectureRun);
+    }
+
+    await client.act(
+      session,
+      [{ kind: "click", selector: "[data-lecture-close]", expectedRisk: "externalEffect" }],
+      { timeoutMs: 30000 },
+    );
 
     const cells = Number(
       value(await evaluate(session, `document.querySelectorAll('[data-cell]').length`)),

@@ -5,7 +5,15 @@
  * 교안에 들어 있는 HTML 이 그대로 실행되지 않을 것, 시각 자산이 제 태그로 나갈 것.
  */
 import assert from "node:assert/strict";
-import { renderMarkdown, renderPost, inline, esc } from "../classroom-render.ts";
+import {
+  renderLecture,
+  renderMarkdown,
+  renderPost,
+  splitCourseSections,
+  inline,
+  esc,
+  type CourseScene,
+} from "../classroom-render.ts";
 
 let count = 0;
 const check = (label: string, fn: () => void) => {
@@ -17,9 +25,9 @@ check("코드 안의 빈 줄이 코드를 가르지 않는다", () => {
   const html = renderMarkdown(
     ["```python", "a = 1", "", "print(a)", "```"].join("\n"),
   );
-  assert.equal(html, "<pre>a = 1\n\nprint(a)</pre>");
+  assert.equal(html, '<pre data-visual="1">a = 1\n\nprint(a)</pre>');
   // 갈라졌다면 pre 가 둘이거나 p 가 생긴다
-  assert.equal(html.match(/<pre>/g)?.length, 1);
+  assert.equal(html.match(/<pre(?:\s|>)/g)?.length, 1);
   assert.ok(!html.includes("<p>"));
 });
 
@@ -27,7 +35,7 @@ check("코드 앞뒤의 글은 문단으로 남는다", () => {
   const html = renderMarkdown(["앞말", "", "```", "x", "", "y", "```", "", "뒷말"].join("\n"));
   assert.ok(html.startsWith("<p>앞말</p>"));
   assert.ok(html.endsWith("<p>뒷말</p>"));
-  assert.equal(html.match(/<pre>/g)?.length, 1);
+  assert.equal(html.match(/<pre(?:\s|>)/g)?.length, 1);
 });
 
 check("코드 안의 꺾쇠는 태그가 되지 않는다", () => {
@@ -86,7 +94,7 @@ check("GFM 표를 머리와 본문 셀로 그린다", () => {
       "| marimo | 내 노트북 | `.py`로 남길 때 |",
     ].join("\n"),
   );
-  assert.match(html, /<div class="table-wrap"><table>/);
+  assert.match(html, /<div[^>]+class="table-wrap"><table>/);
   assert.match(html, /<th scope="col">도구<\/th>/);
   assert.match(html, /<td><strong>공유<\/strong>할 때<\/td>/);
   assert.match(html, /<td><code>\.py<\/code>로 남길 때<\/td>/);
@@ -345,6 +353,8 @@ check("슬라이더 안의 장마다 캡션이 붙는다", () => {
   assert.equal(html.match(/<figcaption>/g)?.length, 2);
   assert.ok(html.includes("첫째") && html.includes("둘째"));
   assert.equal(html.match(/<div class="slider">/g)?.length, 1);
+  assert.ok(html.includes('data-visual="1"'));
+  assert.ok(html.includes('data-visual="2"'));
 });
 
 check("영상 캡션도 나간다", () => {
@@ -357,6 +367,64 @@ check("캡션의 HTML 은 escape 된다", () => {
   const html = renderMarkdown('![a](https://a.b/c.png "<b>굵게</b>")');
   assert.ok(!html.includes("<b>굵게</b>"));
   assert.ok(html.includes("&lt;b&gt;"));
+});
+
+check("course-embed는 격리된 https iframe 시각물이 된다", () => {
+  const html = renderMarkdown(
+    ["```course-embed", "src: https://example.com/demo", "title: 지출 판정 시뮬레이션", "ratio: 16/9", "```"].join("\n"),
+  );
+  assert.ok(html.includes('class="course-embed"'));
+  assert.ok(html.includes('sandbox="allow-scripts allow-forms"'));
+  assert.ok(html.includes('data-visual="1"'));
+  assert.ok(html.includes('title="지출 판정 시뮬레이션"'));
+});
+
+check("코드 펜스 안의 H2는 강의 장면을 나누지 않는다", () => {
+  const sections = splitCourseSections(
+    ["## 첫 장면", "", "### 첫 부제", "", "```text", "## 코드 안 제목", "```", "", "## 둘째 장면", "", "### 둘째 부제", "", "본문"].join("\n"),
+  );
+  assert.equal(sections.length, 2);
+  assert.equal(sections[0].title, "첫 장면");
+  assert.equal(sections[1].subtitle, "둘째 부제");
+});
+
+check("읽기 본문 하나를 장면과 비트 계약으로 투영한다", () => {
+  const body = [
+    "## 첫 장면",
+    "",
+    "### 그림을 먼저 보여 줍니다",
+    "",
+    "설명은 발표자 노트 재료입니다.",
+    "",
+    "![첫 그림](https://example.com/a.svg)",
+    "",
+    "## 결과 확인",
+    "",
+    "### 코드 결과를 확인합니다",
+    "",
+    "```text",
+    "결과 1",
+    "```",
+  ].join("\n");
+  const scenes: CourseScene[] = [
+    { id: "s1", role: "open", layout: "stage", visualCount: 1, beats: [{ effect: "enter", targets: [1] }] },
+    { id: "s2", role: "close", layout: "code", visualCount: 1, beats: [{ effect: "annotate", targets: [1], note: "결과를 확인합니다" }] },
+  ];
+  const lecture = renderLecture(body, scenes);
+  assert.equal(lecture.ok, true);
+  assert.equal(lecture.html.match(/class="lecture-scene"/g)?.length, 2);
+  assert.ok(lecture.html.includes('data-layout="stage"'));
+  assert.ok(lecture.html.includes("설명은 발표자 노트 재료입니다."));
+  assert.ok(lecture.html.includes("결과를 확인합니다"));
+});
+
+check("본문 시각물 수와 계약이 다르면 강의 모드를 만들지 않는다", () => {
+  const lecture = renderLecture(
+    "## 첫 장면\n\n### 부제입니다\n\n![그림](https://example.com/a.png)",
+    [{ id: "s1", role: "open", layout: "stage", visualCount: 2, beats: [{ effect: "enter", targets: [1] }] }],
+  );
+  assert.equal(lecture.ok, false);
+  assert.equal(lecture.html, "");
 });
 
 console.log(`classroom render: 코드 분할과 escape 등 ${count} cases`);
