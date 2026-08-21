@@ -462,6 +462,25 @@ function sessionCookie(token: string, slug: string, url: URL): string {
 const STYLE = `
 ${cssVars()}
 :root { color-scheme: dark; }
+:root[data-theme="light"] {
+  color-scheme:light;
+  --eddm-carbon:${TOKENS.color.ivory};
+  --eddm-ink:color-mix(in srgb, ${TOKENS.color.ivory} 92%, ${TOKENS.color.carbon});
+  --eddm-ivory:${TOKENS.color.carbon};
+  --eddm-sand:color-mix(in srgb, ${TOKENS.color.sand} 45%, ${TOKENS.color.carbon});
+  --eddm-text:color-mix(in srgb, ${TOKENS.color.carbon} 78%, transparent);
+  --eddm-text-muted:color-mix(in srgb, ${TOKENS.color.carbon} 58%, transparent);
+  --eddm-text-dim:color-mix(in srgb, ${TOKENS.color.carbon} 45%, transparent);
+  --eddm-text-faint:color-mix(in srgb, ${TOKENS.color.carbon} 35%, transparent);
+  --eddm-line:color-mix(in srgb, ${TOKENS.color.carbon} 8%, transparent);
+  --eddm-line-base:color-mix(in srgb, ${TOKENS.color.carbon} 11%, transparent);
+  --eddm-line-strong:color-mix(in srgb, ${TOKENS.color.carbon} 17%, transparent);
+  --eddm-raise:color-mix(in srgb, ${TOKENS.color.carbon} 4%, transparent);
+  --eddm-hover:color-mix(in srgb, ${TOKENS.color.carbon} 8%, transparent);
+  --eddm-accent-line:color-mix(in srgb, var(--eddm-sand) 35%, transparent);
+  --eddm-accent-bg:color-mix(in srgb, var(--eddm-sand) 10%, transparent);
+  --eddm-accent-dim:color-mix(in srgb, var(--eddm-sand) 72%, transparent);
+}
 * { box-sizing: border-box; }
 body { margin:0; background:var(--eddm-carbon); color:var(--eddm-ivory); font-family:${TOKENS.font.sans}; word-break:keep-all; -webkit-font-smoothing:antialiased;
   line-height:1.7; -webkit-text-size-adjust:100%; }
@@ -485,6 +504,12 @@ body { margin:0; background:var(--eddm-carbon); color:var(--eddm-ivory); font-fa
 .hd .nav-icon { color:var(--eddm-text-muted); border:0; transition:color .15s cubic-bezier(.4,0,.2,1); }
 .hd .nav-icon:hover { color:var(--eddm-ivory); }
 .hd .nav-icon svg { height:18px; width:18px; display:block; }
+.theme-switch { display:flex; align-items:center; gap:2px; padding:2px; border:1px solid var(--eddm-line-base);
+  border-radius:.55rem; background:var(--eddm-raise); }
+.hd .theme-btn { margin:0; padding:.3rem .5rem; border:0; border-radius:.4rem; background:transparent;
+  color:var(--eddm-text-muted); font:inherit; font-size:.72rem; line-height:1.25; cursor:pointer; }
+.hd .theme-btn:hover { background:var(--eddm-hover); color:var(--eddm-ivory); }
+.hd .theme-btn[aria-pressed="true"] { background:var(--eddm-accent-bg); color:var(--eddm-sand); }
 @media (min-width:768px) {
   .hd { flex-direction:row; justify-content:space-between; gap:0; margin-bottom:64px; }
 }
@@ -687,6 +712,61 @@ article a:hover { border-bottom-color:var(--eddm-sand); }
 .pending span { display:block; font-size:.9rem; color:var(--eddm-text-muted); line-height:1.7; }
 .pending i { display:block; margin-top:.5rem; font-size:.75rem; color:var(--eddm-text-faint); font-style:normal; }
 .slider .pending { flex:0 0 88%; margin:0; scroll-snap-align:center; }
+`;
+
+/**
+ * 첫 화면을 그리기 전에 시스템 설정이나 저장한 선택을 적용한다. body 뒤에서 바꾸면
+ * 라이트 화면이 잠깐 어둡게 번쩍이므로 head에서 먼저 실행한다.
+ */
+const THEME_INIT_SCRIPT = `
+(() => {
+  const root = document.documentElement;
+  const media = matchMedia("(prefers-color-scheme: light)");
+  const choices = new Set(["system", "light", "dark"]);
+  let saved = "system";
+  try {
+    const value = localStorage.getItem("eddmpython-classroom-theme");
+    if (value && choices.has(value)) saved = value;
+  } catch {}
+  const set = (choice, persist = true) => {
+    const selected = choices.has(choice) ? choice : "system";
+    const resolved = selected === "system" ? (media.matches ? "light" : "dark") : selected;
+    root.dataset.themeChoice = selected;
+    root.dataset.theme = resolved;
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", resolved === "light" ? "${TOKENS.color.ivory}" : "${TOKENS.color.carbon}");
+    if (persist) {
+      try { localStorage.setItem("eddmpython-classroom-theme", selected); } catch {}
+    }
+  };
+  window.__eddmTheme = { media, set };
+  set(saved, false);
+})();
+`;
+
+/** 선택 버튼과 시스템 테마 변경을 연결한다. */
+const THEME_SCRIPT = `
+(() => {
+  const api = window.__eddmTheme;
+  if (!api) return;
+  const buttons = [...document.querySelectorAll(".theme-btn[data-theme-choice]")];
+  const sync = () => {
+    const selected = document.documentElement.dataset.themeChoice || "system";
+    for (const button of buttons) {
+      button.setAttribute("aria-pressed", button.dataset.themeChoice === selected ? "true" : "false");
+    }
+  };
+  for (const button of buttons) {
+    button.addEventListener("click", () => {
+      api.set(button.dataset.themeChoice);
+      sync();
+    });
+  }
+  api.media.addEventListener("change", () => {
+    if (document.documentElement.dataset.themeChoice === "system") api.set("system", false);
+  });
+  sync();
+})();
 `;
 
 /**
@@ -918,7 +998,13 @@ function header(): string {
   }" fill="${esc(BRAND.eye)}"/></svg>
     <span class="hd-word"><b>eddm</b><i>python</i></span>
   </a>
-  <div class="hd-right">${links}<span class="hd-icons">${icons}</span></div>
+  <div class="hd-right">${links}<span class="hd-icons">${icons}</span>
+    <div class="theme-switch" role="group" aria-label="화면 테마">
+      <button type="button" class="theme-btn" data-theme-choice="system" aria-pressed="false">자동</button>
+      <button type="button" class="theme-btn" data-theme-choice="light" aria-pressed="false">라이트</button>
+      <button type="button" class="theme-btn" data-theme-choice="dark" aria-pressed="false">다크</button>
+    </div>
+  </div>
 </nav>`;
 }
 
@@ -944,10 +1030,11 @@ function page(
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="${TOKENS.fontHref}">
+<script nonce="${nonce}">${THEME_INIT_SCRIPT}</script>
 <style>${STYLE}</style></head>
 <body><div class="wrap${wide ? " wide" : ""}">${inner}</div>
 <div class="zoom" id="zoom"><img alt=""></div>
-<script nonce="${nonce}">${ZOOM_SCRIPT}${extraScript}</script></body></html>`;
+<script nonce="${nonce}">${THEME_SCRIPT}${ZOOM_SCRIPT}${extraScript}</script></body></html>`;
   return new Response(html, {
     headers: {
       "content-type": "text/html; charset=utf-8",

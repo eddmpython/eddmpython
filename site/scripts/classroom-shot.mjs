@@ -254,6 +254,107 @@ for (const viewport of VIEWPORTS) {
     session = (await client.attachSession(opened.output.targetRef, { timeoutMs: 30000 })).output;
     await save(session, "03-post");
 
+    // 강의장 모든 상태에서 같은 선택기를 쓰고, 선택한 테마를 html과 브라우저 기본 UI에 같이 건다.
+    const lightTheme = value(
+      await evaluate(
+        session,
+        `(async () => {
+          const button = document.querySelector('[data-theme-choice="light"]');
+          if (!button) return null;
+          button.click();
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          return {
+            buttons: document.querySelectorAll('.theme-btn[data-theme-choice]').length,
+            choice: document.documentElement.dataset.themeChoice,
+            theme: document.documentElement.dataset.theme,
+            pressed: button.getAttribute('aria-pressed'),
+            scheme: getComputedStyle(document.documentElement).colorScheme,
+          };
+        })()`,
+      ),
+    );
+    record(
+      `${viewport.id} 라이트 테마`,
+      lightTheme?.buttons === 3 &&
+        lightTheme?.choice === "light" &&
+        lightTheme?.theme === "light" &&
+        lightTheme?.pressed === "true" &&
+        lightTheme?.scheme === "light",
+      JSON.stringify(lightTheme),
+    );
+    await evaluate(session, `location.reload()`, false);
+    await client.act(
+      session,
+      [{ kind: "waitFor", selector: ".body h1", timeoutMs: 15000, expectedRisk: "read" }],
+      { timeoutMs: 30000 },
+    );
+    const persistedTheme = value(
+      await evaluate(
+        session,
+        `(() => ({
+          choice: document.documentElement.dataset.themeChoice,
+          theme: document.documentElement.dataset.theme,
+          pressed: document.querySelector('.theme-btn[data-theme-choice="light"]')?.getAttribute('aria-pressed'),
+        }))()`,
+      ),
+    );
+    record(
+      `${viewport.id} 라이트 테마 새로고침 유지`,
+      persistedTheme?.choice === "light" &&
+        persistedTheme?.theme === "light" &&
+        persistedTheme?.pressed === "true",
+      JSON.stringify(persistedTheme),
+    );
+    await save(session, "03-theme-light");
+
+    const darkTheme = value(
+      await evaluate(
+        session,
+        `(async () => {
+          const button = document.querySelector('[data-theme-choice="dark"]');
+          button.click();
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          return {
+            choice: document.documentElement.dataset.themeChoice,
+            theme: document.documentElement.dataset.theme,
+            pressed: button.getAttribute('aria-pressed'),
+            scheme: getComputedStyle(document.documentElement).colorScheme,
+          };
+        })()`,
+      ),
+    );
+    record(
+      `${viewport.id} 다크 테마`,
+      darkTheme?.choice === "dark" &&
+        darkTheme?.theme === "dark" &&
+        darkTheme?.pressed === "true" &&
+        darkTheme?.scheme === "dark",
+      JSON.stringify(darkTheme),
+    );
+    await save(session, "03-theme-dark");
+
+    const systemTheme = value(
+      await evaluate(
+        session,
+        `(() => {
+          const system = document.querySelector('[data-theme-choice="system"]');
+          const dark = document.querySelector('[data-theme-choice="dark"]');
+          system.click();
+          const selected = {
+            choice: document.documentElement.dataset.themeChoice,
+            pressed: system.getAttribute('aria-pressed'),
+          };
+          dark.click();
+          return selected;
+        })()`,
+      ),
+    );
+    record(
+      `${viewport.id} 시스템 테마`,
+      systemTheme?.choice === "system" && systemTheme?.pressed === "true",
+      JSON.stringify(systemTheme),
+    );
+
     // 확대가 실제로 열리는지 본다. 강의 중에 화면에 띄우는 기능이라 그림만으로는 못 믿는다.
     const zoomed = await evaluate(
       session,

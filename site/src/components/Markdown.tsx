@@ -420,18 +420,25 @@ export function Markdown({ children }: { children: string }) {
           return <p className="my-5 leading-[1.85] text-ivory/75">{kids}</p>;
         },
         h2: ({ children: k }) => {
-          const heading = headings[h2Index++];
+          const index = h2Index++;
+          const heading = headings[index];
           return (
             <h2
               id={heading?.id}
-              className="mt-12 mb-2 scroll-mt-24 text-xl font-medium tracking-tight md:text-2xl"
+              className="mt-20 mb-3 flex scroll-mt-28 items-baseline gap-4 border-t border-white/15 pt-9 text-[1.75rem] leading-[1.2] font-semibold tracking-[-0.025em] text-ivory md:mt-24 md:gap-5 md:pt-10 md:text-[2rem]"
             >
-              {k}
+              <span
+                aria-hidden="true"
+                className="w-8 shrink-0 font-mono text-[11px] font-medium tracking-[0.08em] text-sand/70 md:w-9 md:text-xs"
+              >
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <span>{k}</span>
             </h2>
           );
         },
         h3: ({ children: k }) => (
-          <h3 className="mt-0 mb-5 text-[15px] leading-relaxed font-normal text-ivory/55 md:text-base">
+          <h3 className="mt-0 mb-7 pl-12 text-[15px] leading-relaxed font-normal text-ivory/55 md:pl-14 md:text-base">
             {k}
           </h3>
         ),
