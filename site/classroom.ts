@@ -1,7 +1,7 @@
 /**
  * 강의장. 운영자가 자기 노트북의 운영 화면에서 방을 만들고 그 자리에서 비밀번호를 건다.
  *
- * 설계 근거는 ../eddmpython-course/memory/courseRoom.md 다. 원칙 넷이다.
+ * 설계 근거는 ../eddmpython-course/memory/architecture/courseRoom.md 다. 원칙 넷이다.
  *
  * 1. 운영 화면은 로컬호스트에만 있다. 공개 서버에는 운영자용 페이지가 없다
  * 2. 방은 실행 중에 생긴다. 만드는 즉시 /cr/<이름> 주소가 살아난다. 배포가 필요 없다

@@ -22,7 +22,7 @@ status: observed
 # 블로그 발행
 
 이 문서는 **기계 계약**이다. 파일 이름, frontmatter, 검사, 배포 순서를 정한다.
-**글을 어떻게 쓰는지는 여기 없다.** 작가 파이프라인은 `../eddmpython-course/memory/blogWriter.md` 이고
+**글을 어떻게 쓰는지는 여기 없다.** 작가 파이프라인은 `../eddmpython-course/memory/rules/blogWriter.md` 이고
 비공개 형제 저장소에 있다. 규칙 문서 전체 인덱스는 `../eddmpython-course/memory/MEMORY.md` 다.
 
 ## 정본은 한 곳이다
@@ -84,8 +84,8 @@ frontmatter 파서는 `^([A-Za-z][A-Za-z0-9]*):\s*(.*)$` 한 줄 정규식이다
 
 ## 카테고리와 공개 읽기 순서
 
-`blog/order.json` 이 카테고리와 목록 순서의 정본이다. 카테고리 하나가 강의 한 묶음이며
-폴더 이름과 category slug 는 같다.
+`blog/order.json` 이 카테고리와 목록 순서의 정본이다. 카테고리는 관련 단편을 목록에서 묶는
+단위이며 폴더 이름과 category slug 는 같다.
 
 ```json
 {
@@ -121,8 +121,8 @@ frontmatter 파서는 `^([A-Za-z][A-Za-z0-9]*):\s*(.*)$` 한 줄 정규식이다
 ### 새 카테고리를 열 때
 
 1. 폴더를 만든다. 예: `blog/content/work-automation/`
-2. 그 안에 `README.md` 를 둔다. 블로그는 단편이라 원장을 요구하지 않는다. 원장은 교안 저장소의
-   `curriculum/원장.md` 하나뿐이다
+2. 그 안에 `README.md` 를 둔다. 블로그는 단편이라 원장을 요구하지 않는다. 교안 원장은 비공개
+   형제 저장소의 `../eddmpython-course/memory/curriculum/원장.md` 하나뿐이다
 3. `order.json` 의 `categories` 에 같은 slug 를 넣는다
 4. 목록에 올릴 글만 `posts` 에 넣는다
 
@@ -167,7 +167,7 @@ sitemap 은 그대로 둔다.** 검색에 색인된 글을 실제로 내리면 �
 
 한때 여기에 `블로그가 원문이고 강의가 참조한다` 가 있었다. 커리큘럼이 블로그에 있던 시절의
 구조이고 2026-08-21 에 현재 구조로 고쳤다. 글쓰기 규칙 자체는 블로그든 교안이든
-`../eddmpython-course/memory/blogWriter.md` 하나를 따른다.
+`../eddmpython-course/memory/rules/blogWriter.md` 하나를 따른다.
 
 ## 게이트는 두 개다
 
@@ -222,7 +222,7 @@ title 과 부제와 절 구조와 H4 라벨은 `site/scripts/blog-package.mjs` �
 표본은 각각 `test-blog-style.mjs` 와 `test-blog-package.mjs` 에 있다.
 
 **글자 수 하한은 쓰지 않는다.** 2026-08-17 에 발행 40편을 실측해 없앴다. 까닭은
-`../eddmpython-course/memory/blogWriter.md` 에 있다.
+`../eddmpython-course/memory/rules/blogWriter.md` 에 있다.
 
 ## 실행 칸
 
@@ -240,7 +240,7 @@ Web Run 링크에서 쓸 수 있다고 정확히 적는다.
 
 ## 글 하나 발행하는 순서
 
-1. `../eddmpython-course/memory/blogWriter.md` 의 작가 파이프라인을 통과한다. **[blogCopy.md](blogCopy.md) 의 유입
+1. `../eddmpython-course/memory/rules/blogWriter.md` 의 작가 파이프라인을 통과한다. **[blogCopy.md](blogCopy.md) 의 유입
    패키징 게이트는 제목을 확정하기 전에 본다.** 주제 선택은
    [contentStrategy.md](contentStrategy.md), 제품 맥락은
    [productMarketing.md](productMarketing.md) 다

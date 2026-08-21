@@ -46,7 +46,7 @@ async function exists(path) {
 
 /**
  * 설정이 없으면 만든다. 로컬 토큰은 여기서 뽑아 .dev.vars 와 맞춰 둔다.
- * 운영 토큰은 비워 둔다. wrangler secret put CR_ADMIN_TOKEN 으로 넣은 값을 옮겨 적는다.
+ * 운영 토큰은 비워 둔다. --link-production 이 Worker secret 과 이 설정을 한 번에 맞춘다.
  */
 async function loadConfig() {
   if (!(await exists(CONFIG))) {
@@ -121,7 +121,9 @@ async function drive(targetId, body) {
   if (!target.token) {
     return {
       status: 400,
-      data: { error: `${target.label} 토큰이 비어 있습니다. ${CONFIG} 에 채워 주세요` },
+      data: {
+        error: `${target.label} 토큰이 비어 있습니다. node scripts/classroom-admin.mjs --link-production 을 실행해 주세요`,
+      },
     };
   }
   try {

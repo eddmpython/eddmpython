@@ -4,8 +4,8 @@
 
 | 무엇 | 어디 |
 |---|---|
-| 글을 쓰기 전에 여는 작가 파이프라인 | `../eddmpython-course/memory/blogWriter.md` (비공개 형제 저장소, 추적 안 함) |
-| 문체 실측 근거 (규칙 아님) | `../eddmpython-course/memory/writingVoice.md` (비공개 형제 저장소, 추적 안 함) |
+| 글을 쓰기 전에 여는 작가 파이프라인 | `../eddmpython-course/memory/rules/blogWriter.md` (비공개 형제 저장소, 추적 안 함) |
+| 문체 실측 근거 (규칙 아님) | `../eddmpython-course/memory/evidence/writingVoice.md` (비공개 형제 저장소, 추적 안 함) |
 | 규칙 문서 전체 인덱스 | `../eddmpython-course/memory/MEMORY.md` (비공개 형제 저장소, 추적 안 함) |
 | 파일 이름, frontmatter, 카테고리, 검사, 배포 | `skills/specs/operation/blogPublishing.md` |
 | 이미지와 영상 계약 | `skills/specs/operation/blogMedia.md` |
@@ -22,8 +22,8 @@
 | `order.json` | `/blog` 목록의 카테고리와 읽기 순서 |
 | `media/` | 이미지 계획 (`plan.json`) 과 HF 객체 대응 (`catalog.json`) |
 | `embeds/` | 본문에 붙는 실행 칸 (`codaro-cells.json`) |
-| `scripts/` | 미디어 발행 스크립트와 원장 대조 도구 |
-| **`content/<category-slug>/`** | **카테고리 한 묶음의 글과 원장. 글은 여기에만 있다** |
+| `scripts/` | 미디어 발행과 검사 스크립트 |
+| **`content/<category-slug>/`** | **공개 글. 글은 여기에만 있다** |
 
 `content/` 아래만 글이다. 나머지는 기계다. 검사기가 `content` 만 걷고 나머지는 아예 들어가지
 않는다. 새 기계 폴더를 만들어도 검사기를 고칠 필요가 없다.
@@ -41,12 +41,6 @@
 
 지금 카테고리가 없다. 글을 올릴 때 `order.json` 에 만든다.
 
-**원장은 추적하지 않는다.** 커리큘럼 설계와 내부 판단이 들어 있고, 사이트가 글 파일 원문 전체를
-공개 JS 번들로 굽기 때문에 설계 메모를 글 파일 안에 둘 수도 없다.
-
-```text
-python blog/scripts/outline.py                 원장과 본문 H2 를 대조한다
-python blog/scripts/outline.py --chain          절 사슬을 한 화면에 편다
-```
-
-이 도구는 게이트가 아니다. `npm test` 에 걸지 않는다. 글을 고치는 동안 쓴다.
+블로그에는 원장을 두지 않는다. 사이트가 글 파일 원문 전체를 공개 JS 번들로 굽기 때문에 설계
+메모도 글 파일에 넣지 않는다. 유료 교안의 합의된 순서와 섹션 사슬만 비공개 형제 저장소
+`../eddmpython-course/memory/curriculum/원장.md`에 둔다.

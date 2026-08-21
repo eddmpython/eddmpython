@@ -37,7 +37,7 @@ const readerLevels = new Set(["beginner", "working", "advanced"]);
 // 글과 카테고리 문서는 blog/content 아래에만 있다. 나머지는 기계라 걷지 않는다.
 const contentDirName = "content";
 const rootDocs = new Set(["README.md"]);
-const categoryDocs = new Set(["README.md", "원장.md"]);
+const categoryDocs = new Set(["README.md"]);
 const publicSlug = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const mediaSuffixes = new Set([
   ".svg",
@@ -390,7 +390,7 @@ const markdownDocs = await collectMarkdownDocs(blogDir);
 for (const doc of markdownDocs) {
   if (postName.test(doc.name)) continue;
   const depth = doc.relPath.split("/").length;
-  // blog/README.md 는 depth 1, blog/content/<카테고리>/README.md 와 원장.md 는 depth 3 이다.
+  // blog/README.md 는 depth 1, blog/content/<카테고리>/README.md 는 depth 3 이다.
   const allowed = depth === 1 ? rootDocs.has(doc.name) : depth === 3 && categoryDocs.has(doc.name);
   if (!allowed) {
     fail(doc.relPath, "발행 글이나 운영 문서로 분류되지 않은 파일입니다");
