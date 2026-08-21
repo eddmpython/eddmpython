@@ -504,12 +504,14 @@ body { margin:0; background:var(--eddm-carbon); color:var(--eddm-ivory); font-fa
 .hd .nav-icon { color:var(--eddm-text-muted); border:0; transition:color .15s cubic-bezier(.4,0,.2,1); }
 .hd .nav-icon:hover { color:var(--eddm-ivory); }
 .hd .nav-icon svg { height:18px; width:18px; display:block; }
-.theme-switch { display:flex; align-items:center; gap:2px; padding:2px; border:1px solid var(--eddm-line-base);
-  border-radius:.55rem; background:var(--eddm-raise); }
-.hd .theme-btn { margin:0; padding:.3rem .5rem; border:0; border-radius:.4rem; background:transparent;
-  color:var(--eddm-text-muted); font:inherit; font-size:.72rem; line-height:1.25; cursor:pointer; }
-.hd .theme-btn:hover { background:var(--eddm-hover); color:var(--eddm-ivory); }
-.hd .theme-btn[aria-pressed="true"] { background:var(--eddm-accent-bg); color:var(--eddm-sand); }
+.hd .theme-toggle { display:grid; place-items:center; width:2.15rem; height:2.15rem; margin:0; padding:0;
+  border:1px solid var(--eddm-line-base); border-radius:.55rem; background:var(--eddm-raise);
+  color:var(--eddm-text-muted); cursor:pointer; transition:color .15s cubic-bezier(.4,0,.2,1),
+  background .15s cubic-bezier(.4,0,.2,1), border-color .15s cubic-bezier(.4,0,.2,1); }
+.hd .theme-toggle:hover { border-color:var(--eddm-line-strong); background:var(--eddm-hover); color:var(--eddm-ivory); }
+.hd .theme-toggle svg { display:none; width:17px; height:17px; }
+:root[data-theme="light"] .theme-toggle .theme-icon-moon { display:block; }
+:root[data-theme="dark"] .theme-toggle .theme-icon-sun { display:block; }
 @media (min-width:768px) {
   .hd { flex-direction:row; justify-content:space-between; gap:0; margin-bottom:64px; }
 }
@@ -630,11 +632,17 @@ article h2:first-child { margin-top:0; padding-top:0; border-top:0; }
 article h2 .sn { flex:0 0 auto; font-size:.82rem; font-weight:500; letter-spacing:.04em;
   color:var(--eddm-accent-dim); font-variant-numeric:tabular-nums; }
 article h3 { margin:0 0 1.5rem 2.1rem; font-size:.95rem; font-weight:400; line-height:1.65; color:var(--eddm-text-muted); }
+article h3 + figure.media, article h3 + .slider, article h3 + .yt,
+article h3 + img, article h3 + video, article h3 + .pending { margin-top:.7rem; }
 article p { margin:1.25rem 0; line-height:1.85; color:var(--eddm-text); }
-/* 사례 라벨. 앞의 점 하나로 본문과 갈린다. 굵은 글씨만으로는 안 갈렸다. */
-article p.lb { display:flex; align-items:center; gap:.55rem; margin:2rem 0 .85rem; color:var(--eddm-ivory); }
+/* 사례 라벨과 바로 아래 시각물을 한 묶음으로 보이게 한다. 위 본문과는 벌리고 이미지는 붙인다. */
+article p.lb { display:flex; align-items:center; gap:.6rem; margin:2.4rem 0 .55rem; padding:.55rem .75rem;
+  border-left:2px solid var(--eddm-sand); border-radius:0 .45rem .45rem 0;
+  background:var(--eddm-raise); color:var(--eddm-ivory); }
 article p.lb::before { content:""; flex:0 0 auto; width:5px; height:5px; border-radius:50%; background:var(--eddm-sand); }
 article p.lb strong { font-weight:500; font-size:.95rem; }
+article p.lb + figure.media, article p.lb + .slider, article p.lb + .yt,
+article p.lb + img, article p.lb + video, article p.lb + .pending { margin-top:0; }
 article ul, article ol { margin:1.25rem 0; padding-left:1.25rem; line-height:1.85; color:var(--eddm-text); }
 article li { margin:.5rem 0; }
 article li::marker { color:var(--eddm-accent-dim); }
@@ -744,26 +752,29 @@ const THEME_INIT_SCRIPT = `
 })();
 `;
 
-/** 선택 버튼과 시스템 테마 변경을 연결한다. */
+/** 아이콘 토글과 시스템 테마 변경을 연결한다. */
 const THEME_SCRIPT = `
 (() => {
   const api = window.__eddmTheme;
   if (!api) return;
-  const buttons = [...document.querySelectorAll(".theme-btn[data-theme-choice]")];
+  const root = document.documentElement;
+  const toggle = document.querySelector("[data-theme-toggle]");
+  if (!toggle) return;
   const sync = () => {
-    const selected = document.documentElement.dataset.themeChoice || "system";
-    for (const button of buttons) {
-      button.setAttribute("aria-pressed", button.dataset.themeChoice === selected ? "true" : "false");
-    }
+    const current = root.dataset.theme === "light" ? "light" : "dark";
+    const next = current === "light" ? "dark" : "light";
+    const label = next === "light" ? "라이트 테마로 변경" : "다크 테마로 변경";
+    toggle.dataset.nextTheme = next;
+    toggle.setAttribute("aria-label", label);
+    toggle.setAttribute("title", label);
   };
-  for (const button of buttons) {
-    button.addEventListener("click", () => {
-      api.set(button.dataset.themeChoice);
-      sync();
-    });
-  }
+  toggle.addEventListener("click", () => {
+    api.set(toggle.dataset.nextTheme);
+    sync();
+  });
   api.media.addEventListener("change", () => {
-    if (document.documentElement.dataset.themeChoice === "system") api.set("system", false);
+    if (root.dataset.themeChoice === "system") api.set("system", false);
+    sync();
   });
   sync();
 })();
@@ -998,12 +1009,16 @@ function header(): string {
   }" fill="${esc(BRAND.eye)}"/></svg>
     <span class="hd-word"><b>eddm</b><i>python</i></span>
   </a>
-  <div class="hd-right">${links}<span class="hd-icons">${icons}</span>
-    <div class="theme-switch" role="group" aria-label="화면 테마">
-      <button type="button" class="theme-btn" data-theme-choice="system" aria-pressed="false">자동</button>
-      <button type="button" class="theme-btn" data-theme-choice="light" aria-pressed="false">라이트</button>
-      <button type="button" class="theme-btn" data-theme-choice="dark" aria-pressed="false">다크</button>
-    </div>
+  <div class="hd-right">${links}<span class="hd-icons">${icons}
+    <button type="button" class="theme-toggle" data-theme-toggle aria-label="화면 테마 변경" title="화면 테마 변경">
+      <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="3.5"/><path d="M12 2v2.2M12 19.8V22M4.93 4.93l1.56 1.56M17.51 17.51l1.56 1.56M2 12h2.2M19.8 12H22M4.93 19.07l1.56-1.56M17.51 6.49l1.56-1.56"/>
+      </svg>
+      <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2Z"/>
+      </svg>
+    </button>
+    </span>
   </div>
 </nav>`;
 }

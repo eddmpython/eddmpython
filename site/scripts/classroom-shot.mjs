@@ -254,20 +254,45 @@ for (const viewport of VIEWPORTS) {
     session = (await client.attachSession(opened.output.targetRef, { timeoutMs: 30000 })).output;
     await save(session, "03-post");
 
-    // 강의장 모든 상태에서 같은 선택기를 쓰고, 선택한 테마를 html과 브라우저 기본 UI에 같이 건다.
+    const visualGroup = value(await evaluate(session, `(() => {
+      const label = document.querySelector('article .lb');
+      const visual = label?.nextElementSibling;
+      if (!label || !visual) return null;
+      const labelBox = label.getBoundingClientRect();
+      const visualBox = visual.getBoundingClientRect();
+      return {
+        gap: Math.round((visualBox.top - labelBox.bottom) * 100) / 100,
+        visual: visual.className || visual.tagName.toLowerCase(),
+        background: getComputedStyle(label).backgroundColor,
+        border: getComputedStyle(label).borderLeftWidth,
+      };
+    })()`));
+    record(
+      `${viewport.id} 소제목과 시각물 묶음`,
+      visualGroup !== null &&
+        visualGroup.gap >= 0 &&
+        visualGroup.gap <= 12 &&
+        visualGroup.background !== "rgba(0, 0, 0, 0)" &&
+        visualGroup.border === "2px",
+      JSON.stringify(visualGroup),
+    );
+
+    // 강의장 모든 상태에서 같은 아이콘 토글을 쓰고, 선택한 테마를 html과 브라우저 기본 UI에 같이 건다.
     const lightTheme = value(
       await evaluate(
         session,
         `(async () => {
-          const button = document.querySelector('[data-theme-choice="light"]');
+          const button = document.querySelector('[data-theme-toggle]');
           if (!button) return null;
+          if (document.documentElement.dataset.theme !== 'dark') button.click();
           button.click();
           await new Promise((resolve) => setTimeout(resolve, 100));
           return {
-            buttons: document.querySelectorAll('.theme-btn[data-theme-choice]').length,
+            buttons: document.querySelectorAll('[data-theme-toggle]').length,
             choice: document.documentElement.dataset.themeChoice,
             theme: document.documentElement.dataset.theme,
-            pressed: button.getAttribute('aria-pressed'),
+            next: button.dataset.nextTheme,
+            label: button.getAttribute('aria-label'),
             scheme: getComputedStyle(document.documentElement).colorScheme,
           };
         })()`,
@@ -275,10 +300,11 @@ for (const viewport of VIEWPORTS) {
     );
     record(
       `${viewport.id} 라이트 테마`,
-      lightTheme?.buttons === 3 &&
+      lightTheme?.buttons === 1 &&
         lightTheme?.choice === "light" &&
         lightTheme?.theme === "light" &&
-        lightTheme?.pressed === "true" &&
+        lightTheme?.next === "dark" &&
+        lightTheme?.label === "다크 테마로 변경" &&
         lightTheme?.scheme === "light",
       JSON.stringify(lightTheme),
     );
@@ -294,7 +320,8 @@ for (const viewport of VIEWPORTS) {
         `(() => ({
           choice: document.documentElement.dataset.themeChoice,
           theme: document.documentElement.dataset.theme,
-          pressed: document.querySelector('.theme-btn[data-theme-choice="light"]')?.getAttribute('aria-pressed'),
+          next: document.querySelector('[data-theme-toggle]')?.dataset.nextTheme,
+          label: document.querySelector('[data-theme-toggle]')?.getAttribute('aria-label'),
         }))()`,
       ),
     );
@@ -302,7 +329,8 @@ for (const viewport of VIEWPORTS) {
       `${viewport.id} 라이트 테마 새로고침 유지`,
       persistedTheme?.choice === "light" &&
         persistedTheme?.theme === "light" &&
-        persistedTheme?.pressed === "true",
+        persistedTheme?.next === "dark" &&
+        persistedTheme?.label === "다크 테마로 변경",
       JSON.stringify(persistedTheme),
     );
     await save(session, "03-theme-light");
@@ -311,13 +339,14 @@ for (const viewport of VIEWPORTS) {
       await evaluate(
         session,
         `(async () => {
-          const button = document.querySelector('[data-theme-choice="dark"]');
+          const button = document.querySelector('[data-theme-toggle]');
           button.click();
           await new Promise((resolve) => setTimeout(resolve, 100));
           return {
             choice: document.documentElement.dataset.themeChoice,
             theme: document.documentElement.dataset.theme,
-            pressed: button.getAttribute('aria-pressed'),
+            next: button.dataset.nextTheme,
+            label: button.getAttribute('aria-label'),
             scheme: getComputedStyle(document.documentElement).colorScheme,
           };
         })()`,
@@ -327,31 +356,30 @@ for (const viewport of VIEWPORTS) {
       `${viewport.id} 다크 테마`,
       darkTheme?.choice === "dark" &&
         darkTheme?.theme === "dark" &&
-        darkTheme?.pressed === "true" &&
+        darkTheme?.next === "light" &&
+        darkTheme?.label === "라이트 테마로 변경" &&
         darkTheme?.scheme === "dark",
       JSON.stringify(darkTheme),
     );
     await save(session, "03-theme-dark");
 
-    const systemTheme = value(
-      await evaluate(
-        session,
-        `(() => {
-          const system = document.querySelector('[data-theme-choice="system"]');
-          const dark = document.querySelector('[data-theme-choice="dark"]');
-          system.click();
-          const selected = {
-            choice: document.documentElement.dataset.themeChoice,
-            pressed: system.getAttribute('aria-pressed'),
-          };
-          dark.click();
-          return selected;
-        })()`,
-      ),
+    await evaluate(session, `localStorage.removeItem('eddmpython-classroom-theme'); location.reload()`, false);
+    await client.act(
+      session,
+      [{ kind: "waitFor", selector: ".body h1", timeoutMs: 15000, expectedRisk: "read" }],
+      { timeoutMs: 30000 },
     );
+    const systemTheme = value(await evaluate(session, `(() => ({
+      choice: document.documentElement.dataset.themeChoice,
+      theme: document.documentElement.dataset.theme,
+      expected: matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark',
+      buttons: document.querySelectorAll('[data-theme-toggle]').length,
+    }))()`));
     record(
-      `${viewport.id} 시스템 테마`,
-      systemTheme?.choice === "system" && systemTheme?.pressed === "true",
+      `${viewport.id} 시스템 기본 테마`,
+      systemTheme?.choice === "system" &&
+        systemTheme?.theme === systemTheme?.expected &&
+        systemTheme?.buttons === 1,
       JSON.stringify(systemTheme),
     );
 
