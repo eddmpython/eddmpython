@@ -324,12 +324,21 @@ for (const viewport of VIEWPORTS) {
       const lectureStart = value(await evaluate(session, `(() => {
         const deck = document.querySelector('[data-lecture-deck]');
         const scene = deck?.querySelector('.lecture-scene.on');
+        const stage = deck?.querySelector('.lecture-stage');
+        const head = scene?.querySelector('.scene-head');
+        const stageBox = stage?.getBoundingClientRect();
+        const headBox = head?.getBoundingClientRect();
         return {
           hidden: deck?.hidden,
           body: document.body.classList.contains('lecture-on'),
           scenes: deck?.querySelectorAll('.lecture-scene').length,
           title: scene?.querySelector('.scene-head h2')?.textContent.trim(),
+          titleSize: parseFloat(getComputedStyle(scene?.querySelector('.scene-head h2')).fontSize),
           visible: scene?.querySelectorAll('[data-scene-visible="true"]').length,
+          sceneEmpty: scene?.dataset.sceneEmpty,
+          centerGap: stageBox && headBox ? Math.abs((headBox.top + headBox.height / 2) - (stageBox.top + stageBox.height / 2)) : null,
+          symbolWidth: deck?.querySelector('.lecture-symbol')?.getBoundingClientRect().width,
+          progressValue: deck?.querySelector('[data-lecture-progress]')?.getAttribute('aria-valuenow'),
           progress: deck?.querySelector('[data-lecture-progress]')?.textContent.trim(),
         };
       })()`));
@@ -340,6 +349,11 @@ for (const viewport of VIEWPORTS) {
           lectureStart?.scenes > 0 &&
           lectureStart?.title === "마우스와 키보드 자동화" &&
           lectureStart?.visible === 0 &&
+          lectureStart?.sceneEmpty === "true" &&
+          lectureStart?.centerGap <= 8 &&
+          lectureStart?.symbolWidth >= 20 &&
+          lectureStart?.titleSize >= (viewport.id === "desktop" ? 72 : 44) &&
+          lectureStart?.progressValue === "0" &&
           /· 0 \/ \d+$/.test(lectureStart?.progress ?? ""),
         JSON.stringify(lectureStart),
       );
@@ -355,10 +369,17 @@ for (const viewport of VIEWPORTS) {
         const deck = document.querySelector('[data-lecture-deck]');
         const scene = deck.querySelector('.lecture-scene.on');
         const visual = scene.querySelector('[data-scene-visible="true"]');
+        const frame = visual?.querySelector('img, video, iframe, pre') ?? visual;
+        const caption = visual?.querySelector('figcaption');
         return {
           visible: scene.querySelectorAll('[data-scene-visible="true"]').length,
           effect: visual?.dataset.sceneEffect,
+          sceneEmpty: scene.dataset.sceneEmpty,
           width: visual ? Math.round(visual.getBoundingClientRect().width) : 0,
+          frameBorder: frame ? getComputedStyle(frame).borderTopWidth : null,
+          frameRadius: frame ? parseFloat(getComputedStyle(frame).borderTopLeftRadius) : null,
+          captionBackground: caption ? getComputedStyle(caption).backgroundColor : null,
+          progressValue: deck.querySelector('[data-lecture-progress]').getAttribute('aria-valuenow'),
           progress: deck.querySelector('[data-lecture-progress]').textContent.trim(),
           hash: location.hash,
         };
@@ -367,7 +388,12 @@ for (const viewport of VIEWPORTS) {
         `${viewport.id} 첫 클릭 enter 효과`,
         firstBeat?.visible === 1 &&
           firstBeat?.effect === "enter" &&
+          firstBeat?.sceneEmpty === "false" &&
           firstBeat?.width >= (viewport.id === "desktop" ? 700 : 320) &&
+          firstBeat?.frameBorder === "1px" &&
+          firstBeat?.frameRadius >= 12 &&
+          firstBeat?.captionBackground !== "rgba(0, 0, 0, 0)" &&
+          Number(firstBeat?.progressValue) > 0 &&
           /· 1 \/ \d+$/.test(firstBeat?.progress ?? "") &&
           /^#lecture=s1\.1$/.test(firstBeat?.hash ?? ""),
         JSON.stringify(firstBeat),
@@ -620,18 +646,38 @@ for (const viewport of VIEWPORTS) {
       const visuals = [...(scene?.querySelectorAll('[data-scene-visible="true"]') ?? [])]
         .map((visual) => {
           const rect = visual.getBoundingClientRect();
-          return { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom, center: rect.left + rect.width / 2 };
+          const style = getComputedStyle(visual);
+          return {
+            left: rect.left,
+            top: rect.top,
+            right: rect.right,
+            bottom: rect.bottom,
+            center: rect.left + rect.width / 2,
+            height: rect.height,
+            background: style.backgroundColor,
+            radius: parseFloat(style.borderTopLeftRadius),
+            whiteSpace: style.whiteSpace,
+          };
         });
+      const labels = [...(scene?.querySelectorAll('[data-scene-label-visible="true"]') ?? [])]
+        .map((label) => getComputedStyle(label).backgroundColor);
       return {
         activeLayout: scene?.dataset.activeLayout,
         columns: getComputedStyle(canvas).gridTemplateColumns.split(' ').filter(Boolean).length,
         visuals,
+        labels,
       };
     })()`));
     record(
       `${viewport.id} compare 순간 열 분할`,
-      compareLayout?.activeLayout === "compare" &&
+        compareLayout?.activeLayout === "compare" &&
         compareLayout?.visuals?.length === 2 &&
+        compareLayout?.labels?.length === 2 &&
+        compareLayout.labels.every((background) => background !== "rgba(0, 0, 0, 0)") &&
+        compareLayout.visuals.every((visual) =>
+          visual.background !== "rgba(0, 0, 0, 0)" && visual.radius >= 12 && visual.whiteSpace === "pre-wrap"
+        ) &&
+        Math.abs(compareLayout.visuals[0].height - compareLayout.visuals[1].height) <= 4 &&
         compareLayout?.columns === (viewport.id === "desktop" ? 2 : 1) &&
         (viewport.id === "desktop"
           ? compareLayout.visuals[0].center < viewport.width / 2 &&
