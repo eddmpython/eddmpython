@@ -26,7 +26,7 @@ status: observed
 1 대 1 로 묶었고, 이미지 제작 비용이 절 개수의 상한까지 정하고 있었다.
 
 다만 절마다 **시각물**은 있어야 한다. 영상, 실제 화면, 실행 칸도 시각물이므로 그 절에 맞는
-것을 고르면 된다. 판정 기준은 `../eddmpython-course/memory/blogWriter.md` 의 관문 7 이다.
+것을 고르면 된다. 판정 기준은 `../eddmpython-course/memory/blogWriter.md` 의 `시각물` 절이다.
 **서로 다른 H2 가 같은 이미지를 다시 쓰는 것은 막는다.**
 
 ## 세 파일이 각각 맡는 것

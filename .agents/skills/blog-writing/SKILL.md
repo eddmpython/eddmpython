@@ -12,9 +12,9 @@ description: eddmpython의 한국어 블로그를 주제 조사부터 SEO 제목
 
 ## 열 순서
 
-1. **`../eddmpython-course/memory/blogWriter.md`** 작가 파이프라인. 절 뼈대를 먼저 세우는 순서, 아홉 관문,
+1. **`../eddmpython-course/memory/blogWriter.md`** 글쓰기 규칙 정본. 강행 조항 열둘, 섹션 뼈대를 먼저 세우는 순서,
    절마다 하는 일 네 가지, 한 문장으로 남는 것, 다른 눈이 보는 네 가지, 닫는 법, 함정
-2. **`../eddmpython-course/memory/writingVoice.md`** 문체 작법
+2. **`../eddmpython-course/memory/writingVoice.md`** 문체 실측 근거. 규칙은 1 번에 있다
 3. **카테고리 폴더의 `원장.md`** 커리큘럼과 절 사슬
 4. **`skills/specs/operation/blogPublishing.md`** 발행 계약. 파일 이름, frontmatter, 검사, 배포
 5. `skills/specs/operation/blogMedia.md` 이미지 계약. plan.json, 색상, Hugging Face
