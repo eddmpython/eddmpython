@@ -272,7 +272,7 @@ for (const viewport of VIEWPORTS) {
     /*
      * 5) 실행 칸.
      *
-     * 003 과 004 가 `값을 바꾸고 실행해 보시기 바랍니다` 라고 말하는 자리다.
+     * 003 이 `값을 바꾸고 실행해 보시기 바랍니다` 라고 말하는 자리다.
      * **2026-08-20 까지 여기가 생 주소가 그대로 보이는 링크였다.** 렌더러가 codaro 주소를
      * 못 알아봤고, 교안 검사도 공개 저장소 검사도 그것을 볼 자리가 없어서 아무도 몰랐다.
      * 그림만 찍고 넘어가면 같은 일이 또 난다. 그래서 눌러서 파이썬을 돌려 본다.
@@ -282,12 +282,12 @@ for (const viewport of VIEWPORTS) {
         session,
         `(() => {
           const links = [...document.querySelectorAll('a.nav-post')];
-          const target = links.find((link) => link.getAttribute('href')?.endsWith('/004-python-basic-syntax'));
+          const target = links.find((link) => link.getAttribute('href')?.endsWith('/003-python-basic-syntax'));
           return target?.getAttribute('href') ?? null;
         })()`,
       ),
     );
-    if (!cellPost) throw new Error("004 실행 칸 글 링크를 못 찾았다");
+    if (!cellPost) throw new Error("003 실행 칸 글 링크를 못 찾았다");
     opened = await client.openTarget(`${base}${cellPost}`, {
       expectedRisk: "externalEffect",
       waitUntil: "load",

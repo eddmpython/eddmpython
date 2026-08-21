@@ -5,8 +5,8 @@
  * 출력: ../../eddmpython.out/classroom-audit/
  *
  * classroom-shot.mjs 는 첫 글과 마지막 글만 찍고 기능이 도는지 본다. 이 검수는 다르다.
- * 2026-08-21 에 글쓰기 정본으로 여섯 편을 재고 고친 뒤, 고친 것이 수강생 화면에 실제로
- * 도착했는지를 하나하나 센다. 캡션 수, 준비 중 칸, 생 주소, 실행 칸과 그 출력, 섹션 수.
+ * 2026-08-21 에 글쓰기 정본으로 다섯 편을 재고 고친 뒤, 고친 것이 수강생 화면에 실제로
+ * 도착했는지를 하나하나 센다. 캡션 수, 캐러셀 수, 준비 중 칸, 생 주소, 실행 칸과 그 출력, 섹션 수.
  * 그림만 찍고 넘어가지 않는다. 실행 칸은 눌러서 본문이 적어 둔 출력이 나오는지 본다.
  */
 import { mkdir, writeFile, readFile } from "node:fs/promises";
@@ -70,7 +70,6 @@ async function cleanup() {
  * 키는 data-cell 의 이름이고 값은 결과 칸에 들어 있어야 하는 글자다.
  */
 const EXPECT = {
-  "python-bungeoppang-order": ["붕어빵 3개, 3,000원"],
   "expense-variables": ["영업팀: 120,000원, 기준 100,000원"],
   "expense-list-total": ["3건, 합계 250,000원"],
   "expense-column-map": ["사용금액 -> 금액"],
@@ -85,10 +84,9 @@ const COURSE = resolve(SITE_ROOT, "../../eddmpython-course/curriculum/01-automat
 const posts = [
   "001-what-automation-does",
   "002-what-is-python",
-  "003-first-python-code",
-  "004-python-basic-syntax",
-  "005-run-python-online",
-  "006-run-python-in-vscode",
+  "003-python-basic-syntax",
+  "004-run-python-online",
+  "005-run-python-in-vscode",
 ];
 const expected = {};
 for (const id of posts) {
@@ -101,7 +99,19 @@ for (const id of posts) {
   const pending = (outside.match(/media:\/\//g) ?? []).length;
   const codeBlocks = (body.match(/^```/gm) ?? []).length / 2;
   const tables = (outside.match(/^\|(?:\s*:?-{3,}:?\s*\|){2,}/gm) ?? []).length;
-  expected[id] = { captions, sections, cells, pending, codeBlocks, tables };
+  let imageRun = 0;
+  let sliders = 0;
+  for (const block of outside.split(/\n{2,}/).map((value) => value.trim()).filter(Boolean)) {
+    const image = block.match(/^!\[[^\]]*\]\((\S+)(?:\s+"[^"]*")?\)$/);
+    if (image && !/\.(?:mp4|webm|mov)(?:\?.*)?$/i.test(image[1])) {
+      imageRun += 1;
+      continue;
+    }
+    if (imageRun > 1) sliders += 1;
+    imageRun = 0;
+  }
+  if (imageRun > 1) sliders += 1;
+  expected[id] = { captions, sections, cells, pending, codeBlocks, tables, sliders };
 }
 
 const manifestPath = join(OUT, "pyproc-control.json");
@@ -199,6 +209,7 @@ try {
           h2: document.querySelectorAll('article h2').length,
           h3: document.querySelectorAll('article h3').length,
           captions: document.querySelectorAll('article figure.media figcaption').length,
+          sliders: document.querySelectorAll('article .slider').length,
           pending: document.querySelectorAll('article .pending').length,
           rawCodaro: document.body.innerHTML.includes('codaro/run'),
           cells: [...document.querySelectorAll('[data-cell]')].map(c => c.dataset.cell),
@@ -214,6 +225,7 @@ try {
     record(`${id} 섹션 ${exp.sections}개`, m.h2 === exp.sections, `화면 ${m.h2}`);
     record(`${id} 부제가 섹션마다`, m.h3 === exp.sections, `h3 ${m.h3}`);
     record(`${id} 캡션 ${exp.captions}개 그려짐`, m.captions === exp.captions, `화면 ${m.captions}`);
+    record(`${id} 캐러셀 ${exp.sliders}개 그려짐`, m.sliders === exp.sliders, `화면 ${m.sliders}`);
     record(`${id} 준비 중 칸 0`, m.pending === 0 && exp.pending === 0, `화면 ${m.pending}, 원본 ${exp.pending}`);
     record(`${id} 생 codaro 주소 없음`, m.rawCodaro === false, String(m.rawCodaro));
     record(`${id} 실행 칸 ${exp.cells.length}개`, m.cells.length === exp.cells.length && m.missing === 0 && exp.cells.every((c) => m.cells.includes(c)), `화면 ${m.cells.join(",")} 미발견 ${m.missing}`);
