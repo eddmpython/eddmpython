@@ -1,11 +1,11 @@
 /**
- * 강의장 네 편을 전부 열어 교안이 약속한 것이 화면에 실제로 있는지 잰다.
+ * 강의장 01의 글을 전부 열어 교안이 약속한 것이 화면에 실제로 있는지 잰다.
  *
  * 사용: node scripts/classroom-audit.mjs [baseUrl]
  * 출력: ../../eddmpython.out/classroom-audit/
  *
  * classroom-shot.mjs 는 첫 글과 마지막 글만 찍고 기능이 도는지 본다. 이 검수는 다르다.
- * 2026-08-21 에 글쓰기 정본으로 네 편을 재고 고친 뒤, 고친 것이 수강생 화면에 실제로
+ * 2026-08-21 에 글쓰기 정본으로 여섯 편을 재고 고친 뒤, 고친 것이 수강생 화면에 실제로
  * 도착했는지를 하나하나 센다. 캡션 수, 준비 중 칸, 생 주소, 실행 칸과 그 출력, 섹션 수.
  * 그림만 찍고 넘어가지 않는다. 실행 칸은 눌러서 본문이 적어 둔 출력이 나오는지 본다.
  */
@@ -82,7 +82,14 @@ const EXPECT = {
 
 /** 교안 실측. 자리표시자를 뺀 캡션 수와 섹션 수는 원본 md 에서 센다. 기대값을 손으로 적지 않는다. */
 const COURSE = resolve(SITE_ROOT, "../../eddmpython-course/curriculum/01-automation-start");
-const posts = ["001-what-automation-does", "002-what-is-python", "003-first-python-code", "004-python-basic-syntax"];
+const posts = [
+  "001-what-automation-does",
+  "002-what-is-python",
+  "003-first-python-code",
+  "004-python-basic-syntax",
+  "005-run-python-online",
+  "006-run-python-in-vscode",
+];
 const expected = {};
 for (const id of posts) {
   const md = await readFile(join(COURSE, `${id}.md`), "utf8");
@@ -93,7 +100,8 @@ for (const id of posts) {
   const cells = [...outside.matchAll(/^https:\/\/eddmpython\.com\/codaro\/run\/\?example=([a-z0-9-]+)$/gm)].map((m) => m[1]);
   const pending = (outside.match(/media:\/\//g) ?? []).length;
   const codeBlocks = (body.match(/^```/gm) ?? []).length / 2;
-  expected[id] = { captions, sections, cells, pending, codeBlocks };
+  const tables = (outside.match(/^\|(?:\s*:?-{3,}:?\s*\|){2,}/gm) ?? []).length;
+  expected[id] = { captions, sections, cells, pending, codeBlocks, tables };
 }
 
 const manifestPath = join(OUT, "pyproc-control.json");
@@ -161,7 +169,11 @@ try {
   await client.act(session, [{ kind: "waitFor", selector: ".cat h2", timeoutMs: 15000, expectedRisk: "read" }], { timeoutMs: 30000 });
 
   const hrefs = value(await evaluate(session, `[...document.querySelectorAll('a.post')].map(a => a.getAttribute('href'))`));
-  record("목록에 네 편이 있다", Array.isArray(hrefs) && hrefs.length === 4, String(hrefs?.length));
+  record(
+    `목록에 ${posts.length}편이 있다`,
+    Array.isArray(hrefs) && hrefs.length === posts.length,
+    String(hrefs?.length),
+  );
 
   for (const href of hrefs ?? []) {
     const id = href.split("/").pop();
@@ -192,6 +204,7 @@ try {
           cells: [...document.querySelectorAll('[data-cell]')].map(c => c.dataset.cell),
           missing: document.querySelectorAll('.cell-miss').length,
           pre: document.querySelectorAll('article pre:not(.cell-o)').length,
+          tables: document.querySelectorAll('article table').length,
           imgs: [...document.querySelectorAll('article img')].map(i => i.naturalWidth > 0).filter(Boolean).length,
           imgsAll: document.querySelectorAll('article img').length,
         }))()`,
@@ -205,6 +218,7 @@ try {
     record(`${id} 생 codaro 주소 없음`, m.rawCodaro === false, String(m.rawCodaro));
     record(`${id} 실행 칸 ${exp.cells.length}개`, m.cells.length === exp.cells.length && m.missing === 0 && exp.cells.every((c) => m.cells.includes(c)), `화면 ${m.cells.join(",")} 미발견 ${m.missing}`);
     record(`${id} 코드 블록 ${exp.codeBlocks}개`, m.pre === exp.codeBlocks, `화면 ${m.pre}`);
+    record(`${id} 표 ${exp.tables}개`, m.tables === exp.tables, `화면 ${m.tables}`);
     record(`${id} 이미지가 전부 실제로 떴다`, m.imgs === m.imgsAll, `${m.imgs}/${m.imgsAll}`);
 
     // 실행 칸을 전부 눌러 본문이 약속한 출력을 본다

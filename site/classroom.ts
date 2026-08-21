@@ -287,6 +287,50 @@ export class Classroom {
       return Response.json({ ok: true });
     }
 
+    /**
+     * 검수를 마친 방을 수강생에게 줄 제품 주소로 옮긴다.
+     *
+     * 방을 새로 만들면 기존 비밀번호 원문을 다시 알아야 한다. 주소와 이름만 바꾸면 비밀번호
+     * 해시는 그대로 보존할 수 있다. 두 키를 따로 쓰면 중간에 두 방이 보이거나 둘 다 사라질 수
+     * 있으므로 한 트랜잭션에서 새 키를 쓰고 옛 키를 지운다.
+     */
+    if (action === "rename") {
+      const nextSlug = typeof body.nextSlug === "string" ? body.nextSlug.trim() : "";
+      const title = typeof body.title === "string" ? body.title.trim() : "";
+      if (!validSlug(nextSlug)) {
+        return Response.json({ error: "주소로 쓸 수 없는 이름입니다" }, { status: 400 });
+      }
+      if (!title || title.length > 60) {
+        return Response.json({ error: "강의장 이름은 한 자 이상 60자 이하로 적어 주세요" }, { status: 400 });
+      }
+
+      const moved = await this.state.storage.transaction(async (txn) => {
+        const current = await txn.get<Room>(`room:${slug}`);
+        if (!current) return "missing";
+        if (nextSlug !== slug && (await txn.get<Room>(`room:${nextSlug}`))) return "exists";
+
+        current.slug = nextSlug;
+        current.title = title;
+        if (nextSlug !== slug) {
+          // 예전 검수 주소에서 받은 세션으로 제품 방에 들어오지 못하게 한다.
+          current.gen = randomHex(8);
+          current.fails = 0;
+          current.lockedUntil = 0;
+        }
+        await txn.put(`room:${nextSlug}`, current);
+        if (nextSlug !== slug) await txn.delete(`room:${slug}`);
+        return "ok";
+      });
+
+      if (moved === "missing") {
+        return Response.json({ error: "없는 방입니다" }, { status: 404 });
+      }
+      if (moved === "exists") {
+        return Response.json({ error: "옮길 주소에 이미 방이 있습니다" }, { status: 409 });
+      }
+      return Response.json({ ok: true, slug: nextSlug });
+    }
+
     if (action === "password") {
       const password = String(body.password ?? "");
       if (password.length < 4) {
@@ -421,6 +465,8 @@ ${cssVars()}
 * { box-sizing: border-box; }
 body { margin:0; background:var(--eddm-carbon); color:var(--eddm-ivory); font-family:${TOKENS.font.sans}; word-break:keep-all; -webkit-font-smoothing:antialiased;
   line-height:1.7; -webkit-text-size-adjust:100%; }
+:focus-visible { outline:2px solid var(--eddm-accent-dim); outline-offset:2px; border-radius:.25rem; }
+::selection { background:var(--eddm-accent-line); }
 .wrap { max-width:56rem; margin:0 auto; padding:2.5rem 1.25rem 5rem; }
 .wrap.wide { max-width:88rem; }
 
@@ -430,13 +476,13 @@ body { margin:0; background:var(--eddm-carbon); color:var(--eddm-ivory); font-fa
 .hd-symbol { height:21px; width:auto; color:var(--eddm-ivory); display:block; }
 .hd-word { font-size:15px; letter-spacing:-.025em; line-height:1.5; color:var(--eddm-ivory); }
 .hd-word b { font-weight:700; }
-.hd-word i { font-style:normal; font-weight:400; color:rgba(245,243,238,.8); }
+.hd-word i { font-style:normal; font-weight:400; color:var(--eddm-text); }
 .hd-right { display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
-  column-gap:20px; row-gap:10px; font-size:14px; line-height:1.4285714; color:rgba(245,243,238,.7); }
+  column-gap:20px; row-gap:10px; font-size:14px; line-height:1.4285714; color:var(--eddm-text); }
 .hd .nav-link { color:inherit; text-decoration:none; border:0; transition:color .15s cubic-bezier(.4,0,.2,1); }
 .hd .nav-link:hover { color:var(--eddm-ivory); }
 .hd-icons { display:flex; align-items:center; gap:14px; }
-.hd .nav-icon { color:rgba(245,243,238,.6); border:0; transition:color .15s cubic-bezier(.4,0,.2,1); }
+.hd .nav-icon { color:var(--eddm-text-muted); border:0; transition:color .15s cubic-bezier(.4,0,.2,1); }
 .hd .nav-icon:hover { color:var(--eddm-ivory); }
 .hd .nav-icon svg { height:18px; width:18px; display:block; }
 @media (min-width:768px) {
@@ -448,6 +494,20 @@ body { margin:0; background:var(--eddm-carbon); color:var(--eddm-ivory); font-fa
 .hero { margin-bottom:2.5rem; }
 .hero h1 { margin:0 0 .6rem; font-size:1.9rem; letter-spacing:-.02em; line-height:1.25; }
 .hero .sub { margin:0; color:var(--eddm-text-muted); }
+.gate { position:relative; overflow:hidden; max-width:42rem; margin:0 auto; padding:2rem;
+  border:1px solid var(--eddm-line-base); border-radius:1rem; background:var(--eddm-raise); }
+.gate::before { content:""; position:absolute; top:0; left:0; right:0; height:2px;
+  background:var(--eddm-sand); opacity:.65; }
+.gate h1 { font-size:clamp(1.75rem,5vw,2.35rem); line-height:1.2; letter-spacing:-.03em; }
+.gate .sub { max-width:34rem; margin-bottom:0; color:var(--eddm-text-muted); line-height:1.8; }
+.gate form { margin-top:2rem; }
+.gate input[type=password] { background:var(--eddm-carbon); }
+@media (max-width:520px) {
+  .gate { padding:1.5rem; }
+  .gate form { flex-direction:column; }
+  .gate input[type=password] { flex:0 0 auto; width:100%; }
+  .gate button { width:100%; }
+}
 
 /* 글 화면. 왼쪽 과정 이동, 가운데 본문, 오른쪽 목차 */
 .lay { display:grid; grid-template-columns:15rem minmax(0,1fr) 15rem; gap:3rem; align-items:start; }
@@ -554,7 +614,13 @@ article ul, article ol { margin:1.25rem 0; padding-left:1.25rem; line-height:1.8
 article li { margin:.5rem 0; }
 article li::marker { color:var(--eddm-accent-dim); }
 article pre { overflow-x:auto; background:#00000055; padding:1rem; border-radius:.6rem; }
-article table { display:block; overflow-x:auto; border-collapse:collapse; }
+.table-wrap { margin:1.5rem 0; overflow-x:auto; border:1px solid var(--eddm-line-base); border-radius:.65rem; }
+article table { width:100%; min-width:42rem; border-collapse:collapse; }
+article th, article td { padding:.75rem .85rem; border-bottom:1px solid var(--eddm-line-base);
+  text-align:left; vertical-align:top; line-height:1.6; }
+article th { color:var(--eddm-ivory); background:var(--eddm-hover); font-size:.86rem; font-weight:500; }
+article td { color:var(--eddm-text); font-size:.88rem; }
+article tbody tr:last-child td { border-bottom:0; }
 .cell { margin:1.9rem 0; border:1px solid var(--eddm-accent-line); border-radius:.85rem; overflow:hidden;
   background:var(--eddm-raise); }
 .cell.bad { border-color:#e0908a66; }
@@ -873,7 +939,9 @@ function page(
   const html = `<!doctype html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>${esc(title)}</title>
+<meta name="theme-color" content="${esc(BRAND.carbon)}">
+<title>${esc(title)} | eddmpython</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="${TOKENS.fontHref}">
 <style>${STYLE}</style></head>
@@ -908,11 +976,15 @@ function page(
 function loginPage(slug: string, title: string, message = ""): Response {
   return page(
     title,
-    `<h1>${esc(title)}</h1><p class="sub">비밀번호를 받으신 분만 들어옵니다.</p>
-     <form method="post" action="/cr/${esc(slug)}/login">
-       <input type="password" name="password" placeholder="비밀번호" autofocus autocomplete="current-password">
-       <button type="submit">들어가기</button>
-     </form>${message ? `<p class="err">${esc(message)}</p>` : ""}`,
+    `${header()}<section class="gate">
+       <p class="eyebrow">eddmpython course</p>
+       <h1>${esc(title)}</h1>
+       <p class="sub">등록된 수강생을 위한 비공개 과정입니다. 안내받은 비밀번호로 입장해 주세요</p>
+       <form method="post" action="/cr/${esc(slug)}/login">
+         <input type="password" name="password" placeholder="수강 비밀번호" aria-label="수강 비밀번호" autofocus autocomplete="current-password">
+         <button type="submit">과정 입장</button>
+       </form>${message ? `<p class="err">${esc(message)}</p>` : ""}
+     </section>`,
   );
 }
 
@@ -952,7 +1024,16 @@ async function stampOf(key: string, room: PublicRoom, version: string): Promise<
  * 비밀번호를 아무리 바꿔도 소용이 없다. 방을 만들고 지우는 것은 화면에 보이지만 이것은
  * 안 보인다. 토큰은 노트북의 평문 JSON 에 있다. 새는 날을 전제로 좁혀 둔다.
  */
-const ADMIN_ACTIONS = new Set(["list", "create", "remove", "password", "open", "toggle", "unlock"]);
+const ADMIN_ACTIONS = new Set([
+  "list",
+  "create",
+  "remove",
+  "rename",
+  "password",
+  "open",
+  "toggle",
+  "unlock",
+]);
 
 /** 로컬 운영 화면이 부르는 유일한 조종 통로다. 공개 서버에 운영자 페이지는 없다. */
 async function admin(request: Request, env: Env): Promise<Response> {
@@ -990,7 +1071,11 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
   if (path === "/cr/api/admin") return admin(request, env);
 
   if (path === "/cr") {
-    return page("강의장", `<h1>강의장</h1><p class="sub wait">강사가 알려 준 주소로 들어오세요.</p>`);
+    return page(
+      "course",
+      `${header()}<section class="gate"><p class="eyebrow">eddmpython course</p>
+       <h1>비공개 과정</h1><p class="sub wait">안내받은 과정 주소로 들어오세요</p></section>`,
+    );
   }
 
   const parts = path.split("/").slice(2);
@@ -1052,7 +1137,8 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
   if (!room.open) {
     return page(
       room.title,
-      `<h1>${esc(room.title)}</h1><p class="sub wait">아직 열리지 않았습니다.</p>`,
+      `${header()}<section class="gate"><p class="eyebrow">eddmpython course</p>
+       <h1>${esc(room.title)}</h1><p class="sub wait">아직 열리지 않았습니다. 이 화면을 열어 두세요</p></section>`,
       stamp,
     );
   }
@@ -1097,7 +1183,7 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
       room.title,
       `${header()}
        <section class="hero">
-         <p class="eyebrow">파이썬 업무자동화</p>
+         <p class="eyebrow">eddmpython course</p>
          <h1>${esc(room.title)}</h1>
          <p class="sub">${
            total

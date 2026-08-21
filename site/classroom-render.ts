@@ -4,7 +4,7 @@
  * classroom.ts 에서 떼어 낸 이유는 검사할 수 있게 하려는 것이다. 이 파일은 아무것도
  * import 하지 않으므로 교안 번들 없이도 테스트가 돈다.
  *
- * 다루는 것은 교안이 실제로 쓰는 것뿐이다. h2, h4, 문단, 목록, 링크, 코드, 이미지, 영상.
+ * 다루는 것은 교안이 실제로 쓰는 것뿐이다. h2, h4, 문단, 목록, 표, 링크, 코드, 이미지, 영상.
  * 연속된 이미지는 슬라이더가 되고 영상은 재생기가 된다. 바깥 영상은 유튜브 자리가 되고
  * 아직 발행하지 않은 시각물은 준비 중 자리가 된다.
  */
@@ -34,6 +34,32 @@ const VIDEO = /\.(mp4|webm|mov)$/i;
 const SOLO_LINK = /^\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)$/;
 /** 굵은 글씨 한 줄만 있는 문단. 섹션 안에서 사례를 가르는 라벨이다. */
 const LABEL = /^\*\*[^*\n]+\*\*$/;
+const TABLE_DIVIDER = /^\|?(?:\s*:?-{3,}:?\s*\|)+\s*:?-{3,}:?\s*\|?$/;
+
+function tableCells(line: string): string[] {
+  return line
+    .trim()
+    .replace(/^\|/, "")
+    .replace(/\|$/, "")
+    .split("|")
+    .map((cell) => cell.trim());
+}
+
+/** 교안에서 쓰는 GFM 표. 셀 안의 코드와 링크도 문단과 같은 규칙으로 안전하게 그린다. */
+function markdownTable(block: string): string | null {
+  const lines = block.split("\n").map((line) => line.trim());
+  if (lines.length < 2 || !TABLE_DIVIDER.test(lines[1])) return null;
+  const head = tableCells(lines[0]);
+  const divider = tableCells(lines[1]);
+  if (head.length < 2 || divider.length !== head.length) return null;
+  const rows = lines.slice(2).map(tableCells);
+  if (rows.some((row) => row.length !== head.length)) return null;
+  return `<div class="table-wrap"><table><thead><tr>${head
+    .map((cell) => `<th scope="col">${inline(cell)}</th>`)
+    .join("")}</tr></thead><tbody>${rows
+    .map((row) => `<tr>${row.map((cell) => `<td>${inline(cell)}</td>`).join("")}</tr>`)
+    .join("")}</tbody></table></div>`;
+}
 
 /**
  * 섹션을 닫는 질문에 표시를 남긴다.
@@ -205,6 +231,7 @@ function blocks(text: string, headings: string[], cells: Cells): string[] {
       continue;
     }
     flush();
+    const table = markdownTable(b);
     if (b.startsWith("## ")) {
       // 목차가 여기로 뛴다. 번호로 거는 이유는 제목이 한글이라 slug 를 만들면 깨지기 때문이다.
       const title = b.slice(3);
@@ -216,6 +243,7 @@ function blocks(text: string, headings: string[], cells: Cells): string[] {
       );
     } else if (b.startsWith("### ")) out.push(`<h3>${esc(b.slice(4))}</h3>`);
     else if (b.startsWith("#### ")) out.push(`<h4>${esc(b.slice(5))}</h4>`);
+    else if (table) out.push(table);
     else if (/^[-*]\s/m.test(b)) {
       const items = b.split("\n").filter((l) => /^[-*]\s/.test(l.trim()));
       out.push(`<ul>${items.map((l) => `<li>${inline(l.trim().slice(2))}</li>`).join("")}</ul>`);

@@ -22,6 +22,7 @@ const value = (res) => res?.output?.result?.result?.value;
 const OUT = resolve(SITE_ROOT, "../../eddmpython.out/classroom-shots");
 const base = (process.argv[2] ?? "http://localhost:8787").replace(/\/$/, "");
 
+const SOURCE_ROOM = "shot-source";
 const ROOM = "shot";
 /**
  * 비밀번호를 소스에 적지 않는다. 매번 새로 뽑는다.
@@ -52,16 +53,20 @@ async function admin(body) {
   return data;
 }
 
-// 찍을 방을 그 자리에서 만든다. 배포도 secret 도 없이 주소가 살아나는지 이걸로 확인한다.
+// 찍을 방을 만들고 제품 운영과 같은 주소 이동을 거친다. 비밀번호 원문 없이 방을 옮길 수 있어야 한다.
+await admin({ action: "remove", slug: SOURCE_ROOM }).catch(() => {});
 await admin({ action: "remove", slug: ROOM }).catch(() => {});
-const made = await admin({ action: "create", slug: ROOM, title: "검수용 강의장", password: PASSWORD });
+const made = await admin({ action: "create", slug: SOURCE_ROOM, title: "검수용 강의장", password: PASSWORD });
 const category = made.categories[0];
 if (!category) {
   throw new Error(
     "교안 카테고리가 없다. ../eddmpython-course 에서 npm run publish:local 을 먼저 돌려라",
   );
 }
-await admin({ action: "toggle", slug: ROOM, category: category.slug });
+await admin({ action: "toggle", slug: SOURCE_ROOM, category: category.slug });
+await admin({ action: "rename", slug: SOURCE_ROOM, nextSlug: ROOM, title: "강의장 화면 검수" });
+const oldAddress = await fetch(`${base}/cr/${SOURCE_ROOM}`, { redirect: "manual" });
+if (oldAddress.status !== 404) throw new Error(`주소 이동 뒤 옛 주소가 남았다: ${oldAddress.status}`);
 const listed = await admin({ action: "list" });
 const posts = listed.categories.find((c) => c.slug === category.slug);
 console.log(`  검수용 강의장 ${base}/cr/${ROOM}  카테고리 ${category.slug} (${posts.posts}편)`);
@@ -88,6 +93,7 @@ const record = (label, ok, detail) => {
  */
 async function cleanup() {
   if (local) return;
+  await admin({ action: "remove", slug: SOURCE_ROOM }).catch(() => {});
   await admin({ action: "remove", slug: ROOM }).catch(() => {});
   const gone = await fetch(`${base}/cr/${ROOM}`, { redirect: "manual" }).catch(() => null);
   const status = gone ? gone.status : "확인 못 함";
@@ -196,6 +202,25 @@ for (const viewport of VIEWPORTS) {
     });
     let session = (await client.attachSession(opened.output.targetRef, { timeoutMs: 30000 })).output;
     await save(session, "01-login");
+    const branded = value(
+      await evaluate(
+        session,
+        `(() => ({
+          logo: Boolean(document.querySelector('.hd-logo .hd-symbol')),
+          gate: document.querySelector('.gate .eyebrow')?.textContent.trim(),
+          title: document.title,
+          icon: document.querySelector('link[rel="icon"]')?.getAttribute('href'),
+        }))()`,
+      ),
+    );
+    record(
+      `${viewport.id} 로그인 화면 브랜드`,
+      branded?.logo === true &&
+        branded?.gate === "eddmpython course" &&
+        branded?.title.endsWith(" | eddmpython") &&
+        branded?.icon === "/favicon.svg",
+      JSON.stringify(branded),
+    );
 
     // 2) 비밀번호를 넣고 들어간 목록. type 액션이 없으므로 값을 직접 넣고 제출한다.
     await evaluate(
@@ -257,54 +282,54 @@ for (const viewport of VIEWPORTS) {
         session,
         `(() => {
           const links = [...document.querySelectorAll('a.nav-post')];
-          return links.length ? links[links.length - 1].getAttribute('href') : null;
+          const target = links.find((link) => link.getAttribute('href')?.endsWith('/004-python-basic-syntax'));
+          return target?.getAttribute('href') ?? null;
         })()`,
       ),
     );
-    if (cellPost) {
-      opened = await client.openTarget(`${base}${cellPost}`, {
-        expectedRisk: "externalEffect",
-        waitUntil: "load",
-        timeoutMs: 30000,
-      });
-      session = (await client.attachSession(opened.output.targetRef, { timeoutMs: 30000 })).output;
+    if (!cellPost) throw new Error("004 실행 칸 글 링크를 못 찾았다");
+    opened = await client.openTarget(`${base}${cellPost}`, {
+      expectedRisk: "externalEffect",
+      waitUntil: "load",
+      timeoutMs: 30000,
+    });
+    session = (await client.attachSession(opened.output.targetRef, { timeoutMs: 30000 })).output;
 
-      const cells = Number(
-        value(await evaluate(session, `document.querySelectorAll('[data-cell]').length`)),
-      );
-      record(`${viewport.id} 실행 칸이 그려짐`, cells > 0, String(cells));
+    const cells = Number(
+      value(await evaluate(session, `document.querySelectorAll('[data-cell]').length`)),
+    );
+    record(`${viewport.id} 실행 칸이 그려짐`, cells > 0, String(cells));
 
-      const rawLink = value(
-        await evaluate(session, `document.body.innerHTML.includes('codaro/run')`),
-      );
-      record(`${viewport.id} 생 주소가 화면에 안 보임`, rawLink === false, String(rawLink));
+    const rawLink = value(
+      await evaluate(session, `document.body.innerHTML.includes('codaro/run')`),
+    );
+    record(`${viewport.id} 생 주소가 화면에 안 보임`, rawLink === false, String(rawLink));
 
-      // 파이썬을 실제로 돌리는 것은 데스크톱에서 한 번이면 된다. 뷰포트와 무관한 검사다.
-      if (cells > 0 && viewport.id === "desktop") {
-        const ran = String(
-          value(
-            await evaluate(
-              session,
-              `(async () => {
-                const cell = document.querySelector('[data-cell]');
-                cell.querySelector('[data-run]').click();
-                const st = cell.querySelector('[data-state]');
-                const out = cell.querySelector('[data-out]');
-                for (let i = 0; i < 200; i++) {
-                  await new Promise((r) => setTimeout(r, 500));
-                  const s = st.textContent;
-                  if (s === '완료' || s === '오류') break;
-                }
-                return st.textContent + ' :: ' + out.textContent.slice(0, 160);
-              })()`,
-            ),
+    // 파이썬을 실제로 돌리는 것은 데스크톱에서 한 번이면 된다. 뷰포트와 무관한 검사다.
+    if (cells > 0 && viewport.id === "desktop") {
+      const ran = String(
+        value(
+          await evaluate(
+            session,
+            `(async () => {
+              const cell = document.querySelector('[data-cell]');
+              cell.querySelector('[data-run]').click();
+              const st = cell.querySelector('[data-state]');
+              const out = cell.querySelector('[data-out]');
+              for (let i = 0; i < 200; i++) {
+                await new Promise((r) => setTimeout(r, 500));
+                const s = st.textContent;
+                if (s === '완료' || s === '오류') break;
+              }
+              return st.textContent + ' :: ' + out.textContent.slice(0, 160);
+            })()`,
           ),
-        );
-        record(`${viewport.id} 실행 칸이 실제로 파이썬을 돌림`, ran.startsWith("완료"), ran);
-        await save(session, "05-cell");
-      } else if (cells > 0) {
-        await save(session, "05-cell");
-      }
+        ),
+      );
+      record(`${viewport.id} 실행 칸이 실제로 파이썬을 돌림`, ran.startsWith("완료"), ran);
+      await save(session, "05-cell");
+    } else if (cells > 0) {
+      await save(session, "05-cell");
     }
   } finally {
     await client.stop?.({ timeoutMs: 30000 });

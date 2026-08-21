@@ -306,6 +306,10 @@ function drawRooms() {
       '<input data-pw="' + r.slug + '" placeholder="새 비밀번호" style="flex:0 1 9rem">' +
       '<button data-act="password" data-slug="' + r.slug + '">바꾸기</button>' +
       '<button class="danger" data-act="remove" data-slug="' + r.slug + '">삭제</button></div>' +
+      '<div class="row">' +
+      '<input data-next-slug="' + r.slug + '" value="' + esc(r.slug) + '" aria-label="새 주소 이름" style="flex:0 1 12rem">' +
+      '<input data-next-title="' + r.slug + '" value="' + esc(r.title) + '" aria-label="새 강의장 이름" style="flex:1 1 14rem">' +
+      '<button data-act="rename" data-slug="' + r.slug + '">주소와 이름 적용</button></div>' +
       (r.open ? '<div class="cats">' + (cats || '<p class="note">교안 카테고리가 없습니다</p>') + "</div>"
               : '<p class="note">닫으면 열어 둔 카테고리도 처음으로 돌아갑니다</p>') +
       "</div>";
@@ -327,6 +331,15 @@ function drawRooms() {
         if (!input.value) { $("err").textContent = "새 비밀번호를 적어 주세요"; return; }
         const done = await send({ action: "password", slug, password: input.value });
         if (done) $("err").textContent = "비밀번호를 바꿨습니다";
+        return;
+      }
+      if (act === "rename") {
+        const nextSlug = $("rooms").querySelector('[data-next-slug="' + slug + '"]').value.trim();
+        const title = $("rooms").querySelector('[data-next-title="' + slug + '"]').value.trim();
+        if (!nextSlug || !title) { $("err").textContent = "새 주소와 강의장 이름을 모두 적어 주세요"; return; }
+        if (nextSlug !== slug && !confirm(slug + " 주소를 " + nextSlug + " 주소로 옮깁니다. 예전 주소는 사라집니다")) return;
+        const done = await send({ action: "rename", slug, nextSlug, title });
+        if (done) $("err").textContent = "주소와 이름을 적용했습니다";
         return;
       }
       if (act === "remove") {

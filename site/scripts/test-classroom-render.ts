@@ -77,6 +77,27 @@ check("제목과 목록이 제 태그로 나간다", () => {
   assert.equal(html.match(/<li>/g)?.length, 2);
 });
 
+check("GFM 표를 머리와 본문 셀로 그린다", () => {
+  const html = renderMarkdown(
+    [
+      "| 도구 | 실행 위치 | 지금 고를 때 |",
+      "|---|---|---|",
+      "| Colab | 원격 컴퓨터 | **공유**할 때 |",
+      "| marimo | 내 노트북 | `.py`로 남길 때 |",
+    ].join("\n"),
+  );
+  assert.match(html, /<div class="table-wrap"><table>/);
+  assert.match(html, /<th scope="col">도구<\/th>/);
+  assert.match(html, /<td><strong>공유<\/strong>할 때<\/td>/);
+  assert.match(html, /<td><code>\.py<\/code>로 남길 때<\/td>/);
+});
+
+check("열 수가 다른 표는 문단으로 안전하게 남긴다", () => {
+  const html = renderMarkdown(["| 하나 | 둘 |", "|---|---|", "| 값 |"].join("\n"));
+  assert.doesNotMatch(html, /<table>/);
+  assert.match(html, /\| 하나 \| 둘 \|/);
+});
+
 check("링크와 굵게와 인라인 코드", () => {
   assert.equal(inline("[가기](https://a.b)"), '<a href="https://a.b">가기</a>');
   assert.equal(inline("**굵게**"), "<strong>굵게</strong>");
