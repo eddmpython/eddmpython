@@ -187,11 +187,20 @@ function blocks(text: string, headings: string[], cells: Cells): string[] {
         continue;
       }
       // 영상도 시각 자산이다. 확장자로 갈라 태그를 바꾼다.
+      //
+      // 캡션(img[3])을 반드시 같이 그린다. 2026-08-21 까지 정규식은 캡션을 잡아 놓고
+      // 여기서 버렸다. 교안 캡션 45개가 수강생 화면에 하나도 안 나갔다. 캡션은 그 장면을
+      // 어떻게 읽을지 말하는 자리라 그게 없으면 도식만 덩그러니 뜬다.
+      const caption = img[3] ? `<figcaption>${esc(img[3])}</figcaption>` : "";
       if (VIDEO.test(img[2])) {
         flush();
-        out.push(`<video src="${esc(img[2])}" controls playsinline preload="metadata"></video>`);
+        out.push(
+          `<figure class="media"><video src="${esc(img[2])}" controls playsinline preload="metadata"></video>${caption}</figure>`,
+        );
       } else {
-        images.push(`<img src="${esc(img[2])}" alt="${esc(img[1])}" loading="lazy">`);
+        images.push(
+          `<figure class="media"><img src="${esc(img[2])}" alt="${esc(img[1])}" loading="lazy">${caption}</figure>`,
+        );
       }
       continue;
     }

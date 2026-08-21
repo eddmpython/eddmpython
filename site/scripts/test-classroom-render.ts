@@ -300,4 +300,42 @@ check("codaro 가 아닌 주소는 그대로 링크다", () => {
   assert.ok(html.includes('<a href="https://example.com/a"'));
 });
 
+/*
+ * 캡션.
+ *
+ * 2026-08-21 까지 정규식은 캡션을 잡아 놓고 렌더러가 버렸다. 교안 캡션 45개가 수강생
+ * 화면에 하나도 안 나갔다. 아래가 그 재발을 막는 자리다.
+ */
+check("이미지 캡션이 figcaption 으로 나간다", () => {
+  const html = renderMarkdown('![그림 설명](https://a.b/c.png "이렇게 읽습니다")');
+  assert.ok(html.includes("<figcaption>이렇게 읽습니다</figcaption>"));
+  assert.ok(html.includes('alt="그림 설명"'));
+});
+
+check("캡션 없는 이미지는 figcaption 을 만들지 않는다", () => {
+  const html = renderMarkdown("![그림](https://a.b/c.png)");
+  assert.ok(!html.includes("<figcaption"));
+});
+
+check("슬라이더 안의 장마다 캡션이 붙는다", () => {
+  const html = renderMarkdown(
+    ['![a](https://a.b/1.png "첫째")', "", '![b](https://a.b/2.png "둘째")'].join("\n"),
+  );
+  assert.equal(html.match(/<figcaption>/g)?.length, 2);
+  assert.ok(html.includes("첫째") && html.includes("둘째"));
+  assert.equal(html.match(/<div class="slider">/g)?.length, 1);
+});
+
+check("영상 캡션도 나간다", () => {
+  const html = renderMarkdown('![영상](https://a.b/c.mp4 "움직임을 보세요")');
+  assert.ok(html.includes("<video"));
+  assert.ok(html.includes("<figcaption>움직임을 보세요</figcaption>"));
+});
+
+check("캡션의 HTML 은 escape 된다", () => {
+  const html = renderMarkdown('![a](https://a.b/c.png "<b>굵게</b>")');
+  assert.ok(!html.includes("<b>굵게</b>"));
+  assert.ok(html.includes("&lt;b&gt;"));
+});
+
 console.log(`classroom render: 코드 분할과 escape 등 ${count} cases`);

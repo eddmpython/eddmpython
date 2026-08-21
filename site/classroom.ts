@@ -532,6 +532,9 @@ a.post:hover b { color:var(--eddm-accent-dim); }
 .wait { color:var(--eddm-text-dim); }
 article img, article video { max-width:100%; height:auto; border-radius:.6rem; display:block; margin:1.75rem 0; }
 article img { cursor:zoom-in; }
+figure.media { margin:1.75rem 0; }
+figure.media img, figure.media video { margin:0; }
+figure.media figcaption { margin-top:.55rem; font-size:.86rem; line-height:1.6; color:var(--eddm-text-muted); }
 /* 섹션과 섹션 사이를 벌리고 윗선으로 가른다. 스크롤할 때 경계가 눈에 보여야 한다.
    h3 는 h2 를 풀어 쓴 부제라 h2 에 붙여 두고 본문 색보다 흐리게 둔다. */
 article h2 { margin:4rem 0 .5rem; padding-top:1.75rem; border-top:1px solid var(--eddm-line);
@@ -580,7 +583,8 @@ article table { display:block; overflow-x:auto; border-collapse:collapse; }
 .cell-miss { padding:1rem; color:#e0908a; font-size:.88rem; }
 .cell-miss i { display:block; margin-top:.3rem; font-style:normal; color:var(--eddm-text-faint); }
 .slider { display:flex; gap:.75rem; overflow-x:auto; scroll-snap-type:x mandatory; margin:1.2rem 0; }
-.slider img { scroll-snap-align:center; flex:0 0 88%; margin:0; }
+.slider figure.media { scroll-snap-align:center; flex:0 0 88%; margin:0; }
+.slider img { margin:0; }
 .zoom { position:fixed; inset:0; background:#000000e8; display:none; align-items:center;
   justify-content:center; z-index:50; padding:1rem; cursor:zoom-out; }
 .zoom.on { display:flex; }
