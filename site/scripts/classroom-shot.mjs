@@ -74,7 +74,7 @@ console.log(`  검수용 강의장 ${base}/cr/${ROOM}  카테고리 ${category.s
 const first = process.argv[3] ?? null;
 
 const VIEWPORTS = [
-  { id: "desktop", width: 1440, height: 1000, isMobile: false, hasTouch: false },
+  { id: "desktop", width: 1920, height: 900, isMobile: false, hasTouch: false },
   { id: "mobile", width: 390, height: 844, isMobile: true, hasTouch: true },
 ];
 
@@ -530,6 +530,117 @@ for (const viewport of VIEWPORTS) {
     const zoomState = value(zoomed);
     record(`${viewport.id} 시각 자산 확대`, zoomState === "on", zoomState);
     if (zoomState === "on") await save(session, "04-zoom");
+
+    // 가로가 넓고 세로가 낮은 강의 화면에서도 시각물은 본문 폭의 왼쪽이 아니라 무대 중앙에 놓여야 한다.
+    const comparePost = value(
+      await evaluate(
+        session,
+        `(() => [...document.querySelectorAll('a.nav-post')]
+          .find((link) => link.getAttribute('href')?.endsWith('/002-what-is-python'))
+          ?.getAttribute('href') ?? null)()`,
+      ),
+    );
+    if (!comparePost) throw new Error("002 비교 장면 글 링크를 못 찾았다");
+    await evaluate(
+      session,
+      `localStorage.setItem('eddmpython-classroom-theme', 'light'); location.href = ${JSON.stringify(`${base}${comparePost}#lecture=s2.1`)}`,
+      false,
+    );
+    await client.act(
+      session,
+      [{ kind: "waitFor", selector: ".lecture-scene.on [data-scene-visible=\"true\"]", timeoutMs: 15000, expectedRisk: "read" }],
+      { timeoutMs: 30000 },
+    );
+    await hydrate(session);
+    const balancedStage = value(await evaluate(session, `(() => {
+      const deck = document.querySelector('[data-lecture-deck]');
+      const stage = deck?.querySelector('.lecture-stage');
+      const scene = deck?.querySelector('.lecture-scene.on');
+      const visual = scene?.querySelector('[data-scene-visible="true"]');
+      const media = visual?.querySelector('img, video, iframe') ?? visual;
+      const brand = deck?.querySelector('.lecture-brand');
+      const box = (node) => {
+        const rect = node?.getBoundingClientRect();
+        return rect ? {
+          left: rect.left,
+          top: rect.top,
+          width: rect.width,
+          height: rect.height,
+          right: rect.right,
+          bottom: rect.bottom,
+          center: rect.left + rect.width / 2,
+        } : null;
+      };
+      const mediaBox = box(media);
+      return {
+        viewport: innerWidth,
+        viewportHeight: innerHeight,
+        deck: box(deck),
+        stage: box(stage),
+        footer: box(deck?.querySelector('.lecture-foot')),
+        canvas: box(scene?.querySelector('.scene-canvas')),
+        visual: box(visual),
+        media: mediaBox,
+        centerGap: mediaBox ? Math.abs(mediaBox.center - innerWidth / 2) : null,
+        visualStyle: visual ? {
+          display: getComputedStyle(visual).display,
+          width: getComputedStyle(visual).width,
+          justifySelf: getComputedStyle(visual).justifySelf,
+        } : null,
+        mediaStyle: media ? {
+          width: getComputedStyle(media).width,
+          marginLeft: getComputedStyle(media).marginLeft,
+          justifySelf: getComputedStyle(media).justifySelf,
+        } : null,
+        brandLeft: box(brand)?.left,
+        brandClipped: brand ? brand.scrollWidth > brand.clientWidth : null,
+      };
+    })()`));
+    record(
+      `${viewport.id} 강의 무대 중앙 배선`,
+      balancedStage?.deck?.left === 0 &&
+        balancedStage?.deck?.top === 0 &&
+        balancedStage?.deck?.width === balancedStage?.viewport &&
+        balancedStage?.deck?.height === balancedStage?.viewportHeight &&
+        balancedStage?.stage?.left === 0 &&
+        balancedStage?.stage?.width === balancedStage?.viewport &&
+        Math.abs(balancedStage?.footer?.bottom - balancedStage?.viewportHeight) <= 1 &&
+        balancedStage?.centerGap <= 4 &&
+        (viewport.id !== "desktop" || (balancedStage?.brandLeft >= 16 && balancedStage?.brandClipped === false)),
+      JSON.stringify(balancedStage),
+    );
+    await save(session, "09-lecture-balanced", false);
+    await evaluate(session, `(() => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowRight', bubbles:true }));
+      document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowRight', bubbles:true }));
+    })()`);
+    const compareLayout = value(await evaluate(session, `(() => {
+      const scene = document.querySelector('.lecture-scene.on');
+      const canvas = scene?.querySelector('.scene-canvas');
+      const visuals = [...(scene?.querySelectorAll('[data-scene-visible="true"]') ?? [])]
+        .map((visual) => {
+          const rect = visual.getBoundingClientRect();
+          return { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom, center: rect.left + rect.width / 2 };
+        });
+      return {
+        activeLayout: scene?.dataset.activeLayout,
+        columns: getComputedStyle(canvas).gridTemplateColumns.split(' ').filter(Boolean).length,
+        visuals,
+      };
+    })()`));
+    record(
+      `${viewport.id} compare 순간 열 분할`,
+      compareLayout?.activeLayout === "compare" &&
+        compareLayout?.visuals?.length === 2 &&
+        compareLayout?.columns === (viewport.id === "desktop" ? 2 : 1) &&
+        (viewport.id === "desktop"
+          ? compareLayout.visuals[0].center < viewport.width / 2 &&
+            compareLayout.visuals[1].center > viewport.width / 2 &&
+            Math.abs(compareLayout.visuals[0].top - compareLayout.visuals[1].top) <= 4
+          : compareLayout.visuals[0].bottom < compareLayout.visuals[1].top),
+      JSON.stringify(compareLayout),
+    );
+    await save(session, "10-lecture-compare", false);
 
     /*
      * 5) 실행 칸.

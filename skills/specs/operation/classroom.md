@@ -60,6 +60,9 @@ status: observed
 - `N`은 발표자 노트, `Esc`는 종료다
 - URL의 `#lecture=sN.B`가 현재 장면과 보인 beat 수를 복구한다
 - Fullscreen API가 실패해도 고정 overlay에서 같은 강의 화면을 유지한다
+- 전체화면과 고정 overlay 모두 상단 막대, 무대, 하단 조작부를 viewport 안에 배치한다
+- 시각물 하나만 보이는 beat는 시각물의 원본 폭과 관계없이 무대 중앙에 배치한다
+- `compare` 장면은 `compare` 효과가 대상 둘 이상을 실제로 보여 줄 때만 데스크톱에서 두 칸이 된다
 
 효과 이름과 작성 판단은 비공개 저장소 `memory/rules/blogWriter.md`가 사람용 정본이고,
 허용 형식과 번호 검사는 `scripts/course-scene.mjs`가 기계 정본이다. 이 저장소는
