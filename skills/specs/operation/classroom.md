@@ -42,6 +42,10 @@ status: observed
 소제목에 브랜드 배경과 왼쪽선을 적용해 어떤 시각물의 이름인지 한 묶음으로 보이게 한다.
 `npm run cr:shot`은 소제목과 다음 시각물의 실제 간격과 경계 스타일도 확인한다.
 
+본문 섹션 제목의 크기, 행간, 굵기, 자간은 공개 블로그와 함께
+`site/src/brand.ts`의 `TOKENS.typography.sectionTitle`을 쓴다. 강의장 CSS에서 별도 수치를 만들지
+않으며 `npm run check:brand`와 `npm run cr:shot`이 토큰 소비와 실제 렌더 크기를 확인한다.
+
 ## 운영 화면은 로컬호스트에만 있다
 
 **공개 서버에 운영자 페이지가 없다.** 운영 화면은 운영자 노트북에서 도는 작은 서버가 그리고,

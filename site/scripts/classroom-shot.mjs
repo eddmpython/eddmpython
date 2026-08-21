@@ -254,6 +254,19 @@ for (const viewport of VIEWPORTS) {
     session = (await client.attachSession(opened.output.targetRef, { timeoutMs: 30000 })).output;
     await save(session, "03-post");
 
+    const sectionTitle = value(await evaluate(session, `(() => {
+      const heading = document.querySelector('article h2');
+      if (!heading) return null;
+      const style = getComputedStyle(heading);
+      return { size: style.fontSize, weight: style.fontWeight };
+    })()`));
+    record(
+      `${viewport.id} 섹션 제목 공용 위계`,
+      sectionTitle?.size === (viewport.id === "desktop" ? "24px" : "22px") &&
+        sectionTitle?.weight === "600",
+      JSON.stringify(sectionTitle),
+    );
+
     const visualGroup = value(await evaluate(session, `(() => {
       const label = document.querySelector('article .lb');
       const visual = label?.nextElementSibling;

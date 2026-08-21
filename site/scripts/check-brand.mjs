@@ -29,6 +29,11 @@ const expected = {
   "--eddm-codaro": TOKENS.color.codaro,
   "--eddm-xlpod": TOKENS.color.xlpod,
   "--eddm-pyproc": TOKENS.color.pyproc,
+  "--eddm-section-title-size-mobile": TOKENS.typography.sectionTitle.mobile,
+  "--eddm-section-title-size-desktop": TOKENS.typography.sectionTitle.desktop,
+  "--eddm-section-title-line-height": TOKENS.typography.sectionTitle.lineHeight,
+  "--eddm-section-title-weight": TOKENS.typography.sectionTitle.weight,
+  "--eddm-section-title-tracking": TOKENS.typography.sectionTitle.tracking,
 };
 for (const [name, want] of Object.entries(expected)) {
   const m = css.match(new RegExp(`${name}\\s*:\\s*([^;]+);`));
@@ -41,6 +46,16 @@ for (const [name, want] of Object.entries(expected)) {
 // 폰트 스택도 한 벌이어야 한다. 다르면 자간이 달라져 같은 헤더가 아니게 된다.
 if (!css.includes("Pretendard Variable")) {
   add("src/styles.css", "--font-sans 에 Pretendard 가 없습니다");
+}
+
+// 섹션 제목 값을 정본에 두고도 소비자가 숫자를 다시 쓰면 위계가 다시 갈라진다.
+const sectionConsumers = {
+  "classroom.ts": "font-size:var(--eddm-section-title-size-mobile)",
+  "src/components/Markdown.tsx": "eddm-section-title",
+};
+for (const [rel, needle] of Object.entries(sectionConsumers)) {
+  const text = await readFile(join(SITE, rel), "utf8");
+  if (!text.includes(needle)) add(rel, "섹션 제목이 brand.ts 의 공용 타이포그래피 토큰을 쓰지 않습니다");
 }
 
 /**

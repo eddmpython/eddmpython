@@ -110,6 +110,16 @@ export const TOKENS = {
     sans: '"Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
     mono: '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
   },
+  /** 공개 글과 강의장 본문이 함께 쓰는 섹션 제목 위계 */
+  typography: {
+    sectionTitle: {
+      mobile: "1.375rem",
+      desktop: "1.5rem",
+      lineHeight: "1.35",
+      weight: "600",
+      tracking: "-.015em",
+    },
+  },
   /** 랜딩이 CDN 에서 받는 글꼴. 강의장과 운영 화면도 같은 것을 받아야 자간이 같다 */
   fontHref:
     "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css",
@@ -119,7 +129,8 @@ export const TOKENS = {
 export function cssVars(): string {
   const c = TOKENS.color;
   const t = TOKENS;
-  return `:root{--eddm-carbon:${c.carbon};--eddm-ink:${c.ink};--eddm-ivory:${c.ivory};--eddm-sand:${c.sand};--eddm-alert:${c.alert};--eddm-text:${t.text.body};--eddm-text-muted:${t.text.muted};--eddm-text-dim:${t.text.dim};--eddm-text-faint:${t.text.faint};--eddm-line:${t.line.soft};--eddm-line-base:${t.line.base};--eddm-line-strong:${t.line.strong};--eddm-raise:${t.surface.raise};--eddm-hover:${t.surface.hover};--eddm-accent-line:${t.accent.line};--eddm-accent-bg:${t.accent.bg};--eddm-accent-dim:${t.accent.dim}}`;
+  const section = t.typography.sectionTitle;
+  return `:root{--eddm-carbon:${c.carbon};--eddm-ink:${c.ink};--eddm-ivory:${c.ivory};--eddm-sand:${c.sand};--eddm-alert:${c.alert};--eddm-text:${t.text.body};--eddm-text-muted:${t.text.muted};--eddm-text-dim:${t.text.dim};--eddm-text-faint:${t.text.faint};--eddm-line:${t.line.soft};--eddm-line-base:${t.line.base};--eddm-line-strong:${t.line.strong};--eddm-raise:${t.surface.raise};--eddm-hover:${t.surface.hover};--eddm-accent-line:${t.accent.line};--eddm-accent-bg:${t.accent.bg};--eddm-accent-dim:${t.accent.dim};--eddm-section-title-size-mobile:${section.mobile};--eddm-section-title-size-desktop:${section.desktop};--eddm-section-title-line-height:${section.lineHeight};--eddm-section-title-weight:${section.weight};--eddm-section-title-tracking:${section.tracking}}`;
 }
 
 /**

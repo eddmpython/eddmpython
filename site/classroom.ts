@@ -625,8 +625,12 @@ figure.media figcaption { margin-top:.55rem; font-size:.86rem; line-height:1.6; 
 /* 섹션과 섹션 사이를 벌리고 윗선으로 가른다. 스크롤할 때 경계가 눈에 보여야 한다.
    h3 는 h2 를 풀어 쓴 부제라 h2 에 붙여 두고 본문 색보다 흐리게 둔다. */
 article h2 { margin:4rem 0 .5rem; padding-top:1.75rem; border-top:1px solid var(--eddm-line);
-  font-size:1.3rem; font-weight:500; letter-spacing:-.01em; line-height:1.4;
+  font-size:var(--eddm-section-title-size-mobile); font-weight:var(--eddm-section-title-weight);
+  letter-spacing:var(--eddm-section-title-tracking); line-height:var(--eddm-section-title-line-height);
   display:flex; gap:1.25rem; align-items:baseline; }
+@media (min-width:768px) {
+  article h2 { font-size:var(--eddm-section-title-size-desktop); }
+}
 article h2:first-child { margin-top:0; padding-top:0; border-top:0; }
 /* 섹션 번호. 목차의 번호와 같아서 지금 몇 번째인지 세지 않고 안다. */
 article h2 .sn { flex:0 0 auto; font-size:.82rem; font-weight:500; letter-spacing:.04em;

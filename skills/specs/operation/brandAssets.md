@@ -19,13 +19,19 @@ status: observed
 
 ## 정본은 한 파일이다
 
-`site/src/brand.ts` 가 심볼 좌표와 색의 정본이다. **다른 곳에 좌표를 다시 적지 않는다.**
+`site/src/brand.ts` 가 심볼 좌표, 색, 공용 글자 위계의 정본이다. **다른 곳에 좌표나 공용 수치를
+다시 정하지 않는다.**
 
 | 쓰는 곳 | 어떻게 |
 |---|---|
 | 랜딩 헤더와 푸터 | `components/Logo.tsx` 가 `SYMBOL` 을 읽는다 |
 | `favicon.svg` | `vite.config.ts` 의 `brandAssets` 플러그인이 `faviconSvg()` 로 만든다 |
 | `og.png` | `npm run og` 가 같은 좌표로 그린다 |
+
+공개 블로그와 강의장의 섹션 제목은 `TOKENS.typography.sectionTitle` 하나를 쓴다. 모바일과
+데스크톱 크기, 행간, 굵기, 자간을 그 객체에서 정하고 두 렌더러는 CSS 변수로 소비한다.
+Tailwind 진입점 `src/styles.css`에는 빌드가 읽을 같은 변수값이 필요하지만 `npm run check:brand`가
+`brand.ts`와의 일치와 두 렌더러의 실제 소비를 함께 검사한다.
 
 `public/favicon.svg` 를 두지 않는다. 사본을 두면 랜딩 마크를 고칠 때 파비콘만 옛 형태로
 남는다. dev 는 미들웨어로, build 는 dist 파일로 같은 문자열을 낸다.

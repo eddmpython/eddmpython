@@ -425,7 +425,7 @@ export function Markdown({ children }: { children: string }) {
           return (
             <h2
               id={heading?.id}
-              className="mt-20 mb-3 flex scroll-mt-28 items-baseline gap-4 border-t border-white/15 pt-9 text-[1.75rem] leading-[1.2] font-semibold tracking-[-0.025em] text-ivory md:mt-24 md:gap-5 md:pt-10 md:text-[2rem]"
+              className="eddm-section-title mt-20 mb-3 flex scroll-mt-28 items-baseline gap-4 border-t border-white/15 pt-9 text-ivory md:mt-24 md:gap-5 md:pt-10"
             >
               <span
                 aria-hidden="true"

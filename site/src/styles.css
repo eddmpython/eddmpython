@@ -11,6 +11,12 @@
   --eddm-codaro: #dfa14e;
   --eddm-xlpod: #57b98a;
   --eddm-pyproc: #ff5a36;
+  /* 정본은 brand.ts 의 TOKENS.typography.sectionTitle 이다. check:brand 가 같은지 검사한다 */
+  --eddm-section-title-size-mobile: 1.375rem;
+  --eddm-section-title-size-desktop: 1.5rem;
+  --eddm-section-title-line-height: 1.35;
+  --eddm-section-title-weight: 600;
+  --eddm-section-title-tracking: -.015em;
 }
 
 @theme inline {
@@ -44,6 +50,20 @@ body {
   text-rendering: optimizeLegibility;
   /* 한국어 어절 단위 줄바꿈 */
   word-break: keep-all;
+}
+
+/* 공개 글과 강의장이 같은 섹션 제목 위계를 쓴다 */
+.eddm-section-title {
+  font-size: var(--eddm-section-title-size-mobile);
+  line-height: var(--eddm-section-title-line-height);
+  font-weight: var(--eddm-section-title-weight);
+  letter-spacing: var(--eddm-section-title-tracking);
+}
+
+@media (min-width: 768px) {
+  .eddm-section-title {
+    font-size: var(--eddm-section-title-size-desktop);
+  }
 }
 
 :focus-visible {
