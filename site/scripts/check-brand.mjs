@@ -111,6 +111,22 @@ for (const rel of [...SCAN, "src/styles.css"]) {
   }
 }
 
+// 강의장 테마 표면은 라이트와 다크에서 같은 의미 토큰을 써야 한다. 배경과 글자에 고정 hex 를
+// 다시 넣으면 한쪽 테마에서만 맞는 코드 블록과 실행 칸이 생긴다.
+const classroom = await readFile(join(SITE, "classroom.ts"), "utf8");
+const fixedThemeColors = classroom.match(
+  /(?:background(?:-color)?|color|border(?:-[a-z]+)?-color)\s*:\s*#[0-9a-f]{3,8}/gi,
+);
+if (fixedThemeColors) {
+  add(
+    "classroom.ts",
+    `테마 표면에 고정 색을 썼습니다: ${[...new Set(fixedThemeColors)].join(", ")}. --eddm-* 의미 토큰을 씁니다`,
+  );
+}
+for (const name of ["--eddm-code-surface", "--eddm-code-focus", "--eddm-danger", "--eddm-overlay"]) {
+  if (!classroom.includes(name)) add("classroom.ts", `${name} 테마 토큰이 없습니다`);
+}
+
 if (problems.length) {
   console.error("브랜드 토큰이 갈라졌습니다.\n");
   for (const p of problems) console.error("  " + p);

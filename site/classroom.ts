@@ -497,7 +497,15 @@ function sessionCookie(token: string, slug: string, url: URL): string {
 // scripts/check-brand.mjs 가 이 파일에 hex 가 다시 나타나면 막는다.
 const STYLE = `
 ${cssVars()}
-:root { color-scheme: dark; }
+:root {
+  color-scheme:dark;
+  --eddm-code-surface:color-mix(in srgb,var(--eddm-ivory) 5%,var(--eddm-carbon));
+  --eddm-code-focus:color-mix(in srgb,var(--eddm-ivory) 8%,var(--eddm-carbon));
+  --eddm-danger:color-mix(in srgb,var(--eddm-alert) 68%,var(--eddm-ivory));
+  --eddm-danger-line:color-mix(in srgb,var(--eddm-danger) 38%,transparent);
+  --eddm-media:${TOKENS.color.ink};
+  --eddm-overlay:color-mix(in srgb,${TOKENS.color.ink} 92%,transparent);
+}
 :root[data-theme="light"] {
   color-scheme:light;
   --eddm-carbon:${TOKENS.color.ivory};
@@ -518,7 +526,8 @@ ${cssVars()}
   --eddm-accent-dim:color-mix(in srgb, var(--eddm-sand) 72%, transparent);
 }
 * { box-sizing: border-box; }
-body { margin:0; background:var(--eddm-carbon); color:var(--eddm-ivory); font-family:${TOKENS.font.sans}; word-break:keep-all; -webkit-font-smoothing:antialiased;
+html { min-height:100%; background:var(--eddm-carbon); scrollbar-color:var(--eddm-line-strong) var(--eddm-carbon); }
+body { min-height:100vh; margin:0; background:var(--eddm-carbon); color:var(--eddm-ivory); font-family:${TOKENS.font.sans}; word-break:keep-all; -webkit-font-smoothing:antialiased;
   line-height:1.7; -webkit-text-size-adjust:100%; }
 :focus-visible { outline:2px solid var(--eddm-accent-dim); outline-offset:2px; border-radius:.25rem; }
 ::selection { background:var(--eddm-accent-line); }
@@ -540,12 +549,12 @@ body { margin:0; background:var(--eddm-carbon); color:var(--eddm-ivory); font-fa
 .hd .nav-icon { color:var(--eddm-text-muted); border:0; transition:color .15s cubic-bezier(.4,0,.2,1); }
 .hd .nav-icon:hover { color:var(--eddm-ivory); }
 .hd .nav-icon svg { height:18px; width:18px; display:block; }
-.hd .theme-toggle { display:grid; place-items:center; width:2.15rem; height:2.15rem; margin:0; padding:0;
+.theme-toggle { display:grid; place-items:center; width:2.15rem; height:2.15rem; margin:0; padding:0;
   border:1px solid var(--eddm-line-base); border-radius:.55rem; background:var(--eddm-raise);
   color:var(--eddm-text-muted); cursor:pointer; transition:color .15s cubic-bezier(.4,0,.2,1),
   background .15s cubic-bezier(.4,0,.2,1), border-color .15s cubic-bezier(.4,0,.2,1); }
-.hd .theme-toggle:hover { border-color:var(--eddm-line-strong); background:var(--eddm-hover); color:var(--eddm-ivory); }
-.hd .theme-toggle svg { display:none; width:17px; height:17px; }
+.theme-toggle:hover { border-color:var(--eddm-line-strong); background:var(--eddm-hover); color:var(--eddm-ivory); }
+.theme-toggle svg { display:none; width:17px; height:17px; }
 :root[data-theme="light"] .theme-toggle .theme-icon-moon { display:block; }
 :root[data-theme="dark"] .theme-toggle .theme-icon-sun { display:block; }
 @media (min-width:768px) {
@@ -643,7 +652,7 @@ input[type=password] { flex:1 1 14rem; min-width:0; padding:.7rem .9rem; border-
 button { padding:.7rem 1.1rem; border-radius:.6rem; border:1px solid var(--eddm-accent-line); background:var(--eddm-accent-bg);
   color:var(--eddm-sand); font-size:.95rem; cursor:pointer; }
 button:hover { background:var(--eddm-accent-bg); }
-.err { color:#f5b3a0; margin-top:1rem; font-size:.92rem; }
+.err { color:var(--eddm-danger); margin-top:1rem; font-size:.92rem; }
 .cat { border:1px solid var(--eddm-line-base); border-radius:.85rem; padding:1.4rem 1.5rem 1.1rem; margin:0 0 1rem; }
 .cat-h { display:flex; align-items:baseline; gap:.75rem; }
 .cat-n { font-size:.78rem; font-weight:500; color:var(--eddm-accent-dim); font-variant-numeric:tabular-nums; }
@@ -697,7 +706,8 @@ article p.lb + img, article p.lb + video, article p.lb + .pending { margin-top:0
 article ul, article ol { margin:1.25rem 0; padding-left:1.25rem; line-height:1.85; color:var(--eddm-text); }
 article li { margin:.5rem 0; }
 article li::marker { color:var(--eddm-accent-dim); }
-article pre { overflow-x:auto; background:#00000055; padding:1rem; border-radius:.6rem; }
+article pre { overflow-x:auto; margin:1.5rem 0; padding:1rem; border:1px solid var(--eddm-line-base);
+  border-radius:.6rem; background:var(--eddm-code-surface); }
 .table-wrap { margin:1.5rem 0; overflow-x:auto; border:1px solid var(--eddm-line-base); border-radius:.65rem; }
 article table { width:100%; min-width:42rem; border-collapse:collapse; }
 article th, article td { padding:.75rem .85rem; border-bottom:1px solid var(--eddm-line-base);
@@ -707,7 +717,7 @@ article td { color:var(--eddm-text); font-size:.88rem; }
 article tbody tr:last-child td { border-bottom:0; }
 .cell { margin:1.9rem 0; border:1px solid var(--eddm-accent-line); border-radius:.85rem; overflow:hidden;
   background:var(--eddm-raise); }
-.cell.bad { border-color:#e0908a66; }
+.cell.bad { border-color:var(--eddm-danger-line); }
 .cell-h { display:flex; align-items:center; gap:.5rem; padding:.7rem 1rem;
   border-bottom:1px solid var(--eddm-line-base); background:var(--eddm-accent-bg); }
 .cell-dot { width:6px; height:6px; border-radius:50%; background:var(--eddm-sand); flex:0 0 auto; }
@@ -716,9 +726,9 @@ article tbody tr:last-child td { border-bottom:0; }
 .cell-t { margin:.9rem 1rem .2rem; font-size:.98rem; color:var(--eddm-text); font-weight:500; }
 .cell-d { margin:.2rem 1rem .8rem; font-size:.88rem; line-height:1.7; color:var(--eddm-text-muted); }
 .cell-c { display:block; width:100%; box-sizing:border-box; resize:vertical; border:0; outline:0;
-  background:#00000055; color:var(--eddm-text); padding:.9rem 1rem; line-height:1.65;
+  background:var(--eddm-code-surface); color:var(--eddm-text); padding:.9rem 1rem; line-height:1.65;
   font-family:inherit; font-size:.86rem; white-space:pre; overflow-x:auto; }
-.cell-c:focus { background:#00000077; }
+.cell-c:focus { background:var(--eddm-code-focus); }
 .cell-b { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem; padding:.75rem 1rem;
   border-top:1px solid var(--eddm-line-base); }
 .cell-b button { border-radius:.5rem; padding:.4rem .9rem; font-size:.86rem; cursor:pointer;
@@ -729,13 +739,13 @@ article tbody tr:last-child td { border-bottom:0; }
 .cell-o { margin:0; padding:.9rem 1rem; border-top:1px solid var(--eddm-line-base);
   background:transparent; border-radius:0; max-height:18rem; overflow:auto; font-size:.82rem;
   line-height:1.6; color:var(--eddm-text-muted); white-space:pre-wrap; word-break:break-word; }
-.cell.bad .cell-o { color:#e0908a; }
-.cell-miss { padding:1rem; color:#e0908a; font-size:.88rem; }
+.cell.bad .cell-o { color:var(--eddm-danger); }
+.cell-miss { padding:1rem; color:var(--eddm-danger); font-size:.88rem; }
 .cell-miss i { display:block; margin-top:.3rem; font-style:normal; color:var(--eddm-text-faint); }
 .slider { display:flex; gap:.75rem; overflow-x:auto; scroll-snap-type:x mandatory; margin:1.2rem 0; }
 .slider figure.media { scroll-snap-align:center; flex:0 0 88%; margin:0; }
 .slider img { margin:0; }
-.zoom { position:fixed; inset:0; background:#000000e8; display:none; align-items:center;
+.zoom { position:fixed; inset:0; background:var(--eddm-overlay); display:none; align-items:center;
   justify-content:center; z-index:50; padding:1rem; cursor:zoom-out; }
 .zoom.on { display:flex; }
 .zoom img { max-width:100%; max-height:100%; border-radius:.4rem; }
@@ -749,12 +759,12 @@ article a:hover { border-bottom-color:var(--eddm-sand); }
 .yt figcaption .at { font-style:normal; margin-left:.5rem; padding:.1rem .45rem; border-radius:.35rem;
   background:var(--eddm-accent-bg); color:var(--eddm-sand); font-size:.78rem; white-space:nowrap; }
 .yt .frame { position:relative; width:100%; padding-top:56.25%; border-radius:.6rem;
-  overflow:hidden; background:#000; }
+  overflow:hidden; background:var(--eddm-media); }
 .yt.tall .frame { padding-top:0; aspect-ratio:9/16; max-width:22rem; margin-inline:auto; }
 .yt iframe, .yt .ytplay { position:absolute; inset:0; width:100%; height:100%; border:0; }
-.yt .ytplay { background-color:#000; background-size:cover; background-position:center;
+.yt .ytplay { background-color:var(--eddm-media); background-size:cover; background-position:center;
   cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; }
-.yt .ytplay span { width:4rem; height:4rem; border-radius:50%; background:#000000bf;
+.yt .ytplay span { width:4rem; height:4rem; border-radius:50%; background:color-mix(in srgb,var(--eddm-media) 75%,transparent);
   border:1px solid var(--eddm-line-strong); display:flex; align-items:center; justify-content:center;
   transition:transform .15s; }
 .yt .ytplay span::after { content:""; margin-left:.28rem; border-style:solid;
@@ -1011,12 +1021,15 @@ const THEME_INIT_SCRIPT = `
 (() => {
   const root = document.documentElement;
   const media = matchMedia("(prefers-color-scheme: light)");
+  const key = "eddmpython-classroom-theme";
   const choices = new Set(["system", "light", "dark"]);
   let saved = "system";
   try {
-    const value = localStorage.getItem("eddmpython-classroom-theme");
+    const value = localStorage.getItem(key);
     if (value && choices.has(value)) saved = value;
-  } catch {}
+  } catch {
+    // 저장소가 막혀도 현재 페이지의 시스템 테마는 안전하게 적용할 수 있다.
+  }
   const set = (choice, persist = true) => {
     const selected = choices.has(choice) ? choice : "system";
     const resolved = selected === "system" ? (media.matches ? "light" : "dark") : selected;
@@ -1025,10 +1038,15 @@ const THEME_INIT_SCRIPT = `
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute("content", resolved === "light" ? "${TOKENS.color.ivory}" : "${TOKENS.color.carbon}");
     if (persist) {
-      try { localStorage.setItem("eddmpython-classroom-theme", selected); } catch {}
+      try {
+        localStorage.setItem(key, selected);
+      } catch {
+        // 저장 실패는 다른 페이지 유지에만 영향을 주며 현재 테마 전환은 이미 끝났다.
+      }
     }
+    root.dispatchEvent(new CustomEvent("eddmthemechange", { detail: { selected, resolved } }));
   };
-  window.__eddmTheme = { media, set };
+  window.__eddmTheme = { key, media, set };
   set(saved, false);
 })();
 `;
@@ -1039,23 +1057,27 @@ const THEME_SCRIPT = `
   const api = window.__eddmTheme;
   if (!api) return;
   const root = document.documentElement;
-  const toggle = document.querySelector("[data-theme-toggle]");
-  if (!toggle) return;
+  const toggles = [...document.querySelectorAll("[data-theme-toggle]")];
+  if (!toggles.length) return;
   const sync = () => {
     const current = root.dataset.theme === "light" ? "light" : "dark";
     const next = current === "light" ? "dark" : "light";
     const label = next === "light" ? "라이트 테마로 변경" : "다크 테마로 변경";
-    toggle.dataset.nextTheme = next;
-    toggle.setAttribute("aria-label", label);
-    toggle.setAttribute("title", label);
+    for (const toggle of toggles) {
+      toggle.dataset.nextTheme = next;
+      toggle.setAttribute("aria-label", label);
+      toggle.setAttribute("title", label);
+    }
   };
-  toggle.addEventListener("click", () => {
-    api.set(toggle.dataset.nextTheme);
-    sync();
-  });
+  for (const toggle of toggles) {
+    toggle.addEventListener("click", () => api.set(toggle.dataset.nextTheme));
+  }
+  root.addEventListener("eddmthemechange", sync);
   api.media.addEventListener("change", () => {
     if (root.dataset.themeChoice === "system") api.set("system", false);
-    sync();
+  });
+  window.addEventListener("storage", (event) => {
+    if (event.key === api.key) api.set(event.newValue ?? "system", false);
   });
   sync();
 })();
@@ -1561,6 +1583,19 @@ const NAV_ICONS = [
   },
 ];
 
+/** 같은 테마 조작을 읽기 화면과 강의 셸에 투영한다. */
+function themeToggle(extraClass = ""): string {
+  const className = `theme-toggle${extraClass ? ` ${extraClass}` : ""}`;
+  return `<button type="button" class="${esc(className)}" data-theme-toggle aria-label="화면 테마 변경" title="화면 테마 변경">
+    <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="3.5"/><path d="M12 2v2.2M12 19.8V22M4.93 4.93l1.56 1.56M17.51 17.51l1.56 1.56M2 12h2.2M19.8 12H22M4.93 19.07l1.56-1.56M17.51 6.49l1.56-1.56"/>
+    </svg>
+    <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2Z"/>
+    </svg>
+  </button>`;
+}
+
 /**
  * 브랜드 머리띠. 랜딩 `Nav.tsx` 와 같은 것을 낸다.
  *
@@ -1590,14 +1625,7 @@ function header(): string {
     <span class="hd-word"><b>eddm</b><i>python</i></span>
   </a>
   <div class="hd-right">${links}<span class="hd-icons">${icons}
-    <button type="button" class="theme-toggle" data-theme-toggle aria-label="화면 테마 변경" title="화면 테마 변경">
-      <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
-        <circle cx="12" cy="12" r="3.5"/><path d="M12 2v2.2M12 19.8V22M4.93 4.93l1.56 1.56M17.51 17.51l1.56 1.56M2 12h2.2M19.8 12H22M4.93 19.07l1.56-1.56M17.51 6.49l1.56-1.56"/>
-      </svg>
-      <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2Z"/>
-      </svg>
-    </button>
+    ${themeToggle()}
     </span>
   </div>
 </nav>`;
@@ -1943,6 +1971,7 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
              </span>
              <span class="lecture-progress" data-lecture-progress role="progressbar" aria-label="강의 진행률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">01 / ${String(post.scenes?.length ?? 0).padStart(2, "0")} · 0 / 0</span>
              <div class="lecture-actions">
+               ${themeToggle("lecture-theme-toggle")}
                <button type="button" data-lecture-notes-toggle aria-label="발표자 노트" title="발표자 노트" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3.5h14a1.5 1.5 0 0 1 1.5 1.5v14a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 19V5A1.5 1.5 0 0 1 5 3.5Z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>노트</span></button>
                <button type="button" data-lecture-close aria-label="강의 모드 닫기" title="강의 모드 닫기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg><span>닫기</span></button>
              </div>

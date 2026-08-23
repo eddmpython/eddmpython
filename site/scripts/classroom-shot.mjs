@@ -338,6 +338,8 @@ for (const viewport of VIEWPORTS) {
           sceneEmpty: scene?.dataset.sceneEmpty,
           centerGap: stageBox && headBox ? Math.abs((headBox.top + headBox.height / 2) - (stageBox.top + stageBox.height / 2)) : null,
           symbolWidth: deck?.querySelector('.lecture-symbol')?.getBoundingClientRect().width,
+          themeButtons: document.querySelectorAll('[data-theme-toggle]').length,
+          lectureThemeButtons: deck?.querySelectorAll('[data-theme-toggle]').length,
           progressValue: deck?.querySelector('[data-lecture-progress]')?.getAttribute('aria-valuenow'),
           progress: deck?.querySelector('[data-lecture-progress]')?.textContent.trim(),
         };
@@ -352,12 +354,67 @@ for (const viewport of VIEWPORTS) {
           lectureStart?.sceneEmpty === "true" &&
           lectureStart?.centerGap <= (viewport.id === "desktop" ? 24 : 14) &&
           lectureStart?.symbolWidth >= 20 &&
+          lectureStart?.themeButtons === 2 &&
+          lectureStart?.lectureThemeButtons === 1 &&
           lectureStart?.titleSize >= (viewport.id === "desktop" ? 72 : 44) &&
           lectureStart?.progressValue === "0" &&
           /· 0 \/ \d+$/.test(lectureStart?.progress ?? ""),
         JSON.stringify(lectureStart),
       );
       await save(session, "06-lecture-title", false);
+
+      const lectureLight = value(await evaluate(session, `(async () => {
+        const root = document.documentElement;
+        const button = document.querySelector('[data-lecture-deck] [data-theme-toggle]');
+        if (root.dataset.theme !== 'light') button.click();
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        return {
+          choice: root.dataset.themeChoice,
+          theme: root.dataset.theme,
+          labels: [...document.querySelectorAll('[data-theme-toggle]')].map((item) => item.getAttribute('aria-label')),
+          nextThemes: [...document.querySelectorAll('[data-theme-toggle]')].map((item) => item.dataset.nextTheme),
+          scheme: getComputedStyle(root).colorScheme,
+          meta: document.querySelector('meta[name="theme-color"]')?.content,
+        };
+      })()`));
+      record(
+        `${viewport.id} 강의 셸 라이트 테마`,
+        lectureLight?.choice === "light" &&
+          lectureLight?.theme === "light" &&
+          lectureLight?.labels?.length === 2 &&
+          lectureLight?.labels?.every((label) => label === "다크 테마로 변경") &&
+          lectureLight?.nextThemes?.every((theme) => theme === "dark") &&
+          lectureLight?.scheme === "light" &&
+          Boolean(lectureLight?.meta),
+        JSON.stringify(lectureLight),
+      );
+      await save(session, "06-lecture-title-light", false);
+
+      const lectureDark = value(await evaluate(session, `(async () => {
+        const root = document.documentElement;
+        document.querySelector('[data-lecture-deck] [data-theme-toggle]').click();
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        return {
+          choice: root.dataset.themeChoice,
+          theme: root.dataset.theme,
+          labels: [...document.querySelectorAll('[data-theme-toggle]')].map((item) => item.getAttribute('aria-label')),
+          nextThemes: [...document.querySelectorAll('[data-theme-toggle]')].map((item) => item.dataset.nextTheme),
+          scheme: getComputedStyle(root).colorScheme,
+          meta: document.querySelector('meta[name="theme-color"]')?.content,
+        };
+      })()`));
+      record(
+        `${viewport.id} 강의 셸 다크 테마`,
+        lectureDark?.choice === "dark" &&
+          lectureDark?.theme === "dark" &&
+          lectureDark?.labels?.length === 2 &&
+          lectureDark?.labels?.every((label) => label === "라이트 테마로 변경") &&
+          lectureDark?.nextThemes?.every((theme) => theme === "light") &&
+          lectureDark?.scheme === "dark" &&
+          Boolean(lectureDark?.meta),
+        JSON.stringify(lectureDark),
+      );
+      await save(session, "06-lecture-title-dark", false);
 
       await client.act(
         session,
@@ -490,6 +547,7 @@ for (const viewport of VIEWPORTS) {
           await new Promise((resolve) => setTimeout(resolve, 100));
           return {
             buttons: document.querySelectorAll('[data-theme-toggle]').length,
+            visibleButtons: [...document.querySelectorAll('[data-theme-toggle]')].filter((item) => item.getClientRects().length > 0).length,
             choice: document.documentElement.dataset.themeChoice,
             theme: document.documentElement.dataset.theme,
             next: button.dataset.nextTheme,
@@ -501,7 +559,8 @@ for (const viewport of VIEWPORTS) {
     );
     record(
       `${viewport.id} 라이트 테마`,
-      lightTheme?.buttons === 1 &&
+      lightTheme?.buttons === 2 &&
+        lightTheme?.visibleButtons === 1 &&
         lightTheme?.choice === "light" &&
         lightTheme?.theme === "light" &&
         lightTheme?.next === "dark" &&
@@ -521,6 +580,8 @@ for (const viewport of VIEWPORTS) {
         `(() => ({
           choice: document.documentElement.dataset.themeChoice,
           theme: document.documentElement.dataset.theme,
+          buttons: document.querySelectorAll('[data-theme-toggle]').length,
+          visibleButtons: [...document.querySelectorAll('[data-theme-toggle]')].filter((item) => item.getClientRects().length > 0).length,
           next: document.querySelector('[data-theme-toggle]')?.dataset.nextTheme,
           label: document.querySelector('[data-theme-toggle]')?.getAttribute('aria-label'),
         }))()`,
@@ -530,6 +591,8 @@ for (const viewport of VIEWPORTS) {
       `${viewport.id} 라이트 테마 새로고침 유지`,
       persistedTheme?.choice === "light" &&
         persistedTheme?.theme === "light" &&
+        persistedTheme?.buttons === 2 &&
+        persistedTheme?.visibleButtons === 1 &&
         persistedTheme?.next === "dark" &&
         persistedTheme?.label === "다크 테마로 변경",
       JSON.stringify(persistedTheme),
@@ -546,6 +609,8 @@ for (const viewport of VIEWPORTS) {
           return {
             choice: document.documentElement.dataset.themeChoice,
             theme: document.documentElement.dataset.theme,
+            buttons: document.querySelectorAll('[data-theme-toggle]').length,
+            visibleButtons: [...document.querySelectorAll('[data-theme-toggle]')].filter((item) => item.getClientRects().length > 0).length,
             next: button.dataset.nextTheme,
             label: button.getAttribute('aria-label'),
             scheme: getComputedStyle(document.documentElement).colorScheme,
@@ -557,12 +622,34 @@ for (const viewport of VIEWPORTS) {
       `${viewport.id} 다크 테마`,
       darkTheme?.choice === "dark" &&
         darkTheme?.theme === "dark" &&
+        darkTheme?.buttons === 2 &&
+        darkTheme?.visibleButtons === 1 &&
         darkTheme?.next === "light" &&
         darkTheme?.label === "라이트 테마로 변경" &&
         darkTheme?.scheme === "dark",
       JSON.stringify(darkTheme),
     );
     await save(session, "03-theme-dark");
+
+    const storageTheme = value(await evaluate(session, `(() => {
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'eddmpython-classroom-theme',
+        newValue: 'light',
+      }));
+      return {
+        choice: document.documentElement.dataset.themeChoice,
+        theme: document.documentElement.dataset.theme,
+        labels: [...document.querySelectorAll('[data-theme-toggle]')].map((item) => item.getAttribute('aria-label')),
+      };
+    })()`));
+    record(
+      `${viewport.id} 다른 탭 테마 동기화`,
+      storageTheme?.choice === "light" &&
+        storageTheme?.theme === "light" &&
+        storageTheme?.labels?.length === 2 &&
+        storageTheme?.labels?.every((label) => label === "다크 테마로 변경"),
+      JSON.stringify(storageTheme),
+    );
 
     await evaluate(session, `localStorage.removeItem('eddmpython-classroom-theme'); location.reload()`, false);
     await client.act(
@@ -580,7 +667,7 @@ for (const viewport of VIEWPORTS) {
       `${viewport.id} 시스템 기본 테마`,
       systemTheme?.choice === "system" &&
         systemTheme?.theme === systemTheme?.expected &&
-        systemTheme?.buttons === 1,
+        systemTheme?.buttons === 2,
       JSON.stringify(systemTheme),
     );
 
@@ -857,8 +944,47 @@ for (const viewport of VIEWPORTS) {
         ),
       );
       record(`${viewport.id} 실행 칸이 실제로 파이썬을 돌림`, ran.startsWith("완료"), ran);
-      await save(session, "05-cell");
-    } else if (cells > 0) {
+    }
+    if (cells > 0) {
+      const lightCell = value(await evaluate(session, `(() => {
+        const root = document.documentElement;
+        const button = document.querySelector('.hd [data-theme-toggle]');
+        if (root.dataset.theme !== 'light') button.click();
+        const code = document.querySelector('.cell-c');
+        return {
+          theme: root.dataset.theme,
+          background: getComputedStyle(code).backgroundColor,
+          foreground: getComputedStyle(code).color,
+        };
+      })()`));
+      record(
+        `${viewport.id} 라이트 실행 표면`,
+        lightCell?.theme === "light" &&
+          lightCell?.background !== "rgba(0, 0, 0, 0)" &&
+          lightCell?.background !== lightCell?.foreground,
+        JSON.stringify(lightCell),
+      );
+      await save(session, "05-cell-light");
+
+      const darkCell = value(await evaluate(session, `(() => {
+        const root = document.documentElement;
+        document.querySelector('.hd [data-theme-toggle]').click();
+        const code = document.querySelector('.cell-c');
+        return {
+          theme: root.dataset.theme,
+          background: getComputedStyle(code).backgroundColor,
+          foreground: getComputedStyle(code).color,
+        };
+      })()`));
+      record(
+        `${viewport.id} 다크 실행 표면`,
+        darkCell?.theme === "dark" &&
+          darkCell?.background !== "rgba(0, 0, 0, 0)" &&
+          darkCell?.background !== lightCell?.background &&
+          darkCell?.foreground !== lightCell?.foreground,
+        JSON.stringify({ light: lightCell, dark: darkCell }),
+      );
+      await save(session, "05-cell-dark");
       await save(session, "05-cell");
     }
   } finally {
