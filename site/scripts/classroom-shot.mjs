@@ -416,6 +416,109 @@ for (const viewport of activeViewports) {
       );
       await save(session, "06-lecture-title", false);
 
+      await client.act(
+        session,
+        [{ kind: "click", selector: "[data-lecture-map-toggle]", expectedRisk: "externalEffect" }],
+        { timeoutMs: 30000 },
+      );
+      const mapState = value(await evaluate(session, `(() => {
+        const deck = document.querySelector('[data-lecture-deck]');
+        const map = deck?.querySelector('[data-lecture-map]');
+        const items = [...(map?.querySelectorAll('[data-lecture-map-scene]') ?? [])];
+        return {
+          hidden:map?.hidden,
+          expanded:deck?.querySelector('[data-lecture-map-toggle]')?.getAttribute('aria-expanded'),
+          items:items.length,
+          current:items.filter((item) => item.getAttribute('aria-current') === 'step').length,
+          currentTitle:items.find((item) => item.getAttribute('aria-current') === 'step')?.querySelector('b')?.textContent.trim(),
+          stageInert:deck?.querySelector('.lecture-stage')?.hasAttribute('inert'),
+          barInert:deck?.querySelector('.lecture-bar')?.hasAttribute('inert'),
+          footInert:deck?.querySelector('.lecture-foot')?.hasAttribute('inert'),
+          audienceHelp:deck?.querySelector('.lecture-help')?.textContent.trim(),
+        };
+      })()`));
+      record(
+        `${viewport.id} 장면 지도와 관객 집중 화면`,
+        mapState?.hidden === false &&
+          mapState?.expanded === "true" &&
+          mapState?.items === 12 &&
+          mapState?.current === 1 &&
+          mapState?.currentTitle === "마우스와 키보드 자동화" &&
+          mapState?.stageInert === true &&
+          mapState?.barInert === true &&
+          mapState?.footInert === true &&
+          mapState?.audienceHelp === "",
+        JSON.stringify(mapState),
+      );
+      await save(session, "15-lecture-map", false);
+      const mapNavigation = value(await evaluate(session, `(async () => {
+        const deck = document.querySelector('[data-lecture-deck]');
+        document.dispatchEvent(new KeyboardEvent('keydown', { key:'Escape', bubbles:true }));
+        const closed = {
+          hidden:deck.querySelector('[data-lecture-map]').hidden,
+          expanded:deck.querySelector('[data-lecture-map-toggle]').getAttribute('aria-expanded'),
+          deckHidden:deck.hidden,
+          stageInert:deck.querySelector('.lecture-stage').hasAttribute('inert'),
+        };
+        document.dispatchEvent(new KeyboardEvent('keydown', { key:'m', bubbles:true }));
+        await new Promise((resolve) => {
+          deck.addEventListener('lectureframe', resolve, { once:true });
+          deck.querySelector('[data-lecture-map-scene="1"]').click();
+        });
+        const jumped = {
+          mapHidden:deck.querySelector('[data-lecture-map]').hidden,
+          progress:deck.querySelector('[data-lecture-progress]').textContent.trim(),
+          title:deck.querySelector('.lecture-scene.on h2')?.textContent.trim(),
+        };
+        await new Promise((resolve) => {
+          deck.addEventListener('lectureframe', resolve, { once:true });
+          document.dispatchEvent(new KeyboardEvent('keydown', { key:'Home', bubbles:true }));
+        });
+        return { closed, jumped };
+      })()`));
+      record(
+        `${viewport.id} 장면 지도 키보드와 즉시 이동`,
+        mapNavigation?.closed?.hidden === true &&
+          mapNavigation?.closed?.expanded === "false" &&
+          mapNavigation?.closed?.deckHidden === false &&
+          mapNavigation?.closed?.stageInert === false &&
+          mapNavigation?.jumped?.mapHidden === true &&
+          /^02 \/ 12 · 0 \/ \d+$/.test(mapNavigation?.jumped?.progress ?? "") &&
+          mapNavigation?.jumped?.title === "브라우저 자동화",
+        JSON.stringify(mapNavigation),
+      );
+      const blankState = value(await evaluate(session, `(() => {
+        const deck = document.querySelector('[data-lecture-deck]');
+        const progress = deck.querySelector('[data-lecture-progress]').textContent.trim();
+        document.dispatchEvent(new KeyboardEvent('keydown', { key:'b', bubbles:true }));
+        const covered = {
+          blanked:deck.dataset.audienceBlanked,
+          hidden:deck.querySelector('[data-lecture-break]').hidden,
+          stageInert:deck.querySelector('.lecture-stage').hasAttribute('inert'),
+          progress:deck.querySelector('[data-lecture-progress]').textContent.trim(),
+        };
+        document.dispatchEvent(new KeyboardEvent('keydown', { key:'b', bubbles:true }));
+        const restored = {
+          blanked:deck.dataset.audienceBlanked,
+          hidden:deck.querySelector('[data-lecture-break]').hidden,
+          stageInert:deck.querySelector('.lecture-stage').hasAttribute('inert'),
+          progress:deck.querySelector('[data-lecture-progress]').textContent.trim(),
+        };
+        return { progress, covered, restored };
+      })()`));
+      record(
+        `${viewport.id} 관객 화면 가리기와 복구`,
+        blankState?.covered?.blanked === "true" &&
+          blankState?.covered?.hidden === false &&
+          blankState?.covered?.stageInert === true &&
+          blankState?.covered?.progress === blankState?.progress &&
+          blankState?.restored?.blanked === "false" &&
+          blankState?.restored?.hidden === true &&
+          blankState?.restored?.stageInert === false &&
+          blankState?.restored?.progress === blankState?.progress,
+        JSON.stringify(blankState),
+      );
+
       const fullscreenExit = value(await evaluate(session, `(async () => {
         const deck = document.querySelector('[data-lecture-deck]');
         const button = deck?.querySelector('[data-lecture-fullscreen]');
@@ -781,6 +884,9 @@ for (const viewport of activeViewports) {
           length: note?.textContent.trim().length ?? 0,
           docked: document.querySelector('[data-lecture-deck]')?.classList.contains('notes-on'),
           meta: note?.querySelector('[data-lecture-notes-meta]')?.textContent.trim(),
+          elapsed: note?.querySelector('[data-lecture-elapsed]')?.textContent.trim(),
+          timerRunning: document.querySelector('[data-lecture-deck]')?.dataset.timerRunning,
+          nextLabel: note?.querySelector('[data-lecture-notes-next-label]')?.textContent.trim(),
           next: note?.querySelector('[data-lecture-notes-next]')?.textContent.trim(),
           rect: rect ? { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom, width: rect.width, height: rect.height } : null,
           stage: stage ? { left: stage.left, top: stage.top, right: stage.right, bottom: stage.bottom } : null,
@@ -793,6 +899,9 @@ for (const viewport of activeViewports) {
           noteState?.length > 40 &&
           noteState?.docked === true &&
           /^장면 01 \/ 12 · 클릭 2 \/ 11$/.test(noteState?.meta ?? "") &&
+          /^(?:\d{2}:)?\d{2}:\d{2}$/.test(noteState?.elapsed ?? "") &&
+          noteState?.timerRunning === "true" &&
+          noteState?.nextLabel === "다음 클릭" &&
           noteState?.next?.length > 10 &&
           noteState?.rect?.height > 120 &&
           noteState?.rect?.bottom <= noteState?.stage?.bottom + 1 &&
@@ -802,6 +911,54 @@ for (const viewport of activeViewports) {
         JSON.stringify(noteState),
       );
       await save(session, "08-lecture-notes", false);
+
+      if (viewport.id === "desktop") {
+        const timerControl = value(await evaluate(session, `(async () => {
+          const deck = document.querySelector('[data-lecture-deck]');
+          const parse = (text) => text.split(':').reduce((sum, part) => sum * 60 + Number(part), 0);
+          deck.querySelector('[data-lecture-timer-toggle]').click();
+          const pausedAt = parse(deck.querySelector('[data-lecture-elapsed]').textContent.trim());
+          await new Promise((resolve) => setTimeout(resolve, 1100));
+          const pausedAfter = parse(deck.querySelector('[data-lecture-elapsed]').textContent.trim());
+          const pausedRunning = deck.dataset.timerRunning;
+          deck.querySelector('[data-lecture-timer-reset]').click();
+          await new Promise((resolve) => setTimeout(resolve, 120));
+          const resetAt = parse(deck.querySelector('[data-lecture-elapsed]').textContent.trim());
+          return { pausedAt, pausedAfter, pausedRunning, resetAt, resetRunning:deck.dataset.timerRunning };
+        })()`));
+        record(
+          "desktop 발표 시간 일시정지와 초기화",
+          timerControl?.pausedAfter === timerControl?.pausedAt &&
+            timerControl?.pausedRunning === "false" &&
+            timerControl?.resetAt <= 1 &&
+            timerControl?.resetRunning === "true",
+          JSON.stringify(timerControl),
+        );
+        const nextScenePreview = value(await evaluate(session, `(async () => {
+          const deck = document.querySelector('[data-lecture-deck]');
+          const move = (key) => new Promise((resolve) => {
+            deck.addEventListener('lectureframe', resolve, { once:true });
+            document.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles:true }));
+          });
+          for (let index = 0; index < 9; index += 1) await move('ArrowRight');
+          const state = {
+            label:deck.querySelector('[data-lecture-notes-next-label]')?.textContent.trim(),
+            next:deck.querySelector('[data-lecture-notes-next]')?.textContent.trim(),
+            progress:deck.querySelector('[data-lecture-progress]')?.textContent.trim(),
+          };
+          await move('Home');
+          await move('ArrowRight');
+          await move('ArrowRight');
+          return state;
+        })()`));
+        record(
+          "desktop 다음 장면 제목 예고",
+          nextScenePreview?.label === "다음 장면" &&
+            nextScenePreview?.next === "02. 브라우저 자동화" &&
+            nextScenePreview?.progress === "01 / 12 · 11 / 11",
+          JSON.stringify(nextScenePreview),
+        );
+      }
 
       await client.act(
         session,
@@ -873,6 +1030,10 @@ for (const viewport of activeViewports) {
             width: innerWidth,
             columns: getComputedStyle(stage).gridTemplateColumns.split(' ').filter(Boolean).length,
             rows: getComputedStyle(stage).gridTemplateRows.split(' ').filter(Boolean).length,
+            mapItems: deck?.querySelectorAll('[data-lecture-map-scene]').length,
+            elapsed: deck?.querySelector('[data-lecture-elapsed]')?.textContent.trim(),
+            timerRunning: deck?.dataset.timerRunning,
+            nextLabel: deck?.querySelector('[data-lecture-notes-next-label]')?.textContent.trim(),
             presenterHidden: hidden('[data-lecture-presenter]'),
             fullscreenHidden: hidden('[data-lecture-fullscreen]'),
             noteButtonHidden: hidden('[data-lecture-notes-toggle]'),
@@ -901,6 +1062,10 @@ for (const viewport of activeViewports) {
             /· 2 \/ 11$/.test(presenterState?.progress ?? "") &&
             presenterState?.columns === (presenterState?.width > 980 ? 2 : 1) &&
             presenterState?.rows === (presenterState?.width > 980 ? 1 : 2) &&
+            presenterState?.mapItems === 12 &&
+            /^(?:\d{2}:)?\d{2}:\d{2}$/.test(presenterState?.elapsed ?? "") &&
+            presenterState?.timerRunning === "true" &&
+            presenterState?.nextLabel === "다음 클릭" &&
             presenterState?.presenterHidden === true &&
             presenterState?.fullscreenHidden === true &&
             presenterState?.noteButtonHidden === true &&
@@ -945,6 +1110,106 @@ for (const viewport of activeViewports) {
             syncedBack?.effect === "run",
           JSON.stringify({ forward:syncedForward, back:syncedBack }),
         );
+
+        const waitMapAudience = evaluate(session, `new Promise((resolve) => {
+          const deck = document.querySelector('[data-lecture-deck]');
+          const timer = setTimeout(() => resolve(false), 3000);
+          deck.addEventListener('lectureframe', () => { clearTimeout(timer); resolve(true); }, { once:true });
+        })()`);
+        await evaluate(presenterSession, `(() => {
+          document.dispatchEvent(new KeyboardEvent('keydown', { key:'m', bubbles:true }));
+          document.querySelector('[data-lecture-map-scene="1"]').click();
+        })()`);
+        await waitMapAudience;
+        const mapSynced = {
+          audience: value(await evaluate(session, `(() => ({
+            progress:document.querySelector('[data-lecture-progress]')?.textContent.trim(),
+            title:document.querySelector('.lecture-scene.on h2')?.textContent.trim(),
+          }))()`)),
+          presenter: value(await evaluate(presenterSession, `(() => ({
+            progress:document.querySelector('[data-lecture-progress]')?.textContent.trim(),
+            title:document.querySelector('.lecture-scene.on h2')?.textContent.trim(),
+            mapHidden:document.querySelector('[data-lecture-map]')?.hidden,
+          }))()`)),
+        };
+        record(
+          `${viewport.id} 발표자 장면 지도 즉시 이동`,
+          /^02 \/ 12 · 0 \/ \d+$/.test(mapSynced.audience?.progress ?? "") &&
+            mapSynced.audience?.title === "브라우저 자동화" &&
+            mapSynced.presenter?.progress === mapSynced.audience?.progress &&
+            mapSynced.presenter?.title === mapSynced.audience?.title &&
+            mapSynced.presenter?.mapHidden === true,
+          JSON.stringify(mapSynced),
+        );
+        for (const key of ["Home", "ArrowRight", "ArrowRight"]) {
+          const waitRestore = evaluate(session, `new Promise((resolve) => {
+            const deck = document.querySelector('[data-lecture-deck]');
+            const timer = setTimeout(() => resolve(false), 3000);
+            deck.addEventListener('lectureframe', () => { clearTimeout(timer); resolve(true); }, { once:true });
+          })()`);
+          await evaluate(presenterSession, `document.dispatchEvent(new KeyboardEvent('keydown', { key:${JSON.stringify(key)}, bubbles:true }))`);
+          await waitRestore;
+        }
+
+        await evaluate(presenterSession, `document.dispatchEvent(new KeyboardEvent('keydown', { key:'b', bubbles:true }))`);
+        await evaluate(session, `new Promise((resolve) => setTimeout(resolve, 220))`);
+        const blankSynced = {
+          audience: value(await evaluate(session, `(() => ({
+            blanked:document.querySelector('[data-lecture-deck]')?.dataset.audienceBlanked,
+            hidden:document.querySelector('[data-lecture-break]')?.hidden,
+            stageInert:document.querySelector('.lecture-stage')?.hasAttribute('inert'),
+          }))()`)),
+          presenter: value(await evaluate(presenterSession, `(() => ({
+            blanked:document.querySelector('[data-lecture-deck]')?.dataset.audienceBlanked,
+            hidden:document.querySelector('[data-lecture-break]')?.hidden,
+            stageInert:document.querySelector('.lecture-stage')?.hasAttribute('inert'),
+          }))()`)),
+        };
+        await evaluate(presenterSession, `document.dispatchEvent(new KeyboardEvent('keydown', { key:'b', bubbles:true }))`);
+        await evaluate(session, `new Promise((resolve) => setTimeout(resolve, 220))`);
+        const blankRestored = value(await evaluate(session, `(() => ({
+          blanked:document.querySelector('[data-lecture-deck]')?.dataset.audienceBlanked,
+          hidden:document.querySelector('[data-lecture-break]')?.hidden,
+          stageInert:document.querySelector('.lecture-stage')?.hasAttribute('inert'),
+        }))()`));
+        record(
+          `${viewport.id} 발표자 관객 집중 화면 동기화`,
+          blankSynced.audience?.blanked === "true" &&
+            blankSynced.audience?.hidden === false &&
+            blankSynced.audience?.stageInert === true &&
+            blankSynced.presenter?.blanked === "true" &&
+            blankSynced.presenter?.hidden === true &&
+            blankSynced.presenter?.stageInert === false &&
+            blankRestored?.blanked === "false" &&
+            blankRestored?.hidden === true &&
+            blankRestored?.stageInert === false,
+          JSON.stringify({ blankSynced, blankRestored }),
+        );
+
+        await evaluate(presenterSession, `document.querySelector('[data-lecture-timer-toggle]').click()`);
+        await evaluate(session, `new Promise((resolve) => setTimeout(resolve, 620))`);
+        const timerPaused = {
+          audience: value(await evaluate(session, `(() => ({
+            running:document.querySelector('[data-lecture-deck]')?.dataset.timerRunning,
+            elapsed:document.querySelector('[data-lecture-elapsed]')?.textContent.trim(),
+          }))()`)),
+          presenter: value(await evaluate(presenterSession, `(() => ({
+            running:document.querySelector('[data-lecture-deck]')?.dataset.timerRunning,
+            elapsed:document.querySelector('[data-lecture-elapsed]')?.textContent.trim(),
+          }))()`)),
+        };
+        await evaluate(presenterSession, `document.querySelector('[data-lecture-timer-toggle]').click()`);
+        await evaluate(session, `new Promise((resolve) => setTimeout(resolve, 220))`);
+        const timerResumed = value(await evaluate(session, `document.querySelector('[data-lecture-deck]')?.dataset.timerRunning`));
+        record(
+          `${viewport.id} 발표 시간 두 창 동기화`,
+          timerPaused.audience?.running === "false" &&
+            timerPaused.presenter?.running === "false" &&
+            timerPaused.audience?.elapsed === timerPaused.presenter?.elapsed &&
+            timerResumed === "true",
+          JSON.stringify({ timerPaused, timerResumed }),
+        );
+
         await evaluate(presenterSession, `location.hash = '#lecture=s1.1'; location.reload()`, false);
         await client.act(
           presenterSession,
