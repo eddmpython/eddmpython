@@ -417,11 +417,16 @@ check("읽기 본문 하나를 장면과 비트 계약으로 투영한다", () =
   ];
   const lecture = renderLecture(body, scenes);
   assert.equal(lecture.ok, true);
+  assert.equal(COURSE_SCENE_RUNTIME, 3);
   assert.equal(lecture.html.match(/class="lecture-scene"/g)?.length, 2);
   assert.ok(lecture.html.includes('data-layout="stage"'));
   assert.ok(lecture.html.includes(`data-scene-runtime="${COURSE_SCENE_RUNTIME}"`));
   assert.ok(lecture.html.includes("data-timeline="));
   assert.ok(lecture.html.includes("data-scene-cue"));
+  assert.equal(lecture.html.match(/aria-roledescription="슬라이드"/g)?.length, 2);
+  assert.equal(lecture.html.match(/aria-hidden="true" inert/g)?.length, 2);
+  assert.ok(lecture.html.includes('aria-labelledby="lecture-s1-title"'));
+  assert.ok(lecture.html.includes('id="lecture-s1-title" tabindex="-1"'));
   assert.ok(lecture.html.includes("설명은 발표자 노트 재료입니다."));
   assert.ok(lecture.html.includes("결과를 확인합니다"));
 });

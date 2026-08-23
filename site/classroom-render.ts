@@ -101,7 +101,7 @@ export type CourseScene = {
   beats: CourseSceneBeat[];
 };
 
-export const COURSE_SCENE_RUNTIME = 2;
+export const COURSE_SCENE_RUNTIME = 3;
 
 export type CourseSceneFrame = {
   effect: CourseSceneBeat["effect"];
@@ -493,10 +493,11 @@ export function renderLecture(
     if (state.visual !== scene.visualCount) return { html: "", hasCells: false, ok: false };
     hasCells ||= html.includes('data-cell="');
     const timeline = compileSceneTimeline(scene);
+    const titleId = `lecture-${scene.id}-title`;
     rendered.push(`<section class="lecture-scene" data-scene-runtime="${COURSE_SCENE_RUNTIME}" data-scene="${esc(scene.id)}" data-role="${esc(
       scene.role,
-    )}" data-layout="${esc(scene.layout)}" data-beats="${esc(JSON.stringify(scene.beats))}" data-timeline="${esc(JSON.stringify(timeline))}" aria-hidden="true">
-  <header class="scene-head"><div class="scene-meta"><span class="scene-index">${String(index + 1).padStart(2, "0")}</span><span class="scene-cue" data-scene-cue></span></div><div><h2>${esc(
+    )}" data-layout="${esc(scene.layout)}" data-beats="${esc(JSON.stringify(scene.beats))}" data-timeline="${esc(JSON.stringify(timeline))}" role="group" aria-roledescription="슬라이드" aria-labelledby="${esc(titleId)}" aria-hidden="true" inert>
+  <header class="scene-head"><div class="scene-meta"><span class="scene-index">${String(index + 1).padStart(2, "0")}</span><span class="scene-cue" data-scene-cue></span></div><div><h2 id="${esc(titleId)}" tabindex="-1">${esc(
     section.title,
   )}</h2><p>${esc(section.subtitle)}</p></div></header>
   <div class="scene-canvas">${html}</div>
