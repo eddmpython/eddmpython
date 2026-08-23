@@ -964,10 +964,16 @@ for (const viewport of VIEWPORTS) {
       { timeoutMs: 30000 },
     );
     const focusState = value(await evaluate(session, `(() => {
+      const deck = document.querySelector('[data-lecture-deck]');
+      const bar = deck?.querySelector('.lecture-bar');
+      const foot = deck?.querySelector('.lecture-foot');
       const scene = document.querySelector('.lecture-scene.on');
       const visual = scene?.querySelector('[data-scene-focus="true"]');
       const title = scene?.querySelector('.scene-head > div:last-child');
       const callout = scene?.querySelector('[data-scene-callout]');
+      const deckRect = deck?.getBoundingClientRect();
+      const barRect = bar?.getBoundingClientRect();
+      const footRect = foot?.getBoundingClientRect();
       return {
         effect: scene?.dataset.sceneEffect,
         cue: scene?.querySelector('[data-scene-cue]')?.textContent.trim(),
@@ -976,6 +982,19 @@ for (const viewport of VIEWPORTS) {
         filter: visual ? getComputedStyle(visual).filter : null,
         titleOpacity: title ? Number(getComputedStyle(title).opacity) : null,
         callout: callout?.textContent.trim(),
+        shell: {
+          scrollX: window.scrollX,
+          deckTop: Math.round(deckRect?.top ?? -1),
+          deckLeft: Math.round(deckRect?.left ?? -1),
+          deckWidth: Math.round(deckRect?.width ?? -1),
+          deckHeight: Math.round(deckRect?.height ?? -1),
+          barTop: Math.round(barRect?.top ?? -1),
+          barLeft: Math.round(barRect?.left ?? -1),
+          barWidth: Math.round(barRect?.width ?? -1),
+          footBottom: Math.round(footRect?.bottom ?? -1),
+          viewportWidth: window.innerWidth,
+          viewportHeight: window.innerHeight,
+        },
       };
     })()`));
     record(
@@ -986,7 +1005,16 @@ for (const viewport of VIEWPORTS) {
         focusState?.focused === 1 &&
         focusState?.filter !== "none" &&
         focusState?.titleOpacity <= 0.5 &&
-        focusState?.callout === "",
+        focusState?.callout === "" &&
+        focusState?.shell?.scrollX === 0 &&
+        focusState?.shell?.deckTop === 0 &&
+        focusState?.shell?.deckLeft === 0 &&
+        focusState?.shell?.deckWidth === focusState?.shell?.viewportWidth &&
+        focusState?.shell?.deckHeight === focusState?.shell?.viewportHeight &&
+        focusState?.shell?.barTop === 0 &&
+        focusState?.shell?.barLeft === 0 &&
+        focusState?.shell?.barWidth === focusState?.shell?.viewportWidth &&
+        focusState?.shell?.footBottom === focusState?.shell?.viewportHeight,
       JSON.stringify(focusState),
     );
     await save(session, "11-lecture-focus", false);
