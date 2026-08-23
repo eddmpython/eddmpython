@@ -10,7 +10,14 @@
  *
  * 4번이 이 파일이 존재하는 이유다. 클라이언트에서 거르면 개발자 도구로 앞 내용을 먼저 본다.
  */
-import { esc, renderLecture, renderPost, type Cells, type CourseScene } from "./classroom-render";
+import {
+  COURSE_SCENE_RUNTIME,
+  esc,
+  renderLecture,
+  renderPost,
+  type Cells,
+  type CourseScene,
+} from "./classroom-render";
 // 심볼 좌표와 SNS 주소는 랜딩과 같은 정본을 읽는다. brand.ts 는 React 를 부르지 않는다.
 import { SYMBOL, BRAND, TOKENS, cssVars } from "./src/brand";
 import { SOCIAL } from "./src/social";
@@ -44,7 +51,7 @@ type CourseBundle = { schema: number; sceneContract?: number; categories: Course
  * 2 는 카테고리 성과(goal)가 붙은 판이고 1 은 그 전 판이다.
  */
 const COURSE_SCHEMA = new Set([1, 2, 3, 4]);
-const COURSE_SCENE_CONTRACT = 1;
+const COURSE_SCENE_CONTRACTS = new Set([1, 2]);
 
 export type CourseState = { ok: boolean; categories: CourseCategory[] };
 
@@ -57,10 +64,19 @@ const isPost = (p: unknown): p is CoursePost =>
 const sceneRoles = new Set(["open", "explain", "invert", "close"]);
 const sceneLayouts = new Set(["stage", "sequence", "compare", "code", "demo"]);
 const sceneEffects = new Set(["enter", "replace", "focus", "compare", "annotate", "run", "simulate"]);
+const sceneEffectRules = {
+  enter: { count: 1, requiresVisible: false, visibility: "append" },
+  replace: { count: 1, requiresVisible: false, visibility: "replace" },
+  focus: { count: 1, requiresVisible: true, visibility: "keep" },
+  compare: { count: 2, requiresVisible: false, visibility: "replace" },
+  annotate: { count: 1, requiresVisible: true, visibility: "keep" },
+  run: { count: 1, requiresVisible: true, visibility: "keep" },
+  simulate: { count: 1, requiresVisible: true, visibility: "keep" },
+} as const;
 const isScene = (value: unknown): value is CourseScene => {
   if (!value || typeof value !== "object") return false;
   const scene = value as CourseScene;
-  return (
+  const shapeOk = (
     typeof scene.id === "string" &&
     sceneRoles.has(scene.role) &&
     sceneLayouts.has(scene.layout) &&
@@ -74,9 +90,20 @@ const isScene = (value: unknown): value is CourseScene => {
         Array.isArray(beat.targets) &&
         beat.targets.length > 0 &&
         beat.targets.every((target) => Number.isInteger(target) && target > 0 && target <= scene.visualCount) &&
-        (beat.note === undefined || typeof beat.note === "string"),
+        (beat.note === undefined || typeof beat.note === "string") &&
+        (beat.effect === "annotate" ? Boolean(beat.note?.trim()) : beat.note === undefined),
     )
   );
+  if (!shapeOk || !["enter", "replace"].includes(scene.beats[0]?.effect)) return false;
+  const visible = new Set<number>();
+  for (const beat of scene.beats) {
+    const rule = sceneEffectRules[beat.effect];
+    if (beat.targets.length !== rule.count) return false;
+    if (rule.requiresVisible && beat.targets.some((target) => !visible.has(target))) return false;
+    if (rule.visibility === "replace") visible.clear();
+    if (rule.visibility !== "keep") beat.targets.forEach((target) => visible.add(target));
+  }
+  return true;
 };
 
 /**
@@ -106,7 +133,7 @@ async function course(env: Env): Promise<CourseState> {
   if (!bundle || !COURSE_SCHEMA.has(bundle.schema) || !Array.isArray(bundle.categories)) {
     return { ok: false, categories: [] };
   }
-  if (bundle.schema === 4 && bundle.sceneContract !== COURSE_SCENE_CONTRACT) {
+  if (bundle.schema === 4 && !COURSE_SCENE_CONTRACTS.has(bundle.sceneContract ?? 0)) {
     return { ok: false, categories: [] };
   }
   const categories = bundle.categories
@@ -786,6 +813,9 @@ article a:hover { border-bottom-color:var(--eddm-sand); }
 .lecture-deck[hidden] { display:none; }
 .lecture-deck { position:fixed; inset:0; z-index:100; display:grid; grid-template-rows:auto minmax(0,1fr) auto;
   --eddm-lecture-progress:0%;
+  --lecture-stage-max:100rem; --lecture-visual-max:82rem; --lecture-visual-height:62vh;
+  --lecture-gutter-block:clamp(1.35rem,3vw,3rem); --lecture-gutter-inline:clamp(1rem,5vw,5rem);
+  --lecture-motion:220ms;
   width:100vw; height:100vh; max-width:none; max-height:none; margin:0; padding:0;
   overflow:hidden; background:var(--eddm-carbon); color:var(--eddm-ivory); }
 .lecture-deck::before { content:""; position:absolute; z-index:0; inset:0; pointer-events:none;
@@ -823,25 +853,32 @@ body.lecture-on { overflow:hidden; }
   grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1fr); }
 .lecture-stage > .lecture-scene { grid-column:1; grid-row:1; min-height:0; }
 .lecture-scene { display:none; position:relative; width:100%; height:100%;
-  box-sizing:border-box; padding:clamp(1.35rem,3vw,3rem) clamp(1rem,5vw,5rem);
+  box-sizing:border-box; padding:var(--lecture-gutter-block) var(--lecture-gutter-inline); contain:layout style;
   grid-template-areas:"head" "canvas" "callout";
   grid-template-rows:auto minmax(0,1fr) auto; gap:clamp(1rem,2vh,1.75rem); }
 .lecture-scene.on { display:grid; }
 .scene-head { grid-area:head; position:relative; z-index:2; display:grid; grid-template-columns:auto minmax(0,1fr);
-  align-items:start; gap:.75rem 1rem; max-width:100rem;
+  align-items:start; gap:.75rem 1rem; max-width:var(--lecture-stage-max);
   width:100%; margin:0 auto; }
-.scene-head > span { display:flex; align-items:center; gap:.55rem; padding-top:.42rem;
+.scene-meta { display:grid; justify-items:start; gap:.45rem; width:4.5rem; min-width:4.5rem; padding-top:.42rem; }
+.scene-index { display:flex; align-items:center; gap:.55rem;
   color:var(--eddm-sand); font-size:.74rem; font-weight:650; letter-spacing:.12em; font-variant-numeric:tabular-nums; }
-.scene-head > span::after { content:""; width:2.4rem; height:1px; background:var(--eddm-accent-line); }
+.scene-index::after { content:""; width:2.4rem; height:1px; background:var(--eddm-accent-line); }
+.scene-cue { width:4.5rem; min-height:.85rem; color:var(--eddm-text-faint); font-size:.65rem; font-weight:650;
+  letter-spacing:.08em; white-space:nowrap; opacity:0; transform:translateY(-2px);
+  transition:opacity var(--lecture-motion) ease,transform var(--lecture-motion) ease; }
+.scene-cue:not(:empty) { color:var(--eddm-sand); opacity:.82; transform:none; }
 .scene-head > div { min-width:0; }
+.scene-head > div:last-child { opacity:1; transition:opacity var(--lecture-motion) ease; }
 .scene-head h2 { margin:0; font-size:clamp(2.15rem,3.5vw,4.1rem); line-height:1.05;
   letter-spacing:-.045em; text-wrap:balance; }
 .scene-head p { max-width:72rem; margin:.7rem 0 0; color:var(--eddm-text-muted);
   font-size:clamp(1.15rem,1.6vw,2rem); line-height:1.45; text-wrap:balance; }
 .lecture-scene[data-scene-empty="true"] { grid-template-rows:minmax(0,1fr); }
 .lecture-scene[data-scene-empty="true"] .scene-head { align-self:center; max-width:82rem; }
-.lecture-scene[data-scene-empty="true"] .scene-head > span { padding-top:.65rem; font-size:.82rem; }
-.lecture-scene[data-scene-empty="true"] .scene-head > span::after { width:4rem; }
+.lecture-scene[data-scene-empty="true"] .scene-meta { padding-top:.65rem; }
+.lecture-scene[data-scene-empty="true"] .scene-index { font-size:.82rem; }
+.lecture-scene[data-scene-empty="true"] .scene-index::after { width:4rem; }
 .lecture-scene[data-scene-empty="true"] .scene-head h2 { max-width:68rem;
   font-size:clamp(3.4rem,6.2vw,7.25rem); line-height:.98; letter-spacing:-.058em; }
 .lecture-scene[data-scene-empty="true"] .scene-head p { max-width:58rem; margin-top:1.35rem;
@@ -850,24 +887,36 @@ body.lecture-on { overflow:hidden; }
 .lecture-scene[data-scene-empty="true"] .scene-callout { display:none; }
 .scene-canvas { grid-area:canvas; align-self:stretch; display:grid; grid-template-columns:minmax(0,1fr);
   align-items:center; align-content:center; justify-items:center; gap:clamp(.8rem,2vw,1.6rem);
-  width:min(100rem,100%); min-height:0; margin:0 auto; }
+  width:min(var(--lecture-stage-max),100%); min-height:0; margin:0 auto; contain:layout style; }
 .scene-canvas > p:not(.lb), .scene-canvas > ul, .scene-canvas > ol { display:none; }
 .scene-canvas .slider { display:contents; }
 .scene-canvas .lb, .scene-canvas h4 { display:none; grid-column:1/-1; justify-self:start; margin:0;
   padding:0 0 .45rem; border-bottom:1px solid var(--eddm-accent-line); color:var(--eddm-sand);
   font-size:clamp(.86rem,1vw,1.05rem); font-weight:650; }
 .scene-canvas [data-scene-label-visible="true"] { display:flex; }
-.scene-canvas [data-visual] { display:none; justify-self:center; max-width:100%; max-height:100%; margin:0; opacity:1; }
-.scene-canvas [data-visual][data-scene-visible="true"] { display:block; animation:scene-enter .28s ease-out both; }
+.scene-canvas [data-visual] { display:none; justify-self:center; max-width:100%; max-height:100%; margin:0; opacity:1;
+  transition:opacity var(--lecture-motion) ease,filter var(--lecture-motion) ease,box-shadow var(--lecture-motion) ease; }
+.scene-canvas [data-visual][data-scene-visible="true"] { display:block; animation:scene-enter var(--lecture-motion) cubic-bezier(.2,.7,.2,1) both; }
 .scene-canvas figure.media[data-scene-visible="true"] { display:grid; }
 .scene-canvas [data-visual][data-scene-effect="replace"] { animation-name:scene-replace; }
-.scene-canvas [data-visual][data-scene-effect="focus"] { filter:drop-shadow(0 0 1rem var(--eddm-accent-line)); }
+.scene-canvas [data-visual][data-scene-effect="compare"] { animation-name:scene-pair; }
+.scene-canvas [data-visual][data-scene-active="true"] { will-change:transform,opacity; }
+.scene-canvas [data-visual][data-scene-focus="true"] {
+  filter:drop-shadow(0 0 1.35rem var(--eddm-accent-line)) brightness(1.06); }
 .scene-canvas [data-visual][data-scene-dim="true"] { opacity:.18; filter:saturate(.55); }
-.scene-canvas [data-visual][data-scene-live="true"] { outline:3px solid var(--eddm-sand); outline-offset:4px; }
+.scene-canvas [data-visual][data-scene-live="true"] { outline:2px solid var(--eddm-sand); outline-offset:5px;
+  box-shadow:0 0 0 1px var(--eddm-accent-line); }
+.scene-canvas figure[data-visual][data-scene-live="true"] { outline:0; box-shadow:none; }
+.scene-canvas figure[data-visual][data-scene-live="true"] > img,
+.scene-canvas figure[data-visual][data-scene-live="true"] > video,
+.scene-canvas figure[data-visual][data-scene-live="true"] > iframe,
+.scene-canvas figure[data-visual][data-scene-live="true"] > .frame {
+  outline:2px solid var(--eddm-sand); outline-offset:5px; box-shadow:0 0 0 1px var(--eddm-accent-line); }
+.lecture-scene[data-scene-effect="focus"] .scene-head > div:last-child { opacity:.42; }
 .scene-canvas figure.media img, .scene-canvas .yt,
-.scene-canvas .course-embed, .scene-canvas iframe { max-height:62vh; max-width:100%; margin:0 auto; }
-.scene-canvas figure.media video { max-height:45vh; max-width:100%; margin:0 auto; }
-.scene-canvas figure.media, .scene-canvas .yt, .scene-canvas .course-embed { width:82rem; max-width:100%; }
+.scene-canvas .course-embed, .scene-canvas iframe { max-height:var(--lecture-visual-height); max-width:100%; margin:0 auto; }
+.scene-canvas figure.media video { max-height:40vh; max-width:100%; margin:0 auto; }
+.scene-canvas figure.media, .scene-canvas .yt, .scene-canvas .course-embed { width:var(--lecture-visual-max); max-width:100%; }
 .scene-canvas figure.media img, .scene-canvas figure.media video {
   width:auto; height:auto; max-width:100%; justify-self:center;
   object-fit:contain; object-position:center; border:1px solid var(--eddm-line-strong); border-radius:.5rem;
@@ -880,22 +929,22 @@ html[data-theme="light"] .scene-canvas figure.media video {
 .scene-canvas figure.media figcaption, .scene-canvas .yt figcaption, .scene-canvas .course-embed figcaption {
   margin-top:.65rem; color:var(--eddm-text-muted); font-size:clamp(.86rem,1vw,1.05rem); line-height:1.45; }
 .scene-canvas figure.media figcaption { width:max-content; max-width:100%; text-align:center; }
-.scene-canvas pre { width:82rem; max-width:100%; max-height:62vh; overflow:auto; margin:0; padding:clamp(1.15rem,2.2vw,2.25rem);
+.scene-canvas pre { width:var(--lecture-visual-max); max-width:100%; max-height:var(--lecture-visual-height); overflow:auto; margin:0; padding:clamp(1.15rem,2.2vw,2.25rem);
   border:1px solid var(--eddm-line-strong); border-radius:.5rem;
   background:color-mix(in srgb,var(--eddm-ink) 94%,var(--eddm-sand)); color:var(--eddm-ivory);
   box-shadow:0 1.1rem 3rem color-mix(in srgb,var(--eddm-ink) 38%,transparent);
   font-family:${TOKENS.font.mono}; font-size:clamp(.95rem,1.35vw,1.4rem); line-height:1.6; white-space:pre; }
 html[data-theme="light"] .scene-canvas pre {
   box-shadow:0 1.1rem 3rem color-mix(in srgb,var(--eddm-ivory) 14%,transparent); }
-.scene-canvas .table-wrap { width:82rem; max-width:100%; max-height:62vh; overflow:auto;
+.scene-canvas .table-wrap { width:var(--lecture-visual-max); max-width:100%; max-height:var(--lecture-visual-height); overflow:auto;
   border:1px solid var(--eddm-line-strong); border-radius:.5rem; background:var(--eddm-raise); }
 .scene-canvas table { width:100%; border-collapse:collapse; }
 .scene-canvas th, .scene-canvas td { padding:.85rem 1rem; border-bottom:1px solid var(--eddm-line-base);
   text-align:left; font-size:clamp(.9rem,1.1vw,1.15rem); line-height:1.45; }
 .scene-canvas th { background:var(--eddm-hover); color:var(--eddm-ivory); }
 .scene-canvas td { color:var(--eddm-text); }
-.scene-canvas .cell { width:82rem; max-width:100%; max-height:62vh; overflow:auto; margin:0; }
-.scene-canvas .course-embed { width:82rem; max-width:100%; }
+.scene-canvas .cell { width:var(--lecture-visual-max); max-width:100%; max-height:var(--lecture-visual-height); overflow:auto; margin:0; }
+.scene-canvas .course-embed { width:var(--lecture-visual-max); max-width:100%; }
 .course-embed iframe { display:block; width:100%; aspect-ratio:var(--course-embed-ratio,16/9); border:0; border-radius:.65rem;
   background:var(--eddm-raise); }
 .course-embed figcaption { margin-top:.55rem; color:var(--eddm-text-muted); }
@@ -914,11 +963,16 @@ html[data-theme="light"] .scene-canvas pre {
 .lecture-scene[data-active-layout="compare"] .scene-canvas [data-visual][data-scene-slot="2"] {
   grid-column:2; grid-row:2; }
 .lecture-scene[data-layout="sequence"] .scene-canvas { grid-template-columns:minmax(0,1fr); }
-.lecture-scene[data-layout="code"] .scene-canvas pre { width:92rem; max-width:100%; }
-.lecture-scene[data-layout="demo"] .scene-canvas [data-visual] { width:88rem; max-width:100%; }
-.scene-callout { grid-area:callout; min-height:1.8rem; max-width:76rem; margin:0 auto; padding:.25rem 0 .25rem 1rem;
-  border-left:2px solid transparent; color:transparent; font-size:clamp(1rem,1.2vw,1.35rem); line-height:1.5; }
-.scene-callout.on { border-left-color:var(--eddm-sand); color:var(--eddm-ivory); }
+.lecture-scene[data-layout="code"] { --lecture-visual-max:92rem; }
+.lecture-scene[data-layout="demo"] { --lecture-visual-max:88rem; }
+.lecture-scene[data-layout="demo"] .scene-canvas [data-visual] { width:var(--lecture-visual-max); max-width:100%; }
+.scene-callout { grid-area:callout; display:flex; align-items:center; width:min(76rem,100%);
+  height:clamp(3.4rem,6vh,4.4rem); min-height:0; box-sizing:border-box; overflow:auto;
+  margin:0 auto; padding:.25rem 0 .25rem 1rem;
+  border-left:2px solid transparent; color:transparent; font-size:clamp(1rem,1.2vw,1.35rem); line-height:1.5;
+  transform:translateY(4px); }
+.scene-callout.on { border-left-color:var(--eddm-sand); color:var(--eddm-ivory);
+  animation:scene-callout var(--lecture-motion) ease-out both; }
 .lecture-notes { grid-column:2; grid-row:1; z-index:3; min-width:0; max-height:100%; overflow:auto;
   height:100%; box-sizing:border-box; padding:clamp(1.25rem,2vw,2rem); border-left:1px solid var(--eddm-line-base);
   background:color-mix(in srgb,var(--eddm-ink) 96%,var(--eddm-carbon)); }
@@ -938,8 +992,10 @@ html[data-theme="light"] .scene-canvas pre {
   background:color-mix(in srgb,var(--eddm-carbon) 94%,transparent); }
 .lecture-help { color:var(--eddm-text-faint); font-size:.72rem; letter-spacing:.01em; }
 .lecture-nav { display:flex; gap:.45rem; }
-@keyframes scene-enter { from { opacity:0; transform:translateY(12px) scale(.985); } to { opacity:1; transform:none; } }
-@keyframes scene-replace { from { opacity:0; transform:translateX(18px); } to { opacity:1; transform:none; } }
+@keyframes scene-enter { from { opacity:0; transform:translateY(10px) scale(.988); } to { opacity:1; transform:none; } }
+@keyframes scene-replace { from { opacity:0; transform:translateX(14px); } to { opacity:1; transform:none; } }
+@keyframes scene-pair { from { opacity:0; transform:scale(.992); } to { opacity:1; transform:none; } }
+@keyframes scene-callout { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
 @media (min-width:981px) {
   .lecture-scene[data-scene-empty="false"][data-layout="stage"],
   .lecture-scene[data-scene-empty="false"][data-layout="code"],
@@ -973,6 +1029,7 @@ html[data-theme="light"] .scene-canvas pre {
     border-width:1px 0 0; box-shadow:0 -1.25rem 3rem color-mix(in srgb,var(--eddm-ink) 58%,transparent); }
 }
 @media (max-width:720px) {
+  .lecture-deck { --lecture-gutter-block:1rem; --lecture-gutter-inline:.85rem; --lecture-visual-height:48vh; }
   .lecture-bar { grid-template-columns:minmax(0,1fr) auto; min-height:4rem; padding:.45rem .75rem; }
   .lecture-symbol-wrap { width:2rem; height:2rem; }
   .lecture-brand-copy b { font-size:.67rem; }
@@ -981,14 +1038,16 @@ html[data-theme="light"] .scene-canvas pre {
     font-size:.68rem; }
   .lecture-actions button { width:2.3rem; min-width:2.3rem; height:2.3rem; padding:0; }
   .lecture-actions button span { display:none; }
-  .lecture-scene { padding:1rem .85rem; gap:.7rem; }
+  .lecture-scene { gap:.7rem; }
   .scene-head { gap:.55rem .7rem; }
-  .scene-head > span { padding-top:.32rem; font-size:.68rem; }
-  .scene-head > span::after { width:1.4rem; }
+  .scene-meta { width:3.4rem; min-width:3.4rem; padding-top:.32rem; gap:.28rem; }
+  .scene-index { font-size:.68rem; }
+  .scene-index::after { width:1.4rem; }
+  .scene-cue { width:3.4rem; font-size:.58rem; letter-spacing:.04em; }
   .scene-head h2 { font-size:clamp(1.55rem,7vw,2.25rem); }
   .scene-head p { margin-top:.45rem; font-size:.95rem; line-height:1.45; }
   .lecture-scene[data-scene-empty="true"] .scene-head { gap:.8rem; }
-  .lecture-scene[data-scene-empty="true"] .scene-head > span { padding-top:.5rem; }
+  .lecture-scene[data-scene-empty="true"] .scene-meta { padding-top:.5rem; }
   .lecture-scene[data-scene-empty="true"] .scene-head h2 { font-size:clamp(2.7rem,14vw,4.4rem); }
   .lecture-scene[data-scene-empty="true"] .scene-head p { margin-top:.85rem; font-size:1rem; }
   .lecture-scene[data-active-layout="compare"] .scene-canvas { grid-template-columns:minmax(0,1fr); }
@@ -1002,6 +1061,7 @@ html[data-theme="light"] .scene-canvas pre {
     grid-column:1; grid-row:4; }
   .lecture-scene[data-active-layout="compare"] .scene-canvas pre { height:clamp(7rem,17vh,9rem); padding:.75rem;
     font-size:.7rem; line-height:1.5; }
+  .lecture-scene[data-layout="code"] .scene-canvas pre { white-space:pre-wrap; overflow-wrap:anywhere; }
   .lecture-help { display:none; }
   .lecture-foot { min-height:3.4rem; padding:.45rem .75rem; justify-content:flex-end; }
   .lecture-foot button { height:2.45rem; }
@@ -1010,6 +1070,8 @@ html[data-theme="light"] .scene-canvas pre {
 }
 @media (prefers-reduced-motion:reduce) {
   .scene-canvas [data-visual][data-scene-visible="true"] { animation:none; }
+  .scene-callout.on { animation:none; transform:none; }
+  .scene-cue { transition:none; transform:none; }
 }
 `;
 
@@ -1248,6 +1310,7 @@ const LECTURE_SCRIPT = `
   if (!deck || !openButton) return;
   const scenes = [...deck.querySelectorAll(".lecture-scene")];
   if (!scenes.length) return;
+  if (scenes.some((scene) => scene.dataset.sceneRuntime !== deck.dataset.lectureRuntime)) return;
   const progress = deck.querySelector("[data-lecture-progress]");
   const notes = deck.querySelector("[data-lecture-notes]");
   const notesMeta = deck.querySelector("[data-lecture-notes-meta]");
@@ -1263,15 +1326,48 @@ const LECTURE_SCRIPT = `
     try { return JSON.parse(scene.dataset.beats || "[]"); }
     catch { return []; }
   };
-  const targetsOf = (scene, beat) => beat.targets.map((n) => scene.querySelector('[data-visual="' + n + '"]')).filter(Boolean);
-  const allVisuals = (scene) => [...scene.querySelectorAll("[data-visual]")];
+  const framesOf = (scene) => {
+    try { return JSON.parse(scene.dataset.timeline || "[]"); }
+    catch { return []; }
+  };
+  const visualCatalog = new Map(scenes.map((scene) => {
+    const visuals = [...scene.querySelectorAll("[data-visual]")];
+    return [scene, { visuals, byId: new Map(visuals.map((visual) => [Number(visual.dataset.visual), visual])) }];
+  }));
+  const targetsOf = (scene, beat) => beat.targets.map((n) => visualCatalog.get(scene)?.byId.get(n)).filter(Boolean);
+  const allVisuals = (scene) => visualCatalog.get(scene)?.visuals || [];
+  const flag = (node, name, on, value = "true") => {
+    if (on) {
+      if (node.dataset[name] !== value) node.dataset[name] = value;
+    } else if (node.dataset[name] !== undefined) delete node.dataset[name];
+  };
   const hideAll = (scene) => allVisuals(scene).forEach((visual) => {
     delete visual.dataset.sceneVisible;
     delete visual.dataset.sceneEffect;
+    delete visual.dataset.sceneActive;
+    delete visual.dataset.sceneFocus;
     delete visual.dataset.sceneDim;
     delete visual.dataset.sceneLive;
     delete visual.dataset.sceneSlot;
   });
+  const prime = (scene) => {
+    if (!scene) return;
+    scene.querySelectorAll("img").forEach((img) => {
+      img.loading = "eager";
+      img.decode?.().catch(() => {});
+    });
+  };
+  let paintFrame = 0;
+  const markPaint = () => {
+    deck.dataset.scenePhase = "painting";
+    cancelAnimationFrame(paintFrame);
+    paintFrame = requestAnimationFrame(() => {
+      paintFrame = requestAnimationFrame(() => {
+        deck.dataset.scenePhase = "ready";
+        deck.dispatchEvent(new CustomEvent("lectureframe", { detail: { scene: sceneAt, beat: beatAt } }));
+      });
+    });
+  };
 
   const noteCatalog = new Map();
   scenes.forEach((scene) => {
@@ -1350,47 +1446,46 @@ const LECTURE_SCRIPT = `
   const apply = (fire = false) => {
     const scene = scenes[sceneAt];
     const beats = beatsOf(scene);
-    hideAll(scene);
-    delete scene.dataset.activeLayout;
+    const frames = framesOf(scene);
+    const frame = beatAt >= 0 ? frames[beatAt] : null;
+    const visible = new Set(frame?.visible || []);
+    const focused = new Set(frame?.focus || []);
+    const active = new Set(frame?.targets || []);
+    const interacting = new Set(frame?.interaction || []);
+    const compare = frame?.compare || [];
+    const cue = scene.querySelector("[data-scene-cue]");
+    flag(scene, "activeLayout", compare.length === 2, "compare");
+    flag(scene, "sceneEffect", Boolean(frame), frame?.effect || "");
+    if (cue) cue.textContent = frame?.cue || "";
+    allVisuals(scene).forEach((visual) => {
+      const id = Number(visual.dataset.visual);
+      const isVisible = visible.has(id);
+      const isActive = active.has(id);
+      flag(visual, "sceneVisible", isVisible);
+      flag(visual, "sceneActive", isActive);
+      flag(visual, "sceneFocus", focused.has(id));
+      flag(visual, "sceneDim", focused.size > 0 && isVisible && !focused.has(id));
+      flag(visual, "sceneLive", interacting.has(id));
+      flag(visual, "sceneEffect", isActive, frame?.effect || "");
+      const slot = compare.indexOf(id);
+      flag(visual, "sceneSlot", slot >= 0, String(slot + 1));
+    });
     const callout = scene.querySelector("[data-scene-callout]");
-    callout.textContent = "";
-    callout.classList.remove("on");
-    for (let i = 0; i <= beatAt; i += 1) {
-      const beat = beats[i];
-      if (!beat) continue;
-      const targets = targetsOf(scene, beat);
-      allVisuals(scene).forEach((visual) => delete visual.dataset.sceneDim);
-      if (beat.effect === "replace" || beat.effect === "compare") hideAll(scene);
-      if (beat.effect === "replace") delete scene.dataset.activeLayout;
-      targets.forEach((visual) => {
-        visual.dataset.sceneVisible = "true";
-        visual.dataset.sceneEffect = beat.effect;
-      });
-      if (beat.effect === "focus") {
-        allVisuals(scene).filter((visual) => visual.dataset.sceneVisible === "true" && !targets.includes(visual))
-          .forEach((visual) => { visual.dataset.sceneDim = "true"; });
-      }
-      if (beat.effect === "compare") {
-        scene.dataset.activeLayout = "compare";
-        targets.forEach((visual, index) => { visual.dataset.sceneSlot = String(index + 1); });
-      }
-      if (beat.effect === "annotate") {
-        callout.textContent = beat.note || "";
-        callout.classList.toggle("on", Boolean(beat.note));
-      }
-      if (fire && i === beatAt && (beat.effect === "run" || beat.effect === "simulate")) {
-        targets.forEach((visual) => trigger(visual, beat.effect));
-      }
+    callout.textContent = frame?.annotation || "";
+    callout.classList.toggle("on", Boolean(frame?.annotation));
+    if (fire && frame && (frame.effect === "run" || frame.effect === "simulate")) {
+      targetsOf(scene, frame).forEach((visual) => trigger(visual, frame.effect));
     }
     syncLabels(scene);
     const shown = Math.max(0, beatAt + 1);
-    scene.dataset.sceneEmpty = allVisuals(scene).some((visual) => visual.dataset.sceneVisible === "true") ? "false" : "true";
+    scene.dataset.sceneEmpty = visible.size ? "false" : "true";
     const ratio = Math.min(1, (sceneAt + (beats.length ? shown / beats.length : 0)) / scenes.length);
     deck.style.setProperty("--eddm-lecture-progress", (ratio * 100).toFixed(2) + "%");
     progress.textContent = String(sceneAt + 1).padStart(2, "0") + " / " + String(scenes.length).padStart(2, "0") + " · " + shown + " / " + beats.length;
     progress.setAttribute("aria-valuenow", String(Math.round(ratio * 100)));
     history.replaceState(null, "", "#lecture=" + scene.dataset.scene + "." + shown);
     if (!notes.hidden) fillNotes();
+    markPaint();
   };
 
   const showScene = (nextScene, nextBeat = -1, fire = false) => {
@@ -1402,6 +1497,8 @@ const LECTURE_SCRIPT = `
       scene.setAttribute("aria-hidden", index === sceneAt ? "false" : "true");
       if (index !== sceneAt) hideAll(scene);
     });
+    prime(scenes[sceneAt]);
+    prime(scenes[sceneAt + 1]);
     apply(fire);
   };
 
@@ -1957,7 +2054,7 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
         : "";
 
     const lectureUi = lecture.ok
-      ? `<div class="lecture-deck" data-lecture-deck role="dialog" aria-modal="true" aria-label="${esc(
+      ? `<div class="lecture-deck" data-lecture-deck data-lecture-runtime="${COURSE_SCENE_RUNTIME}" role="dialog" aria-modal="true" aria-label="${esc(
           post.title,
         )} 강의 모드" hidden>
            <header class="lecture-bar">

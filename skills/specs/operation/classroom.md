@@ -75,7 +75,7 @@ status: observed
   중앙에 배치한다
 - `stage`, `code`, 비교 전 `compare`, 마지막 `close`는 데스크톱에서 제목과 시각물을 좌우로
   나눈다. `sequence`와 `demo`는 제목 아래에 넓은 시각물을 둔다
-- `compare` 장면은 `compare` 효과가 대상 둘 이상을 실제로 보여 줄 때만 데스크톱에서 두 칸이 된다
+- `compare` 장면은 `compare` 효과가 대상 두 개를 실제로 보여 줄 때만 데스크톱에서 두 칸이 된다
 - `compare`의 두 시각물은 같은 높이의 프레임으로 맞추고 긴 코드는 가로 스크롤 대신 프레임 안에서 줄바꿈한다
 - 발표자 노트는 데스크톱에서 오른쪽 열로 열어 무대를 덮지 않는다. 모바일에서는 아래 패널로 열고,
   현재 장면과 클릭 위치, 지금 설명할 문단, 다음 클릭의 대상과 동작을 보여 준다
@@ -87,6 +87,34 @@ status: observed
 허용 형식과 번호 검사는 `scripts/course-scene.mjs`가 기계 정본이다. 이 저장소는
 `site/classroom.ts`에서 검사가 끝난 `enter`, `replace`, `focus`, `compare`, `annotate`,
 `run`, `simulate`만 실행한다. 교안이 임의 JavaScript나 CSS 선택자를 실행 효과로 보내지 못한다.
+
+장면 계약 2부터 효과는 이름뿐 아니라 대상 수, 선행 가시성, 실행 가능한 시각물과 클릭 뒤 화면
+결과를 함께 검사한다. `enter`, `replace`, `focus`, `annotate`, `run`, `simulate`는 대상 하나를
+받고 `compare`는 대상 두 개를 받는다. `focus`, `annotate`, `run`, `simulate`의 대상은 앞 beat에서
+이미 보여야 한다. `run`은 영상과 실행 칸, `simulate`는 실행 칸과 격리된 HTML 렌더러에만 쓴다.
+
+화면 배선은 다음 소유권을 지킨다.
+
+```text
+course-scene 선언
+  -> 비공개 발행기: 역할, 레이아웃, beat 검증과 KV 발행
+  -> classroom-render.ts: Markdown 시각물과 클릭별 완성 프레임 생성
+  -> classroom.ts 브라우저 런타임: 현재 프레임 하나를 DOM 속성으로 투영
+  -> classroom.ts CSS: 위치, 강조, 비교, 주석, 실행 상태를 화면에 표시
+```
+
+`site/classroom-render.ts`의 `compileSceneTimeline()`이 보이는 시각물, 초점 대상, 비교 슬롯, 주석,
+조작 대상과 학습자용 안내를 beat마다 미리 계산한다. 브라우저는 클릭할 때 첫 beat부터 다시 재생하지
+않는다. 현재 프레임 하나만 적용하므로 이전 주석이 다음 화면에 남지 않고 beat 수가 늘어도 DOM 쓰기
+횟수는 현재 장면의 시각물 수에만 비례한다. 렌더러와 브라우저는 `data-scene-runtime`과
+`data-lecture-runtime`이 같을 때만 강의 모드를 연다.
+
+학습자 화면에는 작성용 영어 효과 이름 대신 `살펴보기`, `다음 화면`, `핵심`, `비교`, `판단 기준`,
+`실행`, `직접 조작`을 장면 번호 아래에 표시한다. `focus`는 대상과 무대의 밝기를 실제로 갈라서
+보여 주고, `compare`는 두 대상을 같은 높이의 프레임으로 놓는다. `annotate`는 예약된 주석 영역에
+판단 문장만 나타내며, `run`과 `simulate`는 실제 재생이나 실행과 조작 초점을 함께 표시한다.
+효과 안내 폭과 주석 영역 높이는 처음부터 예약해 글자가 바뀌어도 제목과 시각물이 밀리지 않게 한다.
+모든 이동은 opacity와 transform만 쓰고 `prefers-reduced-motion`에서는 애니메이션을 끈다.
 
 외부 HTML 렌더러는 `course-embed`의 https 주소만 받는다. `site/classroom-render.ts`가
 `sandbox=\"allow-scripts allow-forms\"` iframe으로 만들며 raw HTML은 계속 글자로 escape한다.
@@ -242,6 +270,11 @@ node scripts/classroom-shot.mjs
 강의 모드는 기능 확인에 더해 제목 장면의 중앙 정렬과 글자 크기, 브랜드 심볼, 시각물 테두리와
 캡션, 진행률 접근성 값, 레이아웃별 제목과 시각물 위치, 비교 프레임의 높이와 줄바꿈, 비트별
 발표자 노트와 다음 클릭 안내를 데스크톱과 모바일에서 수치로 검사한다.
+효과 검사에서는 `enter`, `run`, `annotate`, `compare`, `focus`, `simulate`의 실제 DOM 상태와
+학습자용 안내를 확인한다. 같은 시각물을 유지하는 비트 12회를 앞뒤로 전환해 두 프레임이 그려질
+때까지의 p95가 90ms 이하, 최댓값이 140ms 이하, 누적 레이아웃 이동이 0.01 이하, 장기 작업이
+0건인지 데스크톱과 모바일에서 각각 검사한다. `data-scene-phase="ready"`와 `lectureframe` 이벤트가
+완성 프레임의 측정 경계다.
 스크린샷은 그 수치 검사를 통과한 뒤 직접 눈으로 확인한다.
 
 강의장 페이지는 nonce 를 붙인 자기 CSP 를 직접 낸다. `worker.ts` 의 `withHeaders` 는 응답이
@@ -249,6 +282,10 @@ node scripts/classroom-shot.mjs
 그림만 남고 죽는다.
 
 ## 배포
+
+장면 계약을 올릴 때는 읽는 Worker를 먼저 배포하고 교안 묶음을 나중에 발행한다. 현재 Worker는
+이전 장면 계약 1과 현재 계약 2를 함께 읽어 배포와 발행 사이에도 강의 모드가 사라지지 않는다.
+새 교안 발행기는 계약 2만 만든다.
 
 ```powershell
 npm run deploy

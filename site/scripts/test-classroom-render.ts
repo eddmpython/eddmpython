@@ -6,6 +6,8 @@
  */
 import assert from "node:assert/strict";
 import {
+  COURSE_SCENE_RUNTIME,
+  compileSceneTimeline,
   renderLecture,
   renderMarkdown,
   renderPost,
@@ -408,14 +410,46 @@ check("읽기 본문 하나를 장면과 비트 계약으로 투영한다", () =
   ].join("\n");
   const scenes: CourseScene[] = [
     { id: "s1", role: "open", layout: "stage", visualCount: 1, beats: [{ effect: "enter", targets: [1] }] },
-    { id: "s2", role: "close", layout: "code", visualCount: 1, beats: [{ effect: "annotate", targets: [1], note: "결과를 확인합니다" }] },
+    { id: "s2", role: "close", layout: "code", visualCount: 1, beats: [
+      { effect: "enter", targets: [1] },
+      { effect: "annotate", targets: [1], note: "결과를 확인합니다" },
+    ] },
   ];
   const lecture = renderLecture(body, scenes);
   assert.equal(lecture.ok, true);
   assert.equal(lecture.html.match(/class="lecture-scene"/g)?.length, 2);
   assert.ok(lecture.html.includes('data-layout="stage"'));
+  assert.ok(lecture.html.includes(`data-scene-runtime="${COURSE_SCENE_RUNTIME}"`));
+  assert.ok(lecture.html.includes("data-timeline="));
+  assert.ok(lecture.html.includes("data-scene-cue"));
   assert.ok(lecture.html.includes("설명은 발표자 노트 재료입니다."));
   assert.ok(lecture.html.includes("결과를 확인합니다"));
+});
+
+check("효과를 클릭별 완성 프레임으로 한 번만 계산한다", () => {
+  const frames = compileSceneTimeline({
+    id: "s1",
+    role: "open",
+    layout: "sequence",
+    visualCount: 3,
+    beats: [
+      { effect: "enter", targets: [1] },
+      { effect: "enter", targets: [2] },
+      { effect: "focus", targets: [2] },
+      { effect: "annotate", targets: [2], note: "둘째 화면을 읽습니다" },
+      { effect: "replace", targets: [3] },
+      { effect: "run", targets: [3] },
+    ],
+  });
+  assert.deepEqual(frames[1].visible, [1, 2]);
+  assert.deepEqual(frames[2].focus, [2]);
+  assert.equal(frames[3].annotation, "둘째 화면을 읽습니다");
+  assert.deepEqual(frames[3].focus, [2]);
+  assert.deepEqual(frames[4].visible, [3]);
+  assert.deepEqual(frames[4].focus, []);
+  assert.equal(frames[4].annotation, "");
+  assert.deepEqual(frames[5].interaction, [3]);
+  assert.equal(frames[5].cue, "실행");
 });
 
 check("본문 시각물 수와 계약이 다르면 강의 모드를 만들지 않는다", () => {

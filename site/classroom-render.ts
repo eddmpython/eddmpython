@@ -101,6 +101,80 @@ export type CourseScene = {
   beats: CourseSceneBeat[];
 };
 
+export const COURSE_SCENE_RUNTIME = 2;
+
+export type CourseSceneFrame = {
+  effect: CourseSceneBeat["effect"];
+  targets: number[];
+  visible: number[];
+  focus: number[];
+  compare: number[];
+  annotation: string;
+  annotationTargets: number[];
+  interaction: number[];
+  cue: string;
+};
+
+const COURSE_SCENE_CUES: Record<CourseSceneBeat["effect"], string> = {
+  enter: "살펴보기",
+  replace: "다음 화면",
+  focus: "핵심",
+  compare: "비교",
+  annotate: "판단 기준",
+  run: "실행",
+  simulate: "직접 조작",
+};
+
+/**
+ * 선언된 beat를 클릭별 완성 프레임으로 한 번만 계산한다.
+ *
+ * 브라우저가 클릭할 때마다 첫 beat부터 다시 재생하면 시각물 수와 beat 수를 곱한 만큼 DOM을
+ * 반복해서 지우고 붙이게 된다. 주석과 강조가 다음 화면에 남는 문제도 같은 재생 루프에서 생긴다.
+ * 렌더러가 상태를 확정하고 브라우저는 현재 프레임 하나만 투영한다.
+ */
+export function compileSceneTimeline(scene: CourseScene): CourseSceneFrame[] {
+  const visible = new Set<number>();
+  let focus: number[] = [];
+  let compare: number[] = [];
+  let annotation = "";
+  let annotationTargets: number[] = [];
+  let interaction: number[] = [];
+  const frames: CourseSceneFrame[] = [];
+
+  for (const beat of scene.beats) {
+    const changesVisibility = beat.effect === "enter" || beat.effect === "replace" || beat.effect === "compare";
+    if (changesVisibility) {
+      focus = [];
+      annotation = "";
+      annotationTargets = [];
+      interaction = [];
+      compare = [];
+    }
+    if (beat.effect === "replace" || beat.effect === "compare") visible.clear();
+    if (changesVisibility) beat.targets.forEach((target) => visible.add(target));
+    if (beat.effect === "focus") focus = [...beat.targets];
+    if (beat.effect === "compare") compare = [...beat.targets];
+    if (beat.effect === "annotate") {
+      annotation = beat.note ?? "";
+      annotationTargets = [...beat.targets];
+    }
+    if (beat.effect === "run" || beat.effect === "simulate") interaction = [...beat.targets];
+
+    frames.push({
+      effect: beat.effect,
+      targets: [...beat.targets],
+      visible: [...visible],
+      focus: [...focus],
+      compare: [...compare],
+      annotation,
+      annotationTargets: [...annotationTargets],
+      interaction: [...interaction],
+      cue: COURSE_SCENE_CUES[beat.effect],
+    });
+  }
+  return frames;
+}
+
 export type CourseCell = {
   title?: string;
   description?: string;
@@ -418,10 +492,11 @@ export function renderLecture(
     const html = renderMarkdown(section.content, [], cells, state);
     if (state.visual !== scene.visualCount) return { html: "", hasCells: false, ok: false };
     hasCells ||= html.includes('data-cell="');
-    rendered.push(`<section class="lecture-scene" data-scene="${esc(scene.id)}" data-role="${esc(
+    const timeline = compileSceneTimeline(scene);
+    rendered.push(`<section class="lecture-scene" data-scene-runtime="${COURSE_SCENE_RUNTIME}" data-scene="${esc(scene.id)}" data-role="${esc(
       scene.role,
-    )}" data-layout="${esc(scene.layout)}" data-beats="${esc(JSON.stringify(scene.beats))}" aria-hidden="true">
-  <header class="scene-head"><span>${String(index + 1).padStart(2, "0")}</span><div><h2>${esc(
+    )}" data-layout="${esc(scene.layout)}" data-beats="${esc(JSON.stringify(scene.beats))}" data-timeline="${esc(JSON.stringify(timeline))}" aria-hidden="true">
+  <header class="scene-head"><div class="scene-meta"><span class="scene-index">${String(index + 1).padStart(2, "0")}</span><span class="scene-cue" data-scene-cue></span></div><div><h2>${esc(
     section.title,
   )}</h2><p>${esc(section.subtitle)}</p></div></header>
   <div class="scene-canvas">${html}</div>
