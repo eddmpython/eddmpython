@@ -1,15 +1,15 @@
 /**
- * 강의장 01의 글을 전부 열어 교안이 약속한 것이 화면에 실제로 있는지 잰다.
+ * 강의장의 모든 글을 열어 교안이 약속한 것이 화면에 실제로 있는지 잰다.
  *
  * 사용: node scripts/classroom-audit.mjs [baseUrl]
  * 출력: ../../eddmpython.out/classroom-audit/
  *
  * classroom-shot.mjs 는 첫 글과 마지막 글만 찍고 기능이 도는지 본다. 이 검수는 다르다.
- * 2026-08-21 에 글쓰기 정본으로 다섯 편을 재고 고친 뒤, 고친 것이 수강생 화면에 실제로
- * 도착했는지를 하나하나 센다. 캡션 수, 캐러셀 수, 준비 중 칸, 생 주소, 실행 칸과 그 출력, 섹션 수.
+ * 글쓰기 정본으로 관리하는 전체 교안이 수강생 화면에 실제로 도착했는지를 하나하나 센다.
+ * 캡션 수, 캐러셀 수, 준비 중 칸, 생 주소, 실행 칸과 그 출력, 섹션 수.
  * 그림만 찍고 넘어가지 않는다. 실행 칸은 눌러서 본문이 적어 둔 출력이 나오는지 본다.
  */
-import { mkdir, writeFile, readFile } from "node:fs/promises";
+import { mkdir, writeFile, readFile, readdir } from "node:fs/promises";
 import { randomBytes } from "node:crypto";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -44,10 +44,11 @@ async function admin(body) {
 
 await admin({ action: "remove", slug: ROOM }).catch(() => {});
 const made = await admin({ action: "create", slug: ROOM, title: "정본 검수 강의장", password: PASSWORD });
-const category = made.categories[0];
-if (!category) throw new Error("교안 카테고리가 없다");
-await admin({ action: "toggle", slug: ROOM, category: category.slug });
-console.log(`  검수용 강의장 ${base}/cr/${ROOM}  카테고리 ${category.slug}`);
+if (!made.categories.length) throw new Error("교안 카테고리가 없다");
+for (const category of made.categories) {
+  await admin({ action: "toggle", slug: ROOM, category: category.slug });
+}
+console.log(`  검수용 강의장 ${base}/cr/${ROOM}  카테고리 ${made.categories.length}개`);
 
 await mkdir(OUT, { recursive: true });
 const checks = [];
@@ -77,20 +78,24 @@ const EXPECT = {
   "expense-loop": ["50,000원: 정상", "120,000원: 확인필요", "80,000원: 정상"],
   "expense-function": ["정상", "확인필요"],
   "expense-syntax-together": ["합계 250,000원", "확인필요 1건", "관리팀: 120,000원, 확인필요"],
+  "expense-sheet-classify": ["합계 250,000원", "확인필요 1건", "관리팀: 120,000원, 확인필요"],
 };
 
 /** 교안 실측. 자리표시자를 뺀 캡션 수와 섹션 수는 원본 md 에서 센다. 기대값을 손으로 적지 않는다. */
-const COURSE = resolve(SITE_ROOT, "../../eddmpython-course/curriculum/01-automation-start");
-const posts = [
-  "001-what-automation-does",
-  "002-what-is-python",
-  "003-python-basic-syntax",
-  "004-run-python-online",
-  "005-run-python-in-vscode",
-];
+const COURSE = resolve(SITE_ROOT, "../../eddmpython-course/curriculum");
+const postFiles = [];
+for (const category of (await readdir(COURSE, { withFileTypes: true })).filter((entry) => entry.isDirectory())) {
+  const categoryPath = join(COURSE, category.name);
+  const files = (await readdir(categoryPath, { withFileTypes: true }))
+    .filter((entry) => entry.isFile() && /^\d{3}-[a-z0-9-]+\.md$/.test(entry.name))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  files.forEach((file) => postFiles.push({ id: file.name.slice(0, -3), path: join(categoryPath, file.name) }));
+}
+const posts = postFiles.map((post) => post.id);
 const expected = {};
-for (const id of posts) {
-  const md = await readFile(join(COURSE, `${id}.md`), "utf8");
+for (const post of postFiles) {
+  const id = post.id;
+  const md = await readFile(post.path, "utf8");
   const body = md.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, "");
   const outside = body.replace(/```[\s\S]*?```/g, "");
   const captions = [...outside.matchAll(/^!\[[^\]]*\]\((\S+)\s+"[^"]*"\)$/gm)].filter((m) => !/^media:\/\//.test(m[1])).length;
@@ -179,7 +184,11 @@ try {
   let opened = await client.openTarget(`${base}/cr/${ROOM}`, { expectedRisk: "externalEffect", waitUntil: "load", timeoutMs: 30000 });
   let session = (await client.attachSession(opened.output.targetRef, { timeoutMs: 30000 })).output;
   await evaluate(session, `(() => { const i = document.querySelector('input[name="password"]'); i.value = ${JSON.stringify(PASSWORD)}; document.querySelector('form').submit(); })()`, false);
-  await client.act(session, [{ kind: "waitFor", selector: ".cat h2", timeoutMs: 15000, expectedRisk: "read" }], { timeoutMs: 30000 });
+  await client.act(
+    session,
+    [{ kind: "waitFor", selector: `a.post[href$="/${posts[0]}"]`, timeoutMs: 15000, expectedRisk: "read" }],
+    { timeoutMs: 30000 },
+  );
 
   const hrefs = value(await evaluate(session, `[...document.querySelectorAll('a.post')].map(a => a.getAttribute('href'))`));
   record(
