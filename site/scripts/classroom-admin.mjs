@@ -233,7 +233,12 @@ h3 { font-size:.95rem; margin:0 0 .8rem; color:var(--eddm-text); }
 </div><script>
 const TARGETS = TARGETS_JSON;
 const KEY = CR_KEY;
-let target = TARGETS.find((t) => t.ready)?.id ?? TARGETS[0].id;
+// 강의장은 배포된 Worker 에서 돈다. 로컬 wrangler dev 는 개발할 때만 쓴다.
+// 먼저 준비된 것을 고르면 목록 순서 때문에 늘 로컬이 잡혔고, 강의 직전에 이 화면을 연
+// 운영자가 실제 강의장이 아니라 자기 노트북을 조종하고 있게 된다.
+let target = TARGETS.find((t) => t.id === "production" && t.ready)?.id
+  ?? TARGETS.find((t) => t.ready)?.id
+  ?? TARGETS[0].id;
 let rooms = [];
 let categories = [];
 // 서버가 교안을 못 읽어도 방 조종은 계속된다. 그 사실을 운영자에게 말해 주는 값이다.
@@ -449,6 +454,57 @@ const server = createServer(async (req, res) => {
   res.writeHead(404).end("not found");
 });
 
+function openBrowser(url, thenExit) {
+  if (!thenExit) {
+    spawn("cmd", ["/c", "start", "", url], { detached: true, stdio: "ignore" }).unref();
+    return;
+  }
+  // 브라우저를 띄우자마자 부모가 죽으면 윈도우에서 자식이 뜨기 전에 사라질 수 있다.
+  // spawn 이 실제로 일어난 것을 보고 나간다.
+  const child = spawn("cmd", ["/c", "start", "", url], { detached: true, stdio: "ignore" });
+  child.unref();
+  child.on("spawn", () => process.exit(0));
+  child.on("error", () => process.exit(0));
+}
+
+/**
+ * 8799 가 이미 잡혀 있으면 그 자리에 있는 것이 우리 운영 화면인지 보고 브라우저만 연다.
+ *
+ * 바탕화면 바로가기를 강의 직전에 두 번 누르는 일은 실제로 일어난다. 그때 두 번째 프로세스가
+ * EADDRINUSE 로 죽는데, 바로가기가 창을 최소화해서 띄우므로 운영자에게는 아무 일도 안 일어난
+ * 것처럼 보인다. 그 상태로 강의를 시작하는 것이 제일 나쁘다.
+ */
+async function alreadyOpen() {
+  const url = `http://127.0.0.1:${PORT}`;
+  let mine = false;
+  try {
+    const res = await fetch(url);
+    mine = res.ok && (await res.text()).includes("<title>강의장 운영</title>");
+  } catch {
+    mine = false;
+  }
+  if (!mine) {
+    console.error("");
+    console.error(`  ${PORT} 을 다른 프로그램이 쓰고 있어 운영 화면을 못 띄웠습니다`);
+    console.error("  그 프로그램을 끄고 다시 실행해 주세요");
+    console.error("");
+    process.exit(1);
+  }
+  console.log("");
+  console.log(`  운영 화면이 이미 떠 있습니다  ${url}`);
+  console.log("");
+  if (OPEN) openBrowser(url, true);
+  else process.exit(0);
+}
+
+server.on("error", (err) => {
+  if (err.code !== "EADDRINUSE") throw err;
+  alreadyOpen().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+});
+
 // 루프백에만 묶는다. 이 프로세스가 운영 토큰을 들고 있으므로 강의장 와이파이에 노출하지 않는다.
 server.listen(PORT, "127.0.0.1", () => {
   const url = `http://127.0.0.1:${PORT}`;
@@ -458,5 +514,5 @@ server.listen(PORT, "127.0.0.1", () => {
     console.log(`    ${t.label}  ${t.base}${t.ready ? "" : "  (토큰 없음)"}`);
   }
   console.log("");
-  if (OPEN) spawn("cmd", ["/c", "start", "", url], { detached: true, stdio: "ignore" }).unref();
+  if (OPEN) openBrowser(url, false);
 });
