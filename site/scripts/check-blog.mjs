@@ -39,6 +39,15 @@ const contentDirName = "content";
 const rootDocs = new Set(["README.md"]);
 const categoryDocs = new Set(["README.md"]);
 const publicSlug = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
+/**
+ * 카테고리는 앞에 두 자리 번호를 붙인다.
+ *
+ * 폴더 이름이 곧 카테고리 slug 라서 번호가 없으면 `content/` 아래에서 읽는 순서가 안 보인다.
+ * 교안은 `curriculum/01-...` 으로 이미 번호를 쓰고 있었고 블로그만 빠져 있었다.
+ * 이 slug 는 공개 주소에 나오지 않는다. 글 주소는 `/blog/<글 slug>` 하나뿐이고
+ * 카테고리는 `/blog` 목록에서 묶는 데만 쓰인다. 그래서 번호를 붙여도 주소가 바뀌지 않는다.
+ */
+const categorySlug = /^\d{2}-[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const mediaSuffixes = new Set([
   ".svg",
   ".webp",
@@ -56,7 +65,9 @@ const mediaSuffixes = new Set([
   ".webm",
   ".mov",
 ]);
-const assetId = /^(\d{3}-[a-z0-9]+(?:-[a-z0-9]+)*)\/([a-z0-9]+(?:-[a-z0-9]+)*)$/;
+// 두 자리와 세 자리를 모두 받는다. catalog 는 공개 블로그와 교안이 함께 쓴다.
+// 블로그 글은 전체에서 이어지는 세 자리, 교안 글은 카테고리마다 다시 세는 두 자리다.
+const assetId = /^(\d{2,3}-[a-z0-9]+(?:-[a-z0-9]+)*)\/([a-z0-9]+(?:-[a-z0-9]+)*)$/;
 const sha256 = /^[0-9a-f]{64}$/;
 const mimeBySuffix = new Map([
   [".webp", "image/webp"],
@@ -158,6 +169,31 @@ if (localMedia.length) {
 }
 
 const plan = await loadJson(resolve(blogDir, "media/plan.json"), "blog/media/plan.json");
+
+/**
+ * 교안 카테고리의 이미지 계획.
+ *
+ * catalog 는 공개 블로그와 비공개 교안이 함께 쓴다. 교안 계획은 형제 저장소에 있어서 이 검사가
+ * 못 보는데, 그러면 교안이 발행한 자산이 전부 "계획이 없습니다" 로 걸린다. 형제 저장소가 없는
+ * 환경(CI, 새 클론)에서는 그냥 비워 두고 catalog 대조에서 그 항목을 건너뛴다.
+ */
+const coursePlans = {};
+{
+  const courseRoot = resolve(blogDir, "../../eddmpython-course/curriculum");
+  try {
+    for (const entry of await readdir(courseRoot, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+      try {
+        const one = JSON.parse(await readFile(join(courseRoot, entry.name, "plan.json"), "utf8"));
+        Object.assign(coursePlans, one.assets ?? {});
+      } catch {
+        /* 그 카테고리에 계획이 없다 */
+      }
+    }
+  } catch {
+    /* 형제 저장소가 없는 환경이다 */
+  }
+}
 const catalog = await loadJson(resolve(blogDir, "media/catalog.json"), "blog/media/catalog.json");
 const codaroEmbeds = await loadJson(codaroEmbedsPath, "blog/embeds/codaro-cells.json");
 const blogOrder = await loadJson(blogOrderPath, "blog/order.json");
@@ -205,7 +241,7 @@ let previousCategoryOrder = 0;
 for (const entry of blogOrder.categories) {
   const slug = String(entry?.slug ?? "");
   const order = Number(entry?.order);
-  if (!publicSlug.test(slug)) fail("blog/order.json", `올바르지 않은 카테고리 slug: ${slug}`);
+  if (!categorySlug.test(slug)) fail("blog/order.json", `카테고리 slug 는 두 자리 번호로 시작합니다: ${slug}`);
   if (categorySlugs.has(slug)) fail("blog/order.json", `카테고리 slug가 중복됐습니다: ${slug}`);
   if (!Number.isInteger(order) || order !== previousCategoryOrder + 1) {
     fail("blog/order.json", `카테고리 order가 1부터 빈 번호 없이 이어지지 않습니다: ${order}`);
@@ -350,7 +386,9 @@ for (const [id, record] of Object.entries(catalog.assets)) {
   if (!match || !record || typeof record !== "object") {
     fail("blog/media/catalog.json", `올바르지 않은 asset id: ${id}`);
   }
-  if (!plan.assets[id]) fail("blog/media/catalog.json", `${id}의 이미지 계획이 없습니다`);
+  if (!plan.assets[id] && !coursePlans[id]) {
+    fail("blog/media/catalog.json", `${id}의 이미지 계획이 없습니다`);
+  }
   if (record.post !== match[1] || record.assetKey !== match[2] || !sha256.test(record.sha256)) {
     fail("blog/media/catalog.json", `${id}의 post, assetKey 또는 SHA-256이 잘못됐습니다`);
   }
@@ -376,7 +414,7 @@ for (const [id, record] of Object.entries(catalog.assets)) {
   const url = `https://huggingface.co/datasets/${catalog.repo}/resolve/main/${record.path}`;
   assetUrlById.set(id, url);
   assetIdByPostUrl.set(`${record.post}|${url}`, id);
-  altByPostUrl.set(`${record.post}|${url}`, String(plan.assets[id].alt));
+  altByPostUrl.set(`${record.post}|${url}`, String((plan.assets[id] ?? coursePlans[id]).alt));
   objectByPostUrl.set(`${record.post}|${url}`, object);
   if (!urlsByPost.has(record.post)) urlsByPost.set(record.post, new Set());
   urlsByPost.get(record.post).add(url);
@@ -667,6 +705,8 @@ if (!targetPost) {
   }
 
   for (const [id, url] of assetUrlById) {
+    // 교안 자산은 형제 비공개 저장소의 교안이 쓴다. 그쪽 게이트가 자기 자산을 본다.
+    if (coursePlans[id]) continue;
     if (!referencedMedia.has(url)) {
       fail("blog/media/catalog.json", `${id}가 글 본문이나 ogImage에서 쓰이지 않습니다`);
     }
