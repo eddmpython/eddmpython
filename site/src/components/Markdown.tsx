@@ -3,6 +3,7 @@ import ReactMarkdown, { defaultUrlTransform } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { decodeHashId } from "../hashNavigation";
 import { CodaroCellEmbed } from "./CodaroCellEmbed";
+import { ToolEmbed } from "./ToolEmbed";
 
 const THREADS = /^https?:\/\/(?:www\.)?threads\.(?:net|com)\/@[\w.]+\/post\/[\w-]+/;
 const IMAGE = /\.(png|jpe?g|gif|webp|avif|svg)(\?.*)?$/i;
@@ -11,6 +12,8 @@ const MEDIA_PENDING = /^media:\/\/([a-z0-9-]+)$/i;
 const VIDEO = /\.(mp4|webm)(\?.*)?$/i;
 const CODARO_CELL =
   /^https:\/\/eddmpython\.com\/codaro\/run\/\?example=([a-z0-9]+(?:-[a-z0-9]+)*)$/;
+/** 글이 품는 도구 마커. 본문에 이 한 줄을 두면 그 자리가 작동하는 도구로 바뀐다. */
+const TOOL_EMBED = /^https:\/\/eddmpython\.com\/tool\/([a-z0-9]+(?:-[a-z0-9]+)*)$/;
 
 type ParagraphLink = { href: string; label: string; title: string };
 
@@ -403,6 +406,10 @@ export function Markdown({ children }: { children: string }) {
               const codaroCell = url.match(CODARO_CELL);
               if (codaroCell) {
                 return <CodaroCellEmbed exampleId={codaroCell[1]} />;
+              }
+              const tool = url.match(TOOL_EMBED);
+              if (tool) {
+                return <ToolEmbed toolId={tool[1]} />;
               }
               if (THREADS.test(url)) return <Threads url={url} />;
               if (IMAGE.test(url)) {

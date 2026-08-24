@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "tools": {
+    "qr": {
+      "title": "QR 생성기",
+      "summary": "주소나 문구를 스캔되는 QR로 바꾼다"
+    }
+  }
+}

@@ -18,6 +18,7 @@ const STRICT = Boolean(targetPost);
 
 const blogDir = resolve(process.cwd(), "../blog");
 const codaroEmbedsPath = resolve(blogDir, "embeds/codaro-cells.json");
+const toolsPath = resolve(blogDir, "embeds/tools.json");
 const blogOrderPath = resolve(blogDir, "order.json");
 const postName = /^(\d{3})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$/;
 const requiredMeta = [
@@ -90,6 +91,7 @@ const mimeBySuffix = new Map([
 const imageRef = /!\[([^\]]*)\]\(\s*<?([^\s)>]+)>?(?:\s+["'][^"']*["'])?\s*\)/g;
 const codaroEmbedRef =
   /^https:\/\/eddmpython\.com\/codaro\/run\/\?example=([a-z0-9]+(?:-[a-z0-9]+)*)\s*$/gm;
+const toolRef = /^https:\/\/eddmpython\.com\/tool\/([a-z0-9]+(?:-[a-z0-9]+)*)\s*$/gm;
 
 function fail(file, message) {
   throw new Error(`${file}: ${message}`);
@@ -207,6 +209,18 @@ const coursePlans = {};
 }
 const catalog = await loadJson(resolve(blogDir, "media/catalog.json"), "blog/media/catalog.json");
 const codaroEmbeds = await loadJson(codaroEmbedsPath, "blog/embeds/codaro-cells.json");
+const tools = await loadJson(toolsPath, "blog/embeds/tools.json");
+if (tools.version !== 1 || !tools.tools || typeof tools.tools !== "object") {
+  fail("blog/embeds/tools.json", "version 또는 tools 계약이 잘못됐습니다");
+}
+for (const [id, tool] of Object.entries(tools.tools)) {
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id) || !tool || typeof tool !== "object") {
+    fail("blog/embeds/tools.json", `올바르지 않은 도구 id: ${id}`);
+  }
+  for (const key of ["title", "summary"]) {
+    if (!String(tool[key] ?? "").trim()) fail("blog/embeds/tools.json", `${id} 필드가 비었습니다: ${key}`);
+  }
+}
 const blogOrder = await loadJson(blogOrderPath, "blog/order.json");
 if (
   plan.version !== 2 ||
@@ -621,6 +635,16 @@ for (const post of targetPosts) {
     fail(file, "Codaro 실습 셀 URL은 다른 내용 없는 한 줄로 둡니다");
   }
   codaroEmbedRef.lastIndex = 0;
+
+  for (const match of body.matchAll(toolRef)) {
+    const id = match[1];
+    if (!tools.tools[id]) fail(file, `등록되지 않은 도구: ${id}`);
+  }
+  if (/eddmpython\.com\/tool\//.test(body) && !toolRef.test(body)) {
+    toolRef.lastIndex = 0;
+    fail(file, "도구 마커 URL은 다른 내용 없는 한 줄로 둡니다");
+  }
+  toolRef.lastIndex = 0;
 
   const sectionAssets = new Set();
   for (const section of sections) {
