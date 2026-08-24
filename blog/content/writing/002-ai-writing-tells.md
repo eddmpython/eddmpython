@@ -10,6 +10,11 @@ readerLevel: working
 readerStartingPoint: AI 로 초안을 받아 고쳐 쓰고 있는데 어디를 손봐야 기계 글처럼 안 읽히는지 감으로만 판단하고 있다.
 primaryKeyword: AI 글 특징
 searchIntent: how-to
+ogImage: https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/93/9350676bec68e5034004743b273718ab9a8dc8620a35704298eac1bb278b92b0.webp
+ogImageAlt: 어두운 바탕에 놓인 접시 안에 잘라 낸 작은 종이 조각 아홉 개가 모여 있고 그 옆에는 아무것도 잘리지 않은 종이 한 장이 그대로 놓여 있는 화면
+ogImageWidth: 1216
+ogImageHeight: 832
+ogImageType: image/webp
 ---
 
 AI 가 써 준 초안을 그대로 올리면 티가 납니다. 그래서 고칩니다. 그런데 어디를 고쳐야 하는지는 대개 감으로 정합니다. 감으로 고치면 눈에 띄는 몇 군데만 바꾸고 넘어가거나 멀쩡한 문장까지 취향으로 다시 쓰게 됩니다. 세어 보면 그 자리를 정확히 알 수 있습니다.
@@ -17,6 +22,8 @@ AI 가 써 준 초안을 그대로 올리면 티가 납니다. 그래서 고칩�
 ## AI 글 특징 71개를 정리한 목록이 이미 있습니다
 
 ### 한국어 전용 공개 저장소에 정리되어 있고 그것으로 절반은 잡힙니다
+
+![어두운 바탕에 놓인 접시 안에 잘라 낸 작은 종이 조각 아홉 개가 모여 있고 그 옆에는 아무것도 잘리지 않은 종이 한 장이 그대로 놓여 있는 화면](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/93/9350676bec68e5034004743b273718ab9a8dc8620a35704298eac1bb278b92b0.webp "목록이 잡아낸 것은 접시에 모이고 목록에 없는 것은 그대로 지나갑니다")
 
 `epoko77-ai/im-not-ai` 라는 저장소가 있습니다. 스타가 4,900 개 넘고 MIT 라이선스이며 한국어 전용입니다. AI 가 쓴 한국어 글의 특징 71개를 A 부터 J 까지 나눠 정리해 두었습니다. 번역투 19개, 영어 과다 4개, 서식 습관 12개, 관용구 7개, 리듬 7개, 과잉 수식 5개, 완곡 3개, 접속사 4개, 형식명사 6개, 시각 장식 4개입니다. 목록이 촘촘해서 초안을 한 번 훑는 데 바로 쓸 수 있습니다.
 

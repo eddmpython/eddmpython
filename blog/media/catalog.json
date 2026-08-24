@@ -41,6 +41,12 @@
       "path": "objects/sha256/5b/5b147cfff2b937f6ec69165c7d43e5a97c96d8febc2e782ff0507fc4fff00673.png",
       "post": "001-ai-needs-an-environment",
       "sha256": "5b147cfff2b937f6ec69165c7d43e5a97c96d8febc2e782ff0507fc4fff00673"
+    },
+    "002-ai-writing-tells/half-caught": {
+      "assetKey": "half-caught",
+      "path": "objects/sha256/93/9350676bec68e5034004743b273718ab9a8dc8620a35704298eac1bb278b92b0.webp",
+      "post": "002-ai-writing-tells",
+      "sha256": "9350676bec68e5034004743b273718ab9a8dc8620a35704298eac1bb278b92b0"
     }
   },
   "objectPrefix": "objects/sha256",
@@ -1774,6 +1780,16 @@
       "sourcePost": "013-uv-python-environment",
       "visualSubject": "의존성 설정 파일, 패키지 트리가 있는 잠금 파일, 추가된 패키지 카드, 제거된 빈 자리, 한 가지만 바뀐 패키지 가지와 고정된 나머지 목록",
       "width": 1536
+    },
+    "9350676bec68e5034004743b273718ab9a8dc8620a35704298eac1bb278b92b0": {
+      "alt": "어두운 바탕에 놓인 접시 안에 잘라 낸 작은 종이 조각 아홉 개가 모여 있고 그 옆에는 아무것도 잘리지 않은 종이 한 장이 그대로 놓여 있는 화면",
+      "bytes": 76242,
+      "height": 832,
+      "mime": "image/webp",
+      "path": "objects/sha256/93/9350676bec68e5034004743b273718ab9a8dc8620a35704298eac1bb278b92b0.webp",
+      "sourcePost": "002-ai-writing-tells",
+      "visualSubject": "걸러 낸 조각을 담은 접시 하나와 손대지 않은 종이 한 장이 나란히 놓인 장면",
+      "width": 1216
     },
     "9472eda159666363665e858a5f347e5363ece27c3cf01a747291518268f9c9c3": {
       "alt": "Excel 파일이 파일 이름과 시트 탭 및 필수 열 세 검사를 지나고 누락 열 파일은 중단되는 모습",
