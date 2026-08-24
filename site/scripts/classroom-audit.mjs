@@ -87,14 +87,25 @@ const postFiles = [];
 for (const category of (await readdir(COURSE, { withFileTypes: true })).filter((entry) => entry.isDirectory())) {
   const categoryPath = join(COURSE, category.name);
   const files = (await readdir(categoryPath, { withFileTypes: true }))
-    .filter((entry) => entry.isFile() && /^\d{3}-[a-z0-9-]+\.md$/.test(entry.name))
+    .filter((entry) => entry.isFile() && /^\d{2}-[a-z0-9-]+\.md$/.test(entry.name))
     .sort((a, b) => a.name.localeCompare(b.name));
-  files.forEach((file) => postFiles.push({ id: file.name.slice(0, -3), path: join(categoryPath, file.name) }));
+  // 글 번호는 카테고리마다 01 부터 다시 센다. 그래서 파일 이름만으로는 커리큘럼 전체에서
+  // 유일하지 않다. 강의장 주소도 카테고리를 거치므로 여기서도 카테고리를 붙여 짝을 짓는다.
+  files.forEach((file) =>
+    postFiles.push({
+      id: file.name.slice(0, -3),
+      key: `${category.name}/${file.name.slice(0, -3)}`,
+      path: join(categoryPath, file.name),
+    }),
+  );
+}
+if (!postFiles.length) {
+  throw new Error(`${COURSE} 에서 교안을 한 편도 못 읽었다. 파일 이름 규칙이 바뀌었는지 본다`);
 }
 const posts = postFiles.map((post) => post.id);
 const expected = {};
 for (const post of postFiles) {
-  const id = post.id;
+  const id = post.key;
   const md = await readFile(post.path, "utf8");
   const body = md.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, "");
   const outside = body.replace(/```[\s\S]*?```/g, "");
@@ -198,7 +209,7 @@ try {
   );
 
   for (const href of hrefs ?? []) {
-    const id = href.split("/").pop();
+    const id = href.split("/").slice(-2).join("/");
     const exp = expected[id];
     if (!exp) { record(`${id} 가 교안 폴더에 있다`, false, "원본 md 없음"); continue; }
     opened = await client.openTarget(`${base}${href}`, { expectedRisk: "externalEffect", waitUntil: "load", timeoutMs: 30000 });
