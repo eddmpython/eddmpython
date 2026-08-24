@@ -121,6 +121,8 @@ body { min-height:100vh; min-height:100dvh; margin:0; background:var(--eddm-carb
 .gate h1 { font-size:clamp(1.75rem,5vw,2.35rem); line-height:1.2; letter-spacing:-.03em; }
 .gate .sub { max-width:34rem; margin-bottom:0; color:var(--eddm-text-muted); line-height:1.8; }
 .gate form { margin-top:2rem; }
+/* 카드에 폼만 있는 화면. 위아래 여백이 같아야 한다 */
+.gate form:first-child { margin-top:0; }
 .gate input[type=password] { background:var(--eddm-carbon); }
 @media (max-width:520px) {
   .gate { padding:1.5rem; }
@@ -146,6 +148,10 @@ button:hover { background:var(--eddm-accent-bg); }
  * **기본은 라이트다.** 시스템 설정을 따라가지 않는다. 한때 저장한 선택이 없으면
  * `prefers-color-scheme` 을 읽었고, 그래서 같은 주소가 보는 사람의 OS 설정에 따라 다르게
  * 떴다. 강의 화면은 운영자와 수강생이 같은 것을 봐야 한다. 고른 사람만 그 선택을 가진다.
+ *
+ * 두 `catch` 는 비워 둔다. 저장소가 막힌 브라우저에서도 기본 라이트는 이미 적용됐고,
+ * 저장 실패는 다음 페이지의 유지에만 영향을 준다. 설명을 이 문자열 안에 주석으로 적지
+ * 않는다. 그대로 응답에 실린다.
  */
 const THEME_INIT_SCRIPT = `
 (() => {
@@ -156,20 +162,14 @@ const THEME_INIT_SCRIPT = `
   try {
     const value = localStorage.getItem(key);
     if (value && choices.has(value)) saved = value;
-  } catch {
-    // 저장소가 막혀도 기본 라이트는 그대로 적용된다.
-  }
+  } catch {}
   const set = (choice, persist = true) => {
     const resolved = choices.has(choice) ? choice : "light";
     root.dataset.theme = resolved;
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute("content", resolved === "light" ? "${TOKENS.color.ivory}" : "${TOKENS.color.carbon}");
     if (persist) {
-      try {
-        localStorage.setItem(key, resolved);
-      } catch {
-        // 저장 실패는 다른 페이지 유지에만 영향을 주며 현재 테마 전환은 이미 끝났다.
-      }
+      try { localStorage.setItem(key, resolved); } catch {}
     }
     root.dispatchEvent(new CustomEvent("eddmthemechange", { detail: { resolved } }));
   };
@@ -327,6 +327,15 @@ export type PageOptions = {
 export function page(opts: PageOptions): Response {
   const nonce = randomHex(16);
   const cells = opts.cells ?? false;
+  /**
+   * CSS 주석은 브라우저로 내보내지 않는다.
+   *
+   * 이 파일과 화면 파일의 CSS 는 왜 그렇게 됐는지를 주석으로 들고 있다. 실패 이력과
+   * 운영자 지시가 그대로 적혀 있는데 템플릿 리터럴이라 응답에 통째로 실렸다. 로그인
+   * 화면은 아무나 열어 볼 수 있고 그 주석이 이 문 뒤에 무엇이 있는지 알려 준다.
+   * 설명은 소스에 남기고 나가는 바이트에서만 뺀다.
+   */
+  const style = `${SHELL_STYLE}${opts.style}`.replace(/\/\*[\s\S]*?\*\//g, "");
   const html = `<!doctype html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
@@ -336,7 +345,7 @@ export function page(opts: PageOptions): Response {
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="${TOKENS.fontHref}">
 <script nonce="${nonce}">${THEME_INIT_SCRIPT}</script>
-<style>${SHELL_STYLE}${opts.style}</style></head>
+<style>${style}</style></head>
 <body><div class="wrap${opts.wide ? " wide" : ""}">${opts.inner}</div>
 ${opts.extraBody ?? ""}
 <script nonce="${nonce}">${THEME_SCRIPT}${opts.script ?? ""}</script></body></html>`;

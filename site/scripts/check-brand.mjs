@@ -180,6 +180,50 @@ for (const rel of SCAN) {
 }
 
 /**
+ * 로그인 화면이 이 문 뒤에 무엇이 있는지 말하지 않는다.
+ *
+ * 2026-08-24 운영자 지시다. 이 주소는 공개 도메인에 그대로 열려 있다. 화면이 스스로
+ * 무엇을 조종하는 문인지 밝히면 지나가던 사람에게 두드릴 이유를 준다. 제목, 라벨,
+ * 안내 문장을 다시 넣는 것을 여기서 막는다. 머리띠는 위의 크롬 검사가 따로 지킨다.
+ */
+const gate = admin.match(/function loginPage\([\s\S]*?\n\}/)?.[0] ?? "";
+if (!gate) add("admin.ts", "loginPage 를 찾지 못했습니다");
+else {
+  for (const word of ["운영장", "운영자", "강의", "수강생", "카테고리", "교안"]) {
+    if (gate.includes(word)) {
+      add("admin.ts", `로그인 화면이 "${word}" 로 정체를 드러냅니다. 비밀번호 칸 하나만 둡니다`);
+    }
+  }
+  if (/<h1|class="eyebrow"|class="sub"/.test(gate)) {
+    add("admin.ts", "로그인 화면에 제목이나 안내 문장이 있습니다. 비밀번호 칸 하나만 둡니다");
+  }
+}
+
+/**
+ * 코드 주석을 브라우저로 내보내지 않는다.
+ *
+ * CSS 와 인라인 스크립트는 템플릿 리터럴이라 주석이 그대로 응답에 실린다. 그 주석에는
+ * 실패 이력과 운영자 지시가 적혀 있고, 로그인 화면은 아무나 열어 볼 수 있다. CSS 는
+ * page() 가 걷어내고, 인라인 스크립트는 애초에 문자열 안에 주석을 쓰지 않는다.
+ */
+if (/<style>\$\{SHELL_STYLE\}/.test(shell)) {
+  add("shell.ts", "CSS 를 걷어내지 않고 그대로 넣습니다. 주석이 응답에 실립니다");
+}
+if (!/const style = [\s\S]{0,200}?\.replace\(/.test(shell)) {
+  add("shell.ts", "page() 가 CSS 주석을 걷어내는 자리가 없습니다");
+}
+for (const [name, re] of [
+  ["THEME_INIT_SCRIPT", /const THEME_INIT_SCRIPT = `([\s\S]*?)`;/],
+  ["THEME_SCRIPT", /const THEME_SCRIPT = `([\s\S]*?)`;/],
+]) {
+  const body = shell.match(re)?.[1] ?? "";
+  if (!body) add("shell.ts", `${name} 을 찾지 못했습니다`);
+  else if (/^\s*\/\//m.test(body)) {
+    add("shell.ts", `${name} 안에 주석이 있습니다. 설명은 함수 위에 적습니다`);
+  }
+}
+
+/**
  * 카드 위에 강조 띠를 얹지 않는다.
  *
  * 2026-08-24 운영자 지시다. 로그인 카드 위에 2px 짜리 밝은 선이 깔려 있었다. 그 선은

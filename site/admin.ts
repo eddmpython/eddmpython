@@ -53,8 +53,8 @@ const ADMIN_ACTIONS = new Set([
  * 두었다. `scripts/check-brand.mjs` 가 이 파일에 hex 가 나타나면 배포를 막는다.
  */
 const ADMIN_STYLE = `
-.adm-top { display:flex; align-items:baseline; gap:1rem; flex-wrap:wrap; margin:0 0 2rem; }
-.adm-top h1 { flex:1 1 auto; margin:0; }
+/* 조종 화면 머리. 제목 없이 나가기 하나만 오른쪽에 둔다 */
+.adm-top { display:flex; align-items:baseline; justify-content:flex-end; gap:1rem; flex-wrap:wrap; margin:0 0 2rem; }
 .adm-top form { margin:0; }
 .adm-top button { padding:.4rem .8rem; font-size:.85rem; border-color:var(--eddm-line-base);
   background:var(--eddm-raise); color:var(--eddm-text-muted); }
@@ -259,16 +259,25 @@ async function signedIn(env: Env, request: Request): Promise<boolean> {
 
 /* 화면 ------------------------------------------------------------------ */
 
+/**
+ * 로그인 화면은 이 문 뒤에 무엇이 있는지 말하지 않는다.
+ *
+ * 2026-08-24 운영자 지시다. 이 주소는 공개된 도메인에 그대로 열려 있고 누구나 열어 볼 수
+ * 있다. 화면이 스스로 무엇을 조종하는 문인지 밝히면 지나가던 사람에게 두드릴 이유를 준다.
+ * 비밀번호 칸 하나만 둔다. 제목도 라벨도 안내 문장도 붙이지 않는다.
+ *
+ * 브랜드 머리띠는 남긴다. 그것은 이 저장소의 모든 표면이 입는 옷이고 이 문이 무엇인지는
+ * 알려 주지 않는다. `scripts/check-brand.mjs` 가 머리띠를 뺀 맨 화면과 정체를 드러내는
+ * 낱말을 둘 다 막는다.
+ */
 function loginPage(message = "", status = 200): Response {
   return page({
-    title: "운영장",
+    title: "admin",
     style: ADMIN_STYLE,
     status,
     inner: `${header()}<section class="gate adm">
-       <p class="eyebrow">eddmpython admin</p>
-       <h1>운영장</h1>
        <form method="post" action="/admin/login">
-         <input type="password" name="password" placeholder="운영자 비밀번호" aria-label="운영자 비밀번호" autofocus autocomplete="current-password">
+         <input type="password" name="password" placeholder="비밀번호" aria-label="비밀번호" autofocus autocomplete="current-password">
          <button type="submit">들어가기</button>
        </form>${message ? `<p class="err">${message}</p>` : ""}
      </section>`,
@@ -277,12 +286,11 @@ function loginPage(message = "", status = 200): Response {
 
 function consolePage(): Response {
   return page({
-    title: "운영장",
+    title: "admin",
     style: ADMIN_STYLE,
     script: ADMIN_SCRIPT,
     inner: `${header()}<div class="adm">
   <div class="adm-top">
-    <h1>운영장</h1>
     <form method="post" action="/admin/logout"><button type="submit">나가기</button></form>
   </div>
 
