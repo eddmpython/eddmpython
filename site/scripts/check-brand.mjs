@@ -202,6 +202,9 @@ else {
 }
 if (admin.includes("수강생에게 보임")) add("admin.ts", "커리큘럼 상태에 수강생에게 보임 문구를 씁니다");
 if (!admin.includes('type="checkbox" data-act="toggle"')) add("admin.ts", "커리큘럼 포함 체크박스가 없습니다");
+if (admin.includes("수강생 입장 닫기")) add("admin.ts", "공개한 강의방을 다시 닫는 버튼이 있습니다. 끝난 방은 삭제합니다");
+if (!admin.includes('class="copy-icon" data-act="copy"')) add("admin.ts", "강의방 URL 옆 복사 아이콘이 없습니다");
+if (!admin.includes('class="danger head-action delete-action"')) add("admin.ts", "강의방 삭제가 카드 우상단에 없습니다");
 
 /**
  * 코드 주석을 브라우저로 내보내지 않는다.

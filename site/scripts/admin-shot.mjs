@@ -51,11 +51,6 @@ try {
     const selected = await drive({ action: "toggle", slug: ROOM, category: category.slug });
     const selectedRoom = selected.rooms.find((room) => room.slug === ROOM);
     record("닫힌 방에서도 커리큘럼을 선택할 수 있다", selectedRoom?.unlocked.includes(category.slug) === true);
-
-    await drive({ action: "open", slug: ROOM, open: true });
-    const closed = await drive({ action: "open", slug: ROOM, open: false });
-    const closedRoom = closed.rooms.find((room) => room.slug === ROOM);
-    record("입장을 닫아도 선택한 커리큘럼이 남는다", closedRoom?.open === false && closedRoom?.unlocked.includes(category.slug) === true);
   }
   console.log(`  검수용 방 ${ROOM}  커리큘럼 ${made.categories.length}개`);
 
@@ -177,6 +172,8 @@ try {
           const create = document.querySelector('.new');
           const rooms = document.querySelector('.rooms-section');
           const card = document.querySelector('[data-room=${ROOM}]');
+          const roomInput = card?.querySelector('[data-next-title]');
+          const roomSave = card?.querySelector('[data-act=rename]');
           return {
             path: location.pathname,
             title: document.title,
@@ -185,7 +182,13 @@ try {
             cats: card?.querySelectorAll('.cat').length ?? 0,
             checkboxes: card?.querySelectorAll('.cat input[type=checkbox][data-act=toggle]').length ?? 0,
             checked: card?.querySelectorAll('.cat input[type=checkbox]:checked').length ?? 0,
-            closed: card?.querySelector('.state')?.textContent.trim(),
+            state: card?.querySelector('.state')?.textContent.trim(),
+            allow: Boolean(card?.querySelector('.head-actions [data-act=open]')),
+            deleteTop: Boolean(card?.querySelector('.head-actions [data-act=remove]')),
+            copyBesideUrl: Boolean(card?.querySelector('.addr-row .addr + .copy-icon[data-act=copy]')),
+            closeCopy: document.body.innerText.includes('수강생 입장 닫기'),
+            controlsAligned: Boolean(roomInput && roomSave && Math.abs(roomInput.getBoundingClientRect().height - roomSave.getBoundingClientRect().height) < 1),
+            controlHeight: roomInput?.getBoundingClientRect().height ?? 0,
             createBeforeRooms: Boolean(create && rooms && (create.compareDocumentPosition(rooms) & Node.DOCUMENT_POSITION_FOLLOWING)),
             urlFirst: create?.querySelector('input')?.id === 'n-slug',
             password: Boolean(create?.querySelector('#n-pw')),
@@ -198,7 +201,11 @@ try {
       );
       record(`${viewport.id} 로그인하면 강의 관리 화면이 뜬다`, consoleView?.path === "/admin" && consoleView?.heading === "강의 관리" && consoleView?.title === "강의 관리 | eddmpython", JSON.stringify(consoleView));
       record(`${viewport.id} URL과 비밀번호 설정이 강의방 목록보다 먼저다`, consoleView?.createBeforeRooms === true && consoleView?.urlFirst === true && consoleView?.password === true);
-      record(`${viewport.id} 만든 방이 닫힌 카드로 보인다`, (consoleView?.cards ?? 0) >= 1 && consoleView?.closed === "입장 닫힘", JSON.stringify(consoleView));
+      record(`${viewport.id} 만든 방이 준비 중으로 보인다`, (consoleView?.cards ?? 0) >= 1 && consoleView?.state === "준비 중" && consoleView?.allow === true, JSON.stringify(consoleView));
+      record(`${viewport.id} URL 옆에 복사 아이콘이 있다`, consoleView?.copyBesideUrl === true);
+      record(`${viewport.id} 삭제가 카드 우상단에 있다`, consoleView?.deleteTop === true);
+      record(`${viewport.id} 입장 닫기 동작이 없다`, consoleView?.closeCopy === false);
+      record(`${viewport.id} 입력창과 저장 버튼 높이가 작고 같다`, consoleView?.controlsAligned === true && consoleView?.controlHeight <= 38, JSON.stringify(consoleView));
       record(`${viewport.id} 닫힌 방에도 커리큘럼 체크박스가 보인다`, (consoleView?.cats ?? 0) >= 1 && consoleView?.checkboxes === consoleView?.cats, JSON.stringify(consoleView));
       record(`${viewport.id} 선택한 커리큘럼이 체크되어 있다`, (consoleView?.checked ?? 0) >= 1, String(consoleView?.checked));
       record(`${viewport.id} 수강생에게 보임 문구를 쓰지 않는다`, consoleView?.weirdCopy === false);
@@ -218,6 +225,10 @@ try {
       await client.stop?.({ timeoutMs: 30000 });
     }
   }
+
+  const opened = await drive({ action: "open", slug: ROOM, open: true });
+  const openedRoom = opened.rooms.find((room) => room.slug === ROOM);
+  record("입장을 허용하면 선택한 커리큘럼과 함께 공개된다", openedRoom?.open === true && (!category || openedRoom?.unlocked.includes(category.slug) === true));
 } finally {
   await cleanup();
   console.log("  검수용 방을 지웠다");

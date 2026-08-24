@@ -291,8 +291,10 @@ export class Classroom {
     }
 
     if (action === "open") {
-      room.open = Boolean(body.open);
-      // 방을 닫아도 선택한 커리큘럼은 남긴다. 다시 열 때 같은 구성을 그대로 쓸 수 있다.
+      if (body.open !== true) {
+        return Response.json({ error: "입장은 허용만 할 수 있습니다. 끝난 강의방은 삭제해 주세요" }, { status: 400 });
+      }
+      room.open = true;
       await this.put(room);
       return Response.json({ ok: true });
     }

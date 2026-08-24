@@ -53,6 +53,7 @@ const ADMIN_ACTIONS = new Set([
  * 두었다. `scripts/check-brand.mjs` 가 이 파일에 hex 가 나타나면 배포를 막는다.
  */
 const ADMIN_STYLE = `
+.adm { --adm-control-h:2.25rem; }
 /* 조종 화면 머리. 현재 화면 이름과 나가기를 같은 줄에 둔다 */
 .adm-top { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin:0 0 2rem; }
 .adm-top form { margin:0; }
@@ -61,14 +62,14 @@ const ADMIN_STYLE = `
 .adm-top button:hover { background:var(--eddm-hover); color:var(--eddm-ivory); }
 .adm-title { margin:0; font-size:clamp(1.65rem,4vw,2.15rem); line-height:1.2; letter-spacing:-.035em; }
 .adm-desc { margin:.45rem 0 0; color:var(--eddm-text-muted); font-size:.92rem; }
-.adm input, .adm select { padding:.6rem .8rem; border-radius:.55rem; border:1px solid var(--eddm-line-strong);
+.adm input, .adm select { height:var(--adm-control-h); padding:.45rem .7rem; border-radius:.5rem; border:1px solid var(--eddm-line-strong);
   background:var(--eddm-raise); color:inherit; font-size:.92rem; font-family:inherit; min-width:0; }
+.adm button { height:var(--adm-control-h); min-height:var(--adm-control-h); padding:.4rem .72rem; font-size:.84rem; white-space:nowrap; }
 .adm input::placeholder { color:var(--eddm-text-faint); }
 .row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; margin-top:.85rem; }
-.row button { padding:.55rem .9rem; font-size:.88rem; }
-.row .go { border-color:var(--eddm-accent-line); background:var(--eddm-accent-bg); color:var(--eddm-sand); }
-.row .danger { border-color:var(--eddm-danger-line); background:transparent; color:var(--eddm-danger); }
-.row .danger:hover { background:var(--eddm-danger-line); }
+.adm .go { border-color:var(--eddm-accent-line); background:var(--eddm-accent-bg); color:var(--eddm-sand); }
+.adm .danger { border-color:var(--eddm-danger-line); background:transparent; color:var(--eddm-danger); }
+.adm .danger:hover { background:var(--eddm-danger-line); }
 .note { color:var(--eddm-text-dim); font-size:.85rem; margin:.4rem 0 0; }
 .err { color:var(--eddm-danger); font-size:.9rem; min-height:1.4em; margin:1rem 0 0; }
 .warn { display:flex; align-items:center; gap:.6rem; padding:.75rem 1rem; margin:1.25rem 0 0;
@@ -77,7 +78,7 @@ const ADMIN_STYLE = `
 .warn[hidden] { display:none; }
 .warn svg { flex:0 0 auto; color:var(--eddm-danger); }
 .warn b { color:var(--eddm-danger); font-weight:600; }
-.new { border:1px solid var(--eddm-line-base); border-radius:.85rem; padding:1.25rem 1.4rem;
+.new { border:1px solid var(--eddm-line-base); border-radius:.8rem; padding:1rem 1.15rem;
   background:var(--eddm-raise); }
 .section-head { display:flex; align-items:baseline; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
 .section-head h2 { margin:0; font-size:1.05rem; font-weight:600; letter-spacing:-.015em; }
@@ -87,46 +88,49 @@ const ADMIN_STYLE = `
 .field { display:grid; gap:.35rem; min-width:0; color:var(--eddm-text-muted); font-size:.78rem; }
 .field input { width:100%; color:var(--eddm-ivory); }
 .url-input { display:grid; grid-template-columns:auto minmax(7rem,1fr); align-items:center; border:1px solid var(--eddm-line-strong);
-  border-radius:.55rem; background:var(--eddm-raise); overflow:hidden; }
+  height:var(--adm-control-h); border-radius:.5rem; background:var(--eddm-raise); overflow:hidden; }
 .url-input span { padding:0 0 0 .75rem; color:var(--eddm-text-faint); font-family:${TOKENS.font.mono};
   font-size:.78rem; white-space:nowrap; }
-.url-input input { border:0; border-radius:0; background:transparent; }
-.new .go { min-height:2.55rem; white-space:nowrap; }
+.url-input input { height:100%; border:0; border-radius:0; background:transparent; }
 .rooms-section { margin-top:2rem; }
 .rooms-section > h2 { margin:0; font-size:1.05rem; font-weight:600; letter-spacing:-.015em; }
-.card { border:1px solid var(--eddm-line-base); border-radius:.85rem; padding:1.3rem 1.4rem;
-  margin:1.25rem 0 0; background:var(--eddm-raise); }
+.card { border:1px solid var(--eddm-line-base); border-radius:.8rem; padding:1rem 1.15rem;
+  margin:1rem 0 0; background:var(--eddm-raise); }
 .card.live { border-color:var(--eddm-accent-line); }
-.head { display:flex; align-items:flex-start; gap:.75rem; flex-wrap:wrap; }
+.head { display:flex; align-items:flex-start; justify-content:space-between; gap:.75rem; }
 .head-main { flex:1 1 20rem; min-width:0; }
 .head h3 { margin:0; font-size:1.12rem; font-weight:600; letter-spacing:-.015em; }
+.head-actions { display:flex; align-items:center; justify-content:flex-end; gap:.4rem; flex-wrap:wrap; }
+.adm .head-action { height:2rem; min-height:2rem; padding:.3rem .62rem; font-size:.78rem; }
+.delete-action { display:inline-flex; align-items:center; gap:.3rem; }
+.delete-action svg { width:.9rem; height:.9rem; }
 .state { flex:0 0 auto; font-size:.7rem; letter-spacing:.06em; padding:.15rem .6rem; border-radius:99px;
   border:1px solid var(--eddm-line-base); color:var(--eddm-text-dim); }
 .state.on { background:var(--eddm-accent-bg); border-color:var(--eddm-accent-line); color:var(--eddm-sand); }
 .state.lock { border-color:var(--eddm-danger-line); color:var(--eddm-danger); }
-.addr { display:inline-block; margin-top:.25rem; font-family:${TOKENS.font.mono}; font-size:.8rem; color:var(--eddm-text-muted);
+.addr-row { display:flex; align-items:center; gap:.25rem; min-width:0; margin-top:.2rem; }
+.addr { min-width:0; font-family:${TOKENS.font.mono}; font-size:.78rem; color:var(--eddm-text-muted);
   text-decoration:none; overflow-wrap:anywhere; }
 .addr:hover { color:var(--eddm-sand); }
-.made { margin-left:auto; font-size:.78rem; color:var(--eddm-text-faint); }
+.adm .copy-icon { display:inline-grid; place-items:center; flex:0 0 auto; width:1.8rem; height:1.8rem;
+  min-height:1.8rem; padding:.3rem; border-color:transparent; background:transparent; color:var(--eddm-text-muted); }
+.copy-icon:hover, .copy-icon[data-copied="1"] { border-color:var(--eddm-line-base); background:var(--eddm-hover); color:var(--eddm-sand); }
+.copy-icon svg { width:1rem; height:1rem; }
+.made { font-size:.72rem; color:var(--eddm-text-faint); }
 .room-settings { display:grid; grid-template-columns:minmax(11rem,.9fr) minmax(14rem,1.3fr) auto;
-  gap:.7rem; align-items:end; margin-top:1.15rem; padding-top:1.1rem; border-top:1px solid var(--eddm-line); }
-.room-settings .apply { min-height:2.55rem; white-space:nowrap; }
-.password-row { display:grid; grid-template-columns:minmax(10rem,1fr) auto; gap:.5rem; align-items:end; margin-top:.8rem; }
-.password-row button { min-height:2.55rem; white-space:nowrap; }
-.cats { margin-top:1.15rem; border-top:1px solid var(--eddm-line); padding-top:1rem; }
+  gap:.55rem; align-items:end; margin-top:.85rem; padding-top:.85rem; border-top:1px solid var(--eddm-line); }
+.password-row { display:grid; grid-template-columns:minmax(10rem,1fr) auto; gap:.55rem; align-items:end; margin-top:.6rem; }
+.cats { margin-top:.9rem; border-top:1px solid var(--eddm-line); padding-top:.8rem; }
 .cats-head { display:flex; align-items:baseline; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:.35rem; }
 .cats-head h4 { margin:0; font-size:.9rem; font-weight:600; }
 .cats-head p { margin:0; color:var(--eddm-text-dim); font-size:.8rem; }
-.cat { display:flex; align-items:center; gap:.75rem; padding:.65rem .1rem; cursor:pointer;
+.cat { display:flex; align-items:center; gap:.75rem; padding:.55rem .1rem; cursor:pointer;
   border-bottom:1px solid var(--eddm-line); }
 .cat:last-child { border-bottom:0; }
 .cat:hover { color:var(--eddm-sand); }
 .cat > span:first-child { flex:1 1 12rem; font-size:.92rem; }
 .cat .num { color:var(--eddm-text-faint); font-size:.8rem; font-variant-numeric:tabular-nums; }
 .cat input[type="checkbox"] { width:1.2rem; height:1.2rem; margin:0; accent-color:var(--eddm-ivory); cursor:pointer; }
-.room-foot { display:flex; align-items:center; justify-content:space-between; gap:.75rem; flex-wrap:wrap;
-  margin-top:1.15rem; padding-top:1rem; border-top:1px solid var(--eddm-line); }
-.room-foot .row { margin:0; }
 .sessions { margin-top:2.5rem; padding-top:1.25rem; border-top:1px solid var(--eddm-line); }
 @media (max-width:860px) {
   .new form { grid-template-columns:1fr 1fr; }
@@ -140,11 +144,9 @@ const ADMIN_STYLE = `
   .new form, .room-settings, .password-row { grid-template-columns:1fr; }
   .room-settings .apply { grid-column:auto; }
   .new .go, .room-settings .apply, .password-row button { width:100%; }
-  .head .state, .made { margin-left:0; }
-  .room-foot, .room-foot .row { align-items:stretch; }
-  .room-foot .row { width:100%; }
-  .room-foot button { flex:1 1 auto; }
-  .room-foot > .danger { width:100%; }
+  .head { flex-wrap:wrap; }
+  .head-main { flex-basis:100%; }
+  .head-actions { justify-content:flex-start; }
 }
 `;
 
@@ -158,6 +160,8 @@ const ADMIN_SCRIPT = `
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const day = (ms) => { const d = new Date(ms); return (d.getMonth() + 1) + "월 " + d.getDate() + "일"; };
   const origin = location.origin;
+  const copyIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>';
+  const deleteIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg>';
 
   async function send(body) {
     $("err").textContent = "";
@@ -202,10 +206,14 @@ const ADMIN_SCRIPT = `
       const left = r.lockedUntil > Date.now() ? Math.ceil((r.lockedUntil - Date.now()) / 60000) : 0;
       return '<article class="card' + (r.open ? " live" : "") + '" data-room="' + r.slug + '">' +
         '<div class="head"><div class="head-main"><h3>' + esc(r.title) + "</h3>" +
-        '<a class="addr" href="' + url + '" target="_blank" rel="noreferrer">' + esc(url) + "</a></div>" +
-        '<span class="state ' + (r.open ? "on" : "") + '">' + (r.open ? "입장 가능" : "입장 닫힘") + "</span>" +
+        '<div class="addr-row"><a class="addr" href="' + url + '" target="_blank" rel="noreferrer">' + esc(url) + "</a>" +
+        '<button type="button" class="copy-icon" data-act="copy" data-url="' + url + '" aria-label="강의방 URL 복사" title="URL 복사">' + copyIcon + "</button></div></div>" +
+        '<div class="head-actions"><span class="state ' + (r.open ? "on" : "") + '">' + (r.open ? "입장 가능" : "준비 중") + "</span>" +
         (left ? '<span class="state lock">로그인 잠김 · ' + left + "분 남음</span>" : "") +
-        '<span class="made">' + day(r.created) + " 만듦</span></div>" +
+        '<span class="made">' + day(r.created) + " 만듦</span>" +
+        (!r.open ? '<button class="go head-action" data-act="open" data-slug="' + r.slug + '">입장 허용</button>' : "") +
+        (left ? '<button class="head-action" data-act="unlock" data-slug="' + r.slug + '">잠김 풀기</button>' : "") +
+        '<button class="danger head-action delete-action" data-act="remove" data-slug="' + r.slug + '">' + deleteIcon + "<span>삭제</span></button></div></div>" +
         '<div class="room-settings">' +
         '<label class="field"><span>강의방 URL</span><span class="url-input"><span>/room/</span>' +
         '<input data-next-slug="' + r.slug + '" value="' + esc(r.slug) + '" aria-label="강의방 URL 이름"></span></label>' +
@@ -218,12 +226,6 @@ const ADMIN_SCRIPT = `
         '<section class="cats"><div class="cats-head"><h4>포함할 커리큘럼</h4>' +
         '<p>체크한 커리큘럼만 강의방에 포함됩니다</p></div>' +
         (cats || '<p class="note">교안 카테고리가 없습니다</p>') + "</section>" +
-        '<div class="room-foot"><div class="row">' +
-        '<button class="go" data-act="open" data-slug="' + r.slug + '" data-open="' + (r.open ? "0" : "1") + '">' +
-        (r.open ? "수강생 입장 닫기" : "수강생 입장 허용") + "</button>" +
-        (left ? '<button data-act="unlock" data-slug="' + r.slug + '">로그인 잠김 풀기</button>' : "") +
-        '<button data-act="copy" data-url="' + url + '">URL 복사</button></div>' +
-        '<button class="danger" data-act="remove" data-slug="' + r.slug + '">강의방 삭제</button></div>' +
         "</article>";
     }).join("");
 
@@ -232,14 +234,19 @@ const ADMIN_SCRIPT = `
         const act = b.dataset.act;
         const slug = b.dataset.slug;
         if (act === "copy") {
-          try { await navigator.clipboard.writeText(b.dataset.url); b.textContent = "복사함"; }
+          try {
+            await navigator.clipboard.writeText(b.dataset.url);
+            b.dataset.copied = "1";
+            b.setAttribute("aria-label", "강의방 URL 복사됨");
+            b.title = "복사됨";
+            setTimeout(() => { b.dataset.copied = "0"; b.setAttribute("aria-label", "강의방 URL 복사"); b.title = "URL 복사"; }, 1200);
+          }
           catch { $("err").textContent = "주소를 복사하지 못했습니다. 주소를 직접 눌러 확인하세요"; }
           return;
         }
         if (act === "open") {
-          const opening = b.dataset.open === "1";
-          const done = await send({ action: "open", slug, open: opening });
-          if (done) $("err").textContent = opening ? "수강생 입장을 허용했습니다" : "수강생 입장을 닫았습니다";
+          const done = await send({ action: "open", slug, open: true });
+          if (done) $("err").textContent = "수강생 입장을 허용했습니다";
           return;
         }
         if (act === "toggle") {
