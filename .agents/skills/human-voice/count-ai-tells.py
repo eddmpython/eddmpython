@@ -93,10 +93,22 @@ PATTERNS = [
 CLOSERS_FORMAL = ["습니다", "합니다", "됩니다", "줍니다", "입니다", "옵니다", "납니다", "니다"]
 CLOSERS_PLAIN = ["이다", "한다", "된다", "있다", "없다", "간다", "온다", "다"]
 
+# 글자로는 `입니다` 로 끝나지만 계사가 아니라 어간이 `이` 로 끝나는 동사다.
+# 계사로 세면 `입니다` 비율이 부풀어 멀쩡한 글이 단조롭다고 판정된다.
+VERB_IPNIDA = (
+    "보입니다", "높입니다", "쓰입니다", "붙입니다", "모입니다", "놓입니다", "쌓입니다",
+    "섞입니다", "줄입니다", "늘입니다", "기울입니다", "끓입니다", "먹입니다", "속입니다",
+    "덮입니다", "깎입니다", "닦입니다",
+)
+
 # 리듬 문턱. 문서(ai-tells-ko.md E 묶음)와 같은 값이다.
 SD_RATIO_FLOOR = 0.45   # 문장 길이 표준편차 / 평균. 이 아래면 고르다
 DOMINANT_CLOSER_MAX = 0.55  # 한 종결어미가 이 비율을 넘으면 단조롭다
 MIN_SENTENCE_LEN = 5    # 짧은 단언도 문장으로 센다
+# 문장이 이보다 적으면 리듬을 재지 않는다. 표본이 적어 값이 튄다.
+# 정본은 references/ai-tells-ko.md 의 E1 절과 SKILL.md 의 문턱 표이고 둘 다 15 다.
+# 코드가 5 로 재고 있어서 짧은 글에 튀는 값으로 경고가 나갔다.
+MIN_SENTENCES_FOR_RHYTHM = 15
 DENSITY_FLOOR = 50      # 1만자당 문자열 항목 건수. 이 위면 밀집
 KIND_FLOOR = 8          # 걸린 항목 종류 수. 이 위면 밀집
 
@@ -137,6 +149,11 @@ def sentences(text):
 def closer_of(sentence):
     """문장의 종결을 고른다. 긴 것부터 맞춰야 니다 가 습니다 를 삼키지 않는다."""
     tail = sentence.rstrip().rstrip(".!?")
+    # `보입니다` 는 `보이다` 의 활용이지 계사 `이다` 가 아니다. 글자만 보면 `입니다` 로 끝나서
+    # 계사로 세면 `입니다 는 정의할 때만 쓴다` 를 이미 지킨 글에 정반대 경고가 나간다.
+    # 어간이 `이` 로 끝나는 동사라 따로 가른다.
+    if any(tail.endswith(v) for v in VERB_IPNIDA):
+        return "니다", "formal"
     for c in CLOSERS_FORMAL:
         if tail.endswith(c):
             return c, "formal"
@@ -197,7 +214,7 @@ def check(name, raw):
             print("  항목마다 한 번씩이라도 종류가 많으면 글 전체가 표식이다. 문턱 아래도 함께 고친다")
 
     # 2. 리듬
-    if len(lengths) >= 5:
+    if len(lengths) >= MIN_SENTENCES_FOR_RHYTHM:
         sd = statistics.pstdev(lengths)
         mean = statistics.mean(lengths)
         ratio = sd / mean if mean else 0
@@ -215,7 +232,10 @@ def check(name, raw):
         if c:
             counts[c] = counts.get(c, 0) + 1
             styles[style] = styles.get(style, 0) + 1
-    if counts:
+    # E1 과 같은 문턱을 쓴다. 문장이 적으면 으뜸 어미 비율도 함께 튄다.
+    if counts and len(sents) < MIN_SENTENCES_FOR_RHYTHM:
+        print("\n[E2 종결어미] 문장이 적어 재지 않는다")
+    elif counts:
         total = sum(counts.values())
         top = sorted(counts.items(), key=lambda x: -x[1])
         share = top[0][1] / total
