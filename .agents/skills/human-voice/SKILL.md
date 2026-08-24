@@ -18,6 +18,9 @@ AI 티를 다루는 도구 대부분이 **빼는 목록**만 준다. 번역투 �
 - [ai-tells-ko.md](references/ai-tells-ko.md) 빼는 목록. 번역투, 형식명사, 완곡, 관용구, 리듬, 서식
 - [human-signals-ko.md](references/human-signals-ko.md) 넣는 목록. 한국어 블로그 69편 실측에서 나온 것
 
+같은 내용을 `https://eddmpython.com/blog/ai-writing-tells` 로 공개해 두었다. 웹을 읽는 AI 에게는
+그 주소 하나만 보내도 된다. 파일을 첨부할 수 있으면 이 폴더의 세 문서를 그대로 준다.
+
 ## 순서
 
 ### 1. 센다
