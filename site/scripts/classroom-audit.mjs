@@ -183,7 +183,9 @@ const save = async (sessionRef, name) => {
   const captured = await client.act(sessionRef, [{ kind: "screenshot", format: "jpeg", fullPage: true, expectedRisk: "read" }], { timeoutMs: 120000 });
   const image = captured.attachments.find((i) => i.mimeType === "image/jpeg");
   if (!image) throw new Error(`screenshot 없음: ${name}`);
-  const file = join(OUT, `${name}.jpg`);
+  // 글 이름에는 카테고리가 붙어 있어 슬래시가 들어 있다. 그대로 파일 이름에 쓰면 없는
+  // 하위 폴더를 가리켜 쓰기가 ENOENT 로 죽는다. 이름은 여기서 파일에 쓸 수 있게 만든다.
+  const file = join(OUT, `${name.replace(/[\/]/g, "__")}.jpg`);
   await writeFile(file, image.bytes);
   console.log(`  ${file}`);
   const ref = captured.output?.actions?.[0]?.result?.artifactRef;

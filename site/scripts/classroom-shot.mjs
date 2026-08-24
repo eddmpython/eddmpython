@@ -1493,11 +1493,11 @@ for (const viewport of activeViewports) {
       await evaluate(
         session,
         `(() => [...document.querySelectorAll('a.nav-post')]
-          .find((link) => link.getAttribute('href')?.endsWith('/002-what-is-python'))
+          .find((link) => link.getAttribute('href')?.endsWith('-what-is-python'))
           ?.getAttribute('href') ?? null)()`,
       ),
     );
-    if (!comparePost) throw new Error("002 비교 장면 글 링크를 못 찾았다");
+    if (!comparePost) throw new Error("what-is-python 비교 장면 글 링크를 못 찾았다");
     await evaluate(
       session,
       `localStorage.setItem('eddmpython-classroom-theme', 'light'); location.href = ${JSON.stringify(`${base}${comparePost}#lecture=s2.1`)}`,
@@ -1638,11 +1638,11 @@ for (const viewport of activeViewports) {
       await evaluate(
         session,
         `(() => [...document.querySelectorAll('a.nav-post')]
-          .find((link) => link.getAttribute('href')?.endsWith('/005-run-python-in-vscode'))
+          .find((link) => link.getAttribute('href')?.endsWith('-run-python-in-vscode'))
           ?.getAttribute('href') ?? null)()`,
       ),
     );
-    if (!focusPost) throw new Error("005 focus 장면 글 링크를 못 찾았다");
+    if (!focusPost) throw new Error("run-python-in-vscode focus 장면 글 링크를 못 찾았다");
     await evaluate(session, `location.href = ${JSON.stringify(`${base}${focusPost}#lecture=s6.2`)}`, false);
     await client.act(
       session,
@@ -1718,12 +1718,12 @@ for (const viewport of activeViewports) {
         session,
         `(() => {
           const links = [...document.querySelectorAll('a.nav-post')];
-          const target = links.find((link) => link.getAttribute('href')?.endsWith('/003-python-basic-syntax'));
+          const target = links.find((link) => link.getAttribute('href')?.endsWith('-python-basic-syntax'));
           return target?.getAttribute('href') ?? null;
         })()`,
       ),
     );
-    if (!cellPost) throw new Error("003 실행 칸 글 링크를 못 찾았다");
+    if (!cellPost) throw new Error("python-basic-syntax 실행 칸 글 링크를 못 찾았다");
     opened = await client.openTarget(`${base}${cellPost}`, {
       expectedRisk: "externalEffect",
       waitUntil: "load",

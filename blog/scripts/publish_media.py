@@ -33,8 +33,11 @@ IMAGE_MIME = {
     ".gif": "image/gif",
     ".mp4": "video/mp4",
 }
+# 두 자리와 세 자리를 모두 받는다. 공개 블로그 글은 커리큘럼 전체에서 이어지는 세 자리
+# 번호를 쓰고 교안 글은 카테고리마다 다시 세는 두 자리 번호를 쓴다. 한쪽만 받으면 다른 쪽
+# 시각물 발행이 통째로 막힌다.
 ASSET_ID_RE = re.compile(
-    r"(?P<post>\d{3}-[a-z0-9]+(?:-[a-z0-9]+)*)/"
+    r"(?P<post>\d{2,3}-[a-z0-9]+(?:-[a-z0-9]+)*)/"
     r"(?P<key>[a-z0-9]+(?:-[a-z0-9]+)*)"
 )
 SHA256_RE = re.compile(r"[0-9a-f]{64}")
@@ -554,7 +557,10 @@ def course_referenced_sha() -> set[str]:
     279개 전부가 삭제 대상으로 잡혔다. 교안 plan 과 교안 본문을 함께 세어 그것을 막는다.
     """
     referenced: set[str] = set()
-    course_root = REPO_ROOT / "course" / "curriculum"
+    # 교안은 이 저장소 안 course/ 에서 형제 비공개 저장소로 나갔다. 경로를 같이 옮기지
+    # 않아 이 함수가 늘 빈 집합을 돌려주고 있었다. 그러면 교안이 쓰는 객체가 전부 참조 없음으로
+    # 보여 지우자고 나온다. 이 함수가 막으려고 만들어진 바로 그 사고다.
+    course_root = REPO_ROOT.parent / "eddmpython-course" / "curriculum"
     if not course_root.is_dir():
         return referenced
     for plan_path in course_root.rglob("plan.json"):
