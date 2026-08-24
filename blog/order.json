@@ -12,6 +12,12 @@
       "title": "글쓰기",
       "order": 2,
       "summary": "AI 가 쓴 글에서 기계 티를 걷어내고 사람이 쓴 글로 다듬는 법을 다룹니다. 무엇을 빼고 무엇을 넣을지, 그것을 어떻게 세는지까지 정리합니다."
+    },
+    {
+      "slug": "03-python",
+      "title": "파이썬 도구",
+      "order": 3,
+      "summary": "링크를 QR로 바꾸는 것처럼 작은 파이썬 도구를 직접 만드는 법을 다룹니다. 도구를 화면에서 바로 써 보고 같은 것을 파이썬 코드로 옮깁니다."
     }
   ],
   "posts": [
@@ -24,6 +30,11 @@
       "order": 2,
       "slug": "ai-writing-tells",
       "category": "02-writing"
+    },
+    {
+      "order": 3,
+      "slug": "python-qr",
+      "category": "03-python"
     }
   ],
   "archived": []

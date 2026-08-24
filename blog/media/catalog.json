@@ -47,6 +47,12 @@
       "path": "objects/sha256/93/9350676bec68e5034004743b273718ab9a8dc8620a35704298eac1bb278b92b0.webp",
       "post": "002-ai-writing-tells",
       "sha256": "9350676bec68e5034004743b273718ab9a8dc8620a35704298eac1bb278b92b0"
+    },
+    "003-python-qr/hero": {
+      "assetKey": "hero",
+      "path": "objects/sha256/17/17e97599ef2ac51854f63acd7d52026fa0af03556885fdb76e1cdc597a99ce3d.webp",
+      "post": "003-python-qr",
+      "sha256": "17e97599ef2ac51854f63acd7d52026fa0af03556885fdb76e1cdc597a99ce3d"
     }
   },
   "objectPrefix": "objects/sha256",
@@ -400,6 +406,16 @@
       "sourcePost": "016-work-automation-plan",
       "visualSubject": "정상 업무자동화 기획서와 아홉 임시 폴더의 누락 및 중복 및 경로 및 문법 고장 복사본과 검사 결과",
       "width": 1536
+    },
+    "17e97599ef2ac51854f63acd7d52026fa0af03556885fdb76e1cdc597a99ce3d": {
+      "alt": "어두운 책상 위에서 휴대폰이 작은 타일 격자 카드를 비추자 카드에서 가는 리본 하나가 흘러나와 화면으로 이어지는 장면",
+      "bytes": 105406,
+      "height": 832,
+      "mime": "image/webp",
+      "path": "objects/sha256/17/17e97599ef2ac51854f63acd7d52026fa0af03556885fdb76e1cdc597a99ce3d.webp",
+      "sourcePost": "003-python-qr",
+      "visualSubject": "휴대폰, 작은 타일 격자 카드, 카드에서 흘러나오는 리본",
+      "width": 1216
     },
     "17eb5fc0ad90e7b332d25a4e5c3329a26a65f118eaa014fbd03346a017131a20": {
       "alt": "입력 파일과 숫자 행 및 Python 실행기에서 생긴 세 오류가 각각 올바른 파일과 값과 경로로 복구되는 장면",
