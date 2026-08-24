@@ -72,7 +72,7 @@ const BRAND_HEX = [
   TOKENS.color.alert,
 ];
 const EXEMPT = new Set(["src/brand.ts", "src/styles.css", "scripts/check-brand.mjs"]);
-const SCAN = ["classroom.ts", "worker.ts", "scripts/classroom-admin.mjs", "classroom-render.ts"];
+const SCAN = ["shell.ts", "admin.ts", "classroom.ts", "classroom-render.ts", "worker.ts"];
 
 for (const rel of SCAN) {
   if (EXEMPT.has(rel)) continue;
@@ -114,17 +114,33 @@ for (const rel of [...SCAN, "src/styles.css"]) {
 // 강의장 테마 표면은 라이트와 다크에서 같은 의미 토큰을 써야 한다. 배경과 글자에 고정 hex 를
 // 다시 넣으면 한쪽 테마에서만 맞는 코드 블록과 실행 칸이 생긴다.
 const classroom = await readFile(join(SITE, "classroom.ts"), "utf8");
-const fixedThemeColors = classroom.match(
+const admin = await readFile(join(SITE, "admin.ts"), "utf8");
+const shell = await readFile(join(SITE, "shell.ts"), "utf8");
+const fixedThemeColors = (classroom + admin + shell).match(
   /(?:background(?:-color)?|color|border(?:-[a-z]+)?-color)\s*:\s*#[0-9a-f]{3,8}/gi,
 );
 if (fixedThemeColors) {
   add(
-    "classroom.ts",
+    "서버 렌더 표면",
     `테마 표면에 고정 색을 썼습니다: ${[...new Set(fixedThemeColors)].join(", ")}. --eddm-* 의미 토큰을 씁니다`,
   );
 }
+// 테마 토큰은 공용 크롬이 깐다. 운영장과 강의방이 같은 것을 물려받는다.
 for (const name of ["--eddm-code-surface", "--eddm-code-focus", "--eddm-danger", "--eddm-overlay"]) {
-  if (!classroom.includes(name)) add("classroom.ts", `${name} 테마 토큰이 없습니다`);
+  if (!shell.includes(name)) add("shell.ts", `${name} 테마 토큰이 없습니다`);
+}
+/**
+ * 운영장이 브랜드 크롬을 실제로 입는지 본다.
+ *
+ * 비공개 화면이라고 브랜딩을 빼는 것을 막는다. hex 검사만으로는 머리띠도 글꼴도 없는
+ * 맨 화면이 통과한다. 로그인해야 보이는 화면이라는 것은 다른 옷을 입을 이유가 아니다.
+ */
+for (const [needle, why] of [
+  ['from "./shell"', "공용 크롬을 import 하지 않습니다"],
+  ["header()", "브랜드 머리띠를 넣지 않습니다"],
+  ["page({", "공용 문서 뼈대를 쓰지 않습니다"],
+]) {
+  if (!admin.includes(needle)) add("admin.ts", why);
 }
 
 if (problems.length) {

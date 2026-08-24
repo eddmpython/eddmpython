@@ -1,616 +1,46 @@
 /**
- * 강의장. 운영자가 자기 노트북의 운영 화면에서 방을 만들고 그 자리에서 비밀번호를 건다.
+ * 강의방. 수강생이 보는 화면 전부다.
  *
- * 설계 근거는 ../eddmpython-course/memory/architecture/courseRoom.md 다. 원칙 넷이다.
+ * 운영은 여기 없다. 방을 만들고 지우고 비밀번호를 걸고 카테고리를 여는 일은 운영장
+ * `admin.ts` 가 한다. 강의방은 그 결과를 받아 그리기만 한다. 한때 이 파일이 운영 API 까지
+ * 들고 있었는데, 그러면 운영장이 강의방의 부속이 된다. 강의방은 운영장이 만드는 여럿 중
+ * 하나다.
  *
- * 1. 운영 화면은 로컬호스트에만 있다. 공개 서버에는 운영자용 페이지가 없다
- * 2. 방은 실행 중에 생긴다. 만드는 즉시 /cr/<이름> 주소가 살아난다. 배포가 필요 없다
- * 3. 비밀번호는 방을 만들 때 그 자리에서 건다. Worker secret 이 아니라 방의 상태다
- * 4. 닫힌 카테고리의 본문은 아예 안 내려간다. 가리는 것이 아니라 안 주는 것이다
+ * 설계 근거는 ../eddmpython-course/memory/architecture/courseRoom.md 다. 원칙 셋이다.
  *
- * 4번이 이 파일이 존재하는 이유다. 클라이언트에서 거르면 개발자 도구로 앞 내용을 먼저 본다.
+ * 1. 방은 실행 중에 생긴다. 만드는 즉시 /room/<이름> 주소가 살아난다. 배포가 필요 없다
+ * 2. 비밀번호는 방을 만들 때 그 자리에서 건다. 배포 비밀값이 아니라 방의 상태다
+ * 3. 닫힌 카테고리의 본문은 아예 안 내려간다. 가리는 것이 아니라 안 주는 것이다
+ *
+ * 3번이 이 파일이 존재하는 이유다. 클라이언트에서 거르면 개발자 도구로 앞 내용을 먼저 본다.
  */
 import {
   COURSE_SCENE_RUNTIME,
   esc,
   renderLecture,
   renderPost,
-  type Cells,
-  type CourseScene,
 } from "./classroom-render";
-// 심볼 좌표와 SNS 주소는 랜딩과 같은 정본을 읽는다. brand.ts 는 React 를 부르지 않는다.
-import { SYMBOL, BRAND, TOKENS, cssVars } from "./src/brand";
-import { SOCIAL } from "./src/social";
+import { SYMBOL, BRAND, TOKENS } from "./src/brand";
+import { checkToken, cookie, issueToken, hmac, readCookie } from "./auth";
+import { call, validSlug, type PublicRoom } from "./rooms";
+import { course, courseVersion, type CourseCategory } from "./course";
+import { header, page, themeToggle } from "./shell";
+import type { Env } from "./env";
 
-export type Env = {
-  CLASSROOM: DurableObjectNamespace;
-  /** 교안 묶음이 들어 있다. eddmpython-course 저장소가 발행한다. */
-  COURSE: KVNamespace;
-  /** 로컬 운영 화면이 이 Worker 를 조종할 때 쓰는 토큰. 배포 때 한 번 넣는 유일한 비밀값이다. */
-  CR_ADMIN_TOKEN?: string;
-};
 
-export type CoursePost = { id: string; title: string; summary: string; body: string; scenes?: CourseScene[] };
-export type CourseCategory = {
-  slug: string;
-  order: number;
-  title: string;
-  /** 이 카테고리를 덮을 때 독자의 일 하나가 무엇이 되는지. schema 2 부터 온다 */
-  goal?: string;
-  /** 실행 칸 예제. schema 3 부터 온다. 교안이 링크로 부르고 렌더러가 칸으로 그린다 */
-  cells?: Cells;
-  posts: CoursePost[];
-};
-type CourseBundle = { schema: number; sceneContract?: number; categories: CourseCategory[] };
 
-/**
- * 묶음의 모양은 eddmpython-course 와의 계약이다. 바꾸면 양쪽을 같은 날 같이 고친다.
- *
- * **두 판을 같이 받는다.** 하나만 받으면 발행과 배포 사이에 강의장이 빈 목록을 낸다.
- * 어느 쪽을 먼저 하든 그 틈이 생기고, 하필 강의 직전이면 그것이 사고다.
- * 2 는 카테고리 성과(goal)가 붙은 판이고 1 은 그 전 판이다.
- */
-const COURSE_SCHEMA = new Set([1, 2, 3, 4]);
-const COURSE_SCENE_CONTRACTS = new Set([1, 2]);
-
-export type CourseState = { ok: boolean; categories: CourseCategory[] };
-
-const isPost = (p: unknown): p is CoursePost =>
-  !!p &&
-  typeof (p as CoursePost).id === "string" &&
-  typeof (p as CoursePost).title === "string" &&
-  typeof (p as CoursePost).body === "string";
-
-const sceneRoles = new Set(["open", "explain", "invert", "close"]);
-const sceneLayouts = new Set(["stage", "sequence", "compare", "code", "demo"]);
-const sceneEffects = new Set(["enter", "replace", "focus", "compare", "annotate", "run", "simulate"]);
-const sceneEffectRules = {
-  enter: { count: 1, requiresVisible: false, visibility: "append" },
-  replace: { count: 1, requiresVisible: false, visibility: "replace" },
-  focus: { count: 1, requiresVisible: true, visibility: "keep" },
-  compare: { count: 2, requiresVisible: false, visibility: "replace" },
-  annotate: { count: 1, requiresVisible: true, visibility: "keep" },
-  run: { count: 1, requiresVisible: true, visibility: "keep" },
-  simulate: { count: 1, requiresVisible: true, visibility: "keep" },
-} as const;
-const isScene = (value: unknown): value is CourseScene => {
-  if (!value || typeof value !== "object") return false;
-  const scene = value as CourseScene;
-  const shapeOk = (
-    typeof scene.id === "string" &&
-    sceneRoles.has(scene.role) &&
-    sceneLayouts.has(scene.layout) &&
-    Number.isInteger(scene.visualCount) &&
-    scene.visualCount > 0 &&
-    Array.isArray(scene.beats) &&
-    scene.beats.every(
-      (beat) =>
-        beat &&
-        sceneEffects.has(beat.effect) &&
-        Array.isArray(beat.targets) &&
-        beat.targets.length > 0 &&
-        beat.targets.every((target) => Number.isInteger(target) && target > 0 && target <= scene.visualCount) &&
-        (beat.note === undefined || typeof beat.note === "string") &&
-        (beat.effect === "annotate" ? Boolean(beat.note?.trim()) : beat.note === undefined),
-    )
-  );
-  if (!shapeOk || !["enter", "replace"].includes(scene.beats[0]?.effect)) return false;
-  const visible = new Set<number>();
-  for (const beat of scene.beats) {
-    const rule = sceneEffectRules[beat.effect];
-    if (beat.targets.length !== rule.count) return false;
-    if (rule.requiresVisible && beat.targets.some((target) => !visible.has(target))) return false;
-    if (rule.visibility === "replace") visible.clear();
-    if (rule.visibility !== "keep") beat.targets.forEach((target) => visible.add(target));
-  }
-  return true;
-};
-
-/**
- * 교안을 KV 에서 읽는다.
- *
- * **이 저장소에는 교안 글자가 한 자도 없다.** 예전에는 빌드 때 교안 폴더를 읽어 Worker
- * 번들에 구웠다. 그러면 교안을 한 줄 고칠 때마다 공개 사이트를 통째로 배포해야 했고,
- * 공개 저장소 옆에 파는 물건을 두고 훅과 누출 검사로 지켜야 했다.
- *
- * 이제 교안은 비공개 저장소가 KV 로 따로 발행한다. 사이트 배포와 교안 발행이 서로를
- * 기다리지 않는다.
- *
- * **무슨 일이 있어도 던지지 않는다.** 묶음이 깨졌을 때 던지면 강의장만이 아니라 운영
- * 화면까지 같이 죽는다. 그러면 강의 중에 운영자가 방 목록조차 못 본다.
- */
-async function course(env: Env): Promise<CourseState> {
-  let bundle: CourseBundle | null = null;
-  try {
-    const raw = await env.COURSE.get("bundle", { cacheTtl: 60 });
-    if (raw === null) return { ok: true, categories: [] };
-    bundle = JSON.parse(raw) as CourseBundle;
-  } catch {
-    // 묶음이 깨졌으면 교안이 없는 것으로 본다. 여기서 던지면 강의장만이 아니라 운영 화면도
-    // 같이 죽는다. 강의 중에 운영자가 방 목록조차 못 보게 되는 것이 제일 나쁜 결과다.
-    return { ok: false, categories: [] };
-  }
-  if (!bundle || !COURSE_SCHEMA.has(bundle.schema) || !Array.isArray(bundle.categories)) {
-    return { ok: false, categories: [] };
-  }
-  if (bundle.schema === 4 && !COURSE_SCENE_CONTRACTS.has(bundle.sceneContract ?? 0)) {
-    return { ok: false, categories: [] };
-  }
-  const categories = bundle.categories
-    .filter((c) => c && typeof c.slug === "string" && Array.isArray(c.posts))
-    .map((c) => ({
-      ...c,
-      order: Number(c.order) || 0,
-      posts: c.posts.filter(isPost).map((post) => ({
-        ...post,
-        scenes: Array.isArray(post.scenes) ? post.scenes.filter(isScene) : undefined,
-      })),
-    }))
-    .sort((a, b) => a.order - b.order);
-  return { ok: true, categories };
-}
-
-/**
- * 교안의 판 번호. 발행할 때마다 바뀐다.
- *
- * 상태 지문에 이것을 넣지 않으면 교안을 다시 발행해도 **이미 화면을 열고 있는 수강생이
- * 모른다.** 새로 들어오는 사람만 새 내용을 본다. 예전에는 교안이 Worker 번들에 있어서
- * 재배포가 강제 새로고침 노릇을 했는데 KV 로 옮기면서 그 효과가 사라졌다.
- */
-async function courseVersion(env: Env): Promise<string> {
-  try {
-    return (await env.COURSE.get("version", { cacheTtl: 60 })) ?? "";
-  } catch {
-    return "";
-  }
-}
-
-/** 방 하나. 비밀번호는 원문을 두지 않고 salt 를 섞어 늘린 해시만 둔다. */
-export type Room = {
-  slug: string;
-  title: string;
-  open: boolean;
-  unlocked: string[];
-  salt: string;
-  hash: string;
-  /** 세션 세대. 비밀번호를 바꾸면 새로 뽑아 그 전에 들어온 사람을 전부 내보낸다. */
-  gen: string;
-  created: number;
-  fails: number;
-  lockedUntil: number;
-};
-
-/** 운영 화면에 보내는 모양. 해시와 salt 는 빼고 보낸다. */
-export type PublicRoom = {
-  slug: string;
-  title: string;
-  open: boolean;
-  unlocked: string[];
-  gen: string;
-  created: number;
-  lockedUntil: number;
-};
-
-const SESSION_COOKIE = "cr_room";
-const SESSION_TTL_SEC = 60 * 60 * 12;
-const MAX_FAILS = 8;
-const LOCK_MS = 5 * 60 * 1000;
-
-const enc = new TextEncoder();
-
-const ROOM_SLUG = /^[a-z0-9][a-z0-9-]{1,30}$/;
-const RESERVED = new Set(["api", "login", "state", "admin"]);
-
-export function validSlug(slug: string): boolean {
-  return ROOM_SLUG.test(slug) && !RESERVED.has(slug);
-}
-
-function hex(buffer: ArrayBuffer): string {
-  return [...new Uint8Array(buffer)].map((b) => b.toString(16).padStart(2, "0")).join("");
-}
-
-function randomHex(bytes: number): string {
-  return hex(crypto.getRandomValues(new Uint8Array(bytes)).buffer);
-}
-
-async function hmac(secret: string, message: string): Promise<string> {
-  const key = await crypto.subtle.importKey(
-    "raw",
-    enc.encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
-  return hex(await crypto.subtle.sign("HMAC", key, enc.encode(message)));
-}
-
-/**
- * 강의장 비밀번호는 짧다. 그대로 해시하면 금방 뒤집히므로 반복해서 늘린다.
- *
- * 반복은 10만 회다. **Cloudflare Workers 가 PBKDF2 반복을 10만 회로 막는다.** 12만 회를
- * 요청했더니 로컬 miniflare 는 통과하고 배포된 Worker 만 NotSupportedError 로 던졌다.
- * 로그를 잡기 전까지 create 와 login 이 프로덕션에서만 500 이었다. 이 상한을 넘기지 않는다.
- */
-const PBKDF2_ITERATIONS = 100000;
-
-async function stretch(password: string, salt: string): Promise<string> {
-  const key = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, [
-    "deriveBits",
-  ]);
-  const bits = await crypto.subtle.deriveBits(
-    { name: "PBKDF2", salt: enc.encode(salt), iterations: PBKDF2_ITERATIONS, hash: "SHA-256" },
-    key,
-    256,
-  );
-  return hex(bits);
-}
-
-/** 길이가 같으면 전부 비교한다. 타이밍으로 비밀번호를 재는 것을 막는다. */
-function safeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let i = 0; i < a.length; i += 1) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return diff === 0;
-}
-
-function publicRoom(room: Room): PublicRoom {
-  return {
-    slug: room.slug,
-    title: room.title,
-    open: room.open,
-    unlocked: room.unlocked,
-    gen: room.gen,
-    created: room.created,
-    lockedUntil: room.lockedUntil,
-  };
-}
-
-/* 상태 보관 ------------------------------------------------------------- */
-
-/**
- * 강의장 전체를 든다. 방 목록, 방마다의 열림 상태, 세션 서명 키가 여기 있다.
- * 인스턴스가 하나라 수강생이 여럿이어도 운영자 클릭이 모두에게 같게 반영된다.
- */
-export class Classroom {
-  private state: DurableObjectState;
-
-  constructor(state: DurableObjectState) {
-    this.state = state;
-  }
-
-  private async rooms(): Promise<Map<string, Room>> {
-    const found = await this.state.storage.list<Room>({ prefix: "room:" });
-    return new Map([...found].map(([k, v]) => [k.slice(5), v]));
-  }
-
-  private async put(room: Room): Promise<void> {
-    await this.state.storage.put(`room:${room.slug}`, room);
-  }
-
-  /** 쿠키 서명 키. 처음 필요할 때 만들어 두고 계속 쓴다. 배포 때 넣을 비밀값을 하나 줄인다. */
-  private async signKey(): Promise<string> {
-    const found = await this.state.storage.get<string>("signKey");
-    if (found) return found;
-    const made = randomHex(32);
-    await this.state.storage.put("signKey", made);
-    return made;
-  }
-
-  async fetch(request: Request): Promise<Response> {
-    const body = (await request.json()) as Record<string, unknown>;
-    const action = String(body.action ?? "");
-    const slug = typeof body.slug === "string" ? body.slug : "";
-    const now = Date.now();
-
-    if (action === "signKey") return Response.json({ key: await this.signKey() });
-
-    if (action === "list") {
-      const all = [...(await this.rooms()).values()].sort((a, b) => b.created - a.created);
-      return Response.json({ rooms: all.map(publicRoom) });
-    }
-
-    if (action === "get") {
-      const room = (await this.rooms()).get(slug);
-      return Response.json({ room: room ? publicRoom(room) : null });
-    }
-
-    if (action === "create") {
-      if (!validSlug(slug)) {
-        return Response.json({ error: "주소로 쓸 수 없는 이름입니다" }, { status: 400 });
-      }
-      if ((await this.rooms()).has(slug)) {
-        return Response.json({ error: "이미 있는 방입니다" }, { status: 409 });
-      }
-      const password = String(body.password ?? "");
-      if (password.length < 4) {
-        return Response.json({ error: "비밀번호는 네 자 이상입니다" }, { status: 400 });
-      }
-      const salt = randomHex(16);
-      await this.put({
-        slug,
-        title: String(body.title ?? slug).slice(0, 60) || slug,
-        // 만들면 바로 산다. 주소를 알려 주는 순간 들어올 수 있다.
-        open: true,
-        unlocked: [],
-        salt,
-        hash: await stretch(password, salt),
-        gen: randomHex(8),
-        created: now,
-        fails: 0,
-        lockedUntil: 0,
-      });
-      return Response.json({ ok: true });
-    }
-
-    const room = (await this.rooms()).get(slug);
-    if (!room) return Response.json({ error: "없는 방입니다" }, { status: 404 });
-
-    if (action === "remove") {
-      await this.state.storage.delete(`room:${slug}`);
-      return Response.json({ ok: true });
-    }
-
-    /**
-     * 검수를 마친 방을 수강생에게 줄 제품 주소로 옮긴다.
-     *
-     * 방을 새로 만들면 기존 비밀번호 원문을 다시 알아야 한다. 주소와 이름만 바꾸면 비밀번호
-     * 해시는 그대로 보존할 수 있다. 두 키를 따로 쓰면 중간에 두 방이 보이거나 둘 다 사라질 수
-     * 있으므로 한 트랜잭션에서 새 키를 쓰고 옛 키를 지운다.
-     */
-    if (action === "rename") {
-      const nextSlug = typeof body.nextSlug === "string" ? body.nextSlug.trim() : "";
-      const title = typeof body.title === "string" ? body.title.trim() : "";
-      if (!validSlug(nextSlug)) {
-        return Response.json({ error: "주소로 쓸 수 없는 이름입니다" }, { status: 400 });
-      }
-      if (!title || title.length > 60) {
-        return Response.json({ error: "강의장 이름은 한 자 이상 60자 이하로 적어 주세요" }, { status: 400 });
-      }
-
-      const moved = await this.state.storage.transaction(async (txn) => {
-        const current = await txn.get<Room>(`room:${slug}`);
-        if (!current) return "missing";
-        if (nextSlug !== slug && (await txn.get<Room>(`room:${nextSlug}`))) return "exists";
-
-        current.slug = nextSlug;
-        current.title = title;
-        if (nextSlug !== slug) {
-          // 예전 검수 주소에서 받은 세션으로 제품 방에 들어오지 못하게 한다.
-          current.gen = randomHex(8);
-          current.fails = 0;
-          current.lockedUntil = 0;
-        }
-        await txn.put(`room:${nextSlug}`, current);
-        if (nextSlug !== slug) await txn.delete(`room:${slug}`);
-        return "ok";
-      });
-
-      if (moved === "missing") {
-        return Response.json({ error: "없는 방입니다" }, { status: 404 });
-      }
-      if (moved === "exists") {
-        return Response.json({ error: "옮길 주소에 이미 방이 있습니다" }, { status: 409 });
-      }
-      return Response.json({ ok: true, slug: nextSlug });
-    }
-
-    if (action === "password") {
-      const password = String(body.password ?? "");
-      if (password.length < 4) {
-        return Response.json({ error: "비밀번호는 네 자 이상입니다" }, { status: 400 });
-      }
-      room.salt = randomHex(16);
-      room.hash = await stretch(password, room.salt);
-      // 세대를 새로 뽑아 앞의 세션을 전부 끊는다. 안 그러면 이미 들어온 사람이 그대로 남는다.
-      room.gen = randomHex(8);
-      room.fails = 0;
-      room.lockedUntil = 0;
-      await this.put(room);
-      return Response.json({ ok: true });
-    }
-
-    /**
-     * 로그인 잠금을 푼다.
-     *
-     * 수강생이 여덟 번 틀리면 5분 막힌다. 강의 중의 5분은 길고, 그 사이 그 사람은 아무것도
-     * 못 본다. 비밀번호를 바꾸면 풀리기는 하지만 세대가 돌아 **이미 들어와 있는 사람이 전부
-     * 튕긴다.** 한 사람 때문에 강의실 전체를 내보내지 않으려고 따로 둔다.
-     */
-    if (action === "unlock") {
-      room.fails = 0;
-      room.lockedUntil = 0;
-      await this.put(room);
-      return Response.json({ ok: true });
-    }
-
-    if (action === "open") {
-      room.open = Boolean(body.open);
-      // 방을 닫으면 잠금도 처음으로 되돌린다. 다음 강의가 앞 강의 상태를 물려받지 않는다.
-      if (!room.open) room.unlocked = [];
-      await this.put(room);
-      return Response.json({ ok: true });
-    }
-
-    if (action === "toggle") {
-      const category = String(body.category ?? "");
-      const at = room.unlocked.indexOf(category);
-      if (at >= 0) room.unlocked.splice(at, 1);
-      else room.unlocked.push(category);
-      await this.put(room);
-      return Response.json({ ok: true });
-    }
-
-    if (action === "login") {
-      if (room.lockedUntil > now) {
-        return Response.json({ ok: false, retryAfter: Math.ceil((room.lockedUntil - now) / 1000) });
-      }
-      const given = await stretch(String(body.password ?? ""), room.salt);
-      if (!safeEqual(given, room.hash)) {
-        room.fails += 1;
-        // 공개 주소에 짧은 비밀번호가 걸려 있다. 계속 두드리면 잠근다.
-        if (room.fails >= MAX_FAILS) {
-          room.fails = 0;
-          room.lockedUntil = now + LOCK_MS;
-        }
-        await this.put(room);
-        return Response.json({ ok: false });
-      }
-      if (room.fails || room.lockedUntil) {
-        room.fails = 0;
-        room.lockedUntil = 0;
-        await this.put(room);
-      }
-      return Response.json({ ok: true });
-    }
-
-    return Response.json({ error: "모르는 동작입니다" }, { status: 400 });
-  }
-}
-
-type Call = { status: number; data: Record<string, any> };
-
-async function call(env: Env, body: Record<string, unknown>): Promise<Call> {
-  const stub = env.CLASSROOM.get(env.CLASSROOM.idFromName("main"));
-  const res = await stub.fetch("https://cr/do", { method: "POST", body: JSON.stringify(body) });
-  return { status: res.status, data: (await res.json()) as Record<string, any> };
-}
-
-/* 세션 ------------------------------------------------------------------ */
-
-async function signKey(env: Env): Promise<string> {
-  const { data } = await call(env, { action: "signKey" });
-  return data.key as string;
-}
-
-function issueSession(key: string, room: PublicRoom): Promise<string> {
-  const expires = Math.floor(Date.now() / 1000) + SESSION_TTL_SEC;
-  const payload = `${room.slug}.${room.gen}.${expires}`;
-  return hmac(key, payload).then((sig) => `${payload}.${sig}`);
-}
-
-/**
- * 쿠키가 이 방의 것이고 아직 살아 있는지 본다.
- *
- * 방 이름만이 아니라 **세대**까지 본다. 비밀번호를 바꾸거나 방을 지웠다 다시 만들면 세대가
- * 바뀌고 앞의 쿠키가 전부 죽는다. 비밀번호를 바꾸는 이유는 그것이 샜기 때문인데 세대를
- * 안 보면 이미 들어와 있는 사람은 12시간을 그대로 남는다.
- */
-async function hasSession(key: string, request: Request, room: PublicRoom): Promise<boolean> {
-  const raw = request.headers.get("cookie") ?? "";
-  let token: string | null = null;
-  for (const part of raw.split(";")) {
-    const [k, ...v] = part.trim().split("=");
-    if (k === SESSION_COOKIE) token = v.join("=");
-  }
-  if (!token) return false;
-  const parts = token.split(".");
-  if (parts.length !== 4) return false;
-  const [got, gen, expiresRaw, sig] = parts;
-  if (got !== room.slug) return false;
-  if (!room.gen || gen !== room.gen) return false;
-  const expires = Number(expiresRaw);
-  if (!Number.isFinite(expires) || expires * 1000 < Date.now()) return false;
-  return safeEqual(sig, await hmac(key, `${got}.${gen}.${expiresRaw}`));
-}
-
-function sessionCookie(token: string, slug: string, url: URL): string {
-  const secure = url.protocol === "https:" ? " Secure;" : "";
-  return `${SESSION_COOKIE}=${token}; Path=/cr/${slug}; HttpOnly;${secure} SameSite=Lax; Max-Age=${SESSION_TTL_SEC}`;
-}
 
 /* 화면 ------------------------------------------------------------------ */
 
 // 브랜드 값은 여기서 만들지 않는다. src/brand.ts 의 TOKENS 가 정본이고 그것이 변수를 깐다.
 // scripts/check-brand.mjs 가 이 파일에 hex 가 다시 나타나면 막는다.
-const STYLE = `
-${cssVars()}
-:root {
-  color-scheme:dark;
-  --eddm-code-surface:color-mix(in srgb,var(--eddm-ivory) 5%,var(--eddm-carbon));
-  --eddm-code-focus:color-mix(in srgb,var(--eddm-ivory) 8%,var(--eddm-carbon));
-  --eddm-danger:color-mix(in srgb,var(--eddm-alert) 68%,var(--eddm-ivory));
-  --eddm-danger-line:color-mix(in srgb,var(--eddm-danger) 38%,transparent);
-  --eddm-media:${TOKENS.color.ink};
-  --eddm-overlay:color-mix(in srgb,${TOKENS.color.ink} 92%,transparent);
-}
-:root[data-theme="light"] {
-  color-scheme:light;
-  --eddm-carbon:${TOKENS.color.ivory};
-  --eddm-ink:color-mix(in srgb, ${TOKENS.color.ivory} 92%, ${TOKENS.color.carbon});
-  --eddm-ivory:${TOKENS.color.carbon};
-  --eddm-sand:color-mix(in srgb, ${TOKENS.color.sand} 45%, ${TOKENS.color.carbon});
-  --eddm-text:color-mix(in srgb, ${TOKENS.color.carbon} 78%, transparent);
-  --eddm-text-muted:color-mix(in srgb, ${TOKENS.color.carbon} 58%, transparent);
-  --eddm-text-dim:color-mix(in srgb, ${TOKENS.color.carbon} 45%, transparent);
-  --eddm-text-faint:color-mix(in srgb, ${TOKENS.color.carbon} 35%, transparent);
-  --eddm-line:color-mix(in srgb, ${TOKENS.color.carbon} 8%, transparent);
-  --eddm-line-base:color-mix(in srgb, ${TOKENS.color.carbon} 11%, transparent);
-  --eddm-line-strong:color-mix(in srgb, ${TOKENS.color.carbon} 17%, transparent);
-  --eddm-raise:color-mix(in srgb, ${TOKENS.color.carbon} 4%, transparent);
-  --eddm-hover:color-mix(in srgb, ${TOKENS.color.carbon} 8%, transparent);
-  --eddm-accent-line:color-mix(in srgb, var(--eddm-sand) 35%, transparent);
-  --eddm-accent-bg:color-mix(in srgb, var(--eddm-sand) 10%, transparent);
-  --eddm-accent-dim:color-mix(in srgb, var(--eddm-sand) 72%, transparent);
-}
-* { box-sizing: border-box; }
-html { min-height:100%; background:var(--eddm-carbon); scrollbar-color:var(--eddm-line-strong) var(--eddm-carbon); }
-body { min-height:100vh; min-height:100dvh; margin:0; background:var(--eddm-carbon); color:var(--eddm-ivory); font-family:${TOKENS.font.sans}; word-break:keep-all; -webkit-font-smoothing:antialiased;
-  line-height:1.7; -webkit-text-size-adjust:100%; }
-:focus-visible { outline:2px solid var(--eddm-accent-dim); outline-offset:2px; border-radius:.25rem; }
-.sr-only { position:absolute !important; width:1px !important; height:1px !important; padding:0 !important;
-  margin:-1px !important; overflow:hidden !important; clip:rect(0,0,0,0) !important;
-  white-space:nowrap !important; border:0 !important; }
-::selection { background:var(--eddm-accent-line); }
-.wrap { max-width:56rem; margin:0 auto; padding:2.5rem 1.25rem 5rem; }
-.wrap.wide { max-width:88rem; }
-
-/* 머리띠. 랜딩 Nav.tsx 의 실측값 그대로다. 값을 바꾸면 두 화면이 어긋난다 */
-.hd { display:flex; flex-direction:column; align-items:center; gap:20px; margin-bottom:56px; }
-.hd-logo { display:flex; align-items:center; gap:10px; text-decoration:none; border:0; color:inherit; }
-.hd-symbol { height:21px; width:auto; color:var(--eddm-ivory); display:block; }
-.hd-word { font-size:15px; letter-spacing:-.025em; line-height:1.5; color:var(--eddm-ivory); }
-.hd-word b { font-weight:700; }
-.hd-word i { font-style:normal; font-weight:400; color:var(--eddm-text); }
-.hd-right { display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
-  column-gap:20px; row-gap:10px; font-size:14px; line-height:1.4285714; color:var(--eddm-text); }
-.hd .nav-link { color:inherit; text-decoration:none; border:0; transition:color .15s cubic-bezier(.4,0,.2,1); }
-.hd .nav-link:hover { color:var(--eddm-ivory); }
-.hd-icons { display:flex; align-items:center; gap:14px; }
-.hd .nav-icon { color:var(--eddm-text-muted); border:0; transition:color .15s cubic-bezier(.4,0,.2,1); }
-.hd .nav-icon:hover { color:var(--eddm-ivory); }
-.hd .nav-icon svg { height:18px; width:18px; display:block; }
-.theme-toggle { display:grid; place-items:center; width:2.15rem; height:2.15rem; margin:0; padding:0;
-  border:1px solid var(--eddm-line-base); border-radius:.55rem; background:var(--eddm-raise);
-  color:var(--eddm-text-muted); cursor:pointer; transition:color .15s cubic-bezier(.4,0,.2,1),
-  background .15s cubic-bezier(.4,0,.2,1), border-color .15s cubic-bezier(.4,0,.2,1); }
-.theme-toggle:hover { border-color:var(--eddm-line-strong); background:var(--eddm-hover); color:var(--eddm-ivory); }
-.theme-toggle svg { display:none; width:17px; height:17px; }
-:root[data-theme="light"] .theme-toggle .theme-icon-moon { display:block; }
-:root[data-theme="dark"] .theme-toggle .theme-icon-sun { display:block; }
-@media (min-width:768px) {
-  .hd { flex-direction:row; justify-content:space-between; gap:0; margin-bottom:64px; }
-}
-
-.eyebrow { font-size:.72rem; letter-spacing:.14em; text-transform:uppercase;
-  color:var(--eddm-sand); margin:0 0 .6rem; }
-.hero { margin-bottom:2.5rem; }
-.hero h1 { margin:0 0 .6rem; font-size:1.9rem; letter-spacing:-.02em; line-height:1.25; }
-.hero .sub { margin:0; color:var(--eddm-text-muted); }
-.gate { position:relative; overflow:hidden; max-width:42rem; margin:0 auto; padding:2rem;
-  border:1px solid var(--eddm-line-base); border-radius:1rem; background:var(--eddm-raise); }
-.gate::before { content:""; position:absolute; top:0; left:0; right:0; height:2px;
-  background:var(--eddm-sand); opacity:.65; }
-.gate h1 { font-size:clamp(1.75rem,5vw,2.35rem); line-height:1.2; letter-spacing:-.03em; }
-.gate .sub { max-width:34rem; margin-bottom:0; color:var(--eddm-text-muted); line-height:1.8; }
-.gate form { margin-top:2rem; }
-.gate input[type=password] { background:var(--eddm-carbon); }
-@media (max-width:520px) {
-  .gate { padding:1.5rem; }
-  .gate form { flex-direction:column; }
-  .gate input[type=password] { flex:0 0 auto; width:100%; }
-  .gate button { width:100%; }
-}
-
+/**
+ * 강의방 화면 CSS.
+ *
+ * 공용 부분은 shell.ts 의 SHELL_STYLE 이 이미 깔았다. 여기에는 글 화면, 카테고리 목록,
+ * 실행 칸, 강의 모드처럼 강의방에서만 쓰는 것만 둔다.
+ */
+const CLASSROOM_STYLE = `
 /* 글 화면. 왼쪽 과정 이동, 가운데 본문, 오른쪽 목차 */
 .lay { display:grid; grid-template-columns:15rem minmax(0,1fr) 15rem; gap:3rem; align-items:start; }
 .side, .toc { position:sticky; top:2rem; max-height:calc(100vh - 4rem); overflow-y:auto;
@@ -674,15 +104,7 @@ article .q { font-style:normal; color:var(--eddm-ivory); }
   .side { display:flex; flex-wrap:wrap; gap:.4rem; align-items:center; }
   .side .side-h { width:100%; margin:.5rem 0 0; }
 }
-h1 { font-size:1.6rem; letter-spacing:-0.01em; margin:0 0 .35rem; }
-.sub { color:var(--eddm-text); font-size:.95rem; margin:0 0 2rem; }
-form { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:1.5rem; }
-input[type=password] { flex:1 1 14rem; min-width:0; padding:.7rem .9rem; border-radius:.6rem;
-  border:1px solid var(--eddm-line-strong); background:var(--eddm-raise); color:inherit; font-size:1rem; }
-button { padding:.7rem 1.1rem; border-radius:.6rem; border:1px solid var(--eddm-accent-line); background:var(--eddm-accent-bg);
-  color:var(--eddm-sand); font-size:.95rem; cursor:pointer; }
-button:hover { background:var(--eddm-accent-bg); }
-.err { color:var(--eddm-danger); margin-top:1rem; font-size:.92rem; }
+
 .cat { border:1px solid var(--eddm-line-base); border-radius:.85rem; padding:1.4rem 1.5rem 1.1rem; margin:0 0 1rem; }
 .cat-h { display:flex; align-items:baseline; gap:.75rem; }
 .cat-n { font-size:.78rem; font-weight:500; color:var(--eddm-accent-dim); font-variant-numeric:tabular-nums; }
@@ -1237,76 +659,6 @@ html[data-theme="light"] .scene-canvas pre {
   .scene-callout.on { animation:none; transform:none; }
   .scene-cue { transition:none; transform:none; }
 }
-`;
-
-/**
- * 첫 화면을 그리기 전에 시스템 설정이나 저장한 선택을 적용한다. body 뒤에서 바꾸면
- * 라이트 화면이 잠깐 어둡게 번쩍이므로 head에서 먼저 실행한다.
- */
-const THEME_INIT_SCRIPT = `
-(() => {
-  const root = document.documentElement;
-  const media = matchMedia("(prefers-color-scheme: light)");
-  const key = "eddmpython-classroom-theme";
-  const choices = new Set(["system", "light", "dark"]);
-  let saved = "system";
-  try {
-    const value = localStorage.getItem(key);
-    if (value && choices.has(value)) saved = value;
-  } catch {
-    // 저장소가 막혀도 현재 페이지의 시스템 테마는 안전하게 적용할 수 있다.
-  }
-  const set = (choice, persist = true) => {
-    const selected = choices.has(choice) ? choice : "system";
-    const resolved = selected === "system" ? (media.matches ? "light" : "dark") : selected;
-    root.dataset.themeChoice = selected;
-    root.dataset.theme = resolved;
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute("content", resolved === "light" ? "${TOKENS.color.ivory}" : "${TOKENS.color.carbon}");
-    if (persist) {
-      try {
-        localStorage.setItem(key, selected);
-      } catch {
-        // 저장 실패는 다른 페이지 유지에만 영향을 주며 현재 테마 전환은 이미 끝났다.
-      }
-    }
-    root.dispatchEvent(new CustomEvent("eddmthemechange", { detail: { selected, resolved } }));
-  };
-  window.__eddmTheme = { key, media, set };
-  set(saved, false);
-})();
-`;
-
-/** 아이콘 토글과 시스템 테마 변경을 연결한다. */
-const THEME_SCRIPT = `
-(() => {
-  const api = window.__eddmTheme;
-  if (!api) return;
-  const root = document.documentElement;
-  const toggles = [...document.querySelectorAll("[data-theme-toggle]")];
-  if (!toggles.length) return;
-  const sync = () => {
-    const current = root.dataset.theme === "light" ? "light" : "dark";
-    const next = current === "light" ? "dark" : "light";
-    const label = next === "light" ? "라이트 테마로 변경" : "다크 테마로 변경";
-    for (const toggle of toggles) {
-      toggle.dataset.nextTheme = next;
-      toggle.setAttribute("aria-label", label);
-      toggle.setAttribute("title", label);
-    }
-  };
-  for (const toggle of toggles) {
-    toggle.addEventListener("click", () => api.set(toggle.dataset.nextTheme));
-  }
-  root.addEventListener("eddmthemechange", sync);
-  api.media.addEventListener("change", () => {
-    if (root.dataset.themeChoice === "system") api.set("system", false);
-  });
-  window.addEventListener("storage", (event) => {
-    if (event.key === api.key) api.set(event.newValue ?? "system", false);
-  });
-  sync();
-})();
 `;
 
 /**
@@ -2215,159 +1567,65 @@ const LECTURE_SCRIPT = `
 })();
 `;
 
-/**
- * 인라인 스크립트를 쓰므로 이 응답만 nonce 를 붙인 CSP 를 직접 단다.
- * worker.ts 의 기본 CSP 는 script-src 'self' 라 인라인이 막힌다. 확대와 실시간 동기화가
- * 둘 다 스크립트라서 nonce 없이는 강의장이 죽은 화면이 된다.
- */
-const SITE = "https://eddmpython.com";
-
-/** 랜딩 `Nav.tsx` 의 링크 그대로. 강의장은 다른 출처라 절대 주소로 건다. */
-const NAV_LINKS = [
-  { label: "제품", href: `${SITE}/#products` },
-  { label: "데이터", href: `${SITE}/#data` },
-  { label: "블로그", href: `${SITE}/blog` },
-  { label: "FAQ", href: `${SITE}/#faq` },
-];
+/* 세션 ------------------------------------------------------------------ */
 
 /**
- * SNS 아이콘. `src/components/icons.tsx` 의 path 를 옮겨 왔다.
+ * 수강생 쿠키.
  *
- * 심볼과 주소는 `src/brand.ts` 와 `src/social.ts` 에서 그대로 import 하는데 아이콘만
- * 옮겨 적는 이유는 그쪽이 React 컴포넌트라서다. 랜딩에서 아이콘을 고치면 여기도 고친다.
+ * 운영자 쿠키와 이름도 경로도 겹치지 않는다. 강의방 세션으로 운영장에 들어가거나 그 반대가
+ * 되면 안 된다. 경로를 방 하나로 좁혀 두어 옆 방 쿠키도 따라가지 않는다.
  */
-const NAV_ICONS = [
-  {
-    label: "GitHub",
-    href: SOCIAL.github,
-    svg: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12Z"/></svg>`,
-  },
-  {
-    label: "Threads",
-    href: SOCIAL.threads,
-    svg: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.27 11.13a6.9 6.9 0 0 0-.26-.12c-.15-2.82-1.7-4.44-4.29-4.46h-.04c-1.55 0-2.84.66-3.63 1.87l1.43.98c.6-.9 1.53-1.1 2.2-1.1h.03c.83 0 1.46.25 1.86.72.3.35.5.83.6 1.44a10.9 10.9 0 0 0-2.4-.12c-2.42.14-3.98 1.55-3.87 3.51.05 1 .55 1.85 1.4 2.4.72.47 1.65.7 2.62.65 1.28-.07 2.28-.56 2.98-1.45.53-.68.87-1.56 1.02-2.66.62.37 1.07.87 1.32 1.46.43 1.01.46 2.68-.9 4.03-1.19 1.19-2.62 1.7-4.78 1.72-2.4-.02-4.21-.79-5.39-2.28C4.98 16.3 4.42 14.36 4.4 12c.02-2.36.58-4.3 1.67-5.72C7.25 4.79 9.06 4.02 11.46 4c2.42.02 4.26.79 5.48 2.29.6.73 1.05 1.66 1.35 2.73l1.68-.45c-.36-1.32-.93-2.46-1.7-3.4C16.7 3.24 14.4 2.24 11.47 2.22h-.01c-2.93.02-5.2 1.02-6.75 2.97C3.33 6.92 2.62 9.2 2.6 11.99v.02c.02 2.79.73 5.07 2.11 6.8 1.55 1.95 3.82 2.95 6.75 2.97h.01c2.6-.02 4.44-.7 5.95-2.21 1.98-1.98 1.92-4.46 1.27-5.98-.47-1.1-1.36-1.99-2.57-2.58Zm-4.44 4.06c-1.07.06-2.19-.42-2.24-1.42-.04-.74.53-1.57 2.3-1.67l.4-.01c.64 0 1.24.06 1.79.18-.2 2.54-1.4 2.86-2.25 2.92Z"/></svg>`,
-  },
-  {
-    label: "YouTube",
-    href: SOCIAL.youtube,
-    svg: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.14C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.51A3.02 3.02 0 0 0 .5 6.2C0 8.09 0 12 0 12s0 3.91.5 5.8a3.02 3.02 0 0 0 2.12 2.14c1.88.51 9.38.51 9.38.51s7.5 0 9.38-.51a3.02 3.02 0 0 0 2.12-2.14C24 15.91 24 12 24 12s0-3.91-.5-5.8ZM9.55 15.57V8.43L15.82 12l-6.27 3.57Z"/></svg>`,
-  },
-  {
-    label: "메일",
-    href: SOCIAL.mail,
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3.5 6.5 8.5 6 8.5-6"/></svg>`,
-  },
-];
+const ROOM_COOKIE = "eddm_room";
 
-/** 같은 테마 조작을 읽기 화면과 강의 셸에 투영한다. */
-function themeToggle(extraClass = ""): string {
-  const className = `theme-toggle${extraClass ? ` ${extraClass}` : ""}`;
-  return `<button type="button" class="${esc(className)}" data-theme-toggle aria-label="화면 테마 변경" title="화면 테마 변경">
-    <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="3.5"/><path d="M12 2v2.2M12 19.8V22M4.93 4.93l1.56 1.56M17.51 17.51l1.56 1.56M2 12h2.2M19.8 12H22M4.93 19.07l1.56-1.56M17.51 6.49l1.56-1.56"/>
-    </svg>
-    <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2Z"/>
-    </svg>
-  </button>`;
+const roomPath = (slug: string) => `/room/${slug}`;
+
+async function signKey(env: Env): Promise<string> {
+  const { data } = await call(env, { action: "signKey" });
+  return data.key as string;
 }
 
 /**
- * 브랜드 머리띠. 랜딩 `Nav.tsx` 와 같은 것을 낸다.
+ * 쿠키가 이 방의 것이고 아직 살아 있는지 본다.
  *
- * 강의장은 Worker 가 HTML 문자열로 뽑는 화면이라 React 컴포넌트를 부를 수 없다. 대신
- * 심볼 좌표(`src/brand.ts`)와 주소(`src/social.ts`)는 정본을 그대로 import 한다.
- * 복사해 두면 한쪽을 고칠 때 다른 쪽이 조용히 어긋난다.
- *
- * 링크는 새 탭으로 연다. 강의 중에 수강생이 눌러 강의 화면을 잃으면 안 된다.
+ * 방 이름만이 아니라 **세대**까지 본다. 비밀번호를 바꾸거나 방을 지웠다 다시 만들면 세대가
+ * 바뀌고 앞의 쿠키가 전부 죽는다. 비밀번호를 바꾸는 이유는 그것이 샜기 때문인데 세대를
+ * 안 보면 이미 들어와 있는 사람은 12시간을 그대로 남는다.
  */
-function header(): string {
-  const links = NAV_LINKS.map(
-    (l) => `<a class="nav-link" href="${esc(l.href)}" target="_blank" rel="noreferrer">${esc(l.label)}</a>`,
-  ).join("");
-  const icons = NAV_ICONS.map(
-    (i) =>
-      `<a class="nav-icon" href="${esc(i.href)}"${
-        i.href.startsWith("mailto:") ? "" : ' target="_blank"'
-      } rel="noreferrer" aria-label="${esc(i.label)}">${i.svg}</a>`,
-  ).join("");
-  return `<nav class="hd">
-  <a class="hd-logo" href="${esc(SITE)}" target="_blank" rel="noreferrer" aria-label="eddmpython 홈">
-    <svg class="hd-symbol" viewBox="${esc(SYMBOL.viewBox)}" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="${esc(
-      SYMBOL.shape,
-    )}"/><ellipse cx="${SYMBOL.eye.cx}" cy="${SYMBOL.eye.cy}" rx="${SYMBOL.eye.rx}" ry="${
-    SYMBOL.eye.ry
-  }" fill="${esc(BRAND.eye)}"/></svg>
-    <span class="hd-word"><b>eddm</b><i>python</i></span>
-  </a>
-  <div class="hd-right">${links}<span class="hd-icons">${icons}
-    ${themeToggle()}
-    </span>
-  </div>
-</nav>`;
+function hasSession(key: string, request: Request, room: PublicRoom): Promise<boolean> {
+  return checkToken(key, readCookie(request, ROOM_COOKIE), room.slug, room.gen);
 }
 
 /**
- * `cells` 는 이 페이지에 실행 칸이 있는지다.
+ * 강의방 화면 하나.
  *
- * 실행 칸이 있는 글에만 파이썬 배포판 출처를 연다. 목록 화면과 실행 칸 없는 글까지
- * 열어 둘 이유가 없다. CSP 는 좁을수록 좋다.
+ * 공용 크롬은 shell.ts 가 깔고 여기서는 강의방 CSS 와 확대 오버레이만 얹는다.
  */
-function page(
+function roomPage(
   title: string,
   inner: string,
   extraScript = "",
   wide = false,
   cells = false,
 ): Response {
-  const nonce = randomHex(16);
-  const html = `<!doctype html><html lang="ko"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="${esc(BRAND.carbon)}">
-<title>${esc(title)} | eddmpython</title>
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="stylesheet" href="${TOKENS.fontHref}">
-<script nonce="${nonce}">${THEME_INIT_SCRIPT}</script>
-<style>${STYLE}</style></head>
-<body><div class="wrap${wide ? " wide" : ""}">${inner}</div>
-<div class="zoom" id="zoom"><img alt=""></div>
-<script nonce="${nonce}">${THEME_SCRIPT}${ZOOM_SCRIPT}${extraScript}</script></body></html>`;
-  return new Response(html, {
-    headers: {
-      "content-type": "text/html; charset=utf-8",
-      "cache-control": "no-store",
-      "content-security-policy": [
-        "default-src 'self'",
-        "base-uri 'self'",
-        "object-src 'none'",
-        "frame-ancestors 'none'",
-        "form-action 'self'",
-        "img-src 'self' data: https:",
-        "media-src 'self' https:",
-        // 랜딩과 같은 글꼴을 쓰려고 연다. 글꼴이 다르면 같은 화면이 아니다.
-        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
-        "font-src 'self' https://cdn.jsdelivr.net",
-        // 실행 칸이 있는 글만 파이썬 배포판을 받아 온다. wasm 을 컴파일하므로 그 권한도 같이 연다.
-        `script-src 'nonce-${nonce}'${cells ? " 'wasm-unsafe-eval' https://cdn.jsdelivr.net" : ""}`,
-        `connect-src 'self'${cells ? " https://cdn.jsdelivr.net" : ""}`,
-        // course-embed 는 https 문서를 sandbox iframe 으로 격리한다. 교안의 raw HTML 은 실행하지 않는다.
-        "frame-src 'self' https:",
-        ...(cells ? ["worker-src 'self' blob:"] : []),
-      ].join("; "),
-    },
+  return page({
+    title,
+    style: CLASSROOM_STYLE,
+    inner,
+    extraBody: `<div class="zoom" id="zoom"><img alt=""></div>`,
+    script: `${ZOOM_SCRIPT}${extraScript}`,
+    wide,
+    cells,
   });
 }
 
 function loginPage(slug: string, title: string, message = ""): Response {
-  return page(
+  return roomPage(
     title,
     `${header()}<section class="gate">
        <p class="eyebrow">eddmpython course</p>
        <h1>${esc(title)}</h1>
        <p class="sub">등록된 수강생을 위한 비공개 과정입니다. 안내받은 비밀번호로 입장해 주세요</p>
-       <form method="post" action="/cr/${esc(slug)}/login">
+       <form method="post" action="/room/${esc(slug)}/login">
          <input type="password" name="password" placeholder="수강 비밀번호" aria-label="수강 비밀번호" autofocus autocomplete="current-password">
          <button type="submit">과정 입장</button>
        </form>${message ? `<p class="err">${esc(message)}</p>` : ""}
@@ -2383,7 +1641,7 @@ function visible(categories: CourseCategory[], unlocked: string[]): CourseCatego
 
 const poll = (slug: string) => `
 setInterval(async () => {
-  const r = await fetch("/cr/${slug}/state", { cache: "no-store" });
+  const r = await fetch("/room/${slug}/state", { cache: "no-store" });
   // 세션이 끊겼으면(비밀번호가 바뀌었거나 방이 지워졌다) 그 자리에 머물지 않고 나간다
   if (r.status === 401 || r.status === 404) { location.reload(); return; }
   if (!r.ok) return;
@@ -2403,62 +1661,11 @@ async function stampOf(key: string, room: PublicRoom, version: string): Promise<
   return (await hmac(key, raw)).slice(0, 16);
 }
 
-/**
- * 운영 화면이 부를 수 있는 동작. 여기 없는 것은 토큰이 맞아도 안 넘긴다.
- *
- * 예전에는 받은 몸통을 그대로 DO 에 넘겼다. 그래서 `signKey` 도 넘어갔다. 그 열쇠가 나가면
- * **모든 방의 세션 쿠키를 조용히 위조**할 수 있고, 열쇠는 한 번 만들면 바뀌지 않으므로
- * 비밀번호를 아무리 바꿔도 소용이 없다. 방을 만들고 지우는 것은 화면에 보이지만 이것은
- * 안 보인다. 토큰은 노트북의 평문 JSON 에 있다. 새는 날을 전제로 좁혀 둔다.
- */
-const ADMIN_ACTIONS = new Set([
-  "list",
-  "create",
-  "remove",
-  "rename",
-  "password",
-  "open",
-  "toggle",
-  "unlock",
-]);
+export async function handleRoom(request: Request, env: Env, url: URL): Promise<Response> {
+  const path = url.pathname.replace(/\/$/, "") || "/room";
 
-/** 로컬 운영 화면이 부르는 유일한 조종 통로다. 공개 서버에 운영자 페이지는 없다. */
-async function admin(request: Request, env: Env): Promise<Response> {
-  if (request.method !== "POST") return new Response("not found", { status: 404 });
-  const token = (request.headers.get("authorization") ?? "").replace(/^Bearer /, "");
-  if (!env.CR_ADMIN_TOKEN || !safeEqual(token, env.CR_ADMIN_TOKEN)) {
-    return Response.json({ error: "운영 토큰이 맞지 않습니다" }, { status: 401 });
-  }
-  const body = (await request.json()) as Record<string, unknown>;
-  if (!ADMIN_ACTIONS.has(String(body.action ?? ""))) {
-    return Response.json({ error: "운영 화면이 부르지 않는 동작입니다" }, { status: 400 });
-  }
-  const { status, data } = await call(env, body);
-  if (status >= 400) return Response.json(data, { status });
-  // 무엇을 했든 전체 상태를 돌려준다. 운영 화면이 늘 실물을 그린다.
-  const { data: listed } = await call(env, { action: "list" });
-  const found = await course(env);
-  return Response.json({
-    ok: true,
-    result: data,
-    rooms: listed.rooms,
-    // 교안을 못 읽어도 방 조종은 계속된다. 운영자에게 상태만 알려 준다.
-    courseOk: found.ok,
-    categories: found.categories.map((c) => ({
-      slug: c.slug,
-      title: c.title,
-      posts: c.posts.length,
-    })),
-  });
-}
-
-export async function handleClassroom(request: Request, env: Env, url: URL): Promise<Response> {
-  const path = url.pathname.replace(/\/$/, "") || "/cr";
-
-  if (path === "/cr/api/admin") return admin(request, env);
-
-  if (path === "/cr") {
-    return page(
+  if (path === "/room") {
+    return roomPage(
       "course",
       `${header()}<section class="gate"><p class="eyebrow">eddmpython course</p>
        <h1>비공개 과정</h1><p class="sub wait">안내받은 과정 주소로 들어오세요</p></section>`,
@@ -2471,7 +1678,7 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
 
   const { data: found } = await call(env, { action: "get", slug });
   // 없는 방은 없는 주소다. 만들기 전에는 아무 데도 존재하지 않는다.
-  if (!found.room) return new Response("없는 강의장입니다.", { status: 404 });
+  if (!found.room) return new Response("없는 강의방입니다.", { status: 404 });
   const room = found.room as PublicRoom;
 
   if (parts[1] === "login" && parts.length === 2) {
@@ -2491,11 +1698,17 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
           : "비밀번호가 맞지 않습니다.",
       );
     }
+    const fresh = await signKey(env);
     return new Response(null, {
       status: 303,
       headers: {
-        location: `/cr/${slug}`,
-        "set-cookie": sessionCookie(await issueSession(await signKey(env), room), slug, url),
+        location: roomPath(slug),
+        "set-cookie": cookie(
+          ROOM_COOKIE,
+          await issueToken(fresh, room.slug, room.gen),
+          roomPath(slug),
+          url,
+        ),
       },
     });
   }
@@ -2522,7 +1735,7 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
   const stamp = `window.__stamp=${JSON.stringify(mark)};${poll(slug)}`;
 
   if (!room.open) {
-    return page(
+    return roomPage(
       room.title,
       `${header()}<section class="gate"><p class="eyebrow">eddmpython course</p>
        <h1>${esc(room.title)}</h1><p class="sub wait">아직 열리지 않았습니다. 이 화면을 열어 두세요</p></section>`,
@@ -2544,7 +1757,7 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
             const posts = c.posts
               .map(
                 (p, j) =>
-                  `<a class="post" href="/cr/${esc(slug)}/${esc(c.slug)}/${esc(p.id)}"><b>${String(
+                  `<a class="post" href="/room/${esc(slug)}/${esc(c.slug)}/${esc(p.id)}"><b>${String(
                     j + 1,
                   ).padStart(2, "0")}</b><span>${esc(p.title)}</span></a>`,
               )
@@ -2566,7 +1779,7 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
           .join("")}</div>`
       : "";
     const total = open.reduce((n, c) => n + c.posts.length, 0);
-    return page(
+    return roomPage(
       room.title,
       `${header()}
        <section class="hero">
@@ -2596,7 +1809,7 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
     const nav = category.posts
       .map(
         (p, i) =>
-          `<a class="nav-post${p.id === post.id ? " on" : ""}" href="/cr/${esc(slug)}/${esc(
+          `<a class="nav-post${p.id === post.id ? " on" : ""}" href="/room/${esc(slug)}/${esc(
             category.slug,
           )}/${esc(p.id)}"><b>${String(i + 1).padStart(2, "0")}</b><span>${esc(p.title)}</span></a>`,
       )
@@ -2623,11 +1836,11 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
       prev || next
         ? `<div class="pager">${
             prev
-              ? `<a href="/cr/${esc(slug)}/${esc(category.slug)}/${esc(prev.id)}"><span>이전</span><b>${esc(prev.title)}</b></a>`
+              ? `<a href="/room/${esc(slug)}/${esc(category.slug)}/${esc(prev.id)}"><span>이전</span><b>${esc(prev.title)}</b></a>`
               : "<i></i>"
           }${
             next
-              ? `<a class="nx" href="/cr/${esc(slug)}/${esc(category.slug)}/${esc(next.id)}"><span>다음</span><b>${esc(next.title)}</b></a>`
+              ? `<a class="nx" href="/room/${esc(slug)}/${esc(category.slug)}/${esc(next.id)}"><span>다음</span><b>${esc(next.title)}</b></a>`
               : "<i></i>"
           }</div>`
         : "";
@@ -2682,13 +1895,13 @@ export async function handleClassroom(request: Request, env: Env, url: URL): Pro
          </div>`
       : "";
 
-    return page(
+    return roomPage(
       post.title,
       `<div class="prog" aria-hidden="true"><i></i></div>
        ${header()}
        <div class="lay">
          <aside class="side">
-           <a class="back" href="/cr/${esc(slug)}">← ${esc(room.title)}</a>
+           <a class="back" href="/room/${esc(slug)}">← ${esc(room.title)}</a>
            <p class="side-h">${esc(category.title)}</p>
            ${nav}
          </aside>

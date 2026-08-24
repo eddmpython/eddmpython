@@ -5,7 +5,7 @@
  * 2026-08-20 에 유료 교안이 샌 경로는 산출물이 아니었다. `scripts/classroom-shot.mjs` 에
  * `shot-room-1234` 가 적혀 있었고, 같은 스크립트가 운영에 그 비밀번호로 방을 만든 뒤
  * 지우지 않았다. 이 저장소는 공개다. 방 이름도 비밀번호도 GitHub 에서 그대로 읽혔고
- * `eddmpython.com/cr/shot` 은 유료 교안 네 편을 통째로 내주고 있었다.
+ * `eddmpython.com` 의 그 방은 유료 교안 네 편을 통째로 내주고 있었다.
  *
  * check-leak 은 이것을 구조적으로 못 본다. 새어 나간 것이 번들 안의 문자열이 아니라
  * **살아 있는 문**이었기 때문이다. 그래서 검사를 따로 둔다.
@@ -34,9 +34,9 @@ const RULES = [
     why: "강의장 비밀번호를 소스에 적으면 공개 저장소를 읽은 사람이 그대로 들어온다",
   },
   {
-    id: "박힌 운영 토큰",
-    re: /\b(?:CR_ADMIN_TOKEN|adminToken|token)\s*[:=]\s*(["'`])[0-9a-f]{24,}\1/g,
-    why: "운영 토큰은 .classroom-admin.json 과 wrangler secret 에만 둔다",
+    id: "박힌 운영 비밀값",
+    re: /\b(?:ADMIN_PASSWORD|adminPassword|adminToken|token)\s*[:=]\s*(["'`])[^"'`\n]{8,}\1/g,
+    why: "운영자 비밀번호는 site/.dev.vars 와 wrangler secret 에만 둔다",
   },
 ];
 
@@ -106,15 +106,15 @@ for (const [sample, shouldBite] of BITE) {
   }
 }
 
-// 운영 화면 설정은 실제 토큰을 들고 있다. 저장소에 추적되면 안 된다.
-const CONFIG = join(SITE, ".classroom-admin.json");
-if (existsSync(CONFIG)) {
+// 로컬 비밀값 파일은 운영자 비밀번호를 들고 있다. 저장소에 추적되면 안 된다.
+const LOCAL_SECRETS = join(SITE, ".dev.vars");
+if (existsSync(LOCAL_SECRETS)) {
   const ignored = readFileSync(resolve(SITE, "..", ".gitignore"), "utf8");
-  if (!/(^|\n)[^\n#]*\.classroom-admin\.json/.test(ignored)) {
+  if (!/(^|\n)[^\n#]*\.dev\.vars/.test(ignored)) {
     found.push({
       where: ".gitignore",
-      rule: "추적되는 운영 설정",
-      why: ".classroom-admin.json 에 운영 토큰이 들어 있다. 커밋되면 안 된다",
+      rule: "추적되는 로컬 비밀값",
+      why: "site/.dev.vars 에 ADMIN_PASSWORD 가 들어 있다. 커밋되면 안 된다",
       text: "(목록에 없음)",
     });
   }

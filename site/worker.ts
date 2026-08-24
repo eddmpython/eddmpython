@@ -149,22 +149,35 @@ function redirect(to: string, requestUrl: URL): Response {
   });
 }
 
-import { handleClassroom, type Env as ClassroomEnv } from "./classroom";
+import { handleRoom } from "./classroom";
+import { handleAdmin } from "./admin";
+import type { Env as SiteEnv } from "./env";
 
-export { Classroom } from "./classroom";
+// Durable Object 는 저장소 모듈이 든다. 운영장과 강의방이 같은 것을 본다.
+export { Classroom } from "./rooms";
 
 export default {
-  async fetch(request: Request, env: { ASSETS: Fetcher } & ClassroomEnv): Promise<Response> {
+  async fetch(request: Request, env: { ASSETS: Fetcher } & SiteEnv): Promise<Response> {
     const url = new URL(request.url);
     const pathname = url.pathname.replace(/\/$/, "") || "/";
 
     const legacy = LEGACY_BLOG[pathname] ?? LEGACY_BLOG[url.pathname];
     if (legacy) return redirect(legacy, url);
 
-    // 강의장. 교안 본문은 Worker 안에만 있고 인증을 통과한 요청에만 내려간다.
-    // 정적 자산보다 먼저 잡아야 /cr 이 index.html 로 새지 않는다.
-    if (pathname === "/cr" || pathname.startsWith("/cr/")) {
-      const res = await handleClassroom(request, env as unknown as ClassroomEnv, url);
+    /**
+     * 운영장. 모든 강의를 여기서 배선한다.
+     *
+     * 강의방보다 먼저 잡는다. 운영장이 위고 강의방은 그것이 만드는 여럿 중 하나다.
+     * 둘 다 정적 자산보다 먼저 잡아야 index.html 로 새지 않는다.
+     */
+    if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+      const res = await handleAdmin(request, env as unknown as SiteEnv, url);
+      return withHeaders(res, (res.headers.get("content-type") ?? "").includes("text/html"));
+    }
+
+    // 강의방. 교안 본문은 Worker 안에만 있고 인증을 통과한 요청에만 내려간다.
+    if (pathname === "/room" || pathname.startsWith("/room/")) {
+      const res = await handleRoom(request, env as unknown as SiteEnv, url);
       return withHeaders(res, (res.headers.get("content-type") ?? "").includes("text/html"));
     }
 

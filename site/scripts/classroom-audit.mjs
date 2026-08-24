@@ -14,6 +14,7 @@ import { randomBytes } from "node:crypto";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { PyProcControlClient } from "pyproc/control";
+import { signIn } from "./admin-client.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SITE_ROOT = resolve(HERE, "..");
@@ -24,31 +25,18 @@ const base = (process.argv[2] ?? "http://localhost:8787").replace(/\/$/, "");
 const ROOM = "audit";
 const PASSWORD = randomBytes(12).toString("base64url");
 
-const config = JSON.parse(await readFile(join(SITE_ROOT, ".classroom-admin.json"), "utf8"));
 const local = /^https?:\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(base);
-const targetId = local ? "local" : "production";
-const token = config.targets.find((t) => t.id === targetId)?.token;
-if (!token) throw new Error(`.classroom-admin.json 의 ${targetId} 토큰이 없다`);
 if (!local) console.log(`운영(${base}) 에 검수용 방을 만들고 끝나면 지운다`);
-
-async function admin(body) {
-  const res = await fetch(`${base}/cr/api/admin`, {
-    method: "POST",
-    headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(`admin ${body.action} 실패: ${JSON.stringify(data)}`);
-  return data;
-}
+// 사람이 들어가는 문으로 같이 들어간다. 기계용 문을 따로 내지 않는다.
+const admin = await signIn(base);
 
 await admin({ action: "remove", slug: ROOM }).catch(() => {});
-const made = await admin({ action: "create", slug: ROOM, title: "정본 검수 강의장", password: PASSWORD });
+const made = await admin({ action: "create", slug: ROOM, title: "정본 검수 강의방", password: PASSWORD });
 if (!made.categories.length) throw new Error("교안 카테고리가 없다");
 for (const category of made.categories) {
   await admin({ action: "toggle", slug: ROOM, category: category.slug });
 }
-console.log(`  검수용 강의장 ${base}/cr/${ROOM}  카테고리 ${made.categories.length}개`);
+console.log(`  검수용 강의방 ${base}/room/${ROOM}  카테고리 ${made.categories.length}개`);
 
 await mkdir(OUT, { recursive: true });
 const checks = [];
@@ -60,7 +48,7 @@ const record = (label, ok, detail) => {
 async function cleanup() {
   if (local) return;
   await admin({ action: "remove", slug: ROOM }).catch(() => {});
-  const gone = await fetch(`${base}/cr/${ROOM}`, { redirect: "manual" }).catch(() => null);
+  const gone = await fetch(`${base}/room/${ROOM}`, { redirect: "manual" }).catch(() => null);
   const status = gone ? gone.status : "확인 못 함";
   console.log(`  운영의 검수용 방을 지웠다 (밖에서 본 status ${status})`);
   if (status !== 404) console.error("  경고: 아직 살아 있다. 운영 화면에서 직접 지워라");
@@ -194,7 +182,7 @@ const save = async (sessionRef, name) => {
 
 try {
   // 들어간다
-  let opened = await client.openTarget(`${base}/cr/${ROOM}`, { expectedRisk: "externalEffect", waitUntil: "load", timeoutMs: 30000 });
+  let opened = await client.openTarget(`${base}/room/${ROOM}`, { expectedRisk: "externalEffect", waitUntil: "load", timeoutMs: 30000 });
   let session = (await client.attachSession(opened.output.targetRef, { timeoutMs: 30000 })).output;
   await evaluate(session, `(() => { const i = document.querySelector('input[name="password"]'); i.value = ${JSON.stringify(PASSWORD)}; document.querySelector('form').submit(); })()`, false);
   await client.act(
