@@ -182,11 +182,12 @@ try {
             cats: card?.querySelectorAll('.cat').length ?? 0,
             checkboxes: card?.querySelectorAll('.cat input[type=checkbox][data-act=toggle]').length ?? 0,
             checked: card?.querySelectorAll('.cat input[type=checkbox]:checked').length ?? 0,
-            state: card?.querySelector('.state')?.textContent.trim(),
             allow: Boolean(card?.querySelector('.head-actions [data-act=open]')),
             deleteTop: Boolean(card?.querySelector('.head-actions [data-act=remove]')),
             copyBesideUrl: Boolean(card?.querySelector('.addr-row .addr + .copy-icon[data-act=copy]')),
             closeCopy: document.body.innerText.includes('수강생 입장 닫기'),
+            redundantState: ['입장 가능', '준비 중'].some((text) => document.body.innerText.includes(text)),
+            createdCopy: document.body.innerText.includes('만듦'),
             controlsAligned: Boolean(roomInput && roomSave && Math.abs(roomInput.getBoundingClientRect().height - roomSave.getBoundingClientRect().height) < 1),
             controlHeight: roomInput?.getBoundingClientRect().height ?? 0,
             createBeforeRooms: Boolean(create && rooms && (create.compareDocumentPosition(rooms) & Node.DOCUMENT_POSITION_FOLLOWING)),
@@ -201,7 +202,8 @@ try {
       );
       record(`${viewport.id} 로그인하면 강의 관리 화면이 뜬다`, consoleView?.path === "/admin" && consoleView?.heading === "강의 관리" && consoleView?.title === "강의 관리 | eddmpython", JSON.stringify(consoleView));
       record(`${viewport.id} URL과 비밀번호 설정이 강의방 목록보다 먼저다`, consoleView?.createBeforeRooms === true && consoleView?.urlFirst === true && consoleView?.password === true);
-      record(`${viewport.id} 만든 방이 준비 중으로 보인다`, (consoleView?.cards ?? 0) >= 1 && consoleView?.state === "준비 중" && consoleView?.allow === true, JSON.stringify(consoleView));
+      record(`${viewport.id} 만든 방에 입장 허용 동작이 보인다`, (consoleView?.cards ?? 0) >= 1 && consoleView?.allow === true, JSON.stringify(consoleView));
+      record(`${viewport.id} 입장 상태와 생성일을 장식으로 표시하지 않는다`, consoleView?.redundantState === false && consoleView?.createdCopy === false, JSON.stringify(consoleView));
       record(`${viewport.id} URL 옆에 복사 아이콘이 있다`, consoleView?.copyBesideUrl === true);
       record(`${viewport.id} 삭제가 카드 우상단에 있다`, consoleView?.deleteTop === true);
       record(`${viewport.id} 입장 닫기 동작이 없다`, consoleView?.closeCopy === false);

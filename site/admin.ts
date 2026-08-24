@@ -96,7 +96,6 @@ const ADMIN_STYLE = `
 .rooms-section > h2 { margin:0; font-size:1.05rem; font-weight:600; letter-spacing:-.015em; }
 .card { border:1px solid var(--eddm-line-base); border-radius:.8rem; padding:1rem 1.15rem;
   margin:1rem 0 0; background:var(--eddm-raise); }
-.card.live { border-color:var(--eddm-accent-line); }
 .head { display:flex; align-items:flex-start; justify-content:space-between; gap:.75rem; }
 .head-main { flex:1 1 20rem; min-width:0; }
 .head h3 { margin:0; font-size:1.12rem; font-weight:600; letter-spacing:-.015em; }
@@ -104,10 +103,7 @@ const ADMIN_STYLE = `
 .adm .head-action { height:2rem; min-height:2rem; padding:.3rem .62rem; font-size:.78rem; }
 .delete-action { display:inline-flex; align-items:center; gap:.3rem; }
 .delete-action svg { width:.9rem; height:.9rem; }
-.state { flex:0 0 auto; font-size:.7rem; letter-spacing:.06em; padding:.15rem .6rem; border-radius:99px;
-  border:1px solid var(--eddm-line-base); color:var(--eddm-text-dim); }
-.state.on { background:var(--eddm-accent-bg); border-color:var(--eddm-accent-line); color:var(--eddm-sand); }
-.state.lock { border-color:var(--eddm-danger-line); color:var(--eddm-danger); }
+.lock-note { flex:0 0 auto; font-size:.72rem; color:var(--eddm-danger); }
 .addr-row { display:flex; align-items:center; gap:.25rem; min-width:0; margin-top:.2rem; }
 .addr { min-width:0; font-family:${TOKENS.font.mono}; font-size:.78rem; color:var(--eddm-text-muted);
   text-decoration:none; overflow-wrap:anywhere; }
@@ -116,7 +112,6 @@ const ADMIN_STYLE = `
   min-height:1.8rem; padding:.3rem; border-color:transparent; background:transparent; color:var(--eddm-text-muted); }
 .copy-icon:hover, .copy-icon[data-copied="1"] { border-color:var(--eddm-line-base); background:var(--eddm-hover); color:var(--eddm-sand); }
 .copy-icon svg { width:1rem; height:1rem; }
-.made { font-size:.72rem; color:var(--eddm-text-faint); }
 .room-settings { display:grid; grid-template-columns:minmax(11rem,.9fr) minmax(14rem,1.3fr) auto;
   gap:.55rem; align-items:end; margin-top:.85rem; padding-top:.85rem; border-top:1px solid var(--eddm-line); }
 .password-row { display:grid; grid-template-columns:minmax(10rem,1fr) auto; gap:.55rem; align-items:end; margin-top:.6rem; }
@@ -158,7 +153,6 @@ const ADMIN_SCRIPT = `
   let courseOk = true;
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const day = (ms) => { const d = new Date(ms); return (d.getMonth() + 1) + "월 " + d.getDate() + "일"; };
   const origin = location.origin;
   const copyIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>';
   const deleteIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg>';
@@ -204,13 +198,12 @@ const ADMIN_SCRIPT = `
           (on ? " checked" : "") + ' aria-label="' + esc(c.title) + ' 커리큘럼 포함"></label>';
       }).join("");
       const left = r.lockedUntil > Date.now() ? Math.ceil((r.lockedUntil - Date.now()) / 60000) : 0;
-      return '<article class="card' + (r.open ? " live" : "") + '" data-room="' + r.slug + '">' +
+      return '<article class="card" data-room="' + r.slug + '">' +
         '<div class="head"><div class="head-main"><h3>' + esc(r.title) + "</h3>" +
         '<div class="addr-row"><a class="addr" href="' + url + '" target="_blank" rel="noreferrer">' + esc(url) + "</a>" +
         '<button type="button" class="copy-icon" data-act="copy" data-url="' + url + '" aria-label="강의방 URL 복사" title="URL 복사">' + copyIcon + "</button></div></div>" +
-        '<div class="head-actions"><span class="state ' + (r.open ? "on" : "") + '">' + (r.open ? "입장 가능" : "준비 중") + "</span>" +
-        (left ? '<span class="state lock">로그인 잠김 · ' + left + "분 남음</span>" : "") +
-        '<span class="made">' + day(r.created) + " 만듦</span>" +
+        '<div class="head-actions">' +
+        (left ? '<span class="lock-note">로그인 잠김 · ' + left + "분 남음</span>" : "") +
         (!r.open ? '<button class="go head-action" data-act="open" data-slug="' + r.slug + '">입장 허용</button>' : "") +
         (left ? '<button class="head-action" data-act="unlock" data-slug="' + r.slug + '">잠김 풀기</button>' : "") +
         '<button class="danger head-action delete-action" data-act="remove" data-slug="' + r.slug + '">' + deleteIcon + "<span>삭제</span></button></div></div>" +
