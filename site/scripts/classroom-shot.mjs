@@ -558,7 +558,6 @@ for (const viewport of activeViewports) {
         if (root.dataset.theme !== 'light') button.click();
         await new Promise((resolve) => setTimeout(resolve, 100));
         return {
-          choice: root.dataset.themeChoice,
           theme: root.dataset.theme,
           labels: [...document.querySelectorAll('[data-theme-toggle]')].map((item) => item.getAttribute('aria-label')),
           nextThemes: [...document.querySelectorAll('[data-theme-toggle]')].map((item) => item.dataset.nextTheme),
@@ -568,7 +567,6 @@ for (const viewport of activeViewports) {
       })()`));
       record(
         `${viewport.id} 강의 셸 라이트 테마`,
-        lectureLight?.choice === "light" &&
           lectureLight?.theme === "light" &&
           lectureLight?.labels?.length === 2 &&
           lectureLight?.labels?.every((label) => label === "다크 테마로 변경") &&
@@ -584,7 +582,6 @@ for (const viewport of activeViewports) {
         document.querySelector('[data-lecture-deck] [data-theme-toggle]').click();
         await new Promise((resolve) => setTimeout(resolve, 100));
         return {
-          choice: root.dataset.themeChoice,
           theme: root.dataset.theme,
           labels: [...document.querySelectorAll('[data-theme-toggle]')].map((item) => item.getAttribute('aria-label')),
           nextThemes: [...document.querySelectorAll('[data-theme-toggle]')].map((item) => item.dataset.nextTheme),
@@ -594,7 +591,6 @@ for (const viewport of activeViewports) {
       })()`));
       record(
         `${viewport.id} 강의 셸 다크 테마`,
-        lectureDark?.choice === "dark" &&
           lectureDark?.theme === "dark" &&
           lectureDark?.labels?.length === 2 &&
           lectureDark?.labels?.every((label) => label === "라이트 테마로 변경") &&
@@ -1337,7 +1333,6 @@ for (const viewport of activeViewports) {
           return {
             buttons: document.querySelectorAll('[data-theme-toggle]').length,
             visibleButtons: [...document.querySelectorAll('[data-theme-toggle]')].filter((item) => item.getClientRects().length > 0).length,
-            choice: document.documentElement.dataset.themeChoice,
             theme: document.documentElement.dataset.theme,
             next: button.dataset.nextTheme,
             label: button.getAttribute('aria-label'),
@@ -1350,7 +1345,6 @@ for (const viewport of activeViewports) {
       `${viewport.id} 라이트 테마`,
       lightTheme?.buttons === 2 &&
         lightTheme?.visibleButtons === 1 &&
-        lightTheme?.choice === "light" &&
         lightTheme?.theme === "light" &&
         lightTheme?.next === "dark" &&
         lightTheme?.label === "다크 테마로 변경" &&
@@ -1367,7 +1361,6 @@ for (const viewport of activeViewports) {
       await evaluate(
         session,
         `(() => ({
-          choice: document.documentElement.dataset.themeChoice,
           theme: document.documentElement.dataset.theme,
           buttons: document.querySelectorAll('[data-theme-toggle]').length,
           visibleButtons: [...document.querySelectorAll('[data-theme-toggle]')].filter((item) => item.getClientRects().length > 0).length,
@@ -1378,7 +1371,6 @@ for (const viewport of activeViewports) {
     );
     record(
       `${viewport.id} 라이트 테마 새로고침 유지`,
-      persistedTheme?.choice === "light" &&
         persistedTheme?.theme === "light" &&
         persistedTheme?.buttons === 2 &&
         persistedTheme?.visibleButtons === 1 &&
@@ -1396,7 +1388,6 @@ for (const viewport of activeViewports) {
           button.click();
           await new Promise((resolve) => setTimeout(resolve, 100));
           return {
-            choice: document.documentElement.dataset.themeChoice,
             theme: document.documentElement.dataset.theme,
             buttons: document.querySelectorAll('[data-theme-toggle]').length,
             visibleButtons: [...document.querySelectorAll('[data-theme-toggle]')].filter((item) => item.getClientRects().length > 0).length,
@@ -1409,7 +1400,6 @@ for (const viewport of activeViewports) {
     );
     record(
       `${viewport.id} 다크 테마`,
-      darkTheme?.choice === "dark" &&
         darkTheme?.theme === "dark" &&
         darkTheme?.buttons === 2 &&
         darkTheme?.visibleButtons === 1 &&
@@ -1426,14 +1416,12 @@ for (const viewport of activeViewports) {
         newValue: 'light',
       }));
       return {
-        choice: document.documentElement.dataset.themeChoice,
         theme: document.documentElement.dataset.theme,
         labels: [...document.querySelectorAll('[data-theme-toggle]')].map((item) => item.getAttribute('aria-label')),
       };
     })()`));
     record(
       `${viewport.id} 다른 탭 테마 동기화`,
-      storageTheme?.choice === "light" &&
         storageTheme?.theme === "light" &&
         storageTheme?.labels?.length === 2 &&
         storageTheme?.labels?.every((label) => label === "다크 테마로 변경"),
@@ -1446,18 +1434,19 @@ for (const viewport of activeViewports) {
       [{ kind: "waitFor", selector: ".body h1", timeoutMs: 15000, expectedRisk: "read" }],
       { timeoutMs: 30000 },
     );
-    const systemTheme = value(await evaluate(session, `(() => ({
-      choice: document.documentElement.dataset.themeChoice,
+    // 고른 적이 없으면 라이트다. 보는 사람의 OS 설정을 따라가지 않는다.
+    const defaultTheme = value(await evaluate(session, `(() => ({
       theme: document.documentElement.dataset.theme,
-      expected: matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark',
+      scheme: getComputedStyle(document.documentElement).colorScheme,
+      system: matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
       buttons: document.querySelectorAll('[data-theme-toggle]').length,
     }))()`));
     record(
-      `${viewport.id} 시스템 기본 테마`,
-      systemTheme?.choice === "system" &&
-        systemTheme?.theme === systemTheme?.expected &&
-        systemTheme?.buttons === 2,
-      JSON.stringify(systemTheme),
+      `${viewport.id} 기본 라이트 테마`,
+      defaultTheme?.theme === "light" &&
+        defaultTheme?.scheme === "light" &&
+        defaultTheme?.buttons === 2,
+      JSON.stringify(defaultTheme),
     );
 
     // 확대가 실제로 열리는지 본다. 강의 중에 화면에 띄우는 기능이라 그림만으로는 못 믿는다.

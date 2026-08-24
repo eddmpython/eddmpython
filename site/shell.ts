@@ -24,7 +24,6 @@ import { randomHex } from "./auth";
 export const SHELL_STYLE = `
 ${cssVars()}
 :root {
-  color-scheme:dark;
   --eddm-code-surface:color-mix(in srgb,var(--eddm-ivory) 5%,var(--eddm-carbon));
   --eddm-code-focus:color-mix(in srgb,var(--eddm-ivory) 8%,var(--eddm-carbon));
   --eddm-danger:color-mix(in srgb,var(--eddm-alert) 68%,var(--eddm-ivory));
@@ -32,12 +31,23 @@ ${cssVars()}
   --eddm-media:${TOKENS.color.ink};
   --eddm-overlay:color-mix(in srgb,${TOKENS.color.ink} 92%,transparent);
 }
-:root[data-theme="light"] {
+/**
+ * 라이트가 기본이다. 2026-08-24 운영자 지시다.
+ *
+ * 다크를 \`:root\` 에 깔고 라이트를 덮던 것을 뒤집었다. 저장한 선택이 없거나 스크립트가
+ * 아직 안 돌았을 때 무엇으로 뜨는지가 곧 기본값이고, 그 자리를 CSS 가 정한다. 스크립트만
+ * 고치면 스크립트가 막힌 화면에서 다크가 나온다.
+ *
+ * \`:not([data-theme="dark"])\` 를 쓰는 이유는 속성이 아직 안 붙은 첫 순간도 라이트로
+ * 잡기 위해서다. 다크는 그 속성이 붙어야만 걸린다.
+ */
+:root:not([data-theme="dark"]) {
   color-scheme:light;
   --eddm-carbon:${TOKENS.color.ivory};
   --eddm-ink:color-mix(in srgb, ${TOKENS.color.ivory} 92%, ${TOKENS.color.carbon});
   --eddm-ivory:${TOKENS.color.carbon};
-  --eddm-sand:color-mix(in srgb, ${TOKENS.color.sand} 45%, ${TOKENS.color.carbon});
+  /* 강조는 색이 아니라 밝기다. 다크에서 가장 밝은 값이듯 라이트에서는 가장 진한 값이다 */
+  --eddm-sand:${TOKENS.color.carbon};
   --eddm-text:color-mix(in srgb, ${TOKENS.color.carbon} 78%, transparent);
   --eddm-text-muted:color-mix(in srgb, ${TOKENS.color.carbon} 58%, transparent);
   --eddm-text-dim:color-mix(in srgb, ${TOKENS.color.carbon} 45%, transparent);
@@ -45,12 +55,22 @@ ${cssVars()}
   --eddm-line:color-mix(in srgb, ${TOKENS.color.carbon} 8%, transparent);
   --eddm-line-base:color-mix(in srgb, ${TOKENS.color.carbon} 11%, transparent);
   --eddm-line-strong:color-mix(in srgb, ${TOKENS.color.carbon} 17%, transparent);
-  --eddm-raise:color-mix(in srgb, ${TOKENS.color.carbon} 4%, transparent);
-  --eddm-hover:color-mix(in srgb, ${TOKENS.color.carbon} 8%, transparent);
-  --eddm-accent-line:color-mix(in srgb, var(--eddm-sand) 35%, transparent);
-  --eddm-accent-bg:color-mix(in srgb, var(--eddm-sand) 10%, transparent);
-  --eddm-accent-dim:color-mix(in srgb, var(--eddm-sand) 72%, transparent);
+  /**
+   * 뜬 면은 바탕보다 밝다. 다크와 같은 방향이다.
+   *
+   * 라이트에서도 검은 알파를 얹어 면을 만들었더니 카드, 입력 칸, 단추가 전부 같은 회색으로
+   * 뭉쳐 위계가 사라졌다. 다크에서 흰 알파 4% 는 검은 바탕에서 겨우 뜨지만 라이트에서 검은
+   * 알파 4% 는 크림 바탕에서 확실한 회색으로 읽힌다. 같은 숫자를 뒤집어 쓰면 안 되는 자리다.
+   * 크림 바탕 위에 흰 종이를 얹는 쪽이 다크의 관계와 같다.
+   */
+  --eddm-raise:color-mix(in srgb, white 60%, transparent);
+  --eddm-hover:color-mix(in srgb, ${TOKENS.color.carbon} 6%, transparent);
+  /* 다크의 ivory 28/7/55 와 같은 비율이다. 두 테마에서 강조의 세기가 같아야 한다 */
+  --eddm-accent-line:color-mix(in srgb, var(--eddm-sand) 28%, transparent);
+  --eddm-accent-bg:color-mix(in srgb, var(--eddm-sand) 7%, transparent);
+  --eddm-accent-dim:color-mix(in srgb, var(--eddm-sand) 55%, transparent);
 }
+:root[data-theme="dark"] { color-scheme:dark; }
 * { box-sizing: border-box; }
 html { min-height:100%; background:var(--eddm-carbon); scrollbar-color:var(--eddm-line-strong) var(--eddm-carbon); }
 body { min-height:100vh; min-height:100dvh; margin:0; background:var(--eddm-carbon); color:var(--eddm-ivory); font-family:${TOKENS.font.sans}; word-break:keep-all; -webkit-font-smoothing:antialiased;
@@ -78,13 +98,13 @@ body { min-height:100vh; min-height:100dvh; margin:0; background:var(--eddm-carb
 .hd .nav-icon { color:var(--eddm-text-muted); border:0; transition:color .15s cubic-bezier(.4,0,.2,1); }
 .hd .nav-icon:hover { color:var(--eddm-ivory); }
 .hd .nav-icon svg { height:18px; width:18px; display:block; }
-.theme-toggle { display:grid; place-items:center; width:2.15rem; height:2.15rem; margin:0; padding:0;
-  border:1px solid var(--eddm-line-base); border-radius:.55rem; background:var(--eddm-raise);
-  color:var(--eddm-text-muted); cursor:pointer; transition:color .15s cubic-bezier(.4,0,.2,1),
-  background .15s cubic-bezier(.4,0,.2,1), border-color .15s cubic-bezier(.4,0,.2,1); }
-.theme-toggle:hover { border-color:var(--eddm-line-strong); background:var(--eddm-hover); color:var(--eddm-ivory); }
-.theme-toggle svg { display:none; width:17px; height:17px; }
-:root[data-theme="light"] .theme-toggle .theme-icon-moon { display:block; }
+/* 테마 토글은 옆의 SNS 아이콘과 같은 것이다. 상자를 두르면 그것만 단추처럼 튀어 보인다 */
+.theme-toggle { display:grid; place-items:center; width:18px; height:18px; margin:0; padding:0;
+  border:0; border-radius:0; background:none; color:var(--eddm-text-muted); cursor:pointer;
+  transition:color .15s cubic-bezier(.4,0,.2,1); }
+.theme-toggle:hover { color:var(--eddm-ivory); }
+.theme-toggle svg { display:none; width:18px; height:18px; }
+:root:not([data-theme="dark"]) .theme-toggle .theme-icon-moon { display:block; }
 :root[data-theme="dark"] .theme-toggle .theme-icon-sun { display:block; }
 @media (min-width:768px) {
   .hd { flex-direction:row; justify-content:space-between; gap:0; margin-bottom:64px; }
@@ -95,10 +115,9 @@ body { min-height:100vh; min-height:100dvh; margin:0; background:var(--eddm-carb
 .hero { margin-bottom:2.5rem; }
 .hero h1 { margin:0 0 .6rem; font-size:1.9rem; letter-spacing:-.02em; line-height:1.25; }
 .hero .sub { margin:0; color:var(--eddm-text-muted); }
-.gate { position:relative; overflow:hidden; max-width:42rem; margin:0 auto; padding:2rem;
+/* 카드 위에 강조 띠를 얹지 않는다. 그 띠는 내용이 아니라 상자를 먼저 읽게 만든다 */
+.gate { max-width:42rem; margin:0 auto; padding:2rem;
   border:1px solid var(--eddm-line-base); border-radius:1rem; background:var(--eddm-raise); }
-.gate::before { content:""; position:absolute; top:0; left:0; right:0; height:2px;
-  background:var(--eddm-sand); opacity:.65; }
 .gate h1 { font-size:clamp(1.75rem,5vw,2.35rem); line-height:1.2; letter-spacing:-.03em; }
 .gate .sub { max-width:34rem; margin-bottom:0; color:var(--eddm-text-muted); line-height:1.8; }
 .gate form { margin-top:2rem; }
@@ -121,44 +140,45 @@ button:hover { background:var(--eddm-accent-bg); }
 `;
 
 /**
- * 첫 화면을 그리기 전에 시스템 설정이나 저장한 선택을 적용한다. body 뒤에서 바꾸면
- * 라이트 화면이 잠깐 어둡게 번쩍이므로 head에서 먼저 실행한다.
+ * 첫 화면을 그리기 전에 저장한 선택을 적용한다. body 뒤에서 바꾸면 화면이 한 번 번쩍이므로
+ * head 에서 먼저 실행한다.
+ *
+ * **기본은 라이트다.** 시스템 설정을 따라가지 않는다. 한때 저장한 선택이 없으면
+ * `prefers-color-scheme` 을 읽었고, 그래서 같은 주소가 보는 사람의 OS 설정에 따라 다르게
+ * 떴다. 강의 화면은 운영자와 수강생이 같은 것을 봐야 한다. 고른 사람만 그 선택을 가진다.
  */
 const THEME_INIT_SCRIPT = `
 (() => {
   const root = document.documentElement;
-  const media = matchMedia("(prefers-color-scheme: light)");
   const key = "eddmpython-classroom-theme";
-  const choices = new Set(["system", "light", "dark"]);
-  let saved = "system";
+  const choices = new Set(["light", "dark"]);
+  let saved = "light";
   try {
     const value = localStorage.getItem(key);
     if (value && choices.has(value)) saved = value;
   } catch {
-    // 저장소가 막혀도 현재 페이지의 시스템 테마는 안전하게 적용할 수 있다.
+    // 저장소가 막혀도 기본 라이트는 그대로 적용된다.
   }
   const set = (choice, persist = true) => {
-    const selected = choices.has(choice) ? choice : "system";
-    const resolved = selected === "system" ? (media.matches ? "light" : "dark") : selected;
-    root.dataset.themeChoice = selected;
+    const resolved = choices.has(choice) ? choice : "light";
     root.dataset.theme = resolved;
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute("content", resolved === "light" ? "${TOKENS.color.ivory}" : "${TOKENS.color.carbon}");
     if (persist) {
       try {
-        localStorage.setItem(key, selected);
+        localStorage.setItem(key, resolved);
       } catch {
         // 저장 실패는 다른 페이지 유지에만 영향을 주며 현재 테마 전환은 이미 끝났다.
       }
     }
-    root.dispatchEvent(new CustomEvent("eddmthemechange", { detail: { selected, resolved } }));
+    root.dispatchEvent(new CustomEvent("eddmthemechange", { detail: { resolved } }));
   };
-  window.__eddmTheme = { key, media, set };
+  window.__eddmTheme = { key, set };
   set(saved, false);
 })();
 `;
 
-/** 아이콘 토글과 시스템 테마 변경을 연결한다. */
+/** 아이콘 토글을 테마에 연결한다. 다른 탭에서 바꾼 선택도 따라온다. */
 const THEME_SCRIPT = `
 (() => {
   const api = window.__eddmTheme;
@@ -167,7 +187,7 @@ const THEME_SCRIPT = `
   const toggles = [...document.querySelectorAll("[data-theme-toggle]")];
   if (!toggles.length) return;
   const sync = () => {
-    const current = root.dataset.theme === "light" ? "light" : "dark";
+    const current = root.dataset.theme === "dark" ? "dark" : "light";
     const next = current === "light" ? "dark" : "light";
     const label = next === "light" ? "라이트 테마로 변경" : "다크 테마로 변경";
     for (const toggle of toggles) {
@@ -180,11 +200,8 @@ const THEME_SCRIPT = `
     toggle.addEventListener("click", () => api.set(toggle.dataset.nextTheme));
   }
   root.addEventListener("eddmthemechange", sync);
-  api.media.addEventListener("change", () => {
-    if (root.dataset.themeChoice === "system") api.set("system", false);
-  });
   window.addEventListener("storage", (event) => {
-    if (event.key === api.key) api.set(event.newValue ?? "system", false);
+    if (event.key === api.key) api.set(event.newValue ?? "light", false);
   });
   sync();
 })();
@@ -313,7 +330,7 @@ export function page(opts: PageOptions): Response {
   const html = `<!doctype html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="${esc(BRAND.carbon)}">
+<meta name="theme-color" content="${esc(BRAND.ivory)}">
 <title>${esc(opts.title)} | eddmpython</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>

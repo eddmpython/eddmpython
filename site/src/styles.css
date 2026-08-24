@@ -6,7 +6,8 @@
   /* carbon보다 한 단 어두운 면. 히어로 화면 프레임 받침 */
   --eddm-ink: #0c0f0e;
   --eddm-ivory: #f5f3ee;
-  --eddm-sand: #d8be91;
+  /* 강조는 색이 아니라 밝기다. 골드는 브랜드 마크의 눈에만 남는다 (src/brand.ts) */
+  --eddm-sand: #f5f3ee;
   --eddm-dartlab: #7da2e8;
   --eddm-codaro: #dfa14e;
   --eddm-xlpod: #57b98a;

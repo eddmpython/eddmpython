@@ -385,17 +385,17 @@ body.lecture-on { overflow:hidden; }
 .scene-canvas [data-visual][data-scene-effect="replace"] { animation-name:scene-replace; }
 .scene-canvas [data-visual][data-scene-effect="compare"] { animation-name:scene-pair; }
 .scene-canvas [data-visual][data-scene-active="true"] { will-change:transform,opacity; }
-.scene-canvas [data-visual][data-scene-focus="true"] {
-  filter:drop-shadow(0 0 1.35rem var(--eddm-accent-line)) brightness(1.06); }
-.scene-canvas [data-visual][data-scene-dim="true"] { opacity:.18; filter:saturate(.55); }
-.scene-canvas [data-visual][data-scene-live="true"] { outline:2px solid var(--eddm-sand); outline-offset:5px;
-  box-shadow:0 0 0 1px var(--eddm-accent-line); }
-.scene-canvas figure[data-visual][data-scene-live="true"] { outline:0; box-shadow:none; }
-.scene-canvas figure[data-visual][data-scene-live="true"] > img,
-.scene-canvas figure[data-visual][data-scene-live="true"] > video,
-.scene-canvas figure[data-visual][data-scene-live="true"] > iframe,
-.scene-canvas figure[data-visual][data-scene-live="true"] > .frame {
-  outline:2px solid var(--eddm-sand); outline-offset:5px; box-shadow:0 0 0 1px var(--eddm-accent-line); }
+/**
+ * 강조는 대비로만 한다. 테두리와 후광을 두르지 않는다.
+ *
+ * 강조할 대상에 선을 두르면 그 선이 학습 대상보다 먼저 눈에 들어온다. 화면 뒤에서 보는
+ * 사람에게는 내용이 아니라 상자만 남는다. 짚어야 할 대상은 밝게 두고 나머지를 내린다.
+ * 2026-08-24 운영자 지시로 테두리 강조를 원천 금지했다.
+ * scripts/check-brand.mjs 가 이 구역에 outline 과 box-shadow 가 다시 들어오면 막는다.
+ */
+.scene-canvas [data-visual][data-scene-focus="true"] { filter:brightness(1.12) contrast(1.04); }
+.scene-canvas [data-visual][data-scene-dim="true"] { opacity:.14; filter:saturate(.4) brightness(.8); }
+.scene-canvas [data-visual][data-scene-live="true"] { filter:brightness(1.12); }
 .lecture-scene[data-scene-effect="focus"] .scene-head > div:last-child { opacity:.42; }
 .scene-canvas figure.media img, .scene-canvas .yt,
 .scene-canvas .course-embed, .scene-canvas iframe { max-height:var(--lecture-visual-height); max-width:100%; margin:0 auto; }
@@ -405,8 +405,8 @@ body.lecture-on { overflow:hidden; }
   width:auto; height:auto; max-width:100%; justify-self:center;
   object-fit:contain; object-position:center; border:1px solid var(--eddm-line-strong); border-radius:.5rem;
   background:var(--eddm-ink); box-shadow:0 1.25rem 3.5rem color-mix(in srgb,var(--eddm-ink) 44%,transparent); }
-html[data-theme="light"] .scene-canvas figure.media img,
-html[data-theme="light"] .scene-canvas figure.media video {
+html:not([data-theme="dark"]) .scene-canvas figure.media img,
+html:not([data-theme="dark"]) .scene-canvas figure.media video {
   box-shadow:0 1.25rem 3.5rem color-mix(in srgb,var(--eddm-ivory) 18%,transparent); }
 .scene-canvas figure.media[data-scene-visible="true"] {
   width:auto; max-width:none; justify-self:stretch; justify-items:center; align-content:center; }
@@ -434,7 +434,7 @@ html[data-theme="light"] .scene-canvas figure.media video {
   background:color-mix(in srgb,var(--eddm-ink) 94%,var(--eddm-sand)); color:var(--eddm-ivory);
   box-shadow:0 1.1rem 3rem color-mix(in srgb,var(--eddm-ink) 38%,transparent);
   font-family:${TOKENS.font.mono}; font-size:clamp(.95rem,1.35vw,1.4rem); line-height:1.6; white-space:pre; }
-html[data-theme="light"] .scene-canvas pre {
+html:not([data-theme="dark"]) .scene-canvas pre {
   box-shadow:0 1.1rem 3rem color-mix(in srgb,var(--eddm-ivory) 14%,transparent); }
 .scene-canvas .table-wrap { width:var(--lecture-visual-max); max-width:100%; max-height:var(--lecture-visual-height); overflow:auto;
   border:1px solid var(--eddm-line-strong); border-radius:.5rem; background:var(--eddm-raise); }

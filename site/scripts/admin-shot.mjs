@@ -122,11 +122,13 @@ try {
   };
 
   const gate = await ev(
-    `(() => ({ logo: !!document.querySelector(".hd-logo"), form: !!document.querySelector('input[name=password]'), bg: getComputedStyle(document.body).backgroundColor, font: getComputedStyle(document.body).fontFamily.split(",")[0] }))()`,
+    `(() => ({ logo: !!document.querySelector(".hd-logo"), form: !!document.querySelector('input[name=password]'), theme: document.documentElement.dataset.theme, bg: getComputedStyle(document.body).backgroundColor, font: getComputedStyle(document.body).fontFamily.split(",")[0] }))()`,
   );
   record("로그인 화면에 브랜드 머리띠가 있다", Boolean(gate?.logo));
   record("로그인 화면에 비밀번호 칸이 있다", Boolean(gate?.form));
   record("브랜드 글꼴이 걸렸다", String(gate?.font ?? "").includes("Pretendard"), gate?.font);
+  // 고른 적이 없는 첫 방문은 라이트다. 보는 기계의 OS 설정을 따라가지 않는다.
+  record("처음 열면 라이트다", gate?.theme === "light", gate?.theme);
   await save("admin-login");
 
   const password = await adminPassword();
@@ -148,12 +150,12 @@ try {
 
   await ev(`(() => { document.querySelector("[data-theme-toggle]").click(); return true; })()`);
   await new Promise((r) => setTimeout(r, 800));
-  const light = await ev(
+  const dark = await ev(
     `(() => ({ theme: document.documentElement.dataset.theme, bg: getComputedStyle(document.body).backgroundColor }))()`,
   );
-  record("라이트 테마로 바뀐다", light?.theme === "light", light?.theme);
-  record("라이트에서 배경이 달라진다", light?.bg !== console_?.bg, `${console_?.bg} -> ${light?.bg}`);
-  await save("admin-console-light");
+  record("다크 테마로 바뀐다", dark?.theme === "dark", dark?.theme);
+  record("다크에서 배경이 달라진다", dark?.bg !== console_?.bg, `${console_?.bg} -> ${dark?.bg}`);
+  await save("admin-console-dark");
 } finally {
   await client.stop?.({ timeoutMs: 30000 });
   await cleanup();

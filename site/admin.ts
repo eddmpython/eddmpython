@@ -53,7 +53,7 @@ const ADMIN_ACTIONS = new Set([
  * 두었다. `scripts/check-brand.mjs` 가 이 파일에 hex 가 나타나면 배포를 막는다.
  */
 const ADMIN_STYLE = `
-.adm-top { display:flex; align-items:baseline; gap:1rem; flex-wrap:wrap; margin:0 0 .4rem; }
+.adm-top { display:flex; align-items:baseline; gap:1rem; flex-wrap:wrap; margin:0 0 2rem; }
 .adm-top h1 { flex:1 1 auto; margin:0; }
 .adm-top form { margin:0; }
 .adm-top button { padding:.4rem .8rem; font-size:.85rem; border-color:var(--eddm-line-base);
@@ -267,7 +267,6 @@ function loginPage(message = "", status = 200): Response {
     inner: `${header()}<section class="gate adm">
        <p class="eyebrow">eddmpython admin</p>
        <h1>운영장</h1>
-       <p class="sub">강의방을 만들고 여는 곳입니다. 운영자 비밀번호로 들어옵니다</p>
        <form method="post" action="/admin/login">
          <input type="password" name="password" placeholder="운영자 비밀번호" aria-label="운영자 비밀번호" autofocus autocomplete="current-password">
          <button type="submit">들어가기</button>
@@ -286,7 +285,6 @@ function consolePage(): Response {
     <h1>운영장</h1>
     <form method="post" action="/admin/logout"><button type="submit">나가기</button></form>
   </div>
-  <p class="sub">여기서 연 것이 수강생 화면에 그대로 반영됩니다. 배포하지 않습니다</p>
 
   <div class="warn" id="cwarn" hidden>
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8"/><path d="M2 3h20v5H2z"/><path d="M10 12h4"/></svg>
@@ -298,7 +296,6 @@ function consolePage(): Response {
 
   <div class="new">
     <h3>강의방 만들기</h3>
-    <p class="note">만드는 즉시 주소가 살아납니다. 배포하지 않습니다</p>
     <div class="row">
       <input id="n-slug" placeholder="주소 이름 (예: 0820)" aria-label="주소 이름" style="flex:0 1 12rem">
       <input id="n-title" placeholder="강의방 이름" aria-label="강의방 이름" style="flex:1 1 14rem">

@@ -12,7 +12,7 @@
 import { readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { TOKENS } from "../src/brand.ts";
+import { TOKENS, BRAND } from "../src/brand.ts";
 
 const SITE = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const problems = [];
@@ -141,6 +141,101 @@ for (const [needle, why] of [
   ["page({", "공용 문서 뼈대를 쓰지 않습니다"],
 ]) {
   if (!admin.includes(needle)) add("admin.ts", why);
+}
+
+/**
+ * 강의 장면의 강조에 테두리와 후광을 두르지 않는다.
+ *
+ * 2026-08-24 운영자 지시로 원천 금지했다. 짚어야 할 대상에 선을 두르면 그 선이 학습 대상보다
+ * 먼저 눈에 들어오고, 화면 뒤에서 보는 사람에게는 내용이 아니라 상자만 남는다. 강조는 밝기와
+ * 흐림의 대비로만 한다. 규칙을 적어 두는 것으로는 다시 들어오므로 여기서 막는다.
+ *
+ * 키보드 초점 링(`:focus-visible`)은 대상이 아니다. 그것은 강조가 아니라 접근성 장치다.
+ */
+const EMPHASIS_BAN = /(outline\s*:\s*(?!0)|box-shadow\s*:\s*(?!none)|drop-shadow\s*\()/;
+for (const line of classroom.split(/\r?\n/)) {
+  if (!/\.scene-canvas|\.lecture-scene/.test(line)) continue;
+  if (/focus-visible/.test(line)) continue;
+  if (EMPHASIS_BAN.test(line)) {
+    add("classroom.ts", `강의 장면 강조에 테두리나 후광을 썼습니다: ${line.trim().slice(0, 90)}`);
+  }
+}
+
+/**
+ * 골드는 브랜드 마크의 눈에만 남는다.
+ *
+ * `TOKENS.color.sand` 가 더 이상 골드가 아니라서 위의 BRAND_HEX 검사가 이 값을 안 본다.
+ * 강조를 다시 골드로 칠하는 것을 막으려면 값 자체를 따로 걸어야 한다.
+ */
+const GOLD = BRAND.eye;
+for (const rel of SCAN) {
+  let text;
+  try {
+    text = await readFile(join(SITE, rel), "utf8");
+  } catch {
+    continue;
+  }
+  const hits = text.match(new RegExp(GOLD + "([0-9a-f]{2})?", "gi"));
+  if (hits) add(rel, `골드 ${GOLD} 를 썼습니다 (${hits.length}곳). 골드는 브랜드 마크의 눈에만 남습니다`);
+}
+
+/**
+ * 카드 위에 강조 띠를 얹지 않는다.
+ *
+ * 2026-08-24 운영자 지시다. 로그인 카드 위에 2px 짜리 밝은 선이 깔려 있었다. 그 선은
+ * 아무것도 알려 주지 않으면서 카드보다 먼저 눈에 들어온다. 읽어야 할 것은 제목과 입력
+ * 칸인데 상자의 윤곽이 먼저 읽힌다. 강조는 밝기로 하고 장식으로 하지 않는다.
+ *
+ * 두 가지 모양을 다 막는다. `::before` 로 깐 절대위치 띠와 강조색 `border-top` 이다.
+ * 앞의 것만 막으면 다음에는 뒤의 모양으로 다시 들어온다. 구분선(`--eddm-line*`)은
+ * 대상이 아니다. 그것은 장식이 아니라 영역을 나누는 선이다.
+ */
+const SURFACES = { "shell.ts": shell, "admin.ts": admin, "classroom.ts": classroom };
+for (const [rel, text] of Object.entries(SURFACES)) {
+  for (const block of text.match(/[^{}\n]*::(?:before|after)[^{}]*\{[^}]*\}/g) ?? []) {
+    const flat = block.replace(/\s+/g, "");
+    if (!/position:absolute/.test(flat)) continue;
+    if (!/(?:top|bottom):0/.test(flat)) continue;
+    if (!/height:(?:[0-3](?:\.\d+)?px|\.\d+rem)/.test(flat)) continue;
+    if (!/background/.test(flat)) continue;
+    add(rel, `카드에 장식 띠를 얹었습니다: ${block.split("{")[0].trim().slice(0, 60)}`);
+  }
+  const bar = text.match(/border-top\s*:\s*[\d.]+(?:px|rem)\s+solid\s+var\(--eddm-(?:sand|ivory|accent-line)\)/g);
+  if (bar) add(rel, `카드 위에 강조색 선을 그었습니다: ${[...new Set(bar)].join(", ")}`);
+}
+
+/**
+ * 머리띠의 테마 토글은 옆의 SNS 아이콘과 같은 것이다.
+ *
+ * 상자를 두르면 링크 넷 옆에서 그것만 단추처럼 튀고, 머리띠에서 가장 안 중요한 것이
+ * 가장 눈에 띈다. 2026-08-24 운영자 지시로 테두리를 뺐다.
+ */
+const toggleRule = shell.match(/\.theme-toggle\s*\{[^}]*\}/)?.[0]?.replace(/\s+/g, "") ?? "";
+if (!toggleRule) add("shell.ts", ".theme-toggle 규칙이 없습니다");
+else if (!/border:0/.test(toggleRule) || /background:var\(/.test(toggleRule)) {
+  add("shell.ts", "테마 토글에 테두리나 배경을 둘렀습니다. 옆의 아이콘과 같은 것이어야 합니다");
+}
+
+/**
+ * 기본 테마는 라이트다. 2026-08-24 운영자 지시다.
+ *
+ * 세 가지가 같이 맞아야 실제로 라이트로 뜬다. CSS 기본값, 스크립트가 저장값 없이 고르는
+ * 값, 그리고 브라우저 UI 색이다. 하나만 고치면 나머지가 다크로 남아 첫 화면이 번쩍인다.
+ * 시스템 설정을 읽지 않는 것도 여기서 지킨다. 같은 주소가 보는 사람의 OS 에 따라 다르게
+ * 뜨면 운영자와 수강생이 다른 화면을 본다.
+ */
+if (!shell.includes(':root:not([data-theme="dark"])')) {
+  add("shell.ts", "라이트가 CSS 기본값이 아닙니다. 다크는 [data-theme=\"dark\"] 가 붙을 때만 걸립니다");
+}
+if (!/let saved = "light"/.test(shell)) {
+  add("shell.ts", "저장한 선택이 없을 때의 기본이 라이트가 아닙니다");
+}
+// 주석은 대상이 아니다. 실제로 시스템 설정을 읽는 코드만 잡는다.
+if (/matchMedia\s*\(|@media\s*\(\s*prefers-color-scheme/.test(shell)) {
+  add("shell.ts", "시스템 테마를 읽습니다. 기본은 라이트 하나이고 고른 사람만 그 선택을 가집니다");
+}
+if (!shell.includes(`content="\${esc(BRAND.ivory)}"`)) {
+  add("shell.ts", "theme-color 기본값이 라이트 바탕이 아닙니다");
 }
 
 if (problems.length) {
