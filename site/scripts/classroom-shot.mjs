@@ -53,6 +53,7 @@ if (!category) {
 }
 await admin({ action: "toggle", slug: SOURCE_ROOM, category: category.slug });
 await admin({ action: "rename", slug: SOURCE_ROOM, nextSlug: ROOM, title: "강의방 화면 검수" });
+await admin({ action: "open", slug: ROOM, open: true });
 const oldAddress = await fetch(`${base}/room/${SOURCE_ROOM}`, { redirect: "manual" });
 if (oldAddress.status !== 404) throw new Error(`주소 이동 뒤 옛 주소가 남았다: ${oldAddress.status}`);
 const listed = await admin({ action: "list" });

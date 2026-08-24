@@ -196,8 +196,8 @@ export class Classroom {
       await this.put({
         slug,
         title: String(body.title ?? slug).slice(0, 60) || slug,
-        // 만들면 바로 산다. 주소를 알려 주는 순간 들어올 수 있다.
-        open: true,
+        // 주소와 비밀번호를 먼저 정하고 커리큘럼을 고른 뒤 운영자가 직접 입장을 연다.
+        open: false,
         unlocked: [],
         salt,
         hash: await stretch(password, salt),
@@ -292,8 +292,7 @@ export class Classroom {
 
     if (action === "open") {
       room.open = Boolean(body.open);
-      // 방을 닫으면 잠금도 처음으로 되돌린다. 다음 강의가 앞 강의 상태를 물려받지 않는다.
-      if (!room.open) room.unlocked = [];
+      // 방을 닫아도 선택한 커리큘럼은 남긴다. 다시 열 때 같은 구성을 그대로 쓸 수 있다.
       await this.put(room);
       return Response.json({ ok: true });
     }

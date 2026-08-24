@@ -36,6 +36,7 @@ if (!made.categories.length) throw new Error("교안 카테고리가 없다");
 for (const category of made.categories) {
   await admin({ action: "toggle", slug: ROOM, category: category.slug });
 }
+await admin({ action: "open", slug: ROOM, open: true });
 console.log(`  검수용 강의방 ${base}/room/${ROOM}  카테고리 ${made.categories.length}개`);
 
 await mkdir(OUT, { recursive: true });

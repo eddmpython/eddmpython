@@ -179,25 +179,29 @@ for (const rel of SCAN) {
   if (hits) add(rel, `골드 ${GOLD} 를 썼습니다 (${hits.length}곳). 골드는 브랜드 마크의 눈에만 남습니다`);
 }
 
-/**
- * 로그인 화면이 이 문 뒤에 무엇이 있는지 말하지 않는다.
- *
- * 2026-08-24 운영자 지시다. 이 주소는 공개 도메인에 그대로 열려 있다. 화면이 스스로
- * 무엇을 조종하는 문인지 밝히면 지나가던 사람에게 두드릴 이유를 준다. 제목, 라벨,
- * 안내 문장을 다시 넣는 것을 여기서 막는다. 머리띠는 위의 크롬 검사가 따로 지킨다.
- */
+/** 로그인과 조종 화면이 `강의 관리`라는 같은 제품 이름을 쓴다. */
 const gate = admin.match(/function loginPage\([\s\S]*?\n\}/)?.[0] ?? "";
 if (!gate) add("admin.ts", "loginPage 를 찾지 못했습니다");
 else {
-  for (const word of ["운영장", "운영자", "강의", "수강생", "카테고리", "교안"]) {
-    if (gate.includes(word)) {
-      add("admin.ts", `로그인 화면이 "${word}" 로 정체를 드러냅니다. 비밀번호 칸 하나만 둡니다`);
-    }
-  }
-  if (/<h1|class="eyebrow"|class="sub"/.test(gate)) {
-    add("admin.ts", "로그인 화면에 제목이나 안내 문장이 있습니다. 비밀번호 칸 하나만 둡니다");
+  if (!gate.includes('title: "강의 관리"')) add("admin.ts", "로그인 탭 이름이 강의 관리가 아닙니다");
+  if (!gate.includes("<h1>강의 관리</h1>")) add("admin.ts", "로그인 화면에 강의 관리 제목이 없습니다");
+  if (!gate.includes('name="password"')) add("admin.ts", "로그인 화면에 비밀번호 칸이 없습니다");
+  for (const detail of ["강의방 목록", "포함할 커리큘럼", "운영 세션"]) {
+    if (gate.includes(detail)) add("admin.ts", `로그인 전에 ${detail} 정보를 내보냅니다`);
   }
 }
+
+const consoleView = admin.match(/function consolePage\(\)[\s\S]*?\n\}/)?.[0] ?? "";
+if (!consoleView) add("admin.ts", "consolePage 를 찾지 못했습니다");
+else {
+  if (!consoleView.includes('title: "강의 관리"')) add("admin.ts", "조종 화면 탭 이름이 강의 관리가 아닙니다");
+  if (!consoleView.includes('class="adm-title">강의 관리</h1>')) add("admin.ts", "조종 화면에 강의 관리 제목이 없습니다");
+  if (consoleView.indexOf('class="new"') > consoleView.indexOf('id="rooms"')) {
+    add("admin.ts", "새 강의방의 URL과 비밀번호 입력이 강의방 목록보다 뒤에 있습니다");
+  }
+}
+if (admin.includes("수강생에게 보임")) add("admin.ts", "커리큘럼 상태에 수강생에게 보임 문구를 씁니다");
+if (!admin.includes('type="checkbox" data-act="toggle"')) add("admin.ts", "커리큘럼 포함 체크박스가 없습니다");
 
 /**
  * 코드 주석을 브라우저로 내보내지 않는다.

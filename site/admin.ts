@@ -53,12 +53,14 @@ const ADMIN_ACTIONS = new Set([
  * 두었다. `scripts/check-brand.mjs` 가 이 파일에 hex 가 나타나면 배포를 막는다.
  */
 const ADMIN_STYLE = `
-/* 조종 화면 머리. 제목 없이 나가기 하나만 오른쪽에 둔다 */
-.adm-top { display:flex; align-items:baseline; justify-content:flex-end; gap:1rem; flex-wrap:wrap; margin:0 0 2rem; }
+/* 조종 화면 머리. 현재 화면 이름과 나가기를 같은 줄에 둔다 */
+.adm-top { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin:0 0 2rem; }
 .adm-top form { margin:0; }
 .adm-top button { padding:.4rem .8rem; font-size:.85rem; border-color:var(--eddm-line-base);
   background:var(--eddm-raise); color:var(--eddm-text-muted); }
 .adm-top button:hover { background:var(--eddm-hover); color:var(--eddm-ivory); }
+.adm-title { margin:0; font-size:clamp(1.65rem,4vw,2.15rem); line-height:1.2; letter-spacing:-.035em; }
+.adm-desc { margin:.45rem 0 0; color:var(--eddm-text-muted); font-size:.92rem; }
 .adm input, .adm select { padding:.6rem .8rem; border-radius:.55rem; border:1px solid var(--eddm-line-strong);
   background:var(--eddm-raise); color:inherit; font-size:.92rem; font-family:inherit; min-width:0; }
 .adm input::placeholder { color:var(--eddm-text-faint); }
@@ -75,31 +77,75 @@ const ADMIN_STYLE = `
 .warn[hidden] { display:none; }
 .warn svg { flex:0 0 auto; color:var(--eddm-danger); }
 .warn b { color:var(--eddm-danger); font-weight:600; }
+.new { border:1px solid var(--eddm-line-base); border-radius:.85rem; padding:1.25rem 1.4rem;
+  background:var(--eddm-raise); }
+.section-head { display:flex; align-items:baseline; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
+.section-head h2 { margin:0; font-size:1.05rem; font-weight:600; letter-spacing:-.015em; }
+.section-head p { margin:0; color:var(--eddm-text-muted); font-size:.85rem; }
+.new form { display:grid; grid-template-columns:minmax(10rem,1fr) minmax(12rem,1.25fr) minmax(10rem,1fr) auto;
+  gap:.75rem; align-items:end; margin-top:1rem; }
+.field { display:grid; gap:.35rem; min-width:0; color:var(--eddm-text-muted); font-size:.78rem; }
+.field input { width:100%; color:var(--eddm-ivory); }
+.url-input { display:grid; grid-template-columns:auto minmax(7rem,1fr); align-items:center; border:1px solid var(--eddm-line-strong);
+  border-radius:.55rem; background:var(--eddm-raise); overflow:hidden; }
+.url-input span { padding:0 0 0 .75rem; color:var(--eddm-text-faint); font-family:${TOKENS.font.mono};
+  font-size:.78rem; white-space:nowrap; }
+.url-input input { border:0; border-radius:0; background:transparent; }
+.new .go { min-height:2.55rem; white-space:nowrap; }
+.rooms-section { margin-top:2rem; }
+.rooms-section > h2 { margin:0; font-size:1.05rem; font-weight:600; letter-spacing:-.015em; }
 .card { border:1px solid var(--eddm-line-base); border-radius:.85rem; padding:1.3rem 1.4rem;
   margin:1.25rem 0 0; background:var(--eddm-raise); }
 .card.live { border-color:var(--eddm-accent-line); }
-.head { display:flex; align-items:baseline; gap:.75rem; flex-wrap:wrap; }
-.head h2 { margin:0; font-size:1.08rem; font-weight:500; letter-spacing:-.01em; }
+.head { display:flex; align-items:flex-start; gap:.75rem; flex-wrap:wrap; }
+.head-main { flex:1 1 20rem; min-width:0; }
+.head h3 { margin:0; font-size:1.12rem; font-weight:600; letter-spacing:-.015em; }
 .state { flex:0 0 auto; font-size:.7rem; letter-spacing:.06em; padding:.15rem .6rem; border-radius:99px;
   border:1px solid var(--eddm-line-base); color:var(--eddm-text-dim); }
 .state.on { background:var(--eddm-accent-bg); border-color:var(--eddm-accent-line); color:var(--eddm-sand); }
 .state.lock { border-color:var(--eddm-danger-line); color:var(--eddm-danger); }
-.addr { flex:1 1 auto; font-family:${TOKENS.font.mono}; font-size:.82rem; color:var(--eddm-text-muted);
+.addr { display:inline-block; margin-top:.25rem; font-family:${TOKENS.font.mono}; font-size:.8rem; color:var(--eddm-text-muted);
   text-decoration:none; overflow-wrap:anywhere; }
 .addr:hover { color:var(--eddm-sand); }
-.made { font-size:.78rem; color:var(--eddm-text-faint); }
-.cats { margin-top:1rem; border-top:1px solid var(--eddm-line); padding-top:.5rem; }
-.cat { display:flex; align-items:center; gap:.75rem; padding:.55rem 0; flex-wrap:wrap;
+.made { margin-left:auto; font-size:.78rem; color:var(--eddm-text-faint); }
+.room-settings { display:grid; grid-template-columns:minmax(11rem,.9fr) minmax(14rem,1.3fr) auto;
+  gap:.7rem; align-items:end; margin-top:1.15rem; padding-top:1.1rem; border-top:1px solid var(--eddm-line); }
+.room-settings .apply { min-height:2.55rem; white-space:nowrap; }
+.password-row { display:grid; grid-template-columns:minmax(10rem,1fr) auto; gap:.5rem; align-items:end; margin-top:.8rem; }
+.password-row button { min-height:2.55rem; white-space:nowrap; }
+.cats { margin-top:1.15rem; border-top:1px solid var(--eddm-line); padding-top:1rem; }
+.cats-head { display:flex; align-items:baseline; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:.35rem; }
+.cats-head h4 { margin:0; font-size:.9rem; font-weight:600; }
+.cats-head p { margin:0; color:var(--eddm-text-dim); font-size:.8rem; }
+.cat { display:flex; align-items:center; gap:.75rem; padding:.65rem .1rem; cursor:pointer;
   border-bottom:1px solid var(--eddm-line); }
 .cat:last-child { border-bottom:0; }
+.cat:hover { color:var(--eddm-sand); }
 .cat > span:first-child { flex:1 1 12rem; font-size:.92rem; }
 .cat .num { color:var(--eddm-text-faint); font-size:.8rem; font-variant-numeric:tabular-nums; }
-.cat .right { display:flex; align-items:center; gap:.6rem; flex:0 0 auto; }
-.cat button { padding:.35rem .75rem; font-size:.82rem; }
-.new { border:1px dashed var(--eddm-line-strong); border-radius:.85rem; padding:1.2rem 1.4rem; margin-top:2rem; }
-.new h3 { font-size:.95rem; margin:0 0 .2rem; color:var(--eddm-text); font-weight:500; }
-.new .row { margin-top:.8rem; }
+.cat input[type="checkbox"] { width:1.2rem; height:1.2rem; margin:0; accent-color:var(--eddm-ivory); cursor:pointer; }
+.room-foot { display:flex; align-items:center; justify-content:space-between; gap:.75rem; flex-wrap:wrap;
+  margin-top:1.15rem; padding-top:1rem; border-top:1px solid var(--eddm-line); }
+.room-foot .row { margin:0; }
 .sessions { margin-top:2.5rem; padding-top:1.25rem; border-top:1px solid var(--eddm-line); }
+@media (max-width:860px) {
+  .new form { grid-template-columns:1fr 1fr; }
+  .room-settings { grid-template-columns:1fr 1fr; }
+  .room-settings .apply { grid-column:1 / -1; }
+}
+@media (max-width:560px) {
+  .adm-top { align-items:stretch; }
+  .adm-top form { width:100%; }
+  .adm-top form button { width:100%; }
+  .new form, .room-settings, .password-row { grid-template-columns:1fr; }
+  .room-settings .apply { grid-column:auto; }
+  .new .go, .room-settings .apply, .password-row button { width:100%; }
+  .head .state, .made { margin-left:0; }
+  .room-foot, .room-foot .row { align-items:stretch; }
+  .room-foot .row { width:100%; }
+  .room-foot button { flex:1 1 auto; }
+  .room-foot > .danger { width:100%; }
+}
 `;
 
 const ADMIN_SCRIPT = `
@@ -141,45 +187,44 @@ const ADMIN_SCRIPT = `
   function draw() {
     $("cwarn").hidden = courseOk;
     if (!rooms.length) {
-      $("rooms").innerHTML = '<p class="note">아직 강의방이 없습니다. 아래에서 만드세요</p>';
+      $("rooms").innerHTML = '<p class="note">아직 강의방이 없습니다. 위에서 URL과 비밀번호를 정해 만드세요</p>';
       return;
     }
     $("rooms").innerHTML = rooms.map((r) => {
       const url = origin + "/room/" + r.slug;
       const cats = categories.map((c) => {
         const on = r.unlocked.includes(c.slug);
-        // 단추 글자는 할 일이고 칩은 지금 상태다. 강의 중에 둘을 헷갈리면 안 열 것을 연다.
-        return '<div class="cat"><span>' + esc(c.title) +
+        return '<label class="cat"><span>' + esc(c.title) +
           ' <span class="num">' + c.posts + "편</span></span>" +
-          '<span class="right"><span class="state ' + (on ? "on" : "") + '">' +
-          (on ? "수강생에게 보임" : "잠김") + "</span>" +
-          '<button data-act="toggle" data-slug="' + r.slug + '" data-cat="' + c.slug + '">' +
-          (on ? "닫기" : "열기") + "</button></span></div>";
+          '<input type="checkbox" data-act="toggle" data-slug="' + r.slug + '" data-cat="' + c.slug + '"' +
+          (on ? " checked" : "") + ' aria-label="' + esc(c.title) + ' 커리큘럼 포함"></label>';
       }).join("");
-      // 여덟 번 틀리면 5분 막힌다. 수강생은 "안 들어가져요" 라고만 말하고 이유를 모른다.
-      // 이 칩이 없으면 운영자도 모르고, 결국 비밀번호를 바꿔서 강의실 전체를 튕기게 된다.
       const left = r.lockedUntil > Date.now() ? Math.ceil((r.lockedUntil - Date.now()) / 60000) : 0;
-      return '<div class="card' + (r.open ? " live" : "") + '">' +
-        '<div class="head"><h2>' + esc(r.title) + "</h2>" +
-        '<span class="state ' + (r.open ? "on" : "") + '">' + (r.open ? "열림" : "닫힘") + "</span>" +
+      return '<article class="card' + (r.open ? " live" : "") + '" data-room="' + r.slug + '">' +
+        '<div class="head"><div class="head-main"><h3>' + esc(r.title) + "</h3>" +
+        '<a class="addr" href="' + url + '" target="_blank" rel="noreferrer">' + esc(url) + "</a></div>" +
+        '<span class="state ' + (r.open ? "on" : "") + '">' + (r.open ? "입장 가능" : "입장 닫힘") + "</span>" +
         (left ? '<span class="state lock">로그인 잠김 · ' + left + "분 남음</span>" : "") +
-        '<a class="addr" href="' + url + '" target="_blank" rel="noreferrer">' + esc(url) + "</a>" +
         '<span class="made">' + day(r.created) + " 만듦</span></div>" +
-        '<div class="row">' +
+        '<div class="room-settings">' +
+        '<label class="field"><span>강의방 URL</span><span class="url-input"><span>/room/</span>' +
+        '<input data-next-slug="' + r.slug + '" value="' + esc(r.slug) + '" aria-label="강의방 URL 이름"></span></label>' +
+        '<label class="field"><span>강의방 이름</span><input data-next-title="' + r.slug + '" value="' + esc(r.title) +
+        '" aria-label="강의방 이름"></label>' +
+        '<button class="apply" data-act="rename" data-slug="' + r.slug + '">URL과 이름 저장</button></div>' +
+        '<div class="password-row"><label class="field"><span>수강 비밀번호 변경</span>' +
+        '<input type="password" data-pw="' + r.slug + '" placeholder="새 비밀번호" aria-label="새 수강 비밀번호" minlength="4"></label>' +
+        '<button data-act="password" data-slug="' + r.slug + '">비밀번호 저장</button></div>' +
+        '<section class="cats"><div class="cats-head"><h4>포함할 커리큘럼</h4>' +
+        '<p>체크한 커리큘럼만 강의방에 포함됩니다</p></div>' +
+        (cats || '<p class="note">교안 카테고리가 없습니다</p>') + "</section>" +
+        '<div class="room-foot"><div class="row">' +
         '<button class="go" data-act="open" data-slug="' + r.slug + '" data-open="' + (r.open ? "0" : "1") + '">' +
-        (r.open ? "강의방 닫기" : "강의방 열기") + "</button>" +
-        (left ? '<button data-act="unlock" data-slug="' + r.slug + '">잠김 풀기</button>' : "") +
-        '<button data-act="copy" data-url="' + url + '">주소 복사</button>' +
-        '<input type="password" data-pw="' + r.slug + '" placeholder="새 비밀번호" aria-label="새 비밀번호" style="flex:0 1 9rem">' +
-        '<button data-act="password" data-slug="' + r.slug + '">바꾸기</button>' +
-        '<button class="danger" data-act="remove" data-slug="' + r.slug + '">삭제</button></div>' +
-        '<div class="row">' +
-        '<input data-next-slug="' + r.slug + '" value="' + esc(r.slug) + '" aria-label="새 주소 이름" style="flex:0 1 12rem">' +
-        '<input data-next-title="' + r.slug + '" value="' + esc(r.title) + '" aria-label="새 강의방 이름" style="flex:1 1 14rem">' +
-        '<button data-act="rename" data-slug="' + r.slug + '">주소와 이름 적용</button></div>' +
-        (r.open ? '<div class="cats">' + (cats || '<p class="note">교안 카테고리가 없습니다</p>') + "</div>"
-                : '<p class="note">닫으면 열어 둔 카테고리도 처음으로 돌아갑니다</p>') +
-        "</div>";
+        (r.open ? "수강생 입장 닫기" : "수강생 입장 허용") + "</button>" +
+        (left ? '<button data-act="unlock" data-slug="' + r.slug + '">로그인 잠김 풀기</button>' : "") +
+        '<button data-act="copy" data-url="' + url + '">URL 복사</button></div>' +
+        '<button class="danger" data-act="remove" data-slug="' + r.slug + '">강의방 삭제</button></div>' +
+        "</article>";
     }).join("");
 
     $("rooms").querySelectorAll("[data-act]").forEach((b) => {
@@ -191,8 +236,18 @@ const ADMIN_SCRIPT = `
           catch { $("err").textContent = "주소를 복사하지 못했습니다. 주소를 직접 눌러 확인하세요"; }
           return;
         }
-        if (act === "open") return send({ action: "open", slug, open: b.dataset.open === "1" });
-        if (act === "toggle") return send({ action: "toggle", slug, category: b.dataset.cat });
+        if (act === "open") {
+          const opening = b.dataset.open === "1";
+          const done = await send({ action: "open", slug, open: opening });
+          if (done) $("err").textContent = opening ? "수강생 입장을 허용했습니다" : "수강생 입장을 닫았습니다";
+          return;
+        }
+        if (act === "toggle") {
+          b.disabled = true;
+          const done = await send({ action: "toggle", slug, category: b.dataset.cat });
+          if (!done) draw();
+          return;
+        }
         if (act === "unlock") {
           const done = await send({ action: "unlock", slug });
           if (done) $("err").textContent = "잠김을 풀었습니다. 다시 비밀번호를 넣어 보라고 하세요";
@@ -203,7 +258,7 @@ const ADMIN_SCRIPT = `
           if (!input.value) { $("err").textContent = "새 비밀번호를 적어 주세요"; return; }
           if (!confirm(slug + " 방의 비밀번호를 바꿉니다. 이미 들어와 있는 수강생이 전부 나갑니다")) return;
           const done = await send({ action: "password", slug, password: input.value });
-          if (done) $("err").textContent = "비밀번호를 바꿨습니다. 수강생에게 새 비밀번호를 알려 주세요";
+          if (done) $("err").textContent = "수강 비밀번호를 저장했습니다. 이미 들어온 수강생은 다시 로그인해야 합니다";
           return;
         }
         if (act === "rename") {
@@ -212,7 +267,7 @@ const ADMIN_SCRIPT = `
           if (!nextSlug || !title) { $("err").textContent = "새 주소와 강의방 이름을 모두 적어 주세요"; return; }
           if (nextSlug !== slug && !confirm(slug + " 주소를 " + nextSlug + " 주소로 옮깁니다. 예전 주소는 사라집니다")) return;
           const done = await send({ action: "rename", slug, nextSlug, title });
-          if (done) $("err").textContent = "주소와 이름을 적용했습니다";
+          if (done) $("err").textContent = "강의방 URL과 이름을 저장했습니다";
           return;
         }
         if (act === "remove") {
@@ -223,13 +278,19 @@ const ADMIN_SCRIPT = `
     });
   }
 
-  $("n-go").onclick = async () => {
+  $("n-form").onsubmit = async (event) => {
+    event.preventDefault();
     const slug = $("n-slug").value.trim();
-    const title = $("n-title").value.trim() || slug;
+    const title = $("n-title").value.trim();
     const password = $("n-pw").value;
-    if (!slug || !password) { $("err").textContent = "주소 이름과 비밀번호가 있어야 합니다"; return; }
+    if (!slug || !title || !password) { $("err").textContent = "강의방 이름과 URL 및 비밀번호를 모두 적어 주세요"; return; }
     const done = await send({ action: "create", slug, title, password });
-    if (done) { $("n-slug").value = ""; $("n-title").value = ""; $("n-pw").value = ""; }
+    if (done) {
+      $("n-slug").value = "";
+      $("n-title").value = "";
+      $("n-pw").value = "";
+      $("err").textContent = "강의방을 만들었습니다. 커리큘럼을 체크한 뒤 수강생 입장을 허용하세요";
+    }
   };
 
   $("rotate").onclick = async () => {
@@ -240,7 +301,7 @@ const ADMIN_SCRIPT = `
 
   send({ action: "list" });
   // 다른 창이나 다른 기기에서 바꾼 것도 따라온다. 강의 중에 화면이 실물과 어긋나지 않게 한다.
-  setInterval(() => { if (!document.hidden) send({ action: "list" }); }, 5000);
+  setInterval(() => { if (!document.hidden && !document.querySelector(".adm input:focus")) send({ action: "list" }); }, 5000);
 })();
 `;
 
@@ -260,22 +321,19 @@ async function signedIn(env: Env, request: Request): Promise<boolean> {
 /* 화면 ------------------------------------------------------------------ */
 
 /**
- * 로그인 화면은 이 문 뒤에 무엇이 있는지 말하지 않는다.
+ * 바탕화면 바로가기와 브라우저 탭 및 로그인 화면의 이름을 `강의 관리`로 맞춘다.
  *
- * 2026-08-24 운영자 지시다. 이 주소는 공개된 도메인에 그대로 열려 있고 누구나 열어 볼 수
- * 있다. 화면이 스스로 무엇을 조종하는 문인지 밝히면 지나가던 사람에게 두드릴 이유를 준다.
- * 비밀번호 칸 하나만 둔다. 제목도 라벨도 안내 문장도 붙이지 않는다.
- *
- * 브랜드 머리띠는 남긴다. 그것은 이 저장소의 모든 표면이 입는 옷이고 이 문이 무엇인지는
- * 알려 주지 않는다. `scripts/check-brand.mjs` 가 머리띠를 뺀 맨 화면과 정체를 드러내는
- * 낱말을 둘 다 막는다.
+ * `/admin`이라는 내부 주소를 그대로 제품 이름처럼 내보내면 다른 eddmpython 화면과 연결되지
+ * 않는다. 공용 머리띠와 강의 관리 제목을 함께 보여 주되 로그인 전에는 비밀번호 입력 외의
+ * 운영 정보나 강의방 상태를 보내지 않는다.
  */
 function loginPage(message = "", status = 200): Response {
   return page({
-    title: "admin",
+    title: "강의 관리",
     style: ADMIN_STYLE,
     status,
     inner: `${header()}<section class="gate adm">
+       <h1>강의 관리</h1>
        <form method="post" action="/admin/login">
          <input type="password" name="password" placeholder="비밀번호" aria-label="비밀번호" autofocus autocomplete="current-password">
          <button type="submit">들어가기</button>
@@ -286,11 +344,12 @@ function loginPage(message = "", status = 200): Response {
 
 function consolePage(): Response {
   return page({
-    title: "admin",
+    title: "강의 관리",
     style: ADMIN_STYLE,
     script: ADMIN_SCRIPT,
     inner: `${header()}<div class="adm">
   <div class="adm-top">
+    <div><h1 class="adm-title">강의 관리</h1><p class="adm-desc">강의방을 만들고 포함할 커리큘럼과 수강생 입장을 관리합니다</p></div>
     <form method="post" action="/admin/logout"><button type="submit">나가기</button></form>
   </div>
 
@@ -299,18 +358,19 @@ function consolePage(): Response {
     <span><b>교안 묶음을 읽지 못했습니다.</b> 방 조종은 그대로 됩니다. eddmpython-course 에서 npm run publish:course 를 다시 해 주세요</span>
   </div>
 
-  <p class="err" id="err"></p>
-  <div id="rooms"></div>
+  <p class="err" id="err" role="status" aria-live="polite"></p>
 
   <div class="new">
-    <h3>강의방 만들기</h3>
-    <div class="row">
-      <input id="n-slug" placeholder="주소 이름 (예: 0820)" aria-label="주소 이름" style="flex:0 1 12rem">
-      <input id="n-title" placeholder="강의방 이름" aria-label="강의방 이름" style="flex:1 1 14rem">
-      <input type="password" id="n-pw" placeholder="수강 비밀번호" aria-label="수강 비밀번호" style="flex:0 1 10rem">
-      <button class="go" id="n-go">만들기</button>
-    </div>
+    <div class="section-head"><h2>새 강의방</h2><p>URL과 비밀번호를 먼저 정합니다</p></div>
+    <form id="n-form">
+      <label class="field"><span>강의방 URL</span><span class="url-input"><span>/room/</span><input id="n-slug" placeholder="0820" aria-label="강의방 URL 이름" pattern="[a-z0-9][a-z0-9-]{1,30}" required></span></label>
+      <label class="field"><span>강의방 이름</span><input id="n-title" placeholder="8월 업무 자동화 강의" aria-label="강의방 이름" maxlength="60" required></label>
+      <label class="field"><span>수강 비밀번호</span><input type="password" id="n-pw" placeholder="네 자 이상" aria-label="수강 비밀번호" minlength="4" autocomplete="new-password" required></label>
+      <button type="submit" class="go" id="n-go">강의방 만들기</button>
+    </form>
   </div>
+
+  <section class="rooms-section"><h2>강의방 목록</h2><div id="rooms"></div></section>
 
   <div class="sessions">
     <h3>운영 세션</h3>
