@@ -1,18 +1,39 @@
-import blogOrder from "../../blog/order.json";
+/**
+ * 글 목록의 정본.
+ *
+ * **글 하나가 파일 하나다.** 글에 관한 사실은 그 파일 안이나 파일이 놓인 경로에만 있다.
+ * 예전에는 같은 사실을 세 곳에 적었다. 파일 이름의 순번, `order.json` 의 `posts[].order`,
+ * `posts[].category` 였고 카테고리 순서는 폴더 번호와 `categories[].order` 두 곳에 있었다.
+ * 글 한 편을 올리려면 손으로 세 자리를 맞춰야 했고 그중 카테고리 메타는 화면이 읽지도 않았다.
+ * 2026-08-24 에 운영자 지시로 `order.json` 을 없애고 전부 파일에서 끌어온다.
+ *
+ * ```
+ * blog/content/<NN-카테고리>/<NNN-slug>.md
+ * ```
+ *
+ * | 사실 | 어디 |
+ * |---|---|
+ * | 발행 순번이자 미디어 키 | 파일 이름의 `NNN` |
+ * | 카테고리와 그 순서 | 폴더 이름의 `NN-카테고리` |
+ * | 공개 URL | frontmatter `slug` |
+ * | 목록에서 뺄지 | frontmatter `archived` 와 `archivedNote` |
+ *
+ * 목록 순서는 최신 발행이 위다. 파일 순번 말고 따로 매기는 편집 순서는 두지 않는다.
+ */
 
 export type Post = {
   /** 파일 stem. media plan/catalog 키와 같다. */
   id: string;
-  /** 파일과 미디어를 연결하는 고정 순번. */
+  /** 발행 순번. 저장소 전체에서 001 부터 빈 번호 없이 이어진다. */
   sequence: number;
-  /** /blog 목록에서만 사용하는 공개 읽기 순서. */
-  readingOrder: number;
   /** 공개 URL 경로. /blog/{slug} */
   slug: string;
-  /** 이 글이 속한 카테고리 slug. 카테고리 하나가 강의 한 묶음이다. */
+  /** 이 글이 놓인 폴더 이름. 파일을 묶는 단위다. */
   category: string;
-  /** 목록에서 뺀 글. URL 은 살아 있다. */
+  /** 목록에서 뺀 글. URL 과 sitemap 은 살아 있다. */
   archived: boolean;
+  /** 왜 목록에서 뺐는지. archived 인 글만 갖는다. */
+  archivedNote: string;
   title: string;
   author: string;
   section: string;
@@ -25,7 +46,7 @@ export type Post = {
   body: string;
 };
 
-/* 글의 SSOT 는 blog/content/<category-slug>/NNN-kebab.md 다. 빌드 타임에 읽고 런타임 fetch 는 없다.
+/* 글의 SSOT 는 blog/content/<카테고리>/NNN-kebab.md 다. 빌드 타임에 읽고 런타임 fetch 는 없다.
    content 아래만 굽는다. media, embeds, scripts 는 글이 아니라 기계다. */
 const files = import.meta.glob("../../blog/content/*/???-*.md", {
   query: "?raw",
@@ -34,40 +55,14 @@ const files = import.meta.glob("../../blog/content/*/???-*.md", {
 }) as Record<string, string>;
 
 const slugPattern = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
-/* order.json 의 배열은 비어 있을 수 있다. 블로그는 그때그때 올리는 단편이라 글이 없는
-   구간이 정상이다. 비면 JSON import 가 never[] 로 추론되므로 원소 모양을 직접 적는다. */
-const postEntries = blogOrder.posts as { order: number; slug: string; category: string }[];
-const readingOrderBySlug = new Map(postEntries.map((entry) => [entry.slug, entry.order]));
-const categoryBySlug = new Map(postEntries.map((entry) => [entry.slug, entry.category]));
-/* 아카이브한 글은 /blog 목록에서만 빠진다. URL 과 sitemap 은 그대로 두어 검색 유입을 지킨다.
-   비어 있으면 JSON import 가 never[] 로 추론되므로 원소 모양을 직접 적는다. */
-const archivedEntries = blogOrder.archived as { slug: string; note?: string }[];
-const archivedSlugs = new Set(archivedEntries.map((entry) => entry.slug));
-
-export type Category = {
-  slug: string;
-  title: string;
-  order: number;
-  summary: string;
-};
 
 function parse(path: string, raw: string): Post {
-  const id = path.replace(/^.*\//, "").replace(/\.md$/, "");
+  const segments = path.split("/");
+  const id = segments[segments.length - 1].replace(/\.md$/, "");
+  const category = segments[segments.length - 2] ?? "";
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
   if (!match) {
-    return {
-      id,
-      sequence: Number(id.slice(0, 3)),
-      readingOrder: Number.MAX_SAFE_INTEGER,
-      slug: id,
-      category: "",
-      archived: false,
-      title: id,
-      author: "",
-      section: "",
-      summary: "",
-      body: raw.trim(),
-    };
+    throw new Error(`${id}: frontmatter 가 없거나 형식이 잘못됐습니다`);
   }
   const meta: Record<string, string> = {};
   for (const line of match[1].split(/\r?\n/)) {
@@ -81,10 +76,10 @@ function parse(path: string, raw: string): Post {
   return {
     id,
     sequence: Number(id.slice(0, 3)),
-    readingOrder: readingOrderBySlug.get(slug) ?? Number.MAX_SAFE_INTEGER,
     slug,
-    category: categoryBySlug.get(slug) ?? "",
-    archived: archivedSlugs.has(slug),
+    category,
+    archived: meta.archived === "true",
+    archivedNote: meta.archivedNote ?? "",
     title: meta.title ?? id,
     author: meta.author ?? "eddmpython",
     section: meta.section ?? "블로그",
@@ -98,27 +93,18 @@ function parse(path: string, raw: string): Post {
   };
 }
 
+/** 발행 순번 오름차순. 화면에서 최신을 위에 두려면 뒤집어 쓴다. */
 export const POSTS: Post[] = Object.entries(files)
   .map(([path, raw]) => parse(path, raw))
-  .sort((a, b) => a.readingOrder - b.readingOrder || a.sequence - b.sequence);
+  .sort((a, b) => a.sequence - b.sequence);
 
 const slugs = new Set(POSTS.map((post) => post.slug));
 if (slugs.size !== POSTS.length) {
   throw new Error("blog slug가 중복됐습니다");
 }
 
-/** 공개 목록 순서대로 정렬한 카테고리. 카테고리 하나가 강의 한 묶음이다. */
-export const CATEGORIES: Category[] = [...(blogOrder.categories as Category[])].sort(
-  (a, b) => a.order - b.order,
-);
-
-/** 카테고리별로 묶은 글. 목록 화면이 이 순서 그대로 렌더한다. */
-export const POSTS_BY_CATEGORY: { category: Category; posts: Post[] }[] = CATEGORIES.map(
-  (category) => ({
-    category,
-    posts: POSTS.filter((post) => post.category === category.slug && !post.archived),
-  }),
-).filter((group) => group.posts.length > 0);
+/** `/blog` 목록에 나가는 글. 아카이브한 글은 URL 만 살고 목록에서는 빠진다. */
+export const LISTED_POSTS: Post[] = POSTS.filter((post) => !post.archived);
 
 export function findPost(slug: string): Post | undefined {
   return POSTS.find((p) => p.slug === slug);

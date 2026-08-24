@@ -19,7 +19,6 @@ const STRICT = Boolean(targetPost);
 const blogDir = resolve(process.cwd(), "../blog");
 const codaroEmbedsPath = resolve(blogDir, "embeds/codaro-cells.json");
 const toolsPath = resolve(blogDir, "embeds/tools.json");
-const blogOrderPath = resolve(blogDir, "order.json");
 const postName = /^(\d{3})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$/;
 const requiredMeta = [
   "title",
@@ -221,7 +220,6 @@ for (const [id, tool] of Object.entries(tools.tools)) {
     if (!String(tool[key] ?? "").trim()) fail("blog/embeds/tools.json", `${id} 필드가 비었습니다: ${key}`);
   }
 }
-const blogOrder = await loadJson(blogOrderPath, "blog/order.json");
 if (
   plan.version !== 2 ||
   plan.promptContract !== "section-grounded-v2" ||
@@ -248,66 +246,26 @@ if (
 ) {
   fail("blog/embeds/codaro-cells.json", "version 또는 examples 계약이 잘못됐습니다");
 }
-// 글이 하나도 없는 상태를 허용한다. 2026-08-19 에 커리큘럼을 유료 강의로 옮기면서
-// 블로그가 비었다. 블로그는 이제 그때그때 올리는 단편이라 빈 구간이 정상이다.
-if (
-  blogOrder.version !== 3 ||
-  !Array.isArray(blogOrder.categories) ||
-  !Array.isArray(blogOrder.posts) ||
-  !Array.isArray(blogOrder.archived)
-) {
-  fail("blog/order.json", "version 또는 categories 또는 posts 또는 archived 계약이 잘못됐습니다");
-}
-
-// 카테고리 하나가 강의 한 묶음이다. 공개 URL 은 /blog/{slug} 그대로이며 카테고리는
-// 목록에서 묶는 데만 쓴다. 발행한 slug 는 바꾸지 않는다.
+/*
+ * 카테고리는 폴더 이름이 정본이다.
+ *
+ * 예전에는 `order.json` 이 카테고리 목록과 순서와 제목과 요약을 따로 들고 있었다. 폴더 번호와
+ * `categories[].order` 가 같은 순서를 두 번 적었고, 제목과 요약은 화면이 읽지도 않았다.
+ * 2026-08-24 에 운영자 지시로 그 파일을 없앴다. 이제 폴더가 있으면 카테고리가 있는 것이다.
+ */
 const categorySlugs = new Set();
-let previousCategoryOrder = 0;
-for (const entry of blogOrder.categories) {
-  const slug = String(entry?.slug ?? "");
-  const order = Number(entry?.order);
-  if (!categorySlug.test(slug)) fail("blog/order.json", `카테고리 slug 는 두 자리 번호로 시작합니다: ${slug}`);
-  if (categorySlugs.has(slug)) fail("blog/order.json", `카테고리 slug가 중복됐습니다: ${slug}`);
-  if (!Number.isInteger(order) || order !== previousCategoryOrder + 1) {
-    fail("blog/order.json", `카테고리 order가 1부터 빈 번호 없이 이어지지 않습니다: ${order}`);
+for (const entry of await readdir(join(blogDir, contentDirName), { withFileTypes: true })) {
+  if (!entry.isDirectory()) continue;
+  if (!categorySlug.test(entry.name)) {
+    fail(`blog/${contentDirName}`, `카테고리 폴더는 두 자리 번호로 시작합니다: ${entry.name}`);
   }
-  if (!String(entry?.title ?? "").trim()) fail("blog/order.json", `${slug}의 title이 비었습니다`);
-  const summary = String(entry?.summary ?? "").trim();
-  if (summary.length < 20 || summary.length > 200) {
-    fail("blog/order.json", `${slug}의 summary는 20자 이상 200자 이하로 씁니다`);
-  }
-  categorySlugs.add(slug);
-  previousCategoryOrder = order;
+  categorySlugs.add(entry.name);
 }
-
-// 아카이브한 글은 /blog 목록에서만 빠진다. URL 과 sitemap 은 그대로 둔다.
-const archivedSlugs = new Set();
-for (const entry of blogOrder.archived) {
-  const slug = String(entry?.slug ?? "");
-  if (!publicSlug.test(slug)) fail("blog/order.json", `올바르지 않은 archived slug: ${slug}`);
-  if (archivedSlugs.has(slug)) fail("blog/order.json", `archived slug가 중복됐습니다: ${slug}`);
-  if (!String(entry?.note ?? "").trim()) {
-    fail("blog/order.json", `${slug}를 왜 목록에서 뺐는지 note에 적습니다`);
+const categoryOrders = [...categorySlugs].map((slug) => Number(slug.slice(0, 2))).sort((a, b) => a - b);
+for (const [index, order] of categoryOrders.entries()) {
+  if (order !== index + 1) {
+    fail(`blog/${contentDirName}`, `카테고리 폴더 번호가 01부터 빈 번호 없이 이어지지 않습니다: ${order}`);
   }
-  archivedSlugs.add(slug);
-}
-
-const orderedSlugs = new Set();
-let previousReadingOrder = 0;
-for (const entry of blogOrder.posts) {
-  const order = Number(entry?.order);
-  const slug = String(entry?.slug ?? "");
-  if (!Number.isInteger(order) || order !== previousReadingOrder + 1) {
-    fail("blog/order.json", `order가 1부터 빈 번호 없이 이어지지 않습니다: ${order}`);
-  }
-  if (!publicSlug.test(slug)) fail("blog/order.json", `올바르지 않은 slug: ${slug}`);
-  if (orderedSlugs.has(slug)) fail("blog/order.json", `slug가 중복됐습니다: ${slug}`);
-  if (archivedSlugs.has(slug)) fail("blog/order.json", `${slug}가 목록과 archived에 동시에 있습니다`);
-  if (!categorySlugs.has(String(entry?.category ?? ""))) {
-    fail("blog/order.json", `${slug}의 category가 categories에 없습니다: ${entry?.category}`);
-  }
-  orderedSlugs.add(slug);
-  previousReadingOrder = order;
 }
 for (const [id, example] of Object.entries(codaroEmbeds.examples)) {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id) || !example || typeof example !== "object") {
@@ -486,7 +444,6 @@ for (const [index, post] of posts.entries()) {
   }
 }
 
-const listedCategoryBySlug = new Map(blogOrder.posts.map((entry) => [entry.slug, entry.category]));
 const titles = new Map();
 const slugs = new Map();
 const referencedMedia = new Set();
@@ -509,13 +466,30 @@ for (const post of targetPosts) {
     fail(file, `발행 글은 ${contentDirName}/<카테고리>/ 안에 둡니다`);
   }
   const folder = segments[1];
-  const listedCategory = listedCategoryBySlug.get(slug);
-  if (listedCategory && folder !== listedCategory) {
-    fail(file, `글 폴더 ${folder}와 category ${listedCategory}가 다릅니다`);
+  if (!categorySlugs.has(folder)) {
+    fail(file, `글이 놓인 폴더가 카테고리 형식이 아닙니다: ${folder}`);
   }
 
   if (meta.has("date") || meta.has("modified")) {
-    fail(file, "발행 날짜 대신 파일 순번과 blog/order.json의 순서만 사용합니다");
+    fail(file, "발행 날짜 대신 파일 순번만 사용합니다");
+  }
+
+  /*
+   * 아카이브는 글 파일이 스스로 들고 있는다.
+   *
+   * 예전에는 `order.json` 의 `archived` 배열에 slug 를 옮겨 적었다. 글과 그 상태가 서로 다른
+   * 파일에 있어서 한쪽만 고치면 조용히 어긋났다. 지금은 frontmatter 한 줄이고, 왜 뺐는지를
+   * 안 적으면 나중에 되돌릴 근거가 없으므로 함께 요구한다.
+   */
+  if (meta.has("archived")) {
+    if (meta.get("archived") !== "true") {
+      fail(file, "archived 는 목록에서 뺄 때만 true 로 적습니다. 아니면 줄을 지웁니다");
+    }
+    if (!String(meta.get("archivedNote") ?? "").trim()) {
+      fail(file, "왜 목록에서 뺐는지 archivedNote 에 적습니다");
+    }
+  } else if (meta.has("archivedNote")) {
+    fail(file, "archivedNote 는 archived 가 true 인 글에만 씁니다");
   }
   if (!publicSlug.test(slug)) {
     fail(file, "slug는 소문자·숫자·하이픈만 쓰고 날짜로 시작하지 않습니다");
@@ -768,18 +742,6 @@ for (const post of targetPosts) {
 
 // 여기부터는 여러 글 사이의 관계다. 한 편만 검사할 때는 건너뛴다.
 if (!targetPost) {
-  for (const slug of orderedSlugs) {
-    if (!slugs.has(slug)) fail("blog/order.json", `목록의 글을 찾지 못했습니다: ${slug}`);
-  }
-  for (const slug of slugs.keys()) {
-    if (!orderedSlugs.has(slug) && !archivedSlugs.has(slug)) {
-      fail("blog/order.json", `${slug} 글이 목록에도 archived에도 없습니다`);
-    }
-  }
-  for (const slug of archivedSlugs) {
-    if (!slugs.has(slug)) fail("blog/order.json", `archived에 없는 글이 있습니다: ${slug}`);
-  }
-
   const postSlugs = new Set(posts.map((post) => post.id));
   for (const [id, entry] of Object.entries(plan.assets)) {
     if (!postSlugs.has(entry.post)) fail("blog/media/plan.json", `${id}의 글 파일이 없습니다`);

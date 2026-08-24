@@ -1,4 +1,4 @@
-import { POSTS } from "../posts";
+import { LISTED_POSTS } from "../posts";
 import { Nav } from "../components/Nav";
 import { Footer } from "../components/Footer";
 
@@ -7,12 +7,15 @@ import { Footer } from "../components/Footer";
  *
  * **카테고리로 묶지 않는다.** 2026-08-24 운영자 지시다. 글이 둘뿐인데 카테고리 제목과
  * 요약과 편수가 글보다 자리를 더 차지했다. 그냥 최신 글이 위에 오는 한 줄기 목록이다.
- * `order.json` 의 categories 는 파일을 정리하는 데만 쓰고 이 화면은 읽지 않는다.
+ * 폴더 이름은 파일을 묶는 데만 쓰고 이 화면은 읽지 않는다.
+ *
+ * 순서는 발행 순번의 역순이다. `LISTED_POSTS` 가 아카이브한 글을 이미 뺀 목록이라
+ * 여기서 다시 거르지 않는다. 아카이브한 글은 URL 과 sitemap 으로만 남는다.
  *
  * 썸네일은 오른쪽이다. 읽는 사람이 제목부터 보고 그림은 곁들여 본다.
  */
 export function Blog() {
-  const posts = [...POSTS].reverse();
+  const posts = [...LISTED_POSTS].reverse();
 
   return (
     <div className="min-h-screen">

@@ -1,8 +1,21 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 
-const blogOrder = JSON.parse(
-  readFileSync(new URL("../../blog/order.json", import.meta.url), "utf8"),
-);
+/**
+ * `/blog` 목록에 나갈 글 수를 파일에서 센다.
+ *
+ * 예전에는 `order.json` 의 `posts` 길이를 썼다. 그 파일이 정본이 아니라 파일 목록을 손으로
+ * 옮겨 적은 것이라, 글을 추가하고 목록에 안 적으면 화면과 계약이 같이 틀린 채로 통과했다.
+ * 2026-08-24 에 그 파일을 없앴다. 지금은 글 파일을 직접 세고 아카이브한 글만 뺀다.
+ */
+const contentRoot = new URL("../../blog/content/", import.meta.url);
+const listedPostCount = readdirSync(contentRoot, { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .flatMap((dir) =>
+    readdirSync(new URL(`${dir.name}/`, contentRoot))
+      .filter((name) => /^\d{3}-[a-z0-9-]+\.md$/.test(name))
+      .map((name) => readFileSync(new URL(`${dir.name}/${name}`, contentRoot), "utf8")),
+  )
+  .filter((raw) => !/^archived:\s*true\s*$/m.test(raw)).length;
 
 export const VISUAL_VIEWPORTS = [
   {
@@ -87,14 +100,14 @@ const ROUTE_RULES = [
       COUNT("main#content h1", { exact: 1 }),
       COUNT("main#content time", { exact: 0 }),
       COUNT("[data-blog-list] > li", {
-        exact: blogOrder.posts.length,
+        exact: listedPostCount,
       }),
       // 목록은 카테고리로 묶지 않고 최신 글이 위에 온다. 2026-08-24 운영자 지시다.
       // 번호를 화면에 내지 않으므로 첫 글의 제목으로 순서를 확인한다.
       COUNT("[data-blog-category]", { exact: 0 }),
-      COUNT("[data-blog-thumb]", { exact: blogOrder.posts.length }),
+      COUNT("[data-blog-thumb]", { exact: listedPostCount }),
       COUNT('main#content a[href^="/blog/"]', {
-        exact: blogOrder.posts.length,
+        exact: listedPostCount,
       }),
     ],
   },
