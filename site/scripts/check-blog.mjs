@@ -685,6 +685,23 @@ for (const post of targetPosts) {
       fail(file, `섹션의 설명이 120자보다 짧습니다: ${section.heading}`);
     }
   }
+  /*
+   * hero 이미지의 계획이 본문과 붙어 있는지 본다.
+   *
+   * 섹션 이미지는 sectionHeading 과 contentAnchor 를 본문과 대조받는데 hero 는 절에 매이지
+   * 않아서 그 검사를 하나도 안 받았다. 2026-08-24 에 003 의 본문 문장을 고치면서 계획의
+   * contentAnchor 가 실제로 죽었고 게이트 아홉 개가 전부 초록불을 냈다. 계획이 본문을
+   * 가리키지 못하면 다음에 이미지를 다시 만들 때 엉뚱한 장면이 나온다.
+   */
+  for (const [id, entry] of Object.entries(plan.assets)) {
+    if (entry.post !== postId || entry.role !== "hero") continue;
+    const anchor = String(entry.contentAnchor ?? "").trim();
+    if (!anchor) fail(file, `${id} 의 hero 계획에 contentAnchor 가 비었습니다`);
+    if (!body.includes(anchor)) {
+      fail(file, `${id} 의 hero 계획 contentAnchor 가 본문에 없습니다: ${anchor.slice(0, 40)}`);
+    }
+  }
+
   const refs = [];
   for (const match of body.matchAll(imageRef)) {
     if (!match[1].trim()) fail(file, "이미지 대체 텍스트가 비었습니다");

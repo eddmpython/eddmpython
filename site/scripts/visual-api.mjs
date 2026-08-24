@@ -316,7 +316,10 @@ async function runInteraction(client, sessionRef, interaction) {
             ?.getAttribute("href") ?? "";
           const activeId = activeHref.startsWith("#") ? decodeURIComponent(activeHref.slice(1)) : "";
           const top = document.getElementById(id)?.getBoundingClientRect().top;
-          if (currentId === id && activeId === id && typeof top === "number" && top >= minTop && top <= maxTop) {
+          // 상한에 1픽셀을 더해 준다. 본문 H2 의 scroll-margin 이 112px 이라 제자리에 선 것이
+          // 정상인데, 한글 줄높이와 테두리에서 소수점 레이아웃이 나와 112.23 처럼 걸린다.
+          // 범위가 80~112 라 1픽셀을 열어도 어긋난 스크롤은 그대로 잡는다.
+          if (currentId === id && activeId === id && typeof top === "number" && top >= minTop && top <= maxTop + 1) {
             await new Promise((resolveFrame) => requestAnimationFrame(() => requestAnimationFrame(resolveFrame)));
             await new Promise((resolveWait) => setTimeout(resolveWait, 200));
             return { hash: location.hash, activeId, targetId: id, targetTop: top };
