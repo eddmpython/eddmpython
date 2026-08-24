@@ -17,13 +17,14 @@ description: 한국어 글의 AI 티와 문법 문제를 세어서 찾고 고친
 
 ## 무엇을 받아야 쓸 수 있나
 
-이 폴더의 **파일 네 개**가 한 벌이다.
+이 폴더의 **파일 다섯 개**가 한 벌이다.
 
 | 파일 | 없으면 |
 |---|---|
 | `SKILL.md` | 순서와 문턱을 모른다 |
 | `references/ai-tells-ko.md` | 무엇이 AI 티인지 모른다 |
 | `references/korean-grammar-ko.md` | 번역투를 뺀 자리의 조사를 못 고른다 |
+| `references/human-signals-ko.md` | 뺀 자리에 무엇을 넣을지 모른다 |
 | `count-ai-tells.py` | 세지 못한다. 아래 **스크립트 없이 세는 법** 을 따른다 |
 
 `agents/openai.yaml` 은 특정 런타임의 등록 파일이라 내용에 영향이 없다.

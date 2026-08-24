@@ -625,26 +625,45 @@ for (const post of targetPosts) {
     }
   }
 
-  for (const match of body.matchAll(codaroEmbedRef)) {
-    const id = match[1];
-    if (!codaroEmbeds.examples[id]) fail(file, `등록되지 않은 Codaro 실습 셀: ${id}`);
-    referencedCodaroEmbeds.add(id);
+  /*
+   * 실행 칸과 도구 마커는 나타난 자리를 전부 본다.
+   *
+   * 예전에는 줄 단독으로 쓴 것만 등록 목록과 대조하고, 그런 줄이 하나도 없을 때만 형식을
+   * 나무랐다. 그래서 정상 마커가 한 줄이라도 있으면 문장 안에 섞인 미등록 id 는 검사도 형식
+   * 지적도 받지 않고 그대로 나갔다. 사이트는 줄 단독일 때만 컴포넌트로 바꾸므로 섞여 들어간
+   * 것은 화면에 생 주소로 찍힌다. 등록 여부와 줄 단독 여부를 따로 센다.
+   */
+  const embedKinds = [
+    {
+      label: "Codaro 실습 셀",
+      any: /https:\/\/eddmpython\.com\/codaro\/run\/\?example=([a-z0-9-]*)/g,
+      line: codaroEmbedRef,
+      known: (id) => Boolean(codaroEmbeds.examples[id]),
+      seen: referencedCodaroEmbeds,
+    },
+    {
+      label: "도구",
+      any: /https:\/\/eddmpython\.com\/tool\/([a-z0-9-]*)/g,
+      line: toolRef,
+      known: (id) => Boolean(tools.tools[id]),
+      seen: null,
+    },
+  ];
+  for (const kind of embedKinds) {
+    kind.any.lastIndex = 0;
+    kind.line.lastIndex = 0;
+    const all = [...body.matchAll(kind.any)];
+    for (const match of all) {
+      const id = match[1];
+      if (!id || !kind.known(id)) fail(file, `등록되지 않은 ${kind.label}: ${id || "(빈 id)"}`);
+      if (kind.seen) kind.seen.add(id);
+    }
+    const standalone = [...body.matchAll(kind.line)].length;
+    kind.line.lastIndex = 0;
+    if (all.length !== standalone) {
+      fail(file, `${kind.label} URL은 다른 내용 없는 한 줄로 둡니다`);
+    }
   }
-  if (/eddmpython\.com\/codaro\/run\/\?example=/.test(body) && !codaroEmbedRef.test(body)) {
-    codaroEmbedRef.lastIndex = 0;
-    fail(file, "Codaro 실습 셀 URL은 다른 내용 없는 한 줄로 둡니다");
-  }
-  codaroEmbedRef.lastIndex = 0;
-
-  for (const match of body.matchAll(toolRef)) {
-    const id = match[1];
-    if (!tools.tools[id]) fail(file, `등록되지 않은 도구: ${id}`);
-  }
-  if (/eddmpython\.com\/tool\//.test(body) && !toolRef.test(body)) {
-    toolRef.lastIndex = 0;
-    fail(file, "도구 마커 URL은 다른 내용 없는 한 줄로 둡니다");
-  }
-  toolRef.lastIndex = 0;
 
   const sectionAssets = new Set();
   for (const section of sections) {
