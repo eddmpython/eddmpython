@@ -13,6 +13,11 @@
       "order": 1,
       "slug": "ai-environment",
       "category": "ai-workflow"
+    },
+    {
+      "order": 2,
+      "slug": "ai-writing-tells",
+      "category": "ai-workflow"
     }
   ],
   "archived": []

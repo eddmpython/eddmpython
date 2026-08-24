@@ -131,14 +131,22 @@ def check(name, raw):
             print(f"  경고: 입니다가 {ipnida / total * 100:.0f}%. 정의할 때만 쓰고 나머지는 동사로")
 
     if plens:
+        # 문단 길이는 재기만 하고 판정하지 않는다.
+        #
+        # 사람 글 표본의 50자 미만 63퍼센트는 네이버 에디터에서 나온 값이다. 거기서는
+        # 줄바꿈 하나가 곧 한 문단이라 단위가 다르다. 마크다운 글에 그 분포를 목표로 삼으면
+        # 고립된 줄의 더미가 된다. 2026-08-24 에 실제로 그것을 목표로 규칙을 넣었다가
+        # 섹션 검사에 걸려서 되돌렸다. 문단을 몇 개로 나눌지는 글의 섹션 규칙이 정한다.
         short = sum(1 for p in plens if p < 50) / len(plens) * 100
-        print(f"\n[E3 문단 길이] 50자 미만 {short:.0f}%  (사람 글 실측 63%)")
-        if short < 25:
-            print("  경고: 짧은 문단이 없다. 한 줄짜리 선언을 섞는다")
+        mid = sorted(plens)[len(plens) // 2]
+        print(f"\n[문단 길이] 50자 미만 {short:.0f}%, 중앙값 {mid}자")
+        print("  참고만 한다. 문단 수는 글의 섹션 규칙이 정한다")
 
-    bold = len(re.findall(r"\*\*[^*\n]+\*\*", text))
-    bullets = len(re.findall(r"^\s*[-*]\s", text, flags=re.M))
-    lines = max(len(text.splitlines()), 1)
+    # 볼드와 불릿은 기호가 살아 있는 원문에서 센다.
+    marked = strip_code(raw)
+    bold = len(re.findall(r"\*\*[^*\n]+\*\*", marked))
+    bullets = len(re.findall(r"^\s*[-*]\s", marked, flags=re.M))
+    lines = max(len(marked.splitlines()), 1)
     print(f"\n[F 서식] 볼드 {bold}개, 불릿 {bullets}줄 (전체 {lines}줄의 {bullets / lines * 100:.0f}%)")
     if bullets / lines > 0.35:
         print("  경고: 불릿이 많다. 문단으로 쓸 것을 쪼갠 자리를 본다")
