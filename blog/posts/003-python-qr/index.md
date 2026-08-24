@@ -1,11 +1,11 @@
 ---
-title: 파이썬으로 QR코드 만드는 법, segno 한 줄부터 저장까지
+title: 파이썬으로 QR코드 만드는 방법, segno로 PNG 저장하고 여백 확인하기
 slug: python-qr
 author: eddmpython
 section: 파이썬 도구
-summary: 링크 하나를 스캔되는 QR코드 이미지로 바꾸고 파일로 저장하는 파이썬 코드를 다룹니다. segno를 설치해 한 줄로 QR코드를 만들고, 오류 복원 수준과 여백을 바꾸면 어떻게 달라지는지 화면으로 확인합니다.
-readerQuestion: 링크 하나를 파이썬으로 스캔되는 QR 이미지로 만들고 파일로 저장하려면 무엇을 설치하고 어떤 코드를 써야 할까?
-readerTakeaway: segno 로 QR 을 만들고 error 로 복원력을, scale 과 border 로 크기와 여백을 정해 PNG 로 저장한다.
+summary: 주소 하나를 파이썬 QR코드로 만들어 PNG 파일로 저장합니다. segno가 실제로 고른 오류 복원 수준과 여백을 포함한 픽셀 크기도 출력해서 확인합니다.
+readerQuestion: 주소 하나를 파이썬으로 QR 이미지로 만들고, 저장된 크기와 오류 복원 수준까지 확인하려면 어떤 코드를 써야 할까?
+readerTakeaway: segno로 QR을 저장한 뒤 designator로 실제 오류 복원 수준을 읽고 border 네 칸을 포함한 픽셀 크기를 확인한다.
 readerLevel: working
 readerStartingPoint: 파이썬으로 print 정도는 돌려 봤지만 외부 라이브러리를 설치해 이미지 파일을 만들어 본 적은 없다.
 primaryKeyword: 파이썬 QR코드
@@ -17,120 +17,146 @@ ogImageHeight: 832
 ogImageType: image/webp
 ---
 
-명함에 넣을 QR 을 만들려고 또 웹사이트를 엽니다. 주소를 붙여 넣고, 크기를 맞추고, 워터마크가 붙는지 확인합니다. 매번 같은 일입니다. 파이썬으로 만들면 `segno.make` 한 줄로 고정됩니다. 설치할 것은 `segno` 하나입니다. 파이썬이 도는 곳이면 어디서나 돌고, 실행하면 코드를 돌린 폴더에 `link.png` 가 생깁니다.
+주소를 QR PNG로 남기는 데 긴 코드는 필요 없습니다. `segno.make`로 QR을 만들고 `save`로 저장하면 됩니다. 다만 파일이 생겼다는 사실만 보고 끝내면 오류 복원 수준과 여백을 잘못 읽기 쉽습니다. 이 글에서는 저장 결과를 숫자로 찍어 보고, 마지막에는 휴대폰으로 주소가 맞는지 확인합니다.
 
 ![어두운 책상 위에서 휴대폰이 작은 타일 격자 카드를 비추자 카드에서 가는 리본 하나가 흘러나와 화면으로 이어지는 장면](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/17/17e97599ef2ac51854f63acd7d52026fa0af03556885fdb76e1cdc597a99ce3d.webp "링크 하나가 휴대폰이 읽는 타일 패턴으로 바뀝니다")
 
-먼저 아래 도구에 주소를 넣어 QR 이 어떻게 나오는지 보고 나서, 같은 것을 파이썬으로 옮겨 보겠습니다.
+파이썬 코드를 쓰기 전에 주소 길이와 여백이 QR 크기를 어떻게 바꾸는지 아래 도구에서 확인합니다. 이 도구는 오류 복원 수준 M을 고정하고, 모듈 한 칸의 픽셀 수와 바깥 여백을 바로 바꿉니다.
 
 https://eddmpython.com/tool/python-qr
 
-## 파이썬 QR코드, segno 설치와 첫 저장
+## 파이썬 QR코드, segno 설치와 PNG 저장
 
-### segno를 설치하고 주소 하나를 PNG로 저장합니다
+### 주소를 넣어 QR을 만들고 파일이 생긴 폴더와 픽셀 크기를 확인합니다
 
-QR 을 그리는 라이브러리는 여러 개입니다. `segno` 를 고른 이유는 딸려 오는 것이 없어서입니다. `pip install segno` 를 돌리면 설치 목록에 `segno` 한 줄만 찍힙니다. 이미지 처리 라이브러리인 Pillow 를 따로 깔지 않아도 PNG 와 SVG 가 바로 저장되고 파일도 가볍습니다. 터미널에 그 한 줄을 실행하고 파이썬 파일에 세 줄을 적습니다.
+`segno`는 다른 패키지를 함께 설치하지 않아도 PNG와 SVG를 저장하며, 공식 [PyPI 설명](https://pypi.org/project/segno/)에도 외부 의존성이 없다고 적혀 있습니다. 터미널에서 설치 명령을 한 번 실행한 뒤, 파이썬 파일에 주소와 파일 이름을 적습니다.
 
-#### 예시 코드: 주소 하나를 QR PNG로 저장하기
+#### 실행 명령: segno 하나만 설치하기
+
+아래 명령은 현재 파이썬이 쓰는 환경에 `segno`를 설치합니다. 명령이 오류 없이 끝나면 설치됐거나 이미 설치돼 있다는 결과가 보입니다. 같은 터미널에서 파이썬 파일을 실행하면 다른 환경을 잘못 열지 않습니다.
+
+```powershell
+python -m pip install segno
+```
+
+#### 예시 코드: 주소를 link.png로 저장하기
+
+`make`가 주소를 QR로 바꾸고 `save`가 현재 폴더에 `link.png`를 만들며, 마지막 줄은 Segno가 고른 버전과 오류 복원 수준, 여백을 포함한 PNG 크기를 출력합니다.
 
 ```python
 import segno
 
 qr = segno.make("https://eddmpython.com", error="m")
 qr.save("link.png", scale=6, border=4)
+print(qr.designator, qr.symbol_size(scale=6, border=4))
 ```
 
-괄호 안 주소를 우리 주소로 바꾸고 실행합니다. 코드를 돌린 폴더에 `link.png` 가 생깁니다. 317 바이트입니다. 이미지를 열어 휴대폰 카메라를 대면 그 주소가 뜹니다. 여기서 만든 QR 은 조금 가려지거나 인쇄가 뭉개져도 읽히는데, 그 여유가 `error="m"` 에서 나옵니다. 그럼 이 값을 `h` 로 올리면 칸이 그만큼 촘촘해질까요?
+이 글을 확인한 `segno 1.6.6`에서는 `2-M (198, 198)`이 찍혔는데, `2-M`은 버전 2와 오류 복원 수준 M을 뜻하고 뒤의 두 숫자는 저장될 PNG의 가로와 세로 픽셀입니다. 코드를 실행한 폴더에서 `link.png`를 열면 생성한 QR이 보입니다. 그런데 `error="m"`을 적었다고 해서 출력이 언제나 M으로 고정될까요?
 
-## 오류 복원을 올려도 칸이 바로 늘지 않는다
+## error 자동 승격 확인
 
-### error를 l부터 h까지 돌려 칸 수가 뛰는 자리를 찾습니다
+### designator를 출력하면 요청한 값과 Segno가 실제로 고른 값이 갈립니다
 
-QR 은 같은 정보를 여러 번 겹쳐 담습니다. 일부가 가려져도 읽히라고 넣는 여유분이고, 이것을 오류 복원 수준이라 부르며 `error` 값으로 정합니다. `l`은 약 7퍼센트, `m`은 15퍼센트, `q`는 25퍼센트, `h`는 30퍼센트까지 가려져도 읽힙니다. 겹쳐 담는 양이 늘면 칸도 늘겠죠. 네 값을 다 돌려 재 봅니다.
+제가 틀렸습니다. `l`과 `m`의 버전과 칸 수만 출력한 뒤 둘의 복원력을 비교했는데, 정작 실제 오류 복원 수준을 찍지 않았습니다. 다시 실행해 보니 `l`과 `m`은 모두 `2-M`이었습니다. 왜 그랬을까요? Segno는 QR 버전을 키우지 않고 더 높은 오류 복원 수준을 담을 자리가 남으면 수준을 자동으로 올립니다.
 
-#### 예시 코드: 복원 수준별로 칸 수를 세어 보기
+#### 예시 코드: 요청값과 실제 designator 비교하기
+
+네 값을 차례로 넘기고 `designator`를 출력합니다. [Segno의 오류 복원 설명](https://segno.readthedocs.io/en/stable/boost-error-correction-level.html)에 따르면 기본값에서는 `error`를 고정값이 아니라 최솟값으로 읽습니다.
 
 ```python
 import segno
 
-for level in ["l", "m", "q", "h"]:
-    qr = segno.make("https://eddmpython.com", error=level)
-    print(level, qr.version, qr.symbol_size(scale=1, border=0))
-```
+url = "https://eddmpython.com"
 
-반복문이 네 수준을 차례로 만들고 각각의 버전과 칸 수를 찍습니다. 22자짜리 우리 주소를 넣고 실행하면 이렇게 나옵니다.
+for level in ["l", "m", "q", "h"]:
+    qr = segno.make(url, error=level)
+    print(level, qr.designator, qr.symbol_size(border=0))
+```
 
 ```text
-l 2 (25, 25)
-m 2 (25, 25)
-q 3 (29, 29)
-h 3 (29, 29)
+l 2-M (25, 25)
+m 2-M (25, 25)
+q 3-H (29, 29)
+h 3-H (29, 29)
 ```
 
-고르게 늘지 않습니다. `l` 과 `m` 이 똑같이 25칸이고, `q` 로 넘어가는 자리에서 29칸으로 한 번에 뜁니다. 계단입니다. QR 은 칸 수를 마음대로 정하지 못하고 21칸, 25칸, 29칸처럼 정해진 크기 중에서 고르는데, 이 크기를 버전이라 부르고 위 출력의 가운데 숫자가 그것을 가리킵니다. `l` 과 `m` 은 둘 다 버전 2 로 나왔죠. 여유분을 더 담고도 같은 칸에 들어갔다는 뜻이고, **그래서 `m` 은 `l` 과 크기가 같으면서 복원력만 두 배입니다.** 주소 길이가 바뀌면 뛰는 자리도 바뀌니 우리 주소로 직접 돌려 보시기 바랍니다. 그런데 방금 칸을 셀 때 `border=0` 을 넘겼습니다. 이 값이 무엇이길래 0 을 넣어야 순수한 칸 수가 나오는지 다음에서 잽니다.
+첫 글자는 우리가 요청한 값이고 `2-M`, `3-H`가 실제 결과입니다. `l`을 요청해도 버전 2 안에 M을 담을 수 있어서 M으로 올라갔고, `q`도 버전 3 안에서 H로 올라갔습니다. L, M, Q, H를 정확히 비교해야 한다면 `boost_error=False`를 넘겨 자동 승격을 끕니다.
 
-## 여백을 빼면 그림이 48픽셀 작아진다
+#### 예시 코드: 자동 승격을 끄고 네 수준 고정하기
 
-### border가 픽셀 크기와 읽힘을 동시에 바꿉니다
+이번에는 요청한 오류 복원 수준이 `designator`에 그대로 남습니다. 같은 주소라도 L과 M은 25칸, Q와 H는 29칸이라 수준을 올릴 때마다 한 칸씩 고르게 늘지는 않습니다.
 
-QR 바깥의 흰 테두리는 장식이 아닙니다. 스캐너가 코드의 경계를 찾는 기준이고, 이 여백을 조용한 구역이라 부릅니다. QR 표준은 네 칸을 요구하며 `segno` 도 `border` 를 안 적으면 4 를 씁니다. 자리를 아끼려고 `border=0` 으로 붙이면 배경과 QR 이 맞닿아 스캐너가 시작점을 잡을 기준을 잃습니다.
+```python
+for level in ["l", "m", "q", "h"]:
+    qr = segno.make(url, error=level, boost_error=False)
+    print(level, qr.designator, qr.symbol_size(border=0))
+```
 
-#### 예시 코드: 여백을 뺀 것과 넣은 것의 픽셀 재기
+```text
+l 2-L (25, 25)
+m 2-M (25, 25)
+q 3-Q (29, 29)
+h 3-H (29, 29)
+```
+
+자동 승격은 끄지 않아도 됩니다. 저는 작은 버전을 유지하면서 복원 수준을 올려 주는 기본값을 그대로 씁니다. 대신 코드에 적은 `error`가 실제 결과라고 단정하지 않고 `designator`를 확인합니다. 이제 25칸이 왜 저장할 때 198픽셀이 되는지 여백까지 계산해 보겠습니다.
+
+## border 네 칸과 픽셀 크기
+
+### QR 본체와 바깥 여백을 따로 재서 저장될 PNG 크기를 계산합니다
+
+QR 바깥의 빈 테두리는 스캐너가 코드의 경계를 찾는 공간입니다. Segno는 일반 QR에 네 모듈의 여백을 기본값으로 씁니다. 여기서 모듈은 QR을 이루는 작은 칸 하나입니다. `scale=6`은 모듈 한 칸을 6픽셀 정사각형으로 그리라는 뜻입니다.
+
+#### 예시 코드: 여백을 뺀 크기와 넣은 크기 재기
+
+같은 QR에 `border=0`과 `border=4`를 번갈아 넣습니다. 주소와 오류 복원 수준이 같으므로 QR 본체는 바뀌지 않고, 바깥 여백만 결과 크기에 더해집니다.
 
 ```python
 import segno
 
 qr = segno.make("https://eddmpython.com", error="m")
-print("border=0", qr.symbol_size(scale=6, border=0))
-print("border=4", qr.symbol_size(scale=6, border=4))
+print("여백 없음", qr.symbol_size(scale=6, border=0))
+print("여백 네 칸", qr.symbol_size(scale=6, border=4))
 ```
-
-`symbol_size` 에 `scale` 과 `border` 를 같이 넘기면 저장될 그림의 픽셀 크기를 미리 알려 줍니다. 두 줄을 실행하면 이렇게 나옵니다.
 
 ```text
-border=0 (150, 150)
-border=4 (198, 198)
+여백 없음 (150, 150)
+여백 네 칸 (198, 198)
 ```
 
-48픽셀 차이입니다. `border=0` 이 150픽셀이고 `border=4` 가 198픽셀이라 여백이 사방으로 그만큼 더합니다. 25칸짜리 QR 에 한 칸이 6픽셀이고 좌우로 네 칸씩 붙으니 `4 x 6 x 2` 가 그대로 48입니다. `scale` 은 칸 하나를 몇 픽셀로 그릴지 정하고 6이면 화면과 인쇄 양쪽에 넉넉합니다. `border` 는 칸 단위 여백이라 4 아래로 내리지 않습니다. 값의 뜻을 알았으니 한 파일에 모아 다시 쓸 저장 코드로 만듭니다.
+QR 본체는 25칸이고 한 칸이 6픽셀이므로 `25 x 6`은 150픽셀이고, 양쪽 여백 네 칸에 해당하는 `4 x 6 x 2`, 곧 48픽셀이 더해져 가로와 세로가 모두 198픽셀이 됩니다. 그럼 인쇄는요? `scale=6`만 보고 인쇄 크기가 충분하다고 말할 수는 없습니다. PNG가 종이에서 몇 밀리미터로 놓일지는 편집 프로그램의 배율과 출력 해상도가 함께 정합니다. 저는 QR 파일에는 `border=4`를 남기고, 명함이나 안내문에 배치한 뒤 실제 크기로 인쇄해서 다시 스캔합니다.
 
-## 링크 QR 저장 코드 완성
+## 다시 쓰는 QR 저장 함수
 
-### 주소와 값을 바꿔 바로 쓰는 저장 함수를 만듭니다
+### 주소와 파일 이름을 바꿔 저장하고 실제 수준과 픽셀 크기를 한 줄로 남깁니다
 
-지금까지 잰 세 값을 한 함수에 모으면 주소만 바꿔 넣고 실행하는 저장 코드가 됩니다. `error` 는 인쇄물이면 `h`, 화면용이면 `m` 으로 고르고 `scale` 로 크기를, `border` 로 여백을 정합니다. 저장한 뒤 어떤 QR 이 나왔는지 확인하려고 버전과 칸 수를 함께 찍습니다.
+매번 확인 코드를 다시 쓰기는 귀찮습니다. 주소, 파일 이름, 최소 오류 복원 수준, 모듈 크기만 받는 함수로 묶으면 저장 결과가 한 줄에 남습니다. 자동 승격은 기본값을 쓰고, 실제 결과는 `designator`로 읽습니다.
 
-#### 예시 코드: 주소와 파일 이름만 바꿔 쓰는 저장 함수
+#### 예시 코드: 저장 뒤 실제 QR 정보를 출력하는 함수
+
+`module_px`는 모듈 한 칸의 픽셀 수입니다. 함수는 여백을 네 칸으로 고정하고, 저장한 파일 이름과 실제 오류 복원 수준과 PNG 크기를 함께 출력합니다.
 
 ```python
 import segno
 
-def save_qr(url, name, level="m", size=6):
+def save_qr(url, name, level="m", module_px=6):
     qr = segno.make(url, error=level)
-    qr.save(name, scale=size, border=4)
-    print(name, "저장", qr.version, "버전", qr.symbol_size())
+    qr.save(name, scale=module_px, border=4)
+    size = qr.symbol_size(scale=module_px, border=4)
+    print(name, qr.designator, size)
 
 save_qr("https://eddmpython.com", "home.png")
-save_qr("https://eddmpython.com/blog", "blog.png", level="h", size=8)
+save_qr(
+    "https://eddmpython.com/blog",
+    "blog.png",
+    level="h",
+    module_px=8,
+)
 ```
-
-함수를 두 번 부르면 `home.png` 와 `blog.png` 가 각각 저장되고 어떤 QR 이 나왔는지 한 줄씩 찍힙니다.
 
 ```text
-home.png 저장 2 버전 (33, 33)
-blog.png 저장 4 버전 (41, 41)
+home.png 2-M (198, 198)
+blog.png 4-H (328, 328)
 ```
 
-여기서 걸립니다. `home.png` 의 33칸이 앞에서 잰 25칸과 다릅니다. `symbol_size()` 를 괄호만 열고 부르면 여백 네 칸이 사방에 포함된 값을 주기 때문이고, 앞 절에서 25칸이 나온 것은 `border=0` 을 넘겼기 때문입니다. **칸 수를 세려면 `symbol_size(scale=1, border=0)` 로 부르고, 그냥 `symbol_size()` 는 여백까지 친 크기라고 읽습니다.** 인쇄용인 `blog.png` 는 주소가 길고 `h` 라서 버전 4까지 올라갔습니다.
-
-#### 실패 예시: 없는 값과 없는 확장자를 넣었을 때
-
-```text
-segno.make("https://eddmpython.com", error="x")
-ValueError: Illegal error correction level: "x". Supported levels: L, M, Q, H
-
-qr.save("qr.bmp", scale=6)
-ValueError: Unknown file extension ".bmp"
-```
-
-`error` 에 `x` 처럼 없는 값을 넣거나 `.bmp` 로 저장하면 위 오류가 그대로 뜹니다. 오류 문구가 쓸 수 있는 값을 알려 주므로 `L, M, Q, H` 중에서 다시 고르고, 확장자는 `.png` 나 `.svg` 로 바꾸면 넘어갑니다. 저장한 파일을 열어 휴대폰으로 스캔해 주소가 맞게 뜨는지 확인해 보시기 바랍니다. 링크 하나를 QR 로 바꾸고 파일로 남기는 데 필요한 것은 `segno` 하나와 이 함수 한 벌입니다.
+주소가 길어지고 오류 복원 수준이 높아지면 더 큰 버전이 필요할 수 있어서 두 파일의 크기가 다릅니다. `error="x"`처럼 없는 수준을 넣으면 `ValueError`가 나고, Segno가 지원하지 않는 `.bmp` 확장자로 저장해도 오류가 납니다. 오류 복원 수준은 L, M, Q, H 중에서 다시 고르고 파일은 `.png`나 `.svg`로 저장하면 됩니다. 코드가 오류 없이 끝났다고 QR 검사가 끝난 것은 아닙니다. 저장한 PNG를 실제 문서에 배치하고, 쓸 크기로 출력한 뒤 휴대폰 카메라로 읽어 봅니다. 화면에 뜬 주소가 코드에 넣은 주소와 같은지도 확인해 보세요

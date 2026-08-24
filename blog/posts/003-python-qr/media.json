@@ -4,14 +4,14 @@
   "assets": {
     "hero": {
       "alt": "어두운 책상 위에서 휴대폰이 작은 타일 격자 카드를 비추자 카드에서 가는 리본 하나가 흘러나와 화면으로 이어지는 장면",
-      "contentAnchor": "파이썬으로 만들면 `segno.make` 한 줄로 고정됩니다.",
+      "contentAnchor": "주소를 QR PNG로 남기는 데 긴 코드는 필요 없습니다.",
       "narrativeUse": "링크 하나가 스캔되는 타일 패턴으로 바뀌어 휴대폰이 그 주소를 읽는 과정을 한 장면으로 보여 준다",
       "palettePolicy": "eddmpython-carbon-ivory-sand-v1",
       "placement": "도입 문단 바로 뒤",
       "prompt": "Wide 3:2 dark editorial still life on a matte charcoal desk. A phone lies flat and casts a soft scanning light over a small physical card covered in a dense grid of tiny raised square tiles in light and dark. From the card, a single thin ribbon lifts and curves toward the phone, suggesting a link being read. Restrained studio lighting, shallow depth, clear physical materials. Muted charcoal and warm ivory tones with one small warm sand accent only. No readable text, letters, numbers, glyphs, real scannable code, content screens, logos, brands, people, robots, watermarks, or decorative scenery.",
       "role": "hero",
-      "sectionHeading": "파이썬 QR코드, segno 설치와 첫 저장",
-      "sectionSubtitle": "segno를 설치하고 주소 하나를 PNG로 저장합니다",
+      "sectionHeading": "파이썬 QR코드, segno 설치와 PNG 저장",
+      "sectionSubtitle": "주소를 넣어 QR을 만들고 파일이 생긴 폴더와 픽셀 크기를 확인합니다",
       "sourceKind": "imagegen",
       "sourcePolicy": "auto",
       "visualProfile": "eddmpython-dark-v2",

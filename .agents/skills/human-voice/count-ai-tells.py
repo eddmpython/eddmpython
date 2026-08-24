@@ -109,6 +109,8 @@ MIN_SENTENCE_LEN = 5    # 짧은 단언도 문장으로 센다
 # 정본은 references/ai-tells-ko.md 의 E1 절과 SKILL.md 의 문턱 표이고 둘 다 15 다.
 # 코드가 5 로 재고 있어서 짧은 글에 튀는 값으로 경고가 나갔다.
 MIN_SENTENCES_FOR_RHYTHM = 15
+# 짧은 계사 문장. 리듬 비율을 올리려고 끼워 넣은 조각이 이 길이 안에 들어온다.
+FILLER_MAX_LEN = 12
 DENSITY_FLOOR = 50      # 1만자당 문자열 항목 건수. 이 위면 밀집
 KIND_FLOOR = 8          # 걸린 항목 종류 수. 이 위면 밀집
 
@@ -144,6 +146,22 @@ def sentences(text):
     body = re.sub(r"^\s*[-*]\s", "", body, flags=re.M)
     parts = re.split(r"(?<=[.!?])\s+|\n\n+", body)
     return [s.strip() for s in parts if len(s.strip()) >= MIN_SENTENCE_LEN]
+
+
+def filler_sentences(sents):
+    """짧은 계사 문장을 모은다.
+
+    `계단입니다`, `317 바이트입니다` 처럼 한 낱말에 `입니다` 만 붙인 조각이다. 뜻을 지고 있으면
+    두어도 되지만 E1 비율을 올리려고 끼워 넣은 것이면 글이 나빠진 자리다. 2026-08-25 에
+    실제로 그런 조각 셋을 넣어 같은 글의 비율을 0.36 에서 0.47 로 만든 적이 있고, 이 검사가
+    그 셋을 모두 잡는다. 숫자를 올리는 가장 쉬운 길이 글을 버리는 길이라 따로 센다.
+    """
+    out = []
+    for sentence in sents:
+        tail = sentence.strip().rstrip(".!?")
+        if len(tail) <= FILLER_MAX_LEN and re.search(r"(입니다|이다)$", tail):
+            out.append(tail)
+    return out
 
 
 def closer_of(sentence):
@@ -218,11 +236,13 @@ def check(name, raw):
         sd = statistics.pstdev(lengths)
         mean = statistics.mean(lengths)
         ratio = sd / mean if mean else 0
-        mark = "경고" if ratio < SD_RATIO_FLOOR else "통과"
-        print(f"\n[E1 문장 길이] 평균 {mean:.0f}자, 표준편차 {sd:.0f}, 비율 {ratio:.2f} (문턱 {SD_RATIO_FLOOR}) {mark}")
+        mark = "고름" if ratio < SD_RATIO_FLOOR else "섞임"
+        print(f"\n[E1 문장 길이] 평균 {mean:.0f}자, 표준편차 {sd:.0f}, 비율 {ratio:.2f} (기준 {SD_RATIO_FLOOR}) {mark}")
         print(f"  최단 {min(lengths)}자, 최장 {max(lengths)}자")
         if ratio < SD_RATIO_FLOOR:
-            print("  짧은 단언과 긴 설명을 섞는다. 붙일 때 원문에 없는 내용을 더하지 않는다")
+            print("  문장이 고르다. 어디를 열어 볼지 알려 주는 신호이지 합격과 불합격이 아니다")
+            print("  짧은 문장을 끼워 넣어 이 값을 올리지 않는다. 숫자만 오르고 글은 나빠진다")
+            print("  붙이거나 나눌 자리는 뜻으로 정한다. 한 문장에 사실이 둘이면 나누고 이어지면 붙인다")
     else:
         print("\n[E1 문장 길이] 문장이 적어 재지 않는다")
 
@@ -248,6 +268,12 @@ def check(name, raw):
             print("  한 어미가 이어진다. 입니다 는 정의할 때만 쓰고 나머지는 동사로 끝낸다")
     else:
         print("\n[E2 종결어미] 종결을 찾지 못했다")
+
+    fillers = filler_sentences(sents)
+    if fillers:
+        print(f"\n[필러 문장] {len(fillers)}건: {', '.join(fillers)}")
+        print("  한 낱말에 입니다 만 붙인 조각이다. 뜻을 지고 있으면 두고")
+        print("  E1 비율을 올리려고 넣은 것이면 뺀다. 그 자리는 독자에게 아무것도 주지 않는다")
 
     # 3. 서식. 기호가 살아 있는 원문에서 센다
     marked = strip_code(raw)
