@@ -89,17 +89,10 @@ const ROUTE_RULES = [
       COUNT("[data-blog-list] > li", {
         exact: blogOrder.posts.length,
       }),
-      COUNT("[data-blog-order]", { exact: blogOrder.posts.length }),
-      // 글이 없는 구간이 정상이다. 번호 검사는 목록에 글이 있을 때만 건다.
-      ...(blogOrder.posts.length
-        ? [
-            TEXT("[data-blog-list] > li:first-child [data-blog-order]", "01"),
-            TEXT(
-              "[data-blog-list] > li:last-child [data-blog-order]",
-              String(blogOrder.posts.length).padStart(2, "0"),
-            ),
-          ]
-        : []),
+      // 목록은 카테고리로 묶지 않고 최신 글이 위에 온다. 2026-08-24 운영자 지시다.
+      // 번호를 화면에 내지 않으므로 첫 글의 제목으로 순서를 확인한다.
+      COUNT("[data-blog-category]", { exact: 0 }),
+      COUNT("[data-blog-thumb]", { exact: blogOrder.posts.length }),
       COUNT('main#content a[href^="/blog/"]', {
         exact: blogOrder.posts.length,
       }),
