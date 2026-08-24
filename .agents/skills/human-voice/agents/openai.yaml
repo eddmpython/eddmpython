@@ -1,0 +1,4 @@
+interface:
+  display_name: "사람 목소리 교정"
+  short_description: "한국어 글의 AI 티를 세어서 찾고 사람이 쓴 글로 고칩니다"
+  default_prompt: "$human-voice를 사용해 이 한국어 글의 AI 티를 세어서 찾고 번역투와 형식명사와 고른 리듬을 고친 뒤, 질문과 실패와 판단이 비어 있는 자리를 알려 주세요"
