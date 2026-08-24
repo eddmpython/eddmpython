@@ -1,21 +1,32 @@
 import { lazy, type ComponentType, type LazyExoticComponent } from "react";
-import toolCatalog from "../../blog/embeds/tools.json";
 
 /**
- * 글이 품는 도구의 레지스트리.
+ * 글이 품는 도구의 등록부.
  *
- * 블로그 자체가 도구를 품은 글이다. 본문에 `https://eddmpython.com/tool/<id>` 한 줄을 두면
- * Markdown 렌더러가 그 자리를 아래 컴포넌트로 바꾼다. 코다로 실습 셀과 같은 방식이다.
+ * **등록 파일이 없다.** 글 폴더 안에 `tool/index.tsx` 를 두면 그것이 등록이다. 이름은 그
+ * 폴더 이름에서 발행 순번을 뗀 것이라 따로 적을 곳이 없고, 적는 곳이 없으니 어긋날 곳도 없다.
  *
- * 유효한 id 의 정본은 blog/embeds/tools.json 이고 `check:blog` 가 본문 마커를 그 목록에
- * 대조한다. 여기에는 각 id 를 실제 컴포넌트에 잇는 매핑을 둔다. 무거운 도구를 첫 화면
- * 번들에 굽지 않도록 lazy 로 나눈다. id 가 목록에 있는데 아래 매핑이 없으면 ToolEmbed 가
- * 화면에 오류를 드러낸다. 조용히 사라지지 않는다.
+ * ```
+ * blog/posts/003-python-qr/tool/index.tsx  ->  https://eddmpython.com/tool/python-qr
+ * ```
+ *
+ * 2026-08-24 전에는 `blog/embeds/tools.json` 이 id 와 제목을 들고 있고 이 파일이 id 를 다시
+ * 컴포넌트에 이어 붙였다. 같은 사실이 세 곳에 있었고 도구 소스는 또 다른 곳에 있었다.
+ *
+ * 도구는 첫 화면 번들에 굽지 않는다. 글을 열 때만 내려받게 lazy 로 나눈다.
  */
-export type ToolMeta = { title: string; summary: string };
+const modules = import.meta.glob("../../blog/posts/*/tool/index.tsx") as Record<
+  string,
+  () => Promise<{ default: ComponentType }>
+>;
 
-export const TOOL_META = (toolCatalog as { tools: Record<string, ToolMeta> }).tools;
+/** 폴더 이름에서 발행 순번을 뗀 것이 도구 이름이다. posts.ts 의 toolIdOf 와 같은 규칙이다. */
+function toolIdFromPath(path: string): string {
+  const segments = path.split("/");
+  const folder = segments[segments.length - 3] ?? "";
+  return folder.replace(/^\d{3}-/, "");
+}
 
-export const TOOLS: Record<string, LazyExoticComponent<ComponentType>> = {
-  qr: lazy(() => import("./components/QrTool").then((m) => ({ default: m.QrTool }))),
-};
+export const TOOLS: Record<string, LazyExoticComponent<ComponentType>> = Object.fromEntries(
+  Object.entries(modules).map(([path, load]) => [toolIdFromPath(path), lazy(load)]),
+);

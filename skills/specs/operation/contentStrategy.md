@@ -20,8 +20,8 @@ status: curated
 ## 먼저 읽을 것
 
 - [productMarketing.md](productMarketing.md)
-- 최근 발행 글 `blog/content/*/[0-9][0-9][0-9]-*.md`
-- `blog/content/` 의 카테고리 폴더 이름과 가장 큰 파일 순번
+- 최근 발행 글 `blog/posts/*/index.md`
+- `blog/posts/` 의 가장 큰 폴더 순번
 - 지금 확인된 제품 변경, 실패, 화면
 
 ## 주제를 고르는 순서

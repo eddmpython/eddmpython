@@ -1,35 +1,35 @@
 /**
  * 글 목록의 정본.
  *
- * **글 하나가 파일 하나다.** 글에 관한 사실은 그 파일 안이나 파일이 놓인 경로에만 있다.
- * 예전에는 같은 사실을 세 곳에 적었다. 파일 이름의 순번, `order.json` 의 `posts[].order`,
- * `posts[].category` 였고 카테고리 순서는 폴더 번호와 `categories[].order` 두 곳에 있었다.
- * 글 한 편을 올리려면 손으로 세 자리를 맞춰야 했고 그중 카테고리 메타는 화면이 읽지도 않았다.
- * 2026-08-24 에 운영자 지시로 `order.json` 을 없애고 전부 파일에서 끌어온다.
+ * **글 하나가 폴더 하나다.** 그 글에 딸린 것은 전부 그 폴더 안에 있다. 본문, 이미지 계획,
+ * 글이 품는 도구의 소스와 그 도구의 게이트까지다.
  *
  * ```
- * blog/content/<NN-카테고리>/<NNN-slug>.md
+ * blog/posts/003-python-qr/
+ *   index.md      글
+ *   media.json    이 글의 이미지 계획
+ *   tool/         이 글이 품는 도구
  * ```
  *
- * | 사실 | 어디 |
- * |---|---|
- * | 발행 순번이자 미디어 키 | 파일 이름의 `NNN` |
- * | 카테고리와 그 순서 | 폴더 이름의 `NN-카테고리` |
- * | 공개 URL | frontmatter `slug` |
- * | 목록에서 뺄지 | frontmatter `archived` 와 `archivedNote` |
+ * 2026-08-24 에 운영자 지시로 이렇게 바꿨다. 그전에는 한 글에 딸린 것이 일곱 군데에 흩어져
+ * 있었다. 본문은 카테고리 폴더에, 이미지 계획은 `blog/media/plan.json` 에, 도구 등록은
+ * `blog/embeds/tools.json` 에, 도구 소스는 `site/src/components` 에, 도구 코어는
+ * `site/src` 에, 도구 게이트는 `site/scripts` 에 있었다. 글 하나를 고치려면 그 일곱 군데를
+ * 다 찾아다녀야 했고 하나를 빠뜨리면 조용히 어긋났다.
  *
- * 목록 순서는 최신 발행이 위다. 파일 순번 말고 따로 매기는 편집 순서는 두지 않는다.
+ * **카테고리는 없다.** 폴더 이름 앞의 세 자리가 발행 순번이자 미디어 키이고, 목록은 그
+ * 역순이다. 공개 URL 은 frontmatter 의 `slug` 하나뿐이다.
  */
 
 export type Post = {
-  /** 파일 stem. media plan/catalog 키와 같다. */
+  /** 폴더 이름. media 키와 같다. 예: 003-python-qr */
   id: string;
   /** 발행 순번. 저장소 전체에서 001 부터 빈 번호 없이 이어진다. */
   sequence: number;
   /** 공개 URL 경로. /blog/{slug} */
   slug: string;
-  /** 이 글이 놓인 폴더 이름. 파일을 묶는 단위다. */
-  category: string;
+  /** 이 글이 품는 도구의 이름. 폴더 이름에서 순번을 뗀 것이다. 도구가 없으면 빈 문자열. */
+  toolId: string;
   /** 목록에서 뺀 글. URL 과 sitemap 은 살아 있다. */
   archived: boolean;
   /** 왜 목록에서 뺐는지. archived 인 글만 갖는다. */
@@ -46,9 +46,8 @@ export type Post = {
   body: string;
 };
 
-/* 글의 SSOT 는 blog/content/<카테고리>/NNN-kebab.md 다. 빌드 타임에 읽고 런타임 fetch 는 없다.
-   content 아래만 굽는다. media, embeds, scripts 는 글이 아니라 기계다. */
-const files = import.meta.glob("../../blog/content/*/???-*.md", {
+/* 글의 SSOT 는 blog/posts/<NNN-slug>/index.md 다. 빌드 타임에 읽고 런타임 fetch 는 없다. */
+const files = import.meta.glob("../../blog/posts/*/index.md", {
   query: "?raw",
   import: "default",
   eager: true,
@@ -56,10 +55,14 @@ const files = import.meta.glob("../../blog/content/*/???-*.md", {
 
 const slugPattern = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 
+/** 폴더 이름에서 발행 순번을 뗀 나머지. 그 글이 품는 도구의 이름이 된다. */
+export function toolIdOf(postId: string): string {
+  return postId.replace(/^\d{3}-/, "");
+}
+
 function parse(path: string, raw: string): Post {
   const segments = path.split("/");
-  const id = segments[segments.length - 1].replace(/\.md$/, "");
-  const category = segments[segments.length - 2] ?? "";
+  const id = segments[segments.length - 2] ?? "";
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
   if (!match) {
     throw new Error(`${id}: frontmatter 가 없거나 형식이 잘못됐습니다`);
@@ -77,7 +80,7 @@ function parse(path: string, raw: string): Post {
     id,
     sequence: Number(id.slice(0, 3)),
     slug,
-    category,
+    toolId: toolIdOf(id),
     archived: meta.archived === "true",
     archivedNote: meta.archivedNote ?? "",
     title: meta.title ?? id,

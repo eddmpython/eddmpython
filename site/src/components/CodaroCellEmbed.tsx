@@ -1,5 +1,15 @@
 import { useState } from "react";
-import codaroCells from "../../../blog/embeds/codaro-cells.json";
+/**
+ * 실습 칸도 글 폴더가 소유한다.
+ *
+ * 글 폴더의 `cells.json` 을 전부 모아 읽는다. 예전에는 `blog/embeds/codaro-cells.json` 하나에
+ * 몰려 있어서 어느 글의 칸인지 파일만 봐서는 알 수 없었다. 이름이 글 사이에서 겹치지 않는지는
+ * `check:blog` 가 본다.
+ */
+const cellFiles = import.meta.glob("../../../blog/posts/*/cells.json", { eager: true }) as Record<
+  string,
+  { examples?: Record<string, CodaroExample> }
+>;
 import { PyCell } from "./PyCell";
 
 type CodaroExample = {
@@ -10,7 +20,10 @@ type CodaroExample = {
   fullUrl: string;
 };
 
-const examples = codaroCells.examples as Record<string, CodaroExample>;
+const examples: Record<string, CodaroExample> = Object.assign(
+  {},
+  ...Object.values(cellFiles).map((mod) => mod.examples ?? {}),
+);
 
 export function CodaroCellEmbed({ exampleId }: { exampleId: string }) {
   const example = examples[exampleId];

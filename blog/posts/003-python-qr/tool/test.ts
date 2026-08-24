@@ -4,7 +4,7 @@
  * 구조 불변식(파인더, 타이밍, format BCH 왕복, 크기, 다크 모듈)과 고정 입력의 골든 해시로
  * 회귀를 막는다. 인코더가 바뀌어 배치나 마스크가 틀어지면 해시가 어긋나 실패한다.
  */
-import { encodeQr } from "../src/qrEncode.ts";
+import { encodeQr } from "./qrEncode.ts";
 
 let failures = 0;
 function fail(msg: string) {

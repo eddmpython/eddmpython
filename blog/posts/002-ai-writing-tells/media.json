@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "promptContract": "section-grounded-v2",
+  "assets": {
+    "half-caught": {
+      "alt": "어두운 바탕에 놓인 접시 안에 잘라 낸 작은 종이 조각 아홉 개가 모여 있고 그 옆에는 아무것도 잘리지 않은 종이 한 장이 그대로 놓여 있는 화면",
+      "contentAnchor": "번역투를 전부 걷어내고 관용구를 다 지워도 여전히 기계가 쓴 것처럼 읽힙니다.",
+      "narrativeUse": "걸러 낼 수 있는 것을 다 걷어내도 손대지 않은 쪽이 그대로 남는다는 것을 한 화면에 보여 빼기만으로 부족하다는 말이 눈으로 읽힌다.",
+      "palettePolicy": "eddmpython-carbon-ivory-sand-v1",
+      "placement": "H3 부제 바로 뒤",
+      "prompt": "Create a wide 3:2 minimal studio still life on a matte charcoal surface. A single long ivory paper strip runs left to right across the frame. In the left half, several small rectangular pieces have been cut out of the strip and lie neatly separated on a shallow tray beside it, leaving clean empty gaps in the strip. In the right half, the same strip continues completely whole and untouched, with no cuts and no gaps. One simple rigid cutting guide sits at the midpoint where the cutting stops. Soft restrained studio lighting, shallow depth, clear physical materials. Muted charcoal and warm ivory tones only, no saturated accent colors. Absolutely no text, letters, numbers, glyphs, screens, logos, brands, people, robots, watermarks, decorative scenery, or unrelated objects.",
+      "role": "section",
+      "sectionHeading": "질문과 실패와 판단 넣기",
+      "sectionSubtitle": "사람 글에는 있고 AI 글에는 없는 것을 넣습니다",
+      "sourceKind": "imagegen",
+      "sourcePolicy": "auto",
+      "visualProfile": "eddmpython-dark-v2",
+      "visualRelationship": "접시에 모인 조각은 목록이 잡아낸 것이고 옆의 온전한 종이는 목록이 닿지 못한 것이다",
+      "visualSubject": "걸러 낸 조각을 담은 접시 하나와 손대지 않은 종이 한 장이 나란히 놓인 화면"
+    }
+  }
+}

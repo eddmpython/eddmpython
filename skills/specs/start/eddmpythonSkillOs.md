@@ -20,7 +20,7 @@ eddmpython 브랜드 표면이다.
 | 경로 | 무엇 |
 |---|---|
 | `site/` | 랜딩, 블로그 렌더링, Cloudflare Worker |
-| `blog/` | 발행 글, 카테고리 원장, 미디어 계획. **규칙 문서는 없다.** 공개용 AI 작업 환경 템플릿은 `blog/content/01-ai-workflow/agent-template/` 가 소유한다 |
+| `blog/` | 발행 글. **글 하나가 폴더 하나**이고 이미지 계획과 도구가 그 안에 있다. **규칙 문서는 없다** |
 | `skills/` | 운영 절차의 정본 |
 
 ## 소유하지 않는 것
@@ -45,7 +45,7 @@ OAuth 를 여기에 만들지 않는다.
 | 블로그 발행 계약 | `skills/specs/operation/blogPublishing.md` |
 | 규칙 문서 전체 인덱스 | `../eddmpython-course/memory/MEMORY.md` (비공개 형제 저장소, 추적 안 함) |
 | 제품 마케팅 맥락 | `skills/specs/operation/productMarketing.md` |
-| 다른 프로젝트에 쓸 규칙 템플릿 | `blog/content/01-ai-workflow/agent-template/` |
+| 다른 프로젝트에 쓸 규칙 템플릿 | `blog/posts/001-ai-needs-an-environment/agent-template/` |
 
 ## 이 저장소의 실패 방식
 

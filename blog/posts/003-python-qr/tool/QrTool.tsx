@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { encodeQr } from "../qrEncode";
+import { encodeQr } from "./qrEncode";
 
 /**
  * 링크나 문구를 QR 로 바꾸는 도구. 글이 품는 도구의 첫 사례다.

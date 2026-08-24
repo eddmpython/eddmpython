@@ -1,7 +1,8 @@
 """plan의 섹션 근거와 imagegen 장면을 합쳐 FLUX 1.1 Pro로 생성한다.
 
 사용: python -X utf8 blog/scripts/generate_flux.py <post-id> [--only key1,key2] [--force] [--plan 경로]
-- 계약: skills/specs/operation/blogMedia.md. 블로그는 blog/media/plan.json이 정본이다.
+- 계약: skills/specs/operation/blogMedia.md. 블로그는 글 하나가 폴더 하나이고
+  blog/posts/<글 폴더>/media.json 이 그 글의 이미지 계획 정본이다.
 - 교안은 --plan ../eddmpython-course/curriculum/<카테고리>/plan.json 을 준다. 본문 문장이 공개 저장소로
   새지 않게 plan만 갈라 두었고 이미지와 catalog는 블로그와 공유한다.
 - 출력: ../eddmpython.out/blog-media/<post-id>/<assetKey>.webp (Git 밖, 검수 후 publish_media.py로 HF 발행)
@@ -24,7 +25,7 @@ sys.dont_write_bytecode = True
 from project_env import load_project_env
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-PLAN_PATH = REPO_ROOT / "blog" / "media" / "plan.json"
+POSTS_ROOT = REPO_ROOT / "blog" / "posts"
 STAGING_ROOT = REPO_ROOT.parent / "eddmpython.out" / "blog-media"
 API = "https://api.replicate.com/v1/predictions"
 MODEL = "black-forest-labs/flux-1.1-pro"
@@ -132,19 +133,23 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    plan_path = Path(args.plan).resolve() if args.plan else PLAN_PATH
+    plan_path = Path(args.plan).resolve() if args.plan else POSTS_ROOT / args.post / "media.json"
     if not plan_path.exists():
         sys.exit(f"plan 을 찾을 수 없다: {plan_path}")
     plan = json.loads(plan_path.read_text(encoding="utf-8"))
-    if plan.get("version") != 2 or plan.get("promptContract") != "section-grounded-v2":
-        sys.exit("plan.json의 section-grounded-v2 계약이 필요하다.")
+    # 글 폴더의 media.json 은 1, 교안 plan 은 2 다.
+    if plan.get("version") not in (1, 2) or plan.get("promptContract") != "section-grounded-v2":
+        sys.exit("media.json의 section-grounded-v2 계약이 필요하다.")
     assets = plan.get("assets", {})
     onlyKeys = {k.strip() for k in args.only.split(",") if k.strip()}
+    # 글 폴더의 media.json 은 자기 글 것만 들고 있어 키가 곧 assetKey 다. 교안 plan 은 여러
+    # 글을 모아 두므로 post 필드로 거른다. 둘 다 받는다.
     targets = [
-        a for k, a in sorted(assets.items())
-        if a.get("post") == args.post
+        {**a, "post": a.get("post", args.post), "assetKey": a.get("assetKey", k.split("/")[-1])}
+        for k, a in sorted(assets.items())
+        if a.get("post", args.post) == args.post
         and a.get("sourceKind") == "imagegen"
-        and (not onlyKeys or a.get("assetKey") in onlyKeys)
+        and (not onlyKeys or a.get("assetKey", k.split("/")[-1]) in onlyKeys)
     ]
     if not targets:
         sys.exit(f"{plan_path}에 {args.post}의 imagegen 자산이 없다.")

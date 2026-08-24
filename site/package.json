@@ -12,7 +12,7 @@
     "test:hash-navigation": "node --experimental-strip-types scripts/test-hash-navigation.ts",
     "test:visual-plan": "node scripts/test-visual-capture-plan.mjs",
     "test:classroom-render": "node --experimental-strip-types scripts/test-classroom-render.ts",
-    "test:qr": "node --experimental-strip-types scripts/test-qr.ts",
+    "test:qr": "node --experimental-strip-types ../blog/posts/003-python-qr/tool/test.ts",
     "check:skills": "node scripts/check-skills.mjs",
     "verify:media": "python -X utf8 ../blog/scripts/publish_media.py --verify",
     "verify:seo": "node scripts/check-seo.mjs",

@@ -3,7 +3,7 @@
 **이 파일은 모양 본보기다. 규칙이 아니다.** 집필 규칙의 정본은 `../eddmpython-course/memory/rules/blogWriter.md`,
 발행 계약의 정본은 `skills/specs/operation/blogPublishing.md`다. 어긋나면 그쪽이 이긴다.
 
-파일명은 `blog/content/<NN-카테고리>/NNN-kebab.md`로 쓴다. `NNN`은 발행할 때 한 번 부여하는 세 자리 고정 순번이며
+글 하나가 폴더 하나다. `blog/posts/<NNN-kebab>/index.md`로 쓰고 그 폴더에 이 글의 이미지 계획과 도구를 함께 둔다. `NNN`은 발행할 때 한 번 부여하는 세 자리 고정 순번이며
 미디어 키로도 쓰인다. 날짜는 저장하지 않는다. 목록은 이 순번의 역순이라 따로 적을 곳이 없다.
 
 블로그 한 편은 강의 차시 요약이 아니다. 검색으로 이 글만 연 독자가 정의, 원리, 예제, 실패와 검증을

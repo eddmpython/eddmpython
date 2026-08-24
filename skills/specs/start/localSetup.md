@@ -50,7 +50,7 @@ npm run dev
 ## 알아 둘 것
 
 - **빌드 산출물은 저장소 밖으로 나간다.** `../eddmpython.out/` 을 본다
-- 글은 `site/`가 아니라 `blog/content/<category-slug>/`에 있다. 블로그는 단편이라 원장을 두지
+- 글은 `site/`가 아니라 `blog/posts/<NNN-slug>/index.md`에 있다. 글 하나가 폴더 하나다. 블로그는 단편이라 원장을 두지
   않는다. dev 서버가 `blog/`를 읽도록 `server.fs.allow`가 열려 있다
 - 랜딩의 실행 셀은 처음 누를 때 Python 런타임을 내려받는다. 30초쯤 걸리고
   Chromium 계열에서만 동작한다

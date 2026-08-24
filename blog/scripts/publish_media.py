@@ -18,7 +18,7 @@ from project_env import load_project_env
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 BLOG_ROOT = REPO_ROOT / "blog"
-PLAN_PATH = BLOG_ROOT / "media" / "plan.json"
+POSTS_ROOT = BLOG_ROOT / "posts"
 CATALOG_PATH = BLOG_ROOT / "media" / "catalog.json"
 STAGING_ROOT = REPO_ROOT.parent / "eddmpython.out" / "blog-media"
 DEFAULT_HF_REPO = "eddmpython/eddmpython-media"
@@ -49,11 +49,19 @@ SKIP_DIRS = frozenset({"media", "scripts", "embeds"})
 
 
 def find_post_markdown(post: str, root: Path | None = None) -> Path:
-    """글 파일을 찾는다. 교안은 plan 이 있는 폴더 옆에, 블로그는 blog/content 아래에 있다."""
-    search = root or BLOG_ROOT
+    """글 파일을 찾는다.
+
+    블로그는 글 하나가 폴더 하나다. blog/posts/<글 폴더>/index.md 가 본문이고 그 옆에 이 글의
+    이미지 계획과 도구가 함께 있다. 교안은 아직 plan 이 있는 폴더 옆에 <글>.md 로 둔다.
+    """
+    if root is None:
+        path = POSTS_ROOT / post / "index.md"
+        if not path.is_file():
+            raise ValueError(f"글 파일이 없음: {path}")
+        return path
     matches = [
         path
-        for path in search.rglob(f"{post}.md")
+        for path in root.rglob(f"{post}.md")
         if path.is_file() and path.parent.name not in SKIP_DIRS
     ]
     if len(matches) != 1:
@@ -79,20 +87,23 @@ def save_json(path: Path, payload: dict[str, object]) -> None:
 
 
 def plan_entry(
-    plan: dict[str, object], asset_id: str, plan_label: str = "blog/media/plan.json"
+    plan: dict[str, object], asset_id: str, plan_label: str = "media.json"
 ) -> dict[str, object]:
     match = ASSET_ID_RE.fullmatch(asset_id)
     if not match:
         raise ValueError("asset id는 <post id>/<영문 kebab-case 키> 형식이어야 함")
     if (
-        plan.get("version") != 2
+        plan.get("version") not in (1, 2)
         or plan.get("promptContract") != "section-grounded-v2"
         or not isinstance(plan.get("assets"), dict)
     ):
         raise ValueError(f"{plan_label} 계약 위반")
-    entry = plan["assets"].get(asset_id)
+    # 글 폴더의 media.json 은 자기 글 것만 들고 있어 키가 assetKey 하나다. 교안 plan 은
+    # 여러 글을 모아 두므로 <글>/<키> 전체를 키로 쓴다. 둘 다 받는다.
+    entry = plan["assets"].get(asset_id) or plan["assets"].get(match.group("key"))
     if not isinstance(entry, dict):
         raise ValueError(f"이미지 계획이 없음: {asset_id}")
+    entry = {**entry, "post": match.group("post"), "assetKey": match.group("key")}
     required = (
         "post",
         "assetKey",
@@ -411,7 +422,11 @@ def publish(
 ) -> str:
     # 교안 plan 은 course 아래에 있고 추적하지 않는다. 본문 문장을 들고 있는 sectionHeading 과
     # contentAnchor 가 공개 저장소로 새지 않게 하려는 것이다. 이미지 자체와 catalog 는 공유한다.
-    plan_path = Path(plan_arg).resolve() if plan_arg else PLAN_PATH
+    plan_path = (
+        Path(plan_arg).resolve()
+        if plan_arg
+        else POSTS_ROOT / asset_id.split("/", 1)[0] / "media.json"
+    )
     if not plan_path.exists():
         raise ValueError(f"plan 을 찾을 수 없음: {plan_path}")
     plan_label = str(plan_path.relative_to(REPO_ROOT)) if plan_path.is_relative_to(REPO_ROOT) else str(plan_path)

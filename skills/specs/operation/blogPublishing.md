@@ -6,7 +6,7 @@ purpose: 글 파일을 어디에 두면 무엇이 자동으로 만들어지고 �
 whenToUse:
   - 글 추가하기
   - frontmatter 필드
-  - 카테고리 만들기
+  - 새 글 폴더 만들기
   - slug 규칙
   - sitemap 에 글이 안 들어간다
   - 발행 전 검사
@@ -28,20 +28,24 @@ status: observed
 ## 정본은 한 곳이다
 
 ```
-blog/content/<category-slug>/NNN-kebab.md
+blog/posts/<NNN-kebab>/
+  index.md      글
+  media.json    이 글의 이미지 계획
+  tool/         이 글이 품는 도구 (선택)
+  cells.json    이 글의 실습 칸 (선택)
 ```
 
 여기가 글의 정본이다. `NNN` 은 저장소 전체에서 `001` 부터 빈 번호 없이 늘어나는 고정 발행
-순번이다. 새 글은 현재 가장 큰 번호에 1을 더한다. 파일 stem 전체가 post id 이자 미디어 키다.
+순번이다. 새 글은 현재 가장 큰 번호에 1을 더한다. 폴더 이름 전체가 post id 이자 미디어 키다.
 공개 경로는 frontmatter `slug` 이고 `/blog/{slug}` 한 형태다.
 
-사이트는 빌드 타임에 카테고리 폴더를 읽는다 (`site/src/posts.ts` 의 `import.meta.glob`).
+사이트는 빌드 타임에 글 폴더를 읽는다 (`site/src/posts.ts` 의 `import.meta.glob`).
 런타임 fetch 도 CMS 도 없다. **글 파일 원문 전체가 공개 JS 번들에 문자열로 구워진다.**
 frontmatter 도 본문도 예외가 아니다. 설계 메모와 내부 판단을 글 파일에 넣지 않는 이유다.
 
 파일 순번은 발행 뒤 바꾸지 않는다. 발행일과 수정일은 저장하지 않고 구조화 데이터, sitemap,
-RSS 에도 넣지 않는다. 사이트가 읽는 것은 `site/src/posts.ts` 의 `blog/content/*/???-*.md` glob 이라
-**세 자리 숫자로 시작하지 않는 파일은 글 목록에 아예 들어가지 않는다.** 대소문자와 무관하다.
+RSS 에도 넣지 않는다. 사이트가 읽는 것은 `site/src/posts.ts` 의 `blog/posts/*/index.md` glob 이라
+**세 자리 숫자로 시작하지 않는 폴더는 글 목록에 아예 들어가지 않는다.**
 
 파일 하나를 넣으면 빌드가 함께 만든다.
 
@@ -63,7 +67,7 @@ RSS 에도 넣지 않는다. 사이트가 읽는 것은 `site/src/posts.ts` 의 
 | `title` | 질문이거나 주장. 명사 나열 금지. 인지도 없는 제품명을 앞에 두지 않는다. **15자 이상 60자 이하** |
 | `slug` | 공개 URL `/blog/{slug}`. 짧은 소문자 kebab, 날짜 금지 |
 | `author` | 화면과 구조화 데이터에 함께 표시할 글쓴이 |
-| `section` | 글 하나의 소주제. 카테고리와 층이 다르다 |
+| `section` | 글 하나의 소주제 |
 | `summary` | 목록과 검색 결과에서 글을 열 이유를 설명하는 한두 문장 |
 | `readerQuestion` | 이 글이 끝까지 답할 질문 하나 |
 | `readerTakeaway` | 독자가 글을 덮고 기억할 한 문장 |
@@ -72,7 +76,7 @@ RSS 에도 넣지 않는다. 사이트가 읽는 것은 `site/src/posts.ts` 의 
 | `primaryKeyword` | 제목과 summary 와 H2 하나에 함께 쓸 두 단어 이상의 검색어 |
 | `searchIntent` | `explanation`, `how-to`, `troubleshooting`, `comparison` 중 하나 |
 | `ogImage` | 대표 썸네일. 발행 전 `media://asset-key`, 발행 뒤 Hugging Face 객체 URL |
-| `ogImageAlt` | 썸네일 대체 텍스트. plan.json 의 alt 와 같아야 한다 |
+| `ogImageAlt` | 썸네일 대체 텍스트. 그 글 `media.json` 의 alt 와 같아야 한다 |
 | `ogImageWidth` | 썸네일 픽셀 가로. catalog.json 의 객체 값과 같아야 한다 |
 | `ogImageHeight` | 썸네일 픽셀 세로. catalog.json 의 객체 값과 같아야 한다 |
 | `ogImageType` | 썸네일 MIME. `image/webp` 또는 `image/png` 등 |
@@ -80,7 +84,7 @@ RSS 에도 넣지 않는다. 사이트가 읽는 것은 `site/src/posts.ts` 의 
 **썸네일은 모든 글에 반드시 있다.** 공유 카드, 구글 Article 대표 이미지, `/blog` 목록 썸네일이
 전부 `ogImage` 에서 나온다. 예전에는 이미지를 붙인 글에만 이 다섯 개를 요구했는데, 그러면 이미지
 없는 글이 빈 공유 카드로 나가고 목록에서도 자리가 비었다. 그래서 전 글 필수로 올렸다. 픽셀 크기와
-MIME, alt 가 미디어 catalog·plan 과 일치하는지도 같은 게이트가 검사한다. 자세한 것은
+MIME, alt 가 그 글의 `media.json` 및 catalog 와 일치하는지도 같은 게이트가 검사한다. 자세한 것은
 [blogMedia.md](blogMedia.md) 를 본다.
 
 `readerStartingPoint` 에 `초보자` 라고만 쓰지 않는다. `파이썬을 설치해 본 적이 없고 셀과 .py 의
@@ -89,46 +93,47 @@ MIME, alt 가 미디어 catalog·plan 과 일치하는지도 같은 게이트가
 frontmatter 파서는 `^([A-Za-z][A-Za-z0-9]*):\s*(.*)$` 한 줄 정규식이다. **여러 줄 배열을 넣으면
 그 줄에서 실패한다.** 목록형 메타데이터를 추가하려면 파서를 먼저 고친다.
 
-## 카테고리와 공개 읽기 순서
+## 글 하나가 폴더 하나다
 
-**글 하나가 파일 하나다.** 글에 관한 사실은 그 파일 안이나 파일이 놓인 경로에만 있다. 목록을
-따로 관리하는 파일은 없다.
+**그 글에 딸린 것은 전부 그 폴더 안에 있다.** 본문, 이 글의 이미지 계획, 이 글이 품는 도구의
+소스와 그 도구의 게이트까지다. 어느 것도 다른 데 등록하지 않는다.
 
 | 사실 | 어디 |
 |---|---|
-| 발행 순번이자 미디어 키 | 파일 이름의 `NNN` |
-| 카테고리와 그 순서 | 폴더 이름의 `NN-카테고리` |
+| 발행 순번이자 미디어 키 | 폴더 이름의 `NNN` |
 | 공개 URL | frontmatter `slug` |
 | 목록에서 뺄지 | frontmatter `archived` 와 `archivedNote` |
+| 이 글의 이미지 계획 | 그 폴더의 `media.json` |
+| 이 글이 품는 도구 | 그 폴더의 `tool/index.tsx` |
+| 도구를 부르는 이름 | 폴더 이름에서 순번을 뗀 것 |
+| 이 글의 실습 칸 | 그 폴더의 `cells.json` |
 
-**2026-08-24 에 `blog/order.json` 을 없앴다.** 그 파일이 카테고리 목록과 순서와 제목과 요약을,
-그리고 글마다 읽기 순서와 카테고리를 다시 적고 있었다. 폴더 번호와 `categories[].order` 가 같은
-순서를 두 번 적었고 파일 순번과 `posts[].order` 도 그랬다. 글 한 편을 올리려면 손으로 세 자리를
-맞춰야 했는데 그중 카테고리 제목과 요약은 화면이 읽지도 않았다. 손으로 옮겨 적는 목록이라
-글을 추가하고 안 적으면 화면과 검사가 같이 틀린 채로 통과하기도 했다.
+**2026-08-24 에 카테고리를 없애고 이 구조로 옮겼다.** 그전에는 글 한 편에 딸린 것이 일곱
+군데에 흩어져 있었다. 본문은 카테고리 폴더에, 이미지 계획은 `blog/media/plan.json` 에, 도구
+등록은 `blog/embeds/tools.json` 에, 실습 칸은 `blog/embeds/codaro-cells.json` 에, 도구 소스는
+`site/src/components` 에, 도구 코어는 `site/src` 에, 도구 게이트는 `site/scripts` 에 있었다.
+글 하나를 고치려면 일곱 군데를 찾아다녀야 했고 하나를 빠뜨리면 조용히 어긋났다. 그 앞에는
+`blog/order.json` 이 목록과 순서를 손으로 옮겨 적고 있었고 그것도 같은 이유로 없앴다.
 
-**공개 URL 에 카테고리를 넣지 않는다.** 폴더는 파일을 묶는 데만 쓰고 주소는 `/blog/{slug}` 하나다.
+**카테고리는 없다.** 폴더 이름 앞의 세 자리가 발행 순번이고 목록은 그 역순이다. 공개 주소는
+`/blog/{slug}` 하나뿐이다.
 
-**목록 순서는 최신 발행이 위다.** 파일 순번의 역순이고 따로 매기는 편집 순서는 두지 않는다.
-`/blog` 화면은 카테고리로 묶지 않는다.
-
-**블로그는 그때그때 올리는 단편이다.** 제품 소개, 사용법, 그날 쓰고 싶은 글을 넣는다.
-연재를 지지 않으므로 카테고리는 글이 여러 편 모였을 때만 만든다. 글이 하나도 없어도 검사를
-통과한다. 글이 없는 구간이 정상이다.
+**블로그는 그때그때 올리는 단편이다.** 제품 소개, 사용법, 그날 쓰고 싶은 글을 넣는다. 연재를
+지지 않는다. 글이 하나도 없어도 검사를 통과한다. 글이 없는 구간이 정상이다.
 
 파이썬 업무자동화 커리큘럼은 2026-08-19 에 유료 강의로 옮겼다. 정본은 형제 비공개 저장소
 `../eddmpython-course/curriculum/` 이고 공개하지 않는다. 블로그로 되돌리지 않는다.
 
-`check:blog` 가 카테고리 폴더 이름의 형식과 번호 연속성, 파일 순번 연속성, 글이 놓인 폴더가
-실제 카테고리인지, 아카이브한 글에 사유가 있는지 검사한다.
+`check:blog` 가 폴더 이름 형식과 순번 연속성, 본문과 이미지 계획이 있는지, 도구를 두고 본문에서
+부르지 않았는지, 아카이브한 글에 사유가 있는지 검사한다.
 
-### 새 카테고리를 열 때
+### 새 글을 열 때
 
-1. 다음 두 자리 번호로 폴더를 만든다. 예: `blog/content/04-work-automation/`
-2. 그 안에 `README.md` 를 둔다. 이 폴더가 무슨 주제를 소유하는지 적는다. 블로그는 단편이라
-   원장을 요구하지 않는다. 교안 원장은 비공개 형제 저장소의
-   `../eddmpython-course/memory/curriculum/원장.md` 하나뿐이다
-3. 글 파일을 그 안에 넣는다. 등록할 곳은 없다
+1. 다음 세 자리 순번으로 폴더를 만든다. 예: `blog/posts/004-excel-merge/`
+2. 그 안에 `index.md` 와 `media.json` 을 둔다. 이 둘은 필수다
+3. 그 글이 도구를 품으면 같은 폴더에 `tool/index.tsx` 를 둔다. 그것이 곧 등록이고 본문에서
+   `https://eddmpython.com/tool/excel-merge` 로 부른다. 이름은 폴더에서 순번을 뗀 것이다
+4. 등록할 곳은 없다. 폴더가 곧 글이다
 
 ## 공개 slug 규칙
 
@@ -144,7 +149,7 @@ frontmatter 파서는 `^([A-Za-z][A-Za-z0-9]*):\s*(.*)$` 한 줄 정규식이다
 나쁜 예: `2026-08-09-codaro-guide` (날짜), `run-python-without-install` (제목 나열로 김),
 `codaro_guide` (밑줄)
 
-미디어 plan 과 catalog 키의 `post` 필드는 파일 stem 을 유지한다. 공개 slug 와 달라도 된다.
+미디어 catalog 키의 글 부분은 폴더 이름을 그대로 쓴다. 공개 slug 와 달라도 된다.
 
 ## 아카이브
 
@@ -179,12 +184,12 @@ archivedNote: 도구를 갈아엎는 동안 목록에서 내린다
 40편이 모두 통과해야 했고, 통과시키려고 `v1` 과 `v2` 같은 계약 버전을 만들어 붙였다. 그 복잡함은
 전부 게이트가 전역이라서 생긴 것이었다.
 
-**`npm run check:post -- <파일 경로>`** 는 그 한 편만 본다. 글을 쓰는 동안 도는 게이트다.
+**`npm run check:post -- <글 폴더 이름>`** 은 그 한 편만 본다. 글을 쓰는 동안 도는 게이트다.
 문장 단위 추상 검사, 서술 문단 줄바꿈, 절의 제목과 부제와 이미지 순서, H4 보조자료 라벨,
 코드 앞뒤 설명 길이, `sectionHeading` 과 `contentAnchor` 가 본문과 같은지를 검사한다.
 
 **`npm run check:blog`** 는 인자 없이 같은 스크립트를 돌린다. 여러 글 사이의 관계 (파일 순번,
-slug 중복, 카테고리 폴더 번호, 미디어 catalog 참조 무결성, SHA-256 경로, `blog/` 아래 로컬 이미지
+slug 중복, 폴더 순번, 미디어 catalog 참조 무결성, SHA-256 경로, `blog/` 아래 로컬 이미지
 차단, em dash, 명령형 뒤 마침표) 에 더해 **모든 글의 문장 품질도 함께 잰다.**
 
 `STRICT = Boolean(targetPost)` 이므로 전체 검사에서 꺼지는 것은 다섯 개뿐이다. `lintProseTexture`,
@@ -231,7 +236,7 @@ title 과 부제와 절 구조와 H4 라벨은 `site/scripts/blog-package.mjs` �
 ## 실행 칸
 
 제품을 직접 실행해야 이해되는 글은 정적 코드 블록에서 멈추지 않는다. 예제를
-`blog/embeds/codaro-cells.json` 에 제목, 설명, 실행 코드, 전체 Web Run URL 로 등록하고 본문에
+그 글 폴더의 `cells.json` 에 제목, 설명, 실행 코드, 전체 Web Run URL 로 등록하고 본문에
 아래 주소를 다른 내용 없는 한 줄로 둔다.
 
 ```text
@@ -248,9 +253,9 @@ Web Run 링크에서 쓸 수 있다고 정확히 적는다.
    패키징 게이트는 제목을 확정하기 전에 본다.** 주제 선택은
    [contentStrategy.md](contentStrategy.md), 제품 맥락은
    [productMarketing.md](productMarketing.md) 다
-2. 다음 세 자리 순번으로 `blog/content/<category-slug>/NNN-slug.md` 를 쓴다
+2. 다음 세 자리 순번으로 `blog/posts/NNN-slug/` 폴더를 만들고 `index.md` 를 쓴다
 3. 이미지가 있으면 [blogMedia.md](blogMedia.md) 의 순서로 계획하고 Hugging Face 에 올린다
-4. `cd site && npm run check:post -- <파일 경로>` 로 한 편을 검사한다
+4. `cd site && npm run check:post -- <글 폴더 이름>` 로 한 편을 검사한다
 5. `npm test` 로 전체 계약과 타입을 확인한다
 6. `npm run verify:media` 로 원격 객체를 확인한다
 7. `npm run build`

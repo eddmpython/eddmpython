@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 import { lintBlogStyle, lintProseTexture, lintSourceWrapping } from "./blog-style.mjs";
@@ -10,16 +11,35 @@ import {
   parseSectionParts,
 } from "./blog-package.mjs";
 
-// 인자로 파일을 주면 그 한 편만 검사한다. 글을 쓰는 동안 도는 게이트다.
+/*
+ * 글 하나가 폴더 하나다.
+ *
+ * ```
+ * blog/posts/003-python-qr/
+ *   index.md      글
+ *   media.json    이 글의 이미지 계획
+ *   tool/         이 글이 품는 도구
+ *   cells.json    이 글의 실습 칸 (선택)
+ * ```
+ *
+ * 그 글에 딸린 것은 전부 그 폴더 안에 있다. 그래서 이 검사기도 전역 목록 파일을 읽지 않고
+ * 폴더를 훑는다. 2026-08-24 전에는 이미지 계획이 `blog/media/plan.json`, 도구 등록이
+ * `blog/embeds/tools.json`, 실습 칸이 `blog/embeds/codaro-cells.json` 에 따로 있었다.
+ */
+// 인자로 폴더 이름이나 파일 경로를 주면 그 한 편만 검사한다. 글을 쓰는 동안 도는 게이트다.
 // 인자가 없으면 전편을 검사한다. STRICT 로 꺼지는 다섯 개만 빠지고 문장 품질도 함께 잰다.
 // 경로를 통째로 받아도 되게 슬래시와 역슬래시 둘 다 자른다. PowerShell 이 역슬래시를 준다.
-const targetPost = process.argv[2] ? process.argv[2].split(/[\\/]/).pop() : null;
+const rawTarget = process.argv[2]
+  ? process.argv[2].split(/[\\/]/).filter((part) => part && part !== "index.md").pop()
+  : null;
+const targetPost = rawTarget ? rawTarget.replace(/\.md$/, "") : null;
 const STRICT = Boolean(targetPost);
 
 const blogDir = resolve(process.cwd(), "../blog");
-const codaroEmbedsPath = resolve(blogDir, "embeds/codaro-cells.json");
-const toolsPath = resolve(blogDir, "embeds/tools.json");
-const postName = /^(\d{3})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$/;
+const postsDirName = "posts";
+const postsDir = resolve(blogDir, postsDirName);
+/** 글 폴더 이름. 앞의 세 자리가 발행 순번이자 미디어 키다. */
+const postFolder = /^(\d{3})-[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const requiredMeta = [
   "title",
   "slug",
@@ -41,24 +61,15 @@ const requiredMeta = [
   "ogImageType",
 ];
 const readerLevels = new Set(["beginner", "working", "advanced"]);
-// 글과 카테고리 문서는 blog/content 아래에만 있다. 나머지는 기계라 걷지 않는다.
-const contentDirName = "content";
-const rootDocs = new Set(["README.md"]);
-const categoryDocs = new Set(["README.md"]);
-// 공개 작업 환경 템플릿은 01-ai-workflow 카테고리가 소유한다. 이 세 파일은 글도 카테고리
-// 문서도 아니지만 발행 글이 설명하는 산출물이라 카테고리 폴더 안에 둔다. 정확히 이 이름만 연다.
-const templateDirName = "agent-template";
-const templateDocs = new Set(["README.md", "AGENTS.md", "CLAUDE.md"]);
+/** 글 본문의 이름. 폴더가 글이므로 본문 파일 이름은 하나로 고정한다. */
+const articleName = "index.md";
+/** 이 글의 이미지 계획. 예전 blog/media/plan.json 의 이 글 몫이다. */
+const mediaName = "media.json";
+/** 이 글이 품는 도구. 이 파일이 있으면 등록된 것이다. */
+const toolEntry = "tool/index.tsx";
+/** 이 글의 실습 칸. 없어도 된다. */
+const cellsName = "cells.json";
 const publicSlug = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
-/**
- * 카테고리는 앞에 두 자리 번호를 붙인다.
- *
- * 폴더 이름이 곧 카테고리 slug 라서 번호가 없으면 `content/` 아래에서 읽는 순서가 안 보인다.
- * 교안은 `curriculum/01-...` 으로 이미 번호를 쓰고 있었고 블로그만 빠져 있었다.
- * 이 slug 는 공개 주소에 나오지 않는다. 글 주소는 `/blog/<글 slug>` 하나뿐이고
- * 카테고리는 `/blog` 목록에서 묶는 데만 쓰인다. 그래서 번호를 붙여도 주소가 바뀌지 않는다.
- */
-const categorySlug = /^\d{2}-[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const mediaSuffixes = new Set([
   ".svg",
   ".webp",
@@ -94,6 +105,11 @@ const toolRef = /^https:\/\/eddmpython\.com\/tool\/([a-z0-9]+(?:-[a-z0-9]+)*)\s*
 
 function fail(file, message) {
   throw new Error(`${file}: ${message}`);
+}
+
+/** 자산 계획이 적힌 자리. 이제 글마다 자기 폴더의 media.json 을 갖는다. */
+function planLabel(id) {
+  return planFileOf.get(id) ?? `blog/${postsDirName}/*/${mediaName}`;
 }
 
 function parseFrontmatter(file, raw) {
@@ -151,7 +167,7 @@ async function collectMarkdownDocs(dir, rel = "") {
     const relPath = rel ? `${rel}/${entry.name}` : entry.name;
     const abs = join(dir, entry.name);
     if (entry.isDirectory()) {
-      if (!rel && entry.name !== contentDirName) continue;
+      if (!rel && entry.name !== postsDirName) continue;
       docs.push(...(await collectMarkdownDocs(abs, relPath)));
       continue;
     }
@@ -180,7 +196,65 @@ if (localMedia.length) {
   );
 }
 
-const plan = await loadJson(resolve(blogDir, "media/plan.json"), "blog/media/plan.json");
+/*
+ * 글 폴더를 훑어 이 저장소의 글을 찾는다.
+ *
+ * 폴더가 곧 글이라 등록부가 없다. 폴더 이름이 발행 순번이자 미디어 키이고, 그 안의 것들은
+ * 전부 그 글의 소유다. 어느 폴더에 무엇이 있는지도 여기서 한 번에 모은다.
+ */
+const postDirs = [];
+for (const entry of await readdir(postsDir, { withFileTypes: true })) {
+  if (!entry.isDirectory()) continue;
+  if (!postFolder.test(entry.name)) {
+    fail(`blog/${postsDirName}`, `글 폴더 이름은 세 자리 순번으로 시작합니다: ${entry.name}`);
+  }
+  const dir = join(postsDir, entry.name);
+  const names = await readdir(dir);
+  if (!names.includes(articleName)) {
+    fail(`blog/${postsDirName}/${entry.name}`, `글 본문 ${articleName} 이 없습니다`);
+  }
+  if (!names.includes(mediaName)) {
+    fail(`blog/${postsDirName}/${entry.name}`, `이미지 계획 ${mediaName} 이 없습니다`);
+  }
+  postDirs.push({
+    id: entry.name,
+    sequence: Number(entry.name.match(postFolder)[1]),
+    dir,
+    /** 폴더 이름에서 순번을 뗀 것이 이 글이 품는 도구의 이름이다. */
+    toolId: entry.name.replace(/^\d{3}-/, ""),
+    hasTool: existsSync(join(dir, "tool", "index.tsx")),
+    hasCells: names.includes(cellsName),
+  });
+}
+postDirs.sort((a, b) => a.sequence - b.sequence);
+for (const [index, post] of postDirs.entries()) {
+  if (post.sequence !== index + 1) {
+    fail(`blog/${postsDirName}/${post.id}`, `폴더 순번은 001부터 빈 번호 없이 이어져야 합니다: ${post.sequence}`);
+  }
+}
+
+/** 등록된 도구 이름. `tool/index.tsx` 를 둔 글 폴더가 곧 등록이다. */
+const toolIds = new Set(postDirs.filter((post) => post.hasTool).map((post) => post.toolId));
+
+/*
+ * 이미지 계획을 글 폴더마다 읽어 하나로 모은다.
+ *
+ * 자산 id 는 `<글 폴더>/<키>` 이고 이 모양은 catalog 와 교안이 함께 쓰는 계약이라 그대로 둔다.
+ * 달라진 것은 계획이 적힌 자리뿐이다. 전역 plan.json 하나가 아니라 각 글이 자기 것을 들고 있다.
+ */
+const plan = { version: 2, promptContract: "section-grounded-v2", assets: {} };
+const planFileOf = new Map();
+for (const post of postDirs) {
+  const label = `blog/${postsDirName}/${post.id}/${mediaName}`;
+  const media = await loadJson(join(post.dir, mediaName), label);
+  if (media.version !== 1 || media.promptContract !== "section-grounded-v2" || !media.assets) {
+    fail(label, "version 또는 promptContract 또는 assets 계약이 잘못됐습니다");
+  }
+  for (const [key, entry] of Object.entries(media.assets)) {
+    plan.assets[`${post.id}/${key}`] = { ...entry, post: post.id, assetKey: key };
+    planFileOf.set(`${post.id}/${key}`, label);
+  }
+}
 
 /**
  * 교안 카테고리의 이미지 계획.
@@ -207,26 +281,25 @@ const coursePlans = {};
   }
 }
 const catalog = await loadJson(resolve(blogDir, "media/catalog.json"), "blog/media/catalog.json");
-const codaroEmbeds = await loadJson(codaroEmbedsPath, "blog/embeds/codaro-cells.json");
-const tools = await loadJson(toolsPath, "blog/embeds/tools.json");
-if (tools.version !== 1 || !tools.tools || typeof tools.tools !== "object") {
-  fail("blog/embeds/tools.json", "version 또는 tools 계약이 잘못됐습니다");
-}
-for (const [id, tool] of Object.entries(tools.tools)) {
-  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id) || !tool || typeof tool !== "object") {
-    fail("blog/embeds/tools.json", `올바르지 않은 도구 id: ${id}`);
+/*
+ * 실습 칸도 글 폴더가 소유한다.
+ *
+ * 예전에는 `blog/embeds/codaro-cells.json` 하나에 전부 모여 있었다. 어느 글의 칸인지 파일만
+ * 봐서는 알 수 없었고, 글을 지워도 칸은 남았다. 이제 글 폴더의 `cells.json` 이고 사이트가
+ * 그것들을 모아 읽는다. 이름은 글 사이에서 겹치면 안 되므로 여기서 함께 본다.
+ */
+const codaroEmbeds = { version: 1, examples: {} };
+for (const post of postDirs) {
+  if (!post.hasCells) continue;
+  const label = `blog/${postsDirName}/${post.id}/${cellsName}`;
+  const cells = await loadJson(join(post.dir, cellsName), label);
+  if (cells.version !== 1 || !cells.examples || typeof cells.examples !== "object") {
+    fail(label, "version 또는 examples 계약이 잘못됐습니다");
   }
-  for (const key of ["title", "summary"]) {
-    if (!String(tool[key] ?? "").trim()) fail("blog/embeds/tools.json", `${id} 필드가 비었습니다: ${key}`);
+  for (const [id, example] of Object.entries(cells.examples)) {
+    if (codaroEmbeds.examples[id]) fail(label, `실습 칸 이름이 다른 글과 겹칩니다: ${id}`);
+    codaroEmbeds.examples[id] = example;
   }
-}
-if (
-  plan.version !== 2 ||
-  plan.promptContract !== "section-grounded-v2" ||
-  !plan.assets ||
-  typeof plan.assets !== "object"
-) {
-  fail("blog/media/plan.json", "version, promptContract 또는 assets 계약이 잘못됐습니다");
 }
 if (
   catalog.version !== 1 ||
@@ -244,47 +317,26 @@ if (
   !codaroEmbeds.examples ||
   typeof codaroEmbeds.examples !== "object"
 ) {
-  fail("blog/embeds/codaro-cells.json", "version 또는 examples 계약이 잘못됐습니다");
-}
-/*
- * 카테고리는 폴더 이름이 정본이다.
- *
- * 예전에는 `order.json` 이 카테고리 목록과 순서와 제목과 요약을 따로 들고 있었다. 폴더 번호와
- * `categories[].order` 가 같은 순서를 두 번 적었고, 제목과 요약은 화면이 읽지도 않았다.
- * 2026-08-24 에 운영자 지시로 그 파일을 없앴다. 이제 폴더가 있으면 카테고리가 있는 것이다.
- */
-const categorySlugs = new Set();
-for (const entry of await readdir(join(blogDir, contentDirName), { withFileTypes: true })) {
-  if (!entry.isDirectory()) continue;
-  if (!categorySlug.test(entry.name)) {
-    fail(`blog/${contentDirName}`, `카테고리 폴더는 두 자리 번호로 시작합니다: ${entry.name}`);
-  }
-  categorySlugs.add(entry.name);
-}
-const categoryOrders = [...categorySlugs].map((slug) => Number(slug.slice(0, 2))).sort((a, b) => a - b);
-for (const [index, order] of categoryOrders.entries()) {
-  if (order !== index + 1) {
-    fail(`blog/${contentDirName}`, `카테고리 폴더 번호가 01부터 빈 번호 없이 이어지지 않습니다: ${order}`);
-  }
+  fail(`blog/${postsDirName}/*/${cellsName}`, "version 또는 examples 계약이 잘못됐습니다");
 }
 for (const [id, example] of Object.entries(codaroEmbeds.examples)) {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id) || !example || typeof example !== "object") {
-    fail("blog/embeds/codaro-cells.json", `올바르지 않은 example id: ${id}`);
+    fail(`blog/${postsDirName}/*/${cellsName}`, `올바르지 않은 example id: ${id}`);
   }
   const required = ["title", "description", "code", "hint", "fullUrl"];
   const missing = required.filter((key) => !String(example[key] ?? "").trim());
   if (missing.length) {
-    fail("blog/embeds/codaro-cells.json", `${id} 필드가 비었습니다: ${missing.join(", ")}`);
+    fail(`blog/${postsDirName}/*/${cellsName}`, `${id} 필드가 비었습니다: ${missing.join(", ")}`);
   }
   if (!String(example.fullUrl).startsWith("https://eddmpython.com/codaro/run/")) {
-    fail("blog/embeds/codaro-cells.json", `${id}의 fullUrl이 Codaro Web Run이 아닙니다`);
+    fail(`blog/${postsDirName}/*/${cellsName}`, `${id}의 fullUrl이 Codaro Web Run이 아닙니다`);
   }
 }
 
 for (const [id, entry] of Object.entries(plan.assets)) {
   const match = id.match(assetId);
   if (!match || !entry || typeof entry !== "object") {
-    fail("blog/media/plan.json", `올바르지 않은 asset id: ${id}`);
+    fail(planLabel(id), `올바르지 않은 asset id: ${id}`);
   }
   const required = [
     "post",
@@ -298,25 +350,25 @@ for (const [id, entry] of Object.entries(plan.assets)) {
     "sourceKind",
   ];
   const missing = required.filter((key) => !String(entry[key] ?? "").trim());
-  if (missing.length) fail("blog/media/plan.json", `${id} 필드가 비었습니다: ${missing.join(", ")}`);
+  if (missing.length) fail(planLabel(id), `${id} 필드가 비었습니다: ${missing.join(", ")}`);
   if (entry.post !== match[1] || entry.assetKey !== match[2]) {
-    fail("blog/media/plan.json", `${id}의 post 또는 assetKey가 id와 다릅니다`);
+    fail(planLabel(id), `${id}의 post 또는 assetKey가 id와 다릅니다`);
   }
   if (
     entry.role === "section" &&
     !["H3 부제 바로 뒤", "H2 제목 바로 뒤"].includes(entry.placement)
   ) {
-    fail("blog/media/plan.json", `${id}의 placement는 H3 부제 바로 뒤 또는 H2 제목 바로 뒤여야 합니다`);
+    fail(planLabel(id), `${id}의 placement는 H3 부제 바로 뒤 또는 H2 제목 바로 뒤여야 합니다`);
   }
-  if (entry.sourcePolicy !== "auto") fail("blog/media/plan.json", `${id}의 sourcePolicy는 auto여야 합니다`);
+  if (entry.sourcePolicy !== "auto") fail(planLabel(id), `${id}의 sourcePolicy는 auto여야 합니다`);
   if (!["hero", "section", "support"].includes(entry.role)) {
-    fail("blog/media/plan.json", `${id}의 role을 지원하지 않습니다`);
+    fail(planLabel(id), `${id}의 role을 지원하지 않습니다`);
   }
   if (entry.role === "section" && !String(entry.sectionHeading ?? "").trim()) {
-    fail("blog/media/plan.json", `${id}의 sectionHeading이 비었습니다`);
+    fail(planLabel(id), `${id}의 sectionHeading이 비었습니다`);
   }
   if (!["imagegen", "screenshot", "official", "licensed", "recording"].includes(entry.sourceKind)) {
-    fail("blog/media/plan.json", `${id}의 sourceKind를 지원하지 않습니다`);
+    fail(planLabel(id), `${id}의 sourceKind를 지원하지 않습니다`);
   }
   const expectedProfiles =
     entry.sourceKind === "imagegen"
@@ -325,15 +377,15 @@ for (const [id, entry] of Object.entries(plan.assets)) {
         ? new Set(["product-screen-v1"])
         : new Set(["source-original-v1"]);
   if (!expectedProfiles.has(entry.visualProfile)) {
-    fail("blog/media/plan.json", `${id}의 visualProfile을 지원하지 않습니다`);
+    fail(planLabel(id), `${id}의 visualProfile을 지원하지 않습니다`);
   }
   if (entry.sourceKind === "imagegen" && !String(entry.prompt ?? "").trim()) {
-    fail("blog/media/plan.json", `${id}의 ImageGen prompt가 비었습니다`);
+    fail(planLabel(id), `${id}의 ImageGen prompt가 비었습니다`);
   }
   const imagePolicyIssues = lintImagePolicy(entry);
   if (imagePolicyIssues.length) {
     fail(
-      "blog/media/plan.json",
+      planLabel(id),
       `${id}의 생성 이미지 색상 정책 위반 ${imagePolicyIssues.length}건\n${imagePolicyIssues
         .map((issue) => `  - ${issue.location}: ${issue.message} (${issue.excerpt})`)
         .join("\n")}`,
@@ -341,20 +393,20 @@ for (const [id, entry] of Object.entries(plan.assets)) {
   }
   if (entry.sourceKind === "screenshot") {
     if (!String(entry.sourceUrl ?? "").trim() || !String(entry.captureState ?? "").trim()) {
-      fail("blog/media/plan.json", `${id}의 screenshot sourceUrl 또는 captureState가 비었습니다`);
+      fail(planLabel(id), `${id}의 screenshot sourceUrl 또는 captureState가 비었습니다`);
     }
   }
   if (["official", "licensed"].includes(entry.sourceKind)) {
     if (!String(entry.sourceUrl ?? "").trim() || !String(entry.credit ?? "").trim()) {
-      fail("blog/media/plan.json", `${id}의 sourceUrl 또는 credit이 비었습니다`);
+      fail(planLabel(id), `${id}의 sourceUrl 또는 credit이 비었습니다`);
     }
   }
   if (entry.sourceKind === "licensed" && !String(entry.license ?? "").trim()) {
-    fail("blog/media/plan.json", `${id}의 license가 비었습니다`);
+    fail(planLabel(id), `${id}의 license가 비었습니다`);
   }
   if (entry.sourceKind === "recording") {
     if (!String(entry.captureState ?? "").trim() || !String(entry.credit ?? "").trim()) {
-      fail("blog/media/plan.json", `${id}의 recording captureState 또는 credit이 비었습니다`);
+      fail(planLabel(id), `${id}의 recording captureState 또는 credit이 비었습니다`);
     }
   }
 }
@@ -404,45 +456,34 @@ for (const [id, record] of Object.entries(catalog.assets)) {
 }
 
 for (const id of Object.keys(plan.assets)) {
-  if (!catalog.assets[id]) fail("blog/media/plan.json", `${id}가 아직 Hugging Face에 발행되지 않았습니다`);
+  if (!catalog.assets[id]) fail(planLabel(id), `${id}가 아직 Hugging Face에 발행되지 않았습니다`);
 }
 
-const markdownDocs = await collectMarkdownDocs(blogDir);
-for (const doc of markdownDocs) {
-  if (postName.test(doc.name)) continue;
+/*
+ * 글은 폴더가 정본이라 여기서는 딸린 문서만 본다.
+ *
+ * 글 폴더 안의 다른 파일은 그 글의 소유라 막지 않는다. 도구 소스도 템플릿도 그 글의 것이다.
+ * 막는 것은 어느 글에도 속하지 않는 떠도는 문서뿐이다.
+ */
+for (const doc of await collectMarkdownDocs(blogDir)) {
   const segments = doc.relPath.split("/");
-  const depth = segments.length;
-  // blog/README.md 는 depth 1, blog/content/<카테고리>/README.md 는 depth 3 이다.
-  // 템플릿은 content/<카테고리>/agent-template/<파일> 로 depth 4 이며 이름을 정확히 맞춘다.
-  const isTemplateDoc =
-    depth === 4 &&
-    segments[0] === contentDirName &&
-    segments[2] === templateDirName &&
-    templateDocs.has(doc.name);
-  const allowed =
-    depth === 1
-      ? rootDocs.has(doc.name)
-      : (depth === 3 && categoryDocs.has(doc.name)) || isTemplateDoc;
-  if (!allowed) {
-    fail(doc.relPath, "발행 글이나 운영 문서로 분류되지 않은 파일입니다");
+  if (segments.length === 1) {
+    if (doc.name !== "README.md") fail(doc.relPath, "블로그 루트에는 README.md 만 둡니다");
+    continue;
+  }
+  if (segments[0] !== postsDirName) {
+    fail(doc.relPath, `글과 딸린 문서는 ${postsDirName}/<글 폴더>/ 안에 둡니다`);
   }
 }
 
-const posts = markdownDocs
-  .filter((doc) => postName.test(doc.name))
-  .map((doc) => ({
-    ...doc,
-    sequence: Number(doc.name.match(postName)[1]),
-    id: doc.name.replace(/\.md$/, ""),
-  }))
-  .sort((a, b) => a.sequence - b.sequence);
+const posts = postDirs.map((post) => ({
+  ...post,
+  name: post.id,
+  relPath: `${postsDirName}/${post.id}/${articleName}`,
+  abs: join(post.dir, articleName),
+}));
 // 빈 블로그를 허용한다. 단편을 그때그때 올리는 구조라 글이 없는 구간이 정상이다.
 if (targetPost && !posts.length) fail("blog", `${targetPost} 를 찾지 못했습니다`);
-for (const [index, post] of posts.entries()) {
-  if (post.sequence !== index + 1) {
-    fail(post.relPath, `파일 순번은 001부터 빈 번호 없이 이어져야 합니다: ${post.sequence}`);
-  }
-}
 
 const titles = new Map();
 const slugs = new Map();
@@ -460,18 +501,19 @@ for (const post of targetPosts) {
   const { meta, body } = parseFrontmatter(file, raw);
   const postId = post.id;
   const slug = meta.get("slug");
-  // relPath 는 content/<카테고리>/NNN-kebab.md 다. 카테고리는 두 번째 조각이다.
-  const segments = file.split("/");
-  if (segments.length !== 3 || segments[0] !== contentDirName) {
-    fail(file, `발행 글은 ${contentDirName}/<카테고리>/ 안에 둡니다`);
-  }
-  const folder = segments[1];
-  if (!categorySlugs.has(folder)) {
-    fail(file, `글이 놓인 폴더가 카테고리 형식이 아닙니다: ${folder}`);
+  if (meta.has("date") || meta.has("modified")) {
+    fail(file, "발행 날짜 대신 폴더 순번만 사용합니다");
   }
 
-  if (meta.has("date") || meta.has("modified")) {
-    fail(file, "발행 날짜 대신 파일 순번만 사용합니다");
+  /*
+   * 이 글이 품는 도구는 이 글의 폴더에 있어야 한다.
+   *
+   * 마커 이름은 폴더 이름에서 순번을 뗀 것이라 남의 글 도구를 부를 수 없다. 부르려면 그
+   * 도구를 자기 폴더로 가져오거나 공용으로 빼야 한다. 그래야 폴더 하나가 글 하나를 온전히
+   * 소유한다는 말이 유지된다.
+   */
+  if (post.hasTool && !new RegExp(`/tool/${post.toolId}\s*$`, "m").test(body)) {
+    fail(file, `${toolEntry} 를 두고 본문에서 부르지 않았습니다: /tool/${post.toolId}`);
   }
 
   /*
@@ -619,7 +661,7 @@ for (const post of targetPosts) {
       label: "도구",
       any: /https:\/\/eddmpython\.com\/tool\/([a-z0-9-]*)/g,
       line: toolRef,
-      known: (id) => Boolean(tools.tools[id]),
+      known: (id) => toolIds.has(id),
       seen: null,
     },
   ];
@@ -744,7 +786,7 @@ for (const post of targetPosts) {
 if (!targetPost) {
   const postSlugs = new Set(posts.map((post) => post.id));
   for (const [id, entry] of Object.entries(plan.assets)) {
-    if (!postSlugs.has(entry.post)) fail("blog/media/plan.json", `${id}의 글 파일이 없습니다`);
+    if (!postSlugs.has(entry.post)) fail(planLabel(id), `${id}의 글 파일이 없습니다`);
   }
 
   for (const [id, url] of assetUrlById) {
@@ -759,7 +801,7 @@ if (!targetPost) {
   // 반대로 글이 없는 예제를 가리키는 것은 여전히 막는다.
   for (const id of []) {
     if (!referencedCodaroEmbeds.has(id)) {
-      fail("blog/embeds/codaro-cells.json", `${id}가 어떤 글에서도 쓰이지 않습니다`);
+      fail(`blog/${postsDirName}/*/${cellsName}`, `${id}가 어떤 글에서도 쓰이지 않습니다`);
     }
   }
 }

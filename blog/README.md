@@ -20,7 +20,7 @@
 | 경로 | 역할 |
 |---|---|
 | `media/` | 이미지 계획 (`plan.json`) 과 HF 객체 대응 (`catalog.json`) |
-| `embeds/` | 본문에 붙는 실행 칸 (`codaro-cells.json`) 과 도구 (`tools.json`) |
+
 | `scripts/` | 미디어 발행과 검사 스크립트 |
 | **`content/<NN-카테고리>/`** | **공개 글. 글은 여기에만 있다** |
 
@@ -31,7 +31,7 @@
 `content/` 아래만 글이다. 나머지는 기계다. 검사기가 `content` 만 걷고 나머지는 아예 들어가지
 않는다. 새 기계 폴더를 만들어도 검사기를 고칠 필요가 없다.
 
-글 파일은 `blog/content/<category-slug>/NNN-kebab.md` 다. 공개 URL 은 frontmatter `slug` 이고
+글 하나가 폴더 하나다. `blog/posts/<NNN-kebab>/` 안에 본문 `index.md`, 이미지 계획 `media.json`, 그 글이 품는 도구 `tool/` 이 함께 있다. 공개 URL 은 frontmatter `slug` 이고
 `/blog/{slug}` 한 형태다. 카테고리를 URL 에 넣지 않는다.
 
 ## 카테고리 폴더

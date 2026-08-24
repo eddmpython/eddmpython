@@ -7,14 +7,10 @@ import { readdirSync, readFileSync } from "node:fs";
  * 옮겨 적은 것이라, 글을 추가하고 목록에 안 적으면 화면과 계약이 같이 틀린 채로 통과했다.
  * 2026-08-24 에 그 파일을 없앴다. 지금은 글 파일을 직접 세고 아카이브한 글만 뺀다.
  */
-const contentRoot = new URL("../../blog/content/", import.meta.url);
-const listedPostCount = readdirSync(contentRoot, { withFileTypes: true })
-  .filter((entry) => entry.isDirectory())
-  .flatMap((dir) =>
-    readdirSync(new URL(`${dir.name}/`, contentRoot))
-      .filter((name) => /^\d{3}-[a-z0-9-]+\.md$/.test(name))
-      .map((name) => readFileSync(new URL(`${dir.name}/${name}`, contentRoot), "utf8")),
-  )
+const postsRoot = new URL("../../blog/posts/", import.meta.url);
+const listedPostCount = readdirSync(postsRoot, { withFileTypes: true })
+  .filter((entry) => entry.isDirectory() && /^\d{3}-[a-z0-9-]+$/.test(entry.name))
+  .map((dir) => readFileSync(new URL(`${dir.name}/index.md`, postsRoot), "utf8"))
   .filter((raw) => !/^archived:\s*true\s*$/m.test(raw)).length;
 
 export const VISUAL_VIEWPORTS = [

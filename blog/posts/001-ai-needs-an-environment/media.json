@@ -1,13 +1,13 @@
 {
+  "version": 1,
+  "promptContract": "section-grounded-v2",
   "assets": {
-    "001-ai-needs-an-environment/authority-guardrails": {
+    "authority-guardrails": {
       "alt": "깨끗하지 않은 작업 트리와 없는 도구 및 비밀값과 배포 버튼 앞에서 멈춤 표시가 갈라지는 안전 경계",
-      "assetKey": "authority-guardrails",
       "contentAnchor": "좋은 환경 문서는 `npm test` 를 돌리라고만 적지 않습니다.",
       "narrativeUse": "기존 변경, 도구 부재, 비밀정보, 배포는 실패와 영향이 서로 달라 각각 다른 멈춤과 보고가 필요하다는 점을 보여 준다.",
       "palettePolicy": "eddmpython-carbon-ivory-sand-v1",
       "placement": "H3 부제 바로 뒤",
-      "post": "001-ai-needs-an-environment",
       "prompt": "Create a wide 3:2 technical editorial scene divided into four clear repository safety situations. Show a source diff with untouched pending changes, an empty tool socket, a sealed credential capsule, and a deployment control behind a firm permission barrier. Give every situation a distinct stop shape and a path toward a small report card. Use physical interface objects with clear depth and restrained studio lighting. No readable text, letters, code, logos, brands, people, robots, watermarks, decorative scenery, or unrelated objects.",
       "role": "section",
       "sectionHeading": "실패와 권한 경계를 먼저 적습니다",
@@ -18,14 +18,12 @@
       "visualRelationship": "네 위험 상황이 실행 경로를 멈추고 각각의 미확인 보고로 연결된다",
       "visualSubject": "기존 변경이 있는 파일 화면, 비어 있는 도구 자리, 봉인된 비밀값, 잠긴 배포 버튼과 보고 카드"
     },
-    "001-ai-needs-an-environment/clean-session": {
+    "clean-session": {
       "alt": "새 대화가 AGENTS.md와 CLAUDE.md를 읽고 작은 검사와 제품 증거 및 완료 보고까지 재현하는 흐름",
-      "assetKey": "clean-session",
       "contentAnchor": "`AGENTS.md` 를 만든 그 대화는 방금 읽은 `package.json` 과 CI 파일을 기억하고 있습니다.",
       "narrativeUse": "환경 파일을 만든 대화의 기억이 없는 새 세션에서도 같은 지침과 검증 순서가 복원되어야 한다는 완료 조건을 보여 준다.",
       "palettePolicy": "eddmpython-carbon-ivory-sand-v1",
       "placement": "H3 부제 바로 뒤",
-      "post": "001-ai-needs-an-environment",
       "prompt": "Create a wide 3:2 technical editorial scene of a completely fresh coding session. A blank chat window receives two repository instruction documents, then connects to a small terminal check, a browser evidence frame, an API response card, and a final four-part report. Make the sequence left to right and show that no previous conversation is present. Use dimensional interface objects, quiet depth, and restrained studio lighting. No readable text, letters, code, logos, brands, people, robots, watermarks, decorative scenery, or unrelated objects.",
       "role": "section",
       "sectionHeading": "새 대화에서 재현성을 검증합니다",
@@ -36,14 +34,12 @@
       "visualRelationship": "대화 기억이 없는 시작점이 저장소 문서를 읽어 같은 검사와 완료 보고를 다시 만든다",
       "visualSubject": "빈 새 대화 화면, 두 지침 문서, 터미널 검사, 브라우저와 API 증거, 네 칸 완료 보고"
     },
-    "001-ai-needs-an-environment/command-proof": {
+    "command-proof": {
       "alt": "다섯 저장소의 설정 파일과 서로 다른 전체 검사 명령 및 완료 증거가 한 줄씩 연결된 비교 장면",
-      "assetKey": "command-proof",
       "contentAnchor": "`테스트를 실행합니다`는 환경 문서로 충분하지 않습니다.",
       "narrativeUse": "같은 운영자의 저장소도 언어와 제품 표면에 따라 검사 진입점과 완료 증거가 달라지므로 명령을 추측하면 안 된다는 사실을 비교한다.",
       "palettePolicy": "eddmpython-carbon-ivory-sand-v1",
       "placement": "H3 부제 바로 뒤",
-      "post": "001-ai-needs-an-environment",
       "prompt": "Create a wide 3:2 technical editorial comparison with exactly five distinct horizontal repository lanes. Every lane starts with different configuration file shapes, passes through a terminal command module, and ends with a different evidence object such as an API frame, code editor, spreadsheet browser, runtime browser, or desktop application. Keep all five lanes easy to compare and visually distinct. Use dimensional interface objects and restrained studio lighting. No readable text, letters, code, logos, brands, people, robots, watermarks, decorative scenery, or unrelated objects.",
       "role": "section",
       "sectionHeading": "명령은 추측하지 않고 증명합니다",
@@ -54,14 +50,12 @@
       "visualRelationship": "각 저장소의 설정이 서로 다른 검사 명령을 고르고 명령이 제품에 맞는 완료 증거로 이어진다",
       "visualSubject": "다섯 저장소별 설정 파일, 터미널 명령 모듈, API와 편집기 및 스프레드시트와 브라우저와 데스크톱 앱 증거"
     },
-    "001-ai-needs-an-environment/instruction-files": {
+    "instruction-files": {
       "alt": "AGENTS.md와 CLAUDE.md 중 한 파일만 큰 정본이 되고 다른 파일이 그곳을 가리키는 두 가지 배치",
-      "assetKey": "instruction-files",
       "contentAnchor": "두 파일을 두는 이유는 도구마다 처음 읽는 이름이 다르기 때문입니다.",
       "narrativeUse": "두 도구를 지원하면서도 규칙을 복사하지 않고 한 파일만 정본으로 두는 양방향 선택 구조를 보여 준다.",
       "palettePolicy": "eddmpython-carbon-ivory-sand-v1",
       "placement": "H3 부제 바로 뒤",
-      "post": "001-ai-needs-an-environment",
       "prompt": "Create a wide 3:2 split technical editorial scene showing two valid single-source instruction layouts. On the left, a small entry document points to one large source document. On the right, the roles reverse and the small document imports the large source document through one clear connector. Only one document per side may appear authoritative. Use dimensional paper and interface objects with restrained studio lighting. No readable text, letters, code, logos, brands, people, robots, watermarks, decorative scenery, or unrelated objects.",
       "role": "section",
       "sectionHeading": "두 지침 파일의 역할을 나눕니다",
@@ -72,14 +66,12 @@
       "visualRelationship": "어느 배치를 고르든 규칙 본문은 큰 정본 하나에만 남고 다른 파일은 그 정본을 가리킨다",
       "visualSubject": "작은 진입 문서와 큰 정본 문서가 한 방향으로 연결된 두 가지 저장소 지침 배치"
     },
-    "001-ai-needs-an-environment/instruction-priority": {
+    "instruction-priority": {
       "alt": "사용자 요청과 기존 저장소 지시가 블로그 작업 계약보다 앞에서 합쳐지는 우선순위 구조",
-      "assetKey": "instruction-priority",
       "contentAnchor": "AI 는 여러 곳에서 지시를 받습니다.",
       "narrativeUse": "공개 링크가 기존 안전 규칙과 사용자 요청을 덮지 않고 빈 환경 정보만 채우는 보조 계약임을 보여 준다.",
       "palettePolicy": "eddmpython-carbon-ivory-sand-v1",
       "placement": "H3 부제 바로 뒤",
-      "post": "001-ai-needs-an-environment",
       "prompt": "Create a wide 3:2 technical editorial priority scene with four physical instruction layers feeding one repository work queue. The upper safety layer and direct user request lock the boundaries first, the existing repository instruction layer fits beneath them, and a small linked article card fills only visible empty slots at the bottom. Make precedence and protected boundaries obvious through height, fit, and locked edges. Use dimensional interface objects and restrained studio lighting. No readable text, letters, code, logos, brands, people, robots, watermarks, decorative scenery, or unrelated objects.",
       "role": "section",
       "sectionHeading": "AI는 지시 우선순위를 먼저 봅니다",
@@ -90,14 +82,12 @@
       "visualRelationship": "상위 규칙과 사용자 요청이 작업 경계를 잠근 뒤 기존 지침이 적용되고 링크는 남은 빈칸만 채운다",
       "visualSubject": "안전 규칙 판, 사용자 요청 카드, 기존 저장소 지침 문서, 빈칸만 채우는 블로그 링크 카드"
     },
-    "001-ai-needs-an-environment/link-as-contract": {
+    "link-as-contract": {
       "alt": "블로그 링크 한 장이 저장소 조사와 지침 파일 작성 및 검증 결과로 이어지는 작업 흐름",
-      "assetKey": "link-as-contract",
       "contentAnchor": "매번 긴 프롬프트를 새로 쓰면 조건이 조금씩 빠집니다.",
       "narrativeUse": "주소 하나가 고정 답을 제공하는 것이 아니라 저장소를 조사하고 문서와 검증 결과를 만드는 반복 절차를 연다는 글의 핵심을 보여 준다.",
       "palettePolicy": "eddmpython-carbon-ivory-sand-v1",
       "placement": "H3 부제 바로 뒤",
-      "post": "001-ai-needs-an-environment",
       "prompt": "Create a wide 3:2 technical editorial workflow. One browser link card enters a repository inspection console with a visible file tree, package configuration shapes, and a CI track. The console produces exactly two instruction document cards and one terminal verification result. Make the four-stage flow immediate, spatial, and practical rather than symbolic. Use dimensional interface objects with restrained studio lighting. No readable text, letters, code, logos, brands, people, robots, watermarks, decorative scenery, or unrelated objects.",
       "role": "section",
       "sectionHeading": "링크는 작업 계약을 한 번에 건넵니다",
@@ -108,14 +98,12 @@
       "visualRelationship": "링크 입력이 저장소 조사로 이어지고 조사 결과가 두 문서와 검증 결과를 만든다",
       "visualSubject": "브라우저 링크 카드, 저장소 파일 트리와 패키지 및 CI 조사 화면, 두 지침 문서, 터미널 검증 결과"
     },
-    "001-ai-needs-an-environment/repository-evidence": {
+    "repository-evidence": {
       "alt": "저장소의 README와 lockfile 및 CI 파일이 실제 설치 명령과 테스트 명령으로 모이는 조사 장면",
-      "assetKey": "repository-evidence",
       "contentAnchor": "AI 는 먼저 `git status` 로 저장소 루트와 현재 브랜치와 이미 바뀐 파일을 봅니다.",
       "narrativeUse": "한 파일 이름만 보고 명령을 추측하지 않고 여러 설정과 실행 정본이 같은 명령을 가리키는지 대조하는 과정을 보여 준다.",
       "palettePolicy": "eddmpython-carbon-ivory-sand-v1",
       "placement": "H3 부제 바로 뒤",
-      "post": "001-ai-needs-an-environment",
       "prompt": "Create a wide 3:2 technical editorial investigation desk. Show a repository tree feeding four distinct evidence objects: a project overview document, a locked dependency file, a package configuration panel, and a CI workflow track. Thin physical connectors converge on two terminal command blocks for installation and testing. Make agreement and disagreement between evidence sources visible through alignment and connector shapes. Use dimensional interface objects and restrained studio lighting. No readable text, letters, code, logos, brands, people, robots, watermarks, decorative scenery, or unrelated objects.",
       "role": "section",
       "sectionHeading": "저장소에서 실행 환경을 역추적합니다",
@@ -125,44 +113,6 @@
       "visualProfile": "eddmpython-dark-v2",
       "visualRelationship": "네 근거 파일의 연결이 일치할 때 설치와 테스트 명령 두 개로 모인다",
       "visualSubject": "저장소 파일 트리, README 문서, lockfile, 패키지 설정 화면, CI 흐름, 설치와 테스트 터미널 명령"
-    },
-    "002-ai-writing-tells/half-caught": {
-      "alt": "어두운 바탕에 놓인 접시 안에 잘라 낸 작은 종이 조각 아홉 개가 모여 있고 그 옆에는 아무것도 잘리지 않은 종이 한 장이 그대로 놓여 있는 화면",
-      "assetKey": "half-caught",
-      "contentAnchor": "번역투를 전부 걷어내고 관용구를 다 지워도 여전히 기계가 쓴 것처럼 읽힙니다.",
-      "narrativeUse": "걸러 낼 수 있는 것을 다 걷어내도 손대지 않은 쪽이 그대로 남는다는 것을 한 화면에 보여 빼기만으로 부족하다는 말이 눈으로 읽힌다.",
-      "palettePolicy": "eddmpython-carbon-ivory-sand-v1",
-      "placement": "H3 부제 바로 뒤",
-      "post": "002-ai-writing-tells",
-      "prompt": "Create a wide 3:2 minimal studio still life on a matte charcoal surface. A single long ivory paper strip runs left to right across the frame. In the left half, several small rectangular pieces have been cut out of the strip and lie neatly separated on a shallow tray beside it, leaving clean empty gaps in the strip. In the right half, the same strip continues completely whole and untouched, with no cuts and no gaps. One simple rigid cutting guide sits at the midpoint where the cutting stops. Soft restrained studio lighting, shallow depth, clear physical materials. Muted charcoal and warm ivory tones only, no saturated accent colors. Absolutely no text, letters, numbers, glyphs, screens, logos, brands, people, robots, watermarks, decorative scenery, or unrelated objects.",
-      "role": "section",
-      "sectionHeading": "질문과 실패와 판단 넣기",
-      "sectionSubtitle": "사람 글에는 있고 AI 글에는 없는 것을 넣습니다",
-      "sourceKind": "imagegen",
-      "sourcePolicy": "auto",
-      "visualProfile": "eddmpython-dark-v2",
-      "visualRelationship": "접시에 모인 조각은 목록이 잡아낸 것이고 옆의 온전한 종이는 목록이 닿지 못한 것이다",
-      "visualSubject": "걸러 낸 조각을 담은 접시 하나와 손대지 않은 종이 한 장이 나란히 놓인 화면"
-    },
-    "003-python-qr/hero": {
-      "alt": "어두운 책상 위에서 휴대폰이 작은 타일 격자 카드를 비추자 카드에서 가는 리본 하나가 흘러나와 화면으로 이어지는 장면",
-      "assetKey": "hero",
-      "contentAnchor": "파이썬으로 만들면 `segno.make` 한 줄로 고정됩니다.",
-      "narrativeUse": "링크 하나가 스캔되는 타일 패턴으로 바뀌어 휴대폰이 그 주소를 읽는 과정을 한 장면으로 보여 준다",
-      "palettePolicy": "eddmpython-carbon-ivory-sand-v1",
-      "placement": "도입 문단 바로 뒤",
-      "post": "003-python-qr",
-      "prompt": "Wide 3:2 dark editorial still life on a matte charcoal desk. A phone lies flat and casts a soft scanning light over a small physical card covered in a dense grid of tiny raised square tiles in light and dark. From the card, a single thin ribbon lifts and curves toward the phone, suggesting a link being read. Restrained studio lighting, shallow depth, clear physical materials. Muted charcoal and warm ivory tones with one small warm sand accent only. No readable text, letters, numbers, glyphs, real scannable code, content screens, logos, brands, people, robots, watermarks, or decorative scenery.",
-      "role": "hero",
-      "sectionHeading": "파이썬 QR코드, segno 설치와 첫 저장",
-      "sectionSubtitle": "segno를 설치하고 주소 하나를 PNG로 저장합니다",
-      "sourceKind": "imagegen",
-      "sourcePolicy": "auto",
-      "visualProfile": "eddmpython-dark-v2",
-      "visualRelationship": "링크가 타일 패턴으로 바뀌고 휴대폰이 그 패턴을 읽어 주소로 돌아간다",
-      "visualSubject": "휴대폰, 작은 타일 격자 카드, 카드에서 흘러나오는 리본"
     }
-  },
-  "promptContract": "section-grounded-v2",
-  "version": 2
+  }
 }

@@ -23,7 +23,7 @@ ogImageType: image/webp
 
 먼저 아래 도구에 주소를 넣어 QR 이 어떻게 나오는지 보고 나서, 같은 것을 파이썬으로 옮겨 보겠습니다.
 
-https://eddmpython.com/tool/qr
+https://eddmpython.com/tool/python-qr
 
 ## 파이썬 QR코드, segno 설치와 첫 저장
 

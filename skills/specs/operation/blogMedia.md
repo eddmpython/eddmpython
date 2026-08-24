@@ -33,7 +33,7 @@ status: observed
 
 | 무엇 | 어디 | 추적 |
 |---|---|---|
-| 의미와 출처 계획 | `blog/media/plan.json` | Git |
+| 의미와 출처 계획 | 각 글 폴더의 `blog/posts/<글>/media.json` | Git |
 | 교안의 의미와 출처 계획 | `../eddmpython-course/curriculum/<카테고리>/plan.json` | 형제 비공개 저장소 |
 | 글과 원격 객체의 대응 | `blog/media/catalog.json` | Git |
 | 실제 바이트 | Hugging Face `eddmpython/eddmpython-media` | 원격만 |
@@ -54,7 +54,7 @@ python -X utf8 blog/scripts/publish_media.py --asset <post-id>/<key> --plan ../e
 ```
 
 **`--plan` 을 주면 글 파일을 그 plan 이 있는 폴더 아래에서 찾는다.** 교안 글이 plan 옆에
-있기 때문이다. 블로그는 plan 이 `blog/media/` 이고 글이 `blog/content/` 라 배치가 다르므로
+있기 때문이다. 블로그는 글 폴더 안에 본문과 계획이 함께 있으므로
 블로그 자산에는 `--plan` 을 주지 않는다. 주면 글을 못 찾는다.
 
 **바이트는 저장소에 커밋하지 않는다.** SVG 를 포함해 `blog/` 아래에 이미지 파일을 두지 않는다.
