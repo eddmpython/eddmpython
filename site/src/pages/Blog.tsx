@@ -26,17 +26,33 @@ export function Blog() {
                 <li key={p.slug} className="border-b border-white/10">
                   <a
                     href={`/blog/${p.slug}`}
-                    className="group grid grid-cols-[2.5rem_1fr] gap-3 py-7 transition-colors md:grid-cols-[3rem_1fr] md:gap-5"
+                    className="group grid grid-cols-[5rem_1fr] items-start gap-4 py-7 transition-colors md:grid-cols-[8.5rem_1fr] md:gap-6"
                   >
                     <span
-                      data-blog-order
-                      className="pt-1 font-mono text-xs text-sand/70"
-                      aria-label={`${p.readingOrder}번째 글`}
+                      data-blog-thumb
+                      className="block overflow-hidden rounded-lg border border-white/10 bg-white/5"
                     >
-                      {String(p.readingOrder).padStart(2, "0")}
+                      <span className="block aspect-[4/3]">
+                        {p.ogImage && (
+                          <img
+                            src={p.ogImage}
+                            alt={p.ogImageAlt ?? ""}
+                            loading="lazy"
+                            decoding="async"
+                            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                          />
+                        )}
+                      </span>
                     </span>
                     <span>
-                      <span className="block text-lg font-medium tracking-tight transition-colors group-hover:text-white md:text-xl">
+                      <span
+                        data-blog-order
+                        className="block font-mono text-xs text-sand/70"
+                        aria-label={`${p.readingOrder}번째 글`}
+                      >
+                        {String(p.readingOrder).padStart(2, "0")}
+                      </span>
+                      <span className="mt-1.5 block text-lg font-medium tracking-tight transition-colors group-hover:text-white md:text-xl">
                         {p.title}
                       </span>
                       {p.summary && (

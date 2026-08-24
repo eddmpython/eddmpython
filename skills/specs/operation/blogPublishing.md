@@ -56,7 +56,7 @@ RSS 에도 넣지 않는다. 사이트가 읽는 것은 `site/src/posts.ts` 의 
 ## frontmatter 계약
 
 `site/scripts/check-blog.mjs` 의 `requiredMeta` 가 검사한다. 빠지면 `npm test` 가 실패하고
-배포까지 못 간다. **필수 11개다.**
+배포까지 못 간다. **필수 16개다.**
 
 | 필드 | 설명 |
 |---|---|
@@ -71,10 +71,17 @@ RSS 에도 넣지 않는다. 사이트가 읽는 것은 `site/src/posts.ts` 의 
 | `readerStartingPoint` | 독자가 이미 아는 것과 아직 모르는 것 |
 | `primaryKeyword` | 제목과 summary 와 H2 하나에 함께 쓸 두 단어 이상의 검색어 |
 | `searchIntent` | `explanation`, `how-to`, `troubleshooting`, `comparison` 중 하나 |
+| `ogImage` | 대표 썸네일. 발행 전 `media://asset-key`, 발행 뒤 Hugging Face 객체 URL |
+| `ogImageAlt` | 썸네일 대체 텍스트. plan.json 의 alt 와 같아야 한다 |
+| `ogImageWidth` | 썸네일 픽셀 가로. catalog.json 의 객체 값과 같아야 한다 |
+| `ogImageHeight` | 썸네일 픽셀 세로. catalog.json 의 객체 값과 같아야 한다 |
+| `ogImageType` | 썸네일 MIME. `image/webp` 또는 `image/png` 등 |
 
-이미지를 붙이면 다섯 개가 더 필수가 된다. `ogImage`, `ogImageAlt`, `ogImageWidth`,
-`ogImageHeight`, `ogImageType` 이다. 발행 전에는 `media://asset-key`, 발행 뒤에는 Hugging Face
-객체 URL 이다. 자세한 것은 [blogMedia.md](blogMedia.md) 를 본다.
+**썸네일은 모든 글에 반드시 있다.** 공유 카드, 구글 Article 대표 이미지, `/blog` 목록 썸네일이
+전부 `ogImage` 에서 나온다. 예전에는 이미지를 붙인 글에만 이 다섯 개를 요구했는데, 그러면 이미지
+없는 글이 빈 공유 카드로 나가고 목록에서도 자리가 비었다. 그래서 전 글 필수로 올렸다. 픽셀 크기와
+MIME, alt 가 미디어 catalog·plan 과 일치하는지도 같은 게이트가 검사한다. 자세한 것은
+[blogMedia.md](blogMedia.md) 를 본다.
 
 `readerStartingPoint` 에 `초보자` 라고만 쓰지 않는다. `파이썬을 설치해 본 적이 없고 셀과 .py 의
 뜻을 모른다` 처럼 독자가 모르는 말을 적는다.

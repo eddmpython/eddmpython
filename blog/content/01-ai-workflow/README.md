@@ -17,3 +17,7 @@
 `../../README.md` 의 규칙이 그대로 적용된다. 판단과 작법은 비공개 형제 저장소의
 `../eddmpython-course/memory/rules/blogWriter.md`, 기계가 강제하는 계약은
 `skills/specs/operation/blogPublishing.md` 다.
+
+이 주제의 공개 산출물은 `agent-template/` 에 있다. 복사해 쓰는 `AGENTS.md` 와 `CLAUDE.md`,
+자리표시자와 적용 순서가 거기 있고 이 폴더의 글이 그것을 설명한다. 저장소 루트가 아니라 이
+카테고리가 소유한다.

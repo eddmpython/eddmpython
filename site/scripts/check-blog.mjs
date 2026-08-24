@@ -32,12 +32,23 @@ const requiredMeta = [
   "readerStartingPoint",
   "primaryKeyword",
   "searchIntent",
+  // 썸네일은 모든 글에 반드시 있다. 공유 카드, 구글 Article 이미지, /blog 목록 썸네일이
+  // 전부 여기서 나온다. 이미지가 있는 글에만 걸던 조건부 규칙을 전 글 필수로 올렸다.
+  "ogImage",
+  "ogImageAlt",
+  "ogImageWidth",
+  "ogImageHeight",
+  "ogImageType",
 ];
 const readerLevels = new Set(["beginner", "working", "advanced"]);
 // 글과 카테고리 문서는 blog/content 아래에만 있다. 나머지는 기계라 걷지 않는다.
 const contentDirName = "content";
 const rootDocs = new Set(["README.md"]);
 const categoryDocs = new Set(["README.md"]);
+// 공개 작업 환경 템플릿은 01-ai-workflow 카테고리가 소유한다. 이 세 파일은 글도 카테고리
+// 문서도 아니지만 발행 글이 설명하는 산출물이라 카테고리 폴더 안에 둔다. 정확히 이 이름만 연다.
+const templateDirName = "agent-template";
+const templateDocs = new Set(["README.md", "AGENTS.md", "CLAUDE.md"]);
 const publicSlug = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 /**
  * 카테고리는 앞에 두 자리 번호를 붙인다.
@@ -427,9 +438,19 @@ for (const id of Object.keys(plan.assets)) {
 const markdownDocs = await collectMarkdownDocs(blogDir);
 for (const doc of markdownDocs) {
   if (postName.test(doc.name)) continue;
-  const depth = doc.relPath.split("/").length;
+  const segments = doc.relPath.split("/");
+  const depth = segments.length;
   // blog/README.md 는 depth 1, blog/content/<카테고리>/README.md 는 depth 3 이다.
-  const allowed = depth === 1 ? rootDocs.has(doc.name) : depth === 3 && categoryDocs.has(doc.name);
+  // 템플릿은 content/<카테고리>/agent-template/<파일> 로 depth 4 이며 이름을 정확히 맞춘다.
+  const isTemplateDoc =
+    depth === 4 &&
+    segments[0] === contentDirName &&
+    segments[2] === templateDirName &&
+    templateDocs.has(doc.name);
+  const allowed =
+    depth === 1
+      ? rootDocs.has(doc.name)
+      : (depth === 3 && categoryDocs.has(doc.name)) || isTemplateDoc;
   if (!allowed) {
     fail(doc.relPath, "발행 글이나 운영 문서로 분류되지 않은 파일입니다");
   }

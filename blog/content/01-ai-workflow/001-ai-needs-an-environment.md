@@ -118,7 +118,7 @@ rg --files -g ".github/workflows/*" -g "tests/**" -g "test/**"
 이 파일에는 공통 규칙을 복사하지 않는다.
 ```
 
-공개 시작 파일은 [eddmpython Agent Template](https://github.com/eddmpython/eddmpython/tree/main/agent-template)에서 볼 수 있습니다. AI는 이 파일을 그대로 붙여 넣고 끝내지 않으며, 저장소에서 확인한 값으로 자리표시자를 바꾸고 필요 없는 항목은 지웁니다. 두 파일의 역할을 정했으면 이제 실행 명령부터 채워야 합니다. 보기 좋은 원칙보다 복사해서 실행할 수 있는 명령과 그 명령의 근거가 먼저입니다.
+공개 시작 파일은 [eddmpython Agent Template](https://github.com/eddmpython/eddmpython/tree/main/blog/content/01-ai-workflow/agent-template)에서 볼 수 있습니다. AI는 이 파일을 그대로 붙여 넣고 끝내지 않으며, 저장소에서 확인한 값으로 자리표시자를 바꾸고 필요 없는 항목은 지웁니다. 두 파일의 역할을 정했으면 이제 실행 명령부터 채워야 합니다. 보기 좋은 원칙보다 복사해서 실행할 수 있는 명령과 그 명령의 근거가 먼저입니다.
 
 ## 명령은 추측하지 않고 증명합니다
 
