@@ -22,8 +22,8 @@ status: observed
 # 블로그 발행
 
 이 문서는 **기계 계약**이다. 파일 이름, frontmatter, 검사, 배포 순서를 정한다.
-**글을 어떻게 쓰는지는 여기 없다.** 글은 전역 `$blog-writing`으로 쓰고,
-저장소용 `$eddmpython-blog-writing`이 이 발행 계약을 연결한다.
+**글을 어떻게 쓰는지는 여기 없다.** 글은 전역 `$blog-writing`으로 쓰고, 이 문서에서 발행에 필요한
+파일 형식과 검사 순서를 직접 확인한다.
 
 ## 정본은 한 곳이다
 
@@ -248,8 +248,8 @@ Web Run 링크에서 쓸 수 있다고 정확히 적는다.
 
 ## 글 하나 발행하는 순서
 
-1. 전역 `$blog-writing`과 저장소용 `$eddmpython-blog-writing`을 사용한다. **[blogCopy.md](blogCopy.md)의 유입
-   패키징 게이트는 제목을 확정하기 전에 본다.** 주제 선택은
+1. 전역 `$blog-writing`을 사용한다. **[blogCopy.md](blogCopy.md)의 유입 패키징 게이트는 제목을 확정하기
+   전에 본다.** 주제 선택은
    [contentStrategy.md](contentStrategy.md), 제품 맥락은
    [productMarketing.md](productMarketing.md) 다
 2. 다음 세 자리 순번으로 `blog/posts/NNN-slug/` 폴더를 만들고 `index.md` 를 쓴다

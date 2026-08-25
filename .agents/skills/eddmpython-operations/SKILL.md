@@ -1,6 +1,6 @@
 ---
 name: eddmpython-operations
-description: eddmpython 브랜드 저장소의 사이트, 제품 카탈로그, 공개 AI 작업 템플릿, Cloudflare 배포, SEO, 시각 검증, 도메인, 자산, 비밀 경계 작업을 현재 Skill OS 계약에 맞게 탐색하고 검증한다. eddmpython 저장소 구조 파악, 랜딩이나 제품 정보 수정, 운영 절차 확인, 배포와 롤백, LLM 작업 환경 정리에 사용한다. 블로그 본문 집필과 교정에는 blog-writing과 eddmpython-blog-writing 스킬을 사용한다.
+description: eddmpython 브랜드 저장소의 사이트, 제품 카탈로그, 공개 AI 작업 템플릿, Cloudflare 배포, SEO, 시각 검증, 도메인, 자산, 비밀 경계 작업을 현재 Skill OS 계약에 맞게 탐색하고 검증한다. eddmpython 저장소 구조 파악, 랜딩이나 제품 정보 수정, 운영 절차 확인, 배포와 롤백, LLM 작업 환경 정리에 사용한다. 블로그 본문 집필과 교정에는 전역 blog-writing 스킬을 사용한다.
 ---
 
 # eddmpython 운영 라우터
@@ -17,9 +17,9 @@ description: eddmpython 브랜드 저장소의 사이트, 제품 카탈로그, �
 3. `skills/specs/start/eddmpythonSkillOs.md`
 4. 작업에 해당하는 `skills/specs/operation/*.md`
 
-블로그 글을 쓰거나 교정하는 요청이면 이 스킬에서 멈추고 전역 `$blog-writing`과
-`$eddmpython-blog-writing`을 함께 사용한다. 제품 소스
-구현 요청이면 해당 제품 저장소로 이동한다. 이 저장소에는 제품 코어를 복제하지 않는다.
+블로그 글을 쓰거나 교정하는 요청이면 전역 `$blog-writing`을 먼저 사용하고, 발행 작업이 있으면
+`operation/blogPublishing.md`와 필요한 운영 문서를 연다. 제품 소스 구현 요청이면 해당 제품
+저장소로 이동한다. 이 저장소에는 제품 코어를 복제하지 않는다.
 
 ## 2. 작업별 정본 선택
 

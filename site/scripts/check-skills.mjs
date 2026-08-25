@@ -13,6 +13,7 @@ const REPO = resolve(HERE, "..", "..");
 const SKILLS = join(REPO, "skills");
 const SPECS = join(SKILLS, "specs");
 const AGENT_SKILLS = join(REPO, ".agents", "skills");
+const BLOG_README = join(REPO, "blog", "README.md");
 
 const REQUIRED = ["id", "title", "category", "purpose", "whenToUse"];
 const CATEGORIES = new Set(["start", "operation"]);
@@ -101,6 +102,28 @@ if (!existsSync(SPECS)) {
 }
 
 const files = [join(SKILLS, "README.md"), ...walk(SPECS)];
+const writingSsotFiles = [
+  BLOG_README,
+  join(SKILLS, "README.md"),
+  join(SPECS, "start", "eddmpythonSkillOs.md"),
+  join(SPECS, "operation", "blogPublishing.md"),
+  join(SPECS, "operation", "blogCopy.md"),
+];
+
+for (const file of writingSsotFiles) {
+  const rel = relative(REPO, file).replace(/\\/g, "/");
+  if (!existsSync(file)) {
+    errors.push(`${rel}: 글쓰기 정본을 가리키는 문서가 없다`);
+    continue;
+  }
+  const text = readFileSync(file, "utf8");
+  if (!text.includes("$blog-writing")) {
+    errors.push(`${rel}: 전역 $blog-writing 을 사용하라는 규칙이 없다`);
+  }
+  if (/\$eddmpython-blog-writing|memory\/rules\/blogWriter\.md/.test(text)) {
+    errors.push(`${rel}: 없앤 글쓰기 스킬이나 옛 blogWriter.md 를 가리킨다`);
+  }
+}
 
 for (const file of files) {
   const rel = relative(REPO, file).replace(/\\/g, "/");
@@ -207,18 +230,12 @@ for (const entry of agentSkillDirs) {
     if (!yaml.includes(`$${entry.name}`)) {
       errors.push(`${rel}: agents/openai.yaml 기본 요청에 $${entry.name} 이 없다`);
     }
-    if (entry.name === "eddmpython-blog-writing" && !yaml.includes("$blog-writing")) {
-      errors.push(`${rel}: 블로그 기본 요청에 전역 $blog-writing 이 없다`);
-    }
     for (const { re, why } of BANNED) {
       if (re.test(yaml)) errors.push(`${relative(REPO, openaiYaml).replace(/\\/g, "/")}: ${why}`);
     }
   }
 
   const rawBody = text.slice(match[0].length);
-  if (entry.name === "eddmpython-blog-writing" && !rawBody.includes("`$blog-writing`을 먼저 사용한다")) {
-    errors.push(`${rel}: 전역 $blog-writing 을 먼저 쓰는 규칙이 없다`);
-  }
   if (unclosedFence(rawBody)) errors.push(`${rel}: 코드 펜스가 닫히지 않았다`);
   const body = stripFencedCode(rawBody);
   for (const [, target] of body.matchAll(/\]\(([^)]+)\)/g)) {
@@ -230,8 +247,10 @@ for (const entry of agentSkillDirs) {
   }
 }
 
-if (existsSync(join(AGENT_SKILLS, "blog-writing"))) {
-  errors.push(".agents/skills/blog-writing: 전역 $blog-writing 의 저장소 복사본을 두지 않는다");
+for (const name of ["blog-writing", "eddmpython-blog-writing"]) {
+  if (existsSync(join(AGENT_SKILLS, name))) {
+    errors.push(`.agents/skills/${name}: 전역 $blog-writing 과 겹치는 저장소 스킬을 두지 않는다`);
+  }
 }
 
 if (errors.length) {

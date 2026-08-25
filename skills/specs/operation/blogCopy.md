@@ -79,9 +79,8 @@ status: curated
 - 수동태와 수식어를 줄인다.
 - beginner 글은 [blogPublishing.md](blogPublishing.md) 의 길이 한도를 지킨다.
 
-본문을 새로 쓰거나 전체 교정할 때는 전역 `$blog-writing`과 저장소용 `$eddmpython-blog-writing`을
-함께 사용한다. 쉬운 말, 직접 쓰기, 글의 구조는 전역 스킬이 맡고, 저장소 전용 스킬이
-[blogPublishing.md](blogPublishing.md) 같은 발행 계약을 연결한다.
+본문을 새로 쓰거나 전체 교정할 때는 전역 `$blog-writing`을 반드시 사용한다. 파일 형식과 발행
+순서는 [blogPublishing.md](blogPublishing.md)에서 직접 확인한다.
 `cd site && npm run test:blog-style`과 `npm run test:blog-package`로 검사 규칙 표본을 먼저 확인하고
 `npm run check:blog`로 실제 글을 검사한다.
 
