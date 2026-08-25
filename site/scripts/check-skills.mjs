@@ -120,8 +120,8 @@ for (const file of writingSsotFiles) {
   if (!text.includes("$blog-writing")) {
     errors.push(`${rel}: 전역 $blog-writing 을 사용하라는 규칙이 없다`);
   }
-  if (/\$eddmpython-blog-writing|memory\/rules\/blogWriter\.md/.test(text)) {
-    errors.push(`${rel}: 없앤 글쓰기 스킬이나 옛 blogWriter.md 를 가리킨다`);
+  if (/\$[a-z0-9]+(?:-[a-z0-9]+)*-blog-writing|memory\/rules\/[^\s`)]*Writer\.md/i.test(text)) {
+    errors.push(`${rel}: 저장소 전용 글쓰기 스킬이나 옛 로컬 글쓰기 문서를 가리킨다`);
   }
 }
 
@@ -247,9 +247,9 @@ for (const entry of agentSkillDirs) {
   }
 }
 
-for (const name of ["blog-writing", "eddmpython-blog-writing"]) {
-  if (existsSync(join(AGENT_SKILLS, name))) {
-    errors.push(`.agents/skills/${name}: 전역 $blog-writing 과 겹치는 저장소 스킬을 두지 않는다`);
+for (const entry of agentSkillDirs) {
+  if (entry.name === "blog-writing" || entry.name.endsWith("-blog-writing")) {
+    errors.push(`.agents/skills/${entry.name}: 전역 $blog-writing 과 겹치는 저장소 스킬을 두지 않는다`);
   }
 }
 
