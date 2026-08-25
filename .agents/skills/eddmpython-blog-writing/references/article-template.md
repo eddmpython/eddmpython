@@ -1,7 +1,7 @@
 # 블로그 한 편 양식
 
-**이 파일은 모양 본보기다. 규칙이 아니다.** 집필 규칙의 정본은 `../eddmpython-course/memory/rules/blogWriter.md`,
-발행 계약의 정본은 `skills/specs/operation/blogPublishing.md`다. 어긋나면 그쪽이 이긴다.
+**이 파일은 모양 본보기다. 규칙이 아니다.** 공통 집필 규칙은 전역 `$blog-writing`, eddmpython 작법은
+`../eddmpython-course/memory/rules/blogWriter.md`, 발행 계약은 `skills/specs/operation/blogPublishing.md`가 맡는다.
 
 글 하나가 폴더 하나다. `blog/posts/<NNN-kebab>/index.md`로 쓰고 그 폴더에 이 글의 이미지 계획과 도구를 함께 둔다. `NNN`은 발행할 때 한 번 부여하는 세 자리 고정 순번이며
 미디어 키로도 쓰인다. 날짜는 저장하지 않는다. 목록은 이 순번의 역순이라 따로 적을 곳이 없다.

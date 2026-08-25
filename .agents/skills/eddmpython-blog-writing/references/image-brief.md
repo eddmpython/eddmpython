@@ -1,5 +1,7 @@
 # 섹션 이미지 브리프
 
+**이 파일은 eddmpython 이미지 본보기다. 규칙은 `skills/specs/operation/blogMedia.md`가 맡는다.**
+
 ## 먼저 고를 것
 
 1. 실제 제품 화면이 핵심이면 `sourceKind: screenshot`, `visualProfile: product-screen-v1`,

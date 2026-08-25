@@ -16,9 +16,9 @@ status: curated
 
 지금 실제로 도는 구조와 절차의 정본이다. 여기 없는 절차는 아직 없는 것이다.
 
-블로그를 쓰거나 고칠 때는 저장소 전용 `$blog-writing` 스킬을 사용한다. 파일은
-`.agents/skills/blog-writing/SKILL.md`에 있고, 자세한 운영 계약은 아래 `operation.blogPublishing`과
-`operation.blogCopy`가 맡는다.
+블로그를 쓰거나 고칠 때는 전역 `$blog-writing`과 저장소 전용 `$eddmpython-blog-writing`을 함께
+사용한다. 쉬운 말과 직접 쓰기는 전역 스킬 한 곳이 맡고, `.agents/skills/eddmpython-blog-writing/SKILL.md`는
+아래 `operation.blogPublishing`과 `operation.blogCopy` 같은 eddmpython 운영 계약만 연결한다.
 
 사이트, 제품 카탈로그, SEO, 배포, 도메인, 자산, 공개 경계를 다루는 작업은 저장소 전용
 `$eddmpython-operations` 스킬을 사용한다. 파일은 `.agents/skills/eddmpython-operations/SKILL.md`에
@@ -32,10 +32,12 @@ status: curated
 |---|---|---|
 | 강행규칙 | 위반하면 사고가 나는 것 | 루트 `CLAUDE.md` (추적하지 않음) |
 | 운영 계약 | 지금 실제로 도는 구조와 절차. 기계가 강제하는 것 | **`skills/specs/`** |
-| 우리 규칙 | 운영자와 에이전트가 정한 판단과 작법 | `../eddmpython-course/memory/` (비공개 형제 저장소, 추적 안 함). 인덱스는 `../eddmpython-course/memory/MEMORY.md` |
+| 공통 집필 규칙 | 다른 저장소와 함께 쓰는 쉬운 말과 직접 쓰기 | 전역 `$blog-writing` |
+| 우리 규칙 | eddmpython에서 정한 판단과 작법 | `../eddmpython-course/memory/` (비공개 형제 저장소, 추적 안 함). 인덱스는 `../eddmpython-course/memory/MEMORY.md` |
 | 예정 | 아직 짓지 않은 설계와 진행 | 커밋 메시지와 이슈 |
 
-**규칙 문서를 다른 폴더에 새로 만들지 않는다.** 운영 계약은 여기, 판단과 작법은 `../eddmpython-course/memory/` 다.
+**규칙 문서를 다른 폴더에 새로 만들지 않는다.** 공통 집필 규칙은 전역 `$blog-writing`, 운영 계약은 여기,
+eddmpython 판단과 작법은 `../eddmpython-course/memory/`가 맡는다.
 2026-08-19 에 집필 규칙 문서가 여섯 곳으로 갈라져 서로 어긋난 뒤 정한 규칙이다. 그중 하나는
 글 파일 경로와 카테고리 정책을, 다른 하나는 폐기된 글자 수 하한을 그대로 들고 있었다.
 

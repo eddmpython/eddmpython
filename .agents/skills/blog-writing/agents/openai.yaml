@@ -1,4 +1,0 @@
-interface:
-  display_name: "토탈 블로그 작가"
-  short_description: "SEO 제목부터 쉬운 본문과 관련 이미지까지 한 세트로 만듭니다"
-  default_prompt: "$blog-writing을 사용해 eddmpython 블로그를 SEO 제목, 구조화된 섹션, 쉬운 설명, 관련 이미지까지 한 세트로 만들거나 고쳐 주세요"

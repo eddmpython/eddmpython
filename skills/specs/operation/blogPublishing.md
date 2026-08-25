@@ -249,7 +249,8 @@ Web Run 링크에서 쓸 수 있다고 정확히 적는다.
 
 ## 글 하나 발행하는 순서
 
-1. `../eddmpython-course/memory/rules/blogWriter.md` 의 작가 파이프라인을 통과한다. **[blogCopy.md](blogCopy.md) 의 유입
+1. 전역 `$blog-writing`과 저장소용 `$eddmpython-blog-writing`을 사용하고,
+   `../eddmpython-course/memory/rules/blogWriter.md`의 작가 파이프라인을 통과한다. **[blogCopy.md](blogCopy.md)의 유입
    패키징 게이트는 제목을 확정하기 전에 본다.** 주제 선택은
    [contentStrategy.md](contentStrategy.md), 제품 맥락은
    [productMarketing.md](productMarketing.md) 다
