@@ -2,6 +2,7 @@ import { PRODUCTS, type Product } from "../products";
 import { SectionHead } from "./SectionHead";
 import { useReveal } from "../useReveal";
 import { ProductCell } from "./ProductCell";
+import { ButtonLink } from "./ButtonLink";
 
 function ProductRow({ product, index }: { product: Product; index: number }) {
   const ref = useReveal<HTMLElement>();
@@ -69,29 +70,26 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
 
         {product.install && (
           <code className="mt-6 block overflow-x-auto rounded-lg border border-white/10 bg-carbon px-3.5 py-2.5 font-mono text-[13px] whitespace-pre text-ivory/80">
-            <span className="select-none text-sand/70">$ </span>
+            <span className="select-none text-accent/70">$ </span>
             {product.install}
           </code>
         )}
 
         <div className="mt-7 flex flex-wrap gap-3">
-          <a
+          <ButtonLink
             href={product.primary.href}
-            target="_blank"
-            rel="noreferrer"
-            className="rounded-lg bg-ivory px-4 py-2.5 text-sm font-medium text-carbon transition-colors hover:bg-white"
+            external
           >
             {product.primary.label}
-          </a>
+          </ButtonLink>
           {product.secondary && (
-            <a
+            <ButtonLink
               href={product.secondary.href}
-              target="_blank"
-              rel="noreferrer"
-              className="rounded-lg border border-white/15 px-4 py-2.5 text-sm text-ivory transition-colors hover:bg-white/5"
+              variant="secondary"
+              external
             >
               {product.secondary.label}
-            </a>
+            </ButtonLink>
           )}
         </div>
       </div>

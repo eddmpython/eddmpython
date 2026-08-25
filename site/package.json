@@ -21,7 +21,7 @@
     "build": "npm run test && vite build && npm run verify:seo",
     "og": "node --experimental-strip-types scripts/og.mjs",
     "preview": "vite preview",
-    "test": "npm run test:blog-media && npm run test:blog-env && npm run test:hash-navigation && npm run test:visual-plan && npm run test:classroom-render && npm run test:qr && npm run check:blog && npm run check:brand && npm run check:secrets && npm run check:skills && tsc --noEmit",
+    "test": "npm run test:blog-media && npm run test:blog-env && npm run test:hash-navigation && npm run test:visual-plan && npm run test:classroom-render && npm run test:qr && npm run check:blog && npm run check:design && npm run check:secrets && npm run check:skills && tsc --noEmit",
     "deploy": "npm run build && npm run check:leak && npm run check:visual && wrangler deploy",
     "check:post": "node scripts/check-blog.mjs",
     "check:leak": "node scripts/check-leak.mjs",
@@ -31,7 +31,8 @@
     "classroom:shot": "node scripts/classroom-shot.mjs",
     "classroom:audit": "node scripts/classroom-audit.mjs",
     "admin:shot": "node scripts/admin-shot.mjs",
-    "check:brand": "node --experimental-strip-types scripts/check-brand.mjs",
+    "check:design": "node --experimental-strip-types scripts/check-brand.mjs",
+    "check:brand": "npm run check:design",
     "check:secrets": "node scripts/check-secrets.mjs"
   },
   "dependencies": {

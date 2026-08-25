@@ -17,10 +17,10 @@ status: observed
 
 # 브랜드 자산
 
-## 정본은 한 파일이다
+## 로고와 디자인 정본을 나눈다
 
-`site/src/brand.ts` 가 심볼 좌표, 색, 공용 글자 위계의 정본이다. **다른 곳에 좌표나 공용 수치를
-다시 정하지 않는다.**
+`site/src/brand.ts`는 심볼 좌표의 정본이고 `site/src/design.ts`는 색, 테마, 글꼴, 모서리,
+공용 글자 위계의 정본이다. **다른 곳에 좌표, 색상값, 공용 수치를 다시 정하지 않는다.**
 
 | 쓰는 곳 | 어떻게 |
 |---|---|
@@ -28,10 +28,15 @@ status: observed
 | `favicon.svg` | `vite.config.ts` 의 `brandAssets` 플러그인이 `faviconSvg()` 로 만든다 |
 | `og.png` | `npm run og` 가 같은 좌표로 그린다 |
 
-공개 블로그와 강의장의 섹션 제목은 `TOKENS.typography.sectionTitle` 하나를 쓴다. 모바일과
+공개 블로그와 강의장의 섹션 제목은 `DESIGN.typography.sectionTitle` 하나를 쓴다. 모바일과
 데스크톱 크기, 행간, 굵기, 자간을 그 객체에서 정하고 두 렌더러는 CSS 변수로 소비한다.
-Tailwind 진입점 `src/styles.css`에는 빌드가 읽을 같은 변수값이 필요하지만 `npm run check:brand`가
-`brand.ts`와의 일치와 두 렌더러의 실제 소비를 함께 검사한다.
+Tailwind 진입점 `src/styles.css`는 값 없이 `--eddm-*` 의미 변수만 연결하고, React와 Worker는
+`designCssVars()`가 만든 같은 변수를 받는다. `npm run check:design`이 값 복제와 두 렌더러의
+실제 소비를 함께 검사한다.
+
+강조색은 `DESIGN.accent.dark`와 `DESIGN.accent.light`가 정본이다. 버튼, 링크,
+선택 상태와 강의 진행선은 `--eddm-accent`와 그 파생 변수만 소비한다. 강조색을 바꿀 때 화면별
+CSS를 찾지 않는다. 로고 눈의 `DESIGN.palette.eye`는 강조색과 별개다.
 
 `public/favicon.svg` 를 두지 않는다. 사본을 두면 랜딩 마크를 고칠 때 파비콘만 옛 형태로
 남는다. dev 는 미들웨어로, build 는 dist 파일로 같은 문자열을 낸다.

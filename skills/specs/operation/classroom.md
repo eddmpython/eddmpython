@@ -23,26 +23,27 @@ status: observed
 
 ## 브랜드 표면
 
-강의장은 별도 제품 팔레트를 만들지 않는다. 색, 글꼴, 심볼 정본은 `site/src/brand.ts`다.
-`site/src/styles.css`는 랜딩에서 그 정본을 소비하는 Tailwind 진입점이고, Worker가 HTML을 직접
-만드는 강의장은 `cssVars()`, `TOKENS`, `SYMBOL`을 가져와 같은 값을 쓴다.
+강의장은 별도 제품 팔레트를 만들지 않는다. 색, 테마와 글꼴 정본은 `site/src/design.ts`,
+심볼 정본은 `site/src/brand.ts`다. `site/src/styles.css`는 의미 변수만 소비하는 Tailwind
+진입점이고, Worker가 HTML을 직접 만드는 강의장은 `designCssVars()`, `DESIGN`, `SYMBOL`을
+가져와 같은 값을 쓴다.
 
 로그인, 대기, 과정 목록, 글 화면은 모두 eddmpython 로고 머리띠를 낸다. 브라우저 탭 제목에는
 `eddmpython`을 붙이고 파비콘은 `/favicon.svg` 정본을 쓴다. 강의장 전용 hex, 글꼴 스택, 심볼
-좌표를 만들지 않는다. `npm run check:brand`가 이 경계를 검사한다.
+좌표를 만들지 않는다. `npm run check:design`이 이 경계를 검사한다.
 
 강의장은 머리띠의 해와 달 아이콘 버튼 하나로 라이트와 다크 테마를 바꾼다. 처음 방문했거나 저장한
-값이 없으면 운영체제의 색상 설정을 따르고, 버튼을 누른 뒤에는 고른 값이 같은 브라우저의 로그인,
+값이 없으면 라이트 테마로 시작하고, 버튼을 누른 뒤에는 고른 값이 같은 브라우저의 로그인,
 대기, 과정 목록, 글 화면에 유지된다. 아이콘은 지금 화면이 아니라 누르면 바뀔 테마를 보여 주며,
 접근성 이름도 `라이트 테마로 변경`이나 `다크 테마로 변경`으로 맞춘다. 라이트 테마도
-`site/src/brand.ts`의 브랜드 색에서 파생하며 별도 팔레트를 만들지 않는다. `npm run classroom:shot`은
+`site/src/design.ts`의 테마 설정에서 파생하며 별도 팔레트를 만들지 않는다. `npm run classroom:shot`은
 데스크톱과 모바일에서 라이트와 다크 화면을 각각 찍고 토글과 저장 상태를 확인한다.
 
 강의 모드가 전체 화면을 덮어도 같은 테마 버튼을 상단 강의 셸에 유지한다. 읽기 화면과 강의 셸의
 두 버튼은 현재 테마, 다음 테마 이름, 아이콘을 하나의 상태로 함께 갱신한다. 다른 탭에서 같은 강의장
 테마를 바꿔도 현재 탭이 즉시 따라가며, 브라우저 테마 색과 네이티브 폼의 `color-scheme`도 같은 값으로
 맞춘다. 코드 블록, 실행 칸, 오류, 영상 받침과 확대 배경은 고정 색을 쓰지 않고 의미 토큰을 소비한다.
-`npm run check:brand`는 강의장 표면에 고정 hex가 다시 들어오면 실패하고, `npm run classroom:shot`은 강의
+`npm run check:design`은 강의장 표면에 고정 hex가 다시 들어오면 실패하고, `npm run classroom:shot`은 강의
 셸의 라이트와 다크 전환, 두 버튼 동기화, 다른 탭의 저장 이벤트 배선을 함께 확인한다.
 
 본문 섹션 안의 사례 소제목은 위 설명과 충분히 벌리고 바로 아래 이미지, 캐러셀, 영상에는 붙인다.
@@ -50,8 +51,8 @@ status: observed
 `npm run classroom:shot`은 소제목과 다음 시각물의 실제 간격과 경계 스타일도 확인한다.
 
 본문 섹션 제목의 크기, 행간, 굵기, 자간은 공개 블로그와 함께
-`site/src/brand.ts`의 `TOKENS.typography.sectionTitle`을 쓴다. 강의장 CSS에서 별도 수치를 만들지
-않으며 `npm run check:brand`와 `npm run classroom:shot`이 토큰 소비와 실제 렌더 크기를 확인한다.
+`site/src/design.ts`의 `DESIGN.typography.sectionTitle`을 쓴다. 강의장 CSS에서 별도 수치를 만들지
+않으며 `npm run check:design`과 `npm run classroom:shot`이 토큰 소비와 실제 렌더 크기를 확인한다.
 
 ## 읽기 모드와 강의 모드
 
@@ -198,8 +199,8 @@ course-scene 선언
 ### 화면은 랜딩과 같은 옷을 입는다
 
 비공개 화면이라고 브랜딩을 빼지 않는다. 머리띠, 색 토큰, 글꼴, 테마 토글이 랜딩과 같다.
-색 값의 정본은 `site/src/brand.ts` 의 TOKENS 이고 공용 크롬은 `site/shell.ts` 다.
-`npm run check:brand` 가 hex 를 다시 적은 파일과 크롬을 안 입은 운영장을 막고,
+디자인 정본은 `site/src/design.ts`의 `DESIGN`이고 공용 크롬은 `site/shell.ts`다.
+`npm run check:design`이 hex를 다시 적은 파일과 크롬을 안 입은 운영장을 막고,
 `npm run admin:shot` 이 로그인 화면과 조종 화면을 다크와 라이트로 찍어 레이아웃을 보게 한다.
 
 ## 강의장에서 벌어지는 일

@@ -27,6 +27,8 @@
  * 이 파일은 React 를 import 하지 않는다. vite.config.ts(Node)에서도 읽는다.
  */
 
+import { DESIGN } from "./design";
+
 export const SYMBOL = {
   viewBox: "0 0 414.20 367.96",
   width: 414.20,
@@ -38,114 +40,17 @@ export const SYMBOL = {
   eye: { cx: 303.71, cy: 28.24, rx: 9.64, ry: 7.58 },
 } as const;
 
-/** styles.css 의 --eddm-* 토큰과 같은 값. 정적 SVG 는 CSS 변수를 못 읽어서 여기서 쓴다. */
+/** 정적 SVG는 CSS 변수를 못 읽으므로 디자인 정본의 원색을 읽어 쓴다. */
 export const BRAND = {
-  carbon: "#101514",
-  ivory: "#f5f3ee",
-  // BRAND.ivory 를 TOKENS.color.sand 가 그대로 쓴다. 강조는 색이 아니라 밝기다.
+  carbon: DESIGN.palette.carbon,
+  ivory: DESIGN.palette.ivory,
   /**
    * 심볼의 눈. 저장소 강행규칙이 핑크 계열을 금지해서 모래빛을 쓴다.
    * 실측에서 48px 아래로는 눈이 보이지 않으므로 작은 크기의 판독에는
    * 영향이 없고, 큰 크기에서 브랜드 색으로 읽히는 유일한 점이다.
    */
-  eye: "#d8be91",
+  eye: DESIGN.palette.eye,
 } as const;
-
-/**
- * 브랜드 토큰 정본.
- *
- * **같은 값을 두 번 적지 않는다.** 랜딩(styles.css), 강의장(classroom.ts), 운영 화면
- * (scripts/classroom-admin.mjs)이 각자 색을 적고 있었고 그래서 배경이 미묘하게 달랐다
- * (강의장 #101514, 운영 화면 #0d1211). 같은 브랜드인데 화면을 옮기면 이상했다.
- *
- * CSS 를 쓰는 쪽은 `cssVars()` 로 변수를 깔고 `var(--eddm-*)` 를 참조한다. Tailwind 를
- * 쓰는 랜딩은 styles.css 의 `:root` 가 같은 값을 들고 있고 `scripts/check-brand.mjs` 가
- * 그 둘이 어긋나면 막는다.
- *
- * 알파 단계에 이름을 준 이유는 `#f5f3ee8c` 같은 값이 화면마다 제각각 나오던 것을 막기
- * 위해서다. 글자는 네 단계, 선은 세 단계면 충분하다.
- */
-export const TOKENS = {
-  color: {
-    /** 바탕. 모든 표면이 같은 검정을 쓴다 */
-    carbon: BRAND.carbon,
-    /** carbon 보다 한 단 어두운 면. 화면 프레임 받침 */
-    ink: "#0c0f0e",
-    /** 글자 기본 */
-    ivory: BRAND.ivory,
-    /**
-     * 강조.
-     *
-     * **골드를 쓰지 않는다.** 2026-08-24 운영자 지시다. 강조는 색이 아니라 밝기로 한다.
-     * 본문 글자가 ivory 75% 라서 강조는 100% 로 더 밝게 두면 그것으로 읽힌다. 색을 얹으면
-     * 강조한 것이 아니라 색칠한 것이 되고, 화면 뒤에서 보는 사람에게는 색이 먼저 들어온다.
-     *
-     * 골드는 `BRAND.eye` 한 자리에만 남는다. 그것은 브랜드 마크의 눈이고 로고이지 강조 표현이
-     * 아니다. 마크 밖으로 넓히지 않는다.
-     */
-    sand: BRAND.ivory,
-    /** 운영 화면에서 프로덕션을 가리키는 경고색. 다른 자리에 쓰지 않는다 */
-    alert: "#e0552d",
-    dartlab: "#7da2e8",
-    codaro: "#dfa14e",
-    xlpod: "#57b98a",
-    pyproc: "#ff5a36",
-  },
-  /** 글자 밝기 네 단계. 본문, 보조, 흐림, 라벨 */
-  text: {
-    body: "rgba(245,243,238,.75)",
-    muted: "rgba(245,243,238,.55)",
-    dim: "rgba(245,243,238,.45)",
-    faint: "rgba(245,243,238,.35)",
-  },
-  /** 선 세 단계. 구분선, 테두리, 눈에 띄는 테두리 */
-  line: {
-    soft: "rgba(255,255,255,.08)",
-    base: "rgba(255,255,255,.11)",
-    strong: "rgba(255,255,255,.17)",
-  },
-  /** 살짝 뜬 면. 카드 배경과 hover */
-  surface: {
-    raise: "rgba(255,255,255,.04)",
-    hover: "rgba(255,255,255,.08)",
-  },
-  /**
-   * 강조를 옅게 쓰는 자리. 선택된 항목의 배경과 선.
-   *
-   * 골드 rgba 였다가 2026-08-24 에 ivory 로 바꿨다. 값만 바뀌고 쓰는 자리는 그대로다.
-   */
-  accent: {
-    line: "rgba(245,243,238,.28)",
-    bg: "rgba(245,243,238,.07)",
-    dim: "rgba(245,243,238,.55)",
-  },
-  radius: { sm: ".45rem", md: ".7rem", lg: ".85rem", xl: "1rem" },
-  font: {
-    sans: '"Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
-    mono: '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
-  },
-  /** 공개 글과 강의장 본문이 함께 쓰는 섹션 제목 위계 */
-  typography: {
-    sectionTitle: {
-      mobile: "1.375rem",
-      desktop: "1.5rem",
-      lineHeight: "1.35",
-      weight: "600",
-      tracking: "-.015em",
-    },
-  },
-  /** 랜딩이 CDN 에서 받는 글꼴. 강의장과 운영 화면도 같은 것을 받아야 자간이 같다 */
-  fontHref:
-    "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css",
-} as const;
-
-/** `:root` 에 깔 CSS 변수. CSS 를 직접 쓰는 표면이 이걸로 시작한다. */
-export function cssVars(): string {
-  const c = TOKENS.color;
-  const t = TOKENS;
-  const section = t.typography.sectionTitle;
-  return `:root{--eddm-carbon:${c.carbon};--eddm-ink:${c.ink};--eddm-ivory:${c.ivory};--eddm-sand:${c.sand};--eddm-alert:${c.alert};--eddm-text:${t.text.body};--eddm-text-muted:${t.text.muted};--eddm-text-dim:${t.text.dim};--eddm-text-faint:${t.text.faint};--eddm-line:${t.line.soft};--eddm-line-base:${t.line.base};--eddm-line-strong:${t.line.strong};--eddm-raise:${t.surface.raise};--eddm-hover:${t.surface.hover};--eddm-accent-line:${t.accent.line};--eddm-accent-bg:${t.accent.bg};--eddm-accent-dim:${t.accent.dim};--eddm-section-title-size-mobile:${section.mobile};--eddm-section-title-size-desktop:${section.desktop};--eddm-section-title-line-height:${section.lineHeight};--eddm-section-title-weight:${section.weight};--eddm-section-title-tracking:${section.tracking}}`;
-}
 
 /**
  * 브라우저 탭 아이콘 본문. 파비콘에는 로고가 아니라 심볼만 넣는다.

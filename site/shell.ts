@@ -7,10 +7,11 @@
  * **비공개 화면이라고 브랜딩을 빼지 않는다.** 운영장은 로그인해야 보이고 색인도 안 되지만
  * 그것이 다른 옷을 입을 이유는 되지 않는다. 한때 운영 화면이 자기 색을 따로 적어 배경이
  * 미묘하게 달랐고(강의장 carbon, 운영 화면은 그보다 어두운 값), 같은 브랜드인데 화면을
- * 옮기면 이상했다. 색 값은 여기서도 적지 않는다. `src/brand.ts` 의 TOKENS 가 정본이고
+ * 옮기면 이상했다. 색 값은 여기서도 적지 않는다. `src/design.ts` 의 DESIGN이 정본이고
  * `scripts/check-brand.mjs` 가 이 파일에 hex 가 나타나면 배포를 막는다.
  */
-import { SYMBOL, BRAND, TOKENS, cssVars } from "./src/brand";
+import { SYMBOL, BRAND } from "./src/brand";
+import { DESIGN, designCssVars, themeColor } from "./src/design";
 import { SOCIAL } from "./src/social";
 import { esc } from "./classroom-render";
 import { randomHex } from "./auth";
@@ -22,15 +23,7 @@ import { randomHex } from "./auth";
  * 넣지 않는다. 넣는 순간 한쪽만 쓰는 규칙이 모두에게 실린다.
  */
 export const SHELL_STYLE = `
-${cssVars()}
-:root {
-  --eddm-code-surface:color-mix(in srgb,var(--eddm-ivory) 5%,var(--eddm-carbon));
-  --eddm-code-focus:color-mix(in srgb,var(--eddm-ivory) 8%,var(--eddm-carbon));
-  --eddm-danger:color-mix(in srgb,var(--eddm-alert) 68%,var(--eddm-ivory));
-  --eddm-danger-line:color-mix(in srgb,var(--eddm-danger) 38%,transparent);
-  --eddm-media:${TOKENS.color.ink};
-  --eddm-overlay:color-mix(in srgb,${TOKENS.color.ink} 92%,transparent);
-}
+${designCssVars("adaptive")}
 /**
  * 라이트가 기본이다. 2026-08-24 운영자 지시다.
  *
@@ -41,39 +34,9 @@ ${cssVars()}
  * \`:not([data-theme="dark"])\` 를 쓰는 이유는 속성이 아직 안 붙은 첫 순간도 라이트로
  * 잡기 위해서다. 다크는 그 속성이 붙어야만 걸린다.
  */
-:root:not([data-theme="dark"]) {
-  color-scheme:light;
-  --eddm-carbon:${TOKENS.color.ivory};
-  --eddm-ink:color-mix(in srgb, ${TOKENS.color.ivory} 92%, ${TOKENS.color.carbon});
-  --eddm-ivory:${TOKENS.color.carbon};
-  /* 강조는 색이 아니라 밝기다. 다크에서 가장 밝은 값이듯 라이트에서는 가장 진한 값이다 */
-  --eddm-sand:${TOKENS.color.carbon};
-  --eddm-text:color-mix(in srgb, ${TOKENS.color.carbon} 78%, transparent);
-  --eddm-text-muted:color-mix(in srgb, ${TOKENS.color.carbon} 58%, transparent);
-  --eddm-text-dim:color-mix(in srgb, ${TOKENS.color.carbon} 45%, transparent);
-  --eddm-text-faint:color-mix(in srgb, ${TOKENS.color.carbon} 35%, transparent);
-  --eddm-line:color-mix(in srgb, ${TOKENS.color.carbon} 8%, transparent);
-  --eddm-line-base:color-mix(in srgb, ${TOKENS.color.carbon} 11%, transparent);
-  --eddm-line-strong:color-mix(in srgb, ${TOKENS.color.carbon} 17%, transparent);
-  /**
-   * 뜬 면은 바탕보다 밝다. 다크와 같은 방향이다.
-   *
-   * 라이트에서도 검은 알파를 얹어 면을 만들었더니 카드, 입력 칸, 단추가 전부 같은 회색으로
-   * 뭉쳐 위계가 사라졌다. 다크에서 흰 알파 4% 는 검은 바탕에서 겨우 뜨지만 라이트에서 검은
-   * 알파 4% 는 크림 바탕에서 확실한 회색으로 읽힌다. 같은 숫자를 뒤집어 쓰면 안 되는 자리다.
-   * 크림 바탕 위에 흰 종이를 얹는 쪽이 다크의 관계와 같다.
-   */
-  --eddm-raise:color-mix(in srgb, white 60%, transparent);
-  --eddm-hover:color-mix(in srgb, ${TOKENS.color.carbon} 6%, transparent);
-  /* 다크의 ivory 28/7/55 와 같은 비율이다. 두 테마에서 강조의 세기가 같아야 한다 */
-  --eddm-accent-line:color-mix(in srgb, var(--eddm-sand) 28%, transparent);
-  --eddm-accent-bg:color-mix(in srgb, var(--eddm-sand) 7%, transparent);
-  --eddm-accent-dim:color-mix(in srgb, var(--eddm-sand) 55%, transparent);
-}
-:root[data-theme="dark"] { color-scheme:dark; }
 * { box-sizing: border-box; }
 html { min-height:100%; background:var(--eddm-carbon); scrollbar-color:var(--eddm-line-strong) var(--eddm-carbon); }
-body { min-height:100vh; min-height:100dvh; margin:0; background:var(--eddm-carbon); color:var(--eddm-ivory); font-family:${TOKENS.font.sans}; word-break:keep-all; -webkit-font-smoothing:antialiased;
+body { min-height:100vh; min-height:100dvh; margin:0; background:var(--eddm-carbon); color:var(--eddm-ivory); font-family:var(--eddm-font-sans); word-break:keep-all; -webkit-font-smoothing:antialiased;
   line-height:1.7; -webkit-text-size-adjust:100%; }
 :focus-visible { outline:2px solid var(--eddm-accent-dim); outline-offset:2px; border-radius:.25rem; }
 .sr-only { position:absolute !important; width:1px !important; height:1px !important; padding:0 !important;
@@ -167,7 +130,7 @@ const THEME_INIT_SCRIPT = `
     const resolved = choices.has(choice) ? choice : "light";
     root.dataset.theme = resolved;
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute("content", resolved === "light" ? "${TOKENS.color.ivory}" : "${TOKENS.color.carbon}");
+    if (meta) meta.setAttribute("content", resolved === "light" ? "${themeColor("light")}" : "${themeColor("dark")}");
     if (persist) {
       try { localStorage.setItem(key, resolved); } catch {}
     }
@@ -339,11 +302,11 @@ export function page(opts: PageOptions): Response {
   const html = `<!doctype html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="${esc(BRAND.ivory)}">
+<meta name="theme-color" content="${esc(themeColor("light"))}">
 <title>${esc(opts.title)} | eddmpython</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="stylesheet" href="${TOKENS.fontHref}">
+<link rel="stylesheet" href="${DESIGN.fontHref}">
 <script nonce="${nonce}">${THEME_INIT_SCRIPT}</script>
 <style>${style}</style></head>
 <body><div class="wrap${opts.wide ? " wide" : ""}">${opts.inner}</div>

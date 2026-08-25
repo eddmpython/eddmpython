@@ -26,6 +26,15 @@ const base = (process.argv[2] ?? "http://localhost:8787").replace(/\/$/, "");
 const SOURCE_ROOM = "shot-source";
 const ROOM = "shot";
 /**
+ * 화면 계약 표본은 영상, 이미지, 비교 장면, 실행 칸을 모두 가진 카테고리로 고정한다.
+ *
+ * 첫 카테고리를 고르면 00 과정 안내처럼 표 중심의 카테고리가 앞에 추가될 때 확대, 재생,
+ * 비교 검사가 전부 거짓 실패한다. 아래 검사는 이미 `what-is-python` 등 이 카테고리의 글을
+ * 명시적으로 찾으므로 시작점도 같은 계약으로 고른다. 전체 카테고리 도달 여부는
+ * classroom-audit.mjs가 별도로 검사한다.
+ */
+const PROBE_CATEGORY = "01-automation-start";
+/**
  * 비밀번호를 소스에 적지 않는다. 매번 새로 뽑는다.
  *
  * 2026-08-20 에 여기 적혀 있던 `shot-room-1234` 로 **운영의 유료 교안이 통째로 열렸다.**
@@ -45,10 +54,10 @@ const admin = await signIn(base);
 await admin({ action: "remove", slug: SOURCE_ROOM }).catch(() => {});
 await admin({ action: "remove", slug: ROOM }).catch(() => {});
 const made = await admin({ action: "create", slug: SOURCE_ROOM, title: "검수용 강의방", password: PASSWORD });
-const category = made.categories[0];
+const category = made.categories.find((candidate) => candidate.slug === PROBE_CATEGORY);
 if (!category) {
   throw new Error(
-    "교안 카테고리가 없다. ../eddmpython-course 에서 npm run publish:local 을 먼저 돌려라",
+    `${PROBE_CATEGORY} 카테고리가 없다. ../eddmpython-course 에서 npm run publish:local 을 먼저 돌려라`,
   );
 }
 await admin({ action: "toggle", slug: SOURCE_ROOM, category: category.slug });
@@ -1620,7 +1629,7 @@ for (const viewport of activeViewports) {
       ),
     );
     if (!focusPost) throw new Error("run-python-in-vscode focus 장면 글 링크를 못 찾았다");
-    await evaluate(session, `location.href = ${JSON.stringify(`${base}${focusPost}#lecture=s6.2`)}`, false);
+    await evaluate(session, `location.href = ${JSON.stringify(`${base}${focusPost}#lecture=s7.2`)}`, false);
     await client.act(
       session,
       [{ kind: "waitFor", selector: '[data-lecture-deck][data-scene-phase="ready"] .lecture-scene.on [data-scene-focus="true"]', timeoutMs: 15000, expectedRisk: "read" }],
@@ -1729,7 +1738,7 @@ for (const viewport of activeViewports) {
       `${viewport.id} 강의 위치 URL 복구`,
       restoredLecture?.hidden === false &&
         restoredLecture?.scene === "s2" &&
-        /02 \/ 08 · 2 \/ 4/.test(restoredLecture?.progress ?? "") &&
+        /02 \/ \d+ · 2 \/ 4/.test(restoredLecture?.progress ?? "") &&
         restoredLecture?.visual === "2",
       JSON.stringify(restoredLecture),
     );

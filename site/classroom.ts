@@ -20,7 +20,8 @@ import {
   renderLecture,
   renderPost,
 } from "./classroom-render";
-import { SYMBOL, BRAND, TOKENS } from "./src/brand";
+import { SYMBOL, BRAND } from "./src/brand";
+import { DESIGN } from "./src/design";
 import { checkToken, cookie, issueToken, hmac, readCookie } from "./auth";
 import { call, validSlug, type PublicRoom } from "./rooms";
 import { course, courseVersion, type CourseCategory } from "./course";
@@ -32,7 +33,7 @@ import type { Env } from "./env";
 
 /* 화면 ------------------------------------------------------------------ */
 
-// 브랜드 값은 여기서 만들지 않는다. src/brand.ts 의 TOKENS 가 정본이고 그것이 변수를 깐다.
+// 디자인 값은 여기서 만들지 않는다. src/design.ts 의 DESIGN이 정본이고 그것이 변수를 깐다.
 // scripts/check-brand.mjs 가 이 파일에 hex 가 다시 나타나면 막는다.
 /**
  * 강의방 화면 CSS.
@@ -433,7 +434,7 @@ html:not([data-theme="dark"]) .scene-canvas figure.media video {
   border:1px solid var(--eddm-line-strong); border-radius:.5rem;
   background:color-mix(in srgb,var(--eddm-ink) 94%,var(--eddm-sand)); color:var(--eddm-ivory);
   box-shadow:0 1.1rem 3rem color-mix(in srgb,var(--eddm-ink) 38%,transparent);
-  font-family:${TOKENS.font.mono}; font-size:clamp(.95rem,1.35vw,1.4rem); line-height:1.6; white-space:pre; }
+  font-family:${DESIGN.font.mono}; font-size:clamp(.95rem,1.35vw,1.4rem); line-height:1.6; white-space:pre; }
 html:not([data-theme="dark"]) .scene-canvas pre {
   box-shadow:0 1.1rem 3rem color-mix(in srgb,var(--eddm-ivory) 14%,transparent); }
 .scene-canvas .table-wrap { width:var(--lecture-visual-max); max-width:100%; max-height:var(--lecture-visual-height); overflow:auto;

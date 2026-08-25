@@ -4,6 +4,7 @@ import { Nav } from "./Nav";
 import { ProductRail } from "./ProductRail";
 import { SLIDES, firstSlideIndex } from "../slides";
 import type { ProductKey } from "../productMarks";
+import { ButtonLink } from "./ButtonLink";
 
 export function Hero() {
   const [active, setActive] = useState(0);
@@ -42,20 +43,16 @@ export function Hero() {
           className="fade-up mt-9 flex flex-wrap items-center gap-3"
           style={{ animationDelay: "0.25s" }}
         >
-          <a
-            href="#products"
-            className="rounded-lg bg-ivory px-4 py-2.5 text-sm font-medium text-carbon transition-colors hover:bg-white"
-          >
+          <ButtonLink href="#products">
             제품 보기
-          </a>
-          <a
+          </ButtonLink>
+          <ButtonLink
             href="https://github.com/eddmpython"
-            target="_blank"
-            rel="noreferrer"
-            className="rounded-lg border border-white/15 px-4 py-2.5 text-sm text-ivory transition-colors hover:bg-white/5"
+            variant="secondary"
+            external
           >
             GitHub
-          </a>
+          </ButtonLink>
         </div>
 
         <div className="fade-up mt-8" style={{ animationDelay: "0.35s" }}>

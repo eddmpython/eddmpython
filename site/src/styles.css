@@ -1,42 +1,17 @@
 @import "tailwindcss";
 
-/* 브랜드 토큰 정본. 값은 eddmpython 브랜드 시트의 비핑크 팔레트만 쓴다. */
-:root {
-  --eddm-carbon: #101514;
-  /* carbon보다 한 단 어두운 면. 히어로 화면 프레임 받침 */
-  --eddm-ink: #0c0f0e;
-  --eddm-ivory: #f5f3ee;
-  /* 강조는 색이 아니라 밝기다. 골드는 브랜드 마크의 눈에만 남는다 (src/brand.ts) */
-  --eddm-sand: #f5f3ee;
-  --eddm-dartlab: #7da2e8;
-  --eddm-codaro: #dfa14e;
-  --eddm-xlpod: #57b98a;
-  --eddm-pyproc: #ff5a36;
-  /* 정본은 brand.ts 의 TOKENS.typography.sectionTitle 이다. check:brand 가 같은지 검사한다 */
-  --eddm-section-title-size-mobile: 1.375rem;
-  --eddm-section-title-size-desktop: 1.5rem;
-  --eddm-section-title-line-height: 1.35;
-  --eddm-section-title-weight: 600;
-  --eddm-section-title-tracking: -.015em;
-}
-
 @theme inline {
   --color-carbon: var(--eddm-carbon);
   --color-ink: var(--eddm-ink);
   --color-ivory: var(--eddm-ivory);
-  --color-sand: var(--eddm-sand);
+  --color-accent: var(--eddm-accent);
+  --color-sand: var(--eddm-accent);
   --color-dartlab: var(--eddm-dartlab);
   --color-codaro: var(--eddm-codaro);
   --color-xlpod: var(--eddm-xlpod);
   --color-pyproc: var(--eddm-pyproc);
-}
-
-@theme {
-  --font-sans:
-    "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
-    system-ui, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-  --font-mono:
-    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-sans: var(--eddm-font-sans);
+  --font-mono: var(--eddm-font-mono);
 }
 
 html {
@@ -68,13 +43,68 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--eddm-sand) 80%, transparent);
+  outline: 2px solid var(--eddm-accent-dim);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: var(--eddm-radius-sm);
 }
 
 ::selection {
-  background-color: color-mix(in srgb, var(--eddm-sand) 30%, transparent);
+  background-color: var(--eddm-accent-line);
+}
+
+/* 공개 React 표면이 함께 쓰는 기본 동작 컴포넌트. 값은 design.ts 의 의미 변수만 읽는다. */
+.eddm-button {
+  display: inline-flex;
+  min-height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--eddm-radius-md);
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  text-decoration: none;
+  transition:
+    background-color var(--eddm-motion-fast) var(--eddm-motion-easing),
+    border-color var(--eddm-motion-fast) var(--eddm-motion-easing),
+    color var(--eddm-motion-fast) var(--eddm-motion-easing);
+}
+
+.eddm-button-primary {
+  background: var(--eddm-accent);
+  color: var(--eddm-accent-contrast);
+}
+
+.eddm-button-primary:hover {
+  background: color-mix(in srgb, var(--eddm-accent) 88%, var(--eddm-canvas));
+}
+
+.eddm-button-secondary {
+  border-color: var(--eddm-line-strong);
+  background: transparent;
+  color: var(--eddm-foreground);
+}
+
+.eddm-button-secondary:hover {
+  border-color: var(--eddm-accent-line);
+  background: var(--eddm-accent-bg);
+}
+
+.eddm-panel {
+  border: 1px solid var(--eddm-line-base);
+  border-radius: var(--eddm-radius-lg);
+  background: var(--eddm-raise);
+}
+
+.eddm-kicker {
+  color: var(--eddm-accent-dim);
+  font-family: var(--eddm-font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 @keyframes fade-up {

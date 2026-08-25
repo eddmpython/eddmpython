@@ -1,52 +1,41 @@
 /**
- * 브랜드 토큰이 한 곳에서만 정의되는지 본다.
+ * 디자인 토큰이 한 곳에서만 정의되는지 본다.
  *
- * 정본은 `src/brand.ts` 의 TOKENS 다. 랜딩은 Tailwind 를 쓰느라 styles.css 의 `:root` 에
- * 같은 값을 들고 있어야 하는데, 그 둘이 갈라지면 화면을 옮길 때 배경색이 미묘하게 달라진다.
- * 실제로 강의장(#101514)과 운영 화면(#0d1211)이 그렇게 갈라져 있었다.
+ * 정본은 `src/design.ts` 의 DESIGN이다. 랜딩과 Worker 표면은 같은 생성 함수가 만든
+ * `--eddm-*` 의미 변수를 쓰고, styles.css는 Tailwind 이름을 그 변수에 연결만 한다.
  *
  * 두 가지를 본다.
- * 1. styles.css 의 --eddm-* 값이 TOKENS 와 같은가
- * 2. 브랜드 색을 쓰는 파일이 hex 를 직접 적고 있지 않은가 (정본과 생성물만 예외)
+ * 1. 모든 렌더 진입점이 디자인 변수 생성 함수를 쓰는가
+ * 2. styles.css가 디자인 값을 복제하지 않고 의미 변수만 소비하는가
+ * 3. 브랜드 색을 쓰는 파일이 hex를 직접 적고 있지 않은가
  */
 import { readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { TOKENS, BRAND } from "../src/brand.ts";
+import { DESIGN, designCssVars, themeColor } from "../src/design.ts";
 
 const SITE = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const problems = [];
 const add = (where, msg) => problems.push(`${where}: ${msg}`);
 
-// 1. styles.css 의 :root 가 정본과 같은 값인가
+// 1. 랜딩 CSS는 값을 복제하지 않고 디자인 의미 변수만 Tailwind 이름에 연결한다.
 const css = await readFile(join(SITE, "src/styles.css"), "utf8");
-const expected = {
-  "--eddm-carbon": TOKENS.color.carbon,
-  "--eddm-ink": TOKENS.color.ink,
-  "--eddm-ivory": TOKENS.color.ivory,
-  "--eddm-sand": TOKENS.color.sand,
-  "--eddm-dartlab": TOKENS.color.dartlab,
-  "--eddm-codaro": TOKENS.color.codaro,
-  "--eddm-xlpod": TOKENS.color.xlpod,
-  "--eddm-pyproc": TOKENS.color.pyproc,
-  "--eddm-section-title-size-mobile": TOKENS.typography.sectionTitle.mobile,
-  "--eddm-section-title-size-desktop": TOKENS.typography.sectionTitle.desktop,
-  "--eddm-section-title-line-height": TOKENS.typography.sectionTitle.lineHeight,
-  "--eddm-section-title-weight": TOKENS.typography.sectionTitle.weight,
-  "--eddm-section-title-tracking": TOKENS.typography.sectionTitle.tracking,
-};
-for (const [name, want] of Object.entries(expected)) {
-  const m = css.match(new RegExp(`${name}\\s*:\\s*([^;]+);`));
-  if (!m) add("src/styles.css", `${name} 이 없습니다. brand.ts 의 TOKENS 와 맞춥니다`);
-  else if (m[1].trim() !== want) {
-    add("src/styles.css", `${name} 이 ${m[1].trim()} 인데 brand.ts 는 ${want} 입니다`);
-  }
+if (/:root\s*\{[^}]*--eddm-/s.test(css)) {
+  add("src/styles.css", "디자인 값을 :root에 복제했습니다. designCssVars()를 씁니다");
+}
+for (const name of ["carbon", "ink", "ivory", "accent", "dartlab", "codaro", "xlpod", "pyproc"]) {
+  if (!css.includes(`var(--eddm-${name})`)) add("src/styles.css", `--eddm-${name} 의미 변수를 소비하지 않습니다`);
 }
 
 // 폰트 스택도 한 벌이어야 한다. 다르면 자간이 달라져 같은 헤더가 아니게 된다.
-if (!css.includes("Pretendard Variable")) {
-  add("src/styles.css", "--font-sans 에 Pretendard 가 없습니다");
+if (!css.includes("var(--eddm-font-sans)") || !css.includes("var(--eddm-font-mono)")) {
+  add("src/styles.css", "글꼴 스택을 design.ts의 의미 변수에 연결하지 않았습니다");
 }
+
+const app = await readFile(join(SITE, "src/App.tsx"), "utf8");
+const serverEntry = await readFile(join(SITE, "src/entry-server.tsx"), "utf8");
+if (!app.includes('designCssVars("dark")')) add("src/App.tsx", "랜딩에 디자인 변수를 주입하지 않습니다");
+if (!serverEntry.includes('designCssVars("dark")')) add("src/entry-server.tsx", "미리 렌더한 페이지에 디자인 변수를 주입하지 않습니다");
 
 // 섹션 제목 값을 정본에 두고도 소비자가 숫자를 다시 쓰면 위계가 다시 갈라진다.
 const sectionConsumers = {
@@ -55,23 +44,22 @@ const sectionConsumers = {
 };
 for (const [rel, needle] of Object.entries(sectionConsumers)) {
   const text = await readFile(join(SITE, rel), "utf8");
-  if (!text.includes(needle)) add(rel, "섹션 제목이 brand.ts 의 공용 타이포그래피 토큰을 쓰지 않습니다");
+  if (!text.includes(needle)) add(rel, "섹션 제목이 design.ts의 공용 타이포그래피 토큰을 쓰지 않습니다");
 }
 
 /**
  * 2. 브랜드 hex 를 직접 적은 곳.
  *
- * 정본(brand.ts)과 브랜드 문서는 당연히 값을 담는다. styles.css 는 위에서 이미 대조했다.
+ * 정본(design.ts)과 로고 모듈은 당연히 값을 담는다.
  * 그 밖의 파일이 브랜드 색을 직접 적으면 정본이 둘이 된다.
  */
 const BRAND_HEX = [
-  TOKENS.color.carbon,
-  TOKENS.color.ink,
-  TOKENS.color.ivory,
-  TOKENS.color.sand,
-  TOKENS.color.alert,
+  DESIGN.palette.carbon,
+  DESIGN.palette.ink,
+  DESIGN.palette.ivory,
+  DESIGN.palette.alert,
 ];
-const EXEMPT = new Set(["src/brand.ts", "src/styles.css", "scripts/check-brand.mjs"]);
+const EXEMPT = new Set(["src/design.ts", "src/brand.ts", "scripts/check-brand.mjs"]);
 const SCAN = ["shell.ts", "admin.ts", "classroom.ts", "classroom-render.ts", "worker.ts"];
 
 for (const rel of SCAN) {
@@ -87,7 +75,7 @@ for (const rel of SCAN) {
     const re = new RegExp(hex.replace("#", "#") + "([0-9a-f]{2})?", "gi");
     const hits = text.match(re);
     if (hits) {
-      add(rel, `브랜드 색 ${hex} 를 직접 적었습니다 (${hits.length}곳). brand.ts 의 TOKENS 를 씁니다`);
+      add(rel, `브랜드 색 ${hex}를 직접 적었습니다 (${hits.length}곳). design.ts의 DESIGN을 씁니다`);
     }
   }
 }
@@ -125,10 +113,12 @@ if (fixedThemeColors) {
     `테마 표면에 고정 색을 썼습니다: ${[...new Set(fixedThemeColors)].join(", ")}. --eddm-* 의미 토큰을 씁니다`,
   );
 }
-// 테마 토큰은 공용 크롬이 깐다. 운영장과 강의방이 같은 것을 물려받는다.
+// 테마 토큰은 디자인 생성 함수가 깐다. 운영장과 강의방이 같은 것을 물려받는다.
+const adaptiveCss = designCssVars("adaptive");
 for (const name of ["--eddm-code-surface", "--eddm-code-focus", "--eddm-danger", "--eddm-overlay"]) {
-  if (!shell.includes(name)) add("shell.ts", `${name} 테마 토큰이 없습니다`);
+  if (!adaptiveCss.includes(name)) add("src/design.ts", `${name} 테마 토큰이 없습니다`);
 }
+if (!shell.includes('designCssVars("adaptive")')) add("shell.ts", "공용 크롬이 adaptive 디자인 변수를 쓰지 않습니다");
 /**
  * 운영장이 브랜드 크롬을 실제로 입는지 본다.
  *
@@ -164,10 +154,10 @@ for (const line of classroom.split(/\r?\n/)) {
 /**
  * 골드는 브랜드 마크의 눈에만 남는다.
  *
- * `TOKENS.color.sand` 가 더 이상 골드가 아니라서 위의 BRAND_HEX 검사가 이 값을 안 본다.
+ * 강조색과 별개인 로고 눈 색을 위의 BRAND_HEX 검사가 보지 않으므로 따로 확인한다.
  * 강조를 다시 골드로 칠하는 것을 막으려면 값 자체를 따로 걸어야 한다.
  */
-const GOLD = BRAND.eye;
+const GOLD = DESIGN.palette.eye;
 for (const rel of SCAN) {
   let text;
   try {
@@ -277,8 +267,8 @@ else if (!/border:0/.test(toggleRule) || /background:var\(/.test(toggleRule)) {
  * 시스템 설정을 읽지 않는 것도 여기서 지킨다. 같은 주소가 보는 사람의 OS 에 따라 다르게
  * 뜨면 운영자와 수강생이 다른 화면을 본다.
  */
-if (!shell.includes(':root:not([data-theme="dark"])')) {
-  add("shell.ts", "라이트가 CSS 기본값이 아닙니다. 다크는 [data-theme=\"dark\"] 가 붙을 때만 걸립니다");
+if (!adaptiveCss.includes(':root:not([data-theme="dark"])')) {
+  add("src/design.ts", "라이트가 CSS 기본값이 아닙니다. 다크는 [data-theme=\"dark\"]가 붙을 때만 걸립니다");
 }
 if (!/let saved = "light"/.test(shell)) {
   add("shell.ts", "저장한 선택이 없을 때의 기본이 라이트가 아닙니다");
@@ -287,15 +277,15 @@ if (!/let saved = "light"/.test(shell)) {
 if (/matchMedia\s*\(|@media\s*\(\s*prefers-color-scheme/.test(shell)) {
   add("shell.ts", "시스템 테마를 읽습니다. 기본은 라이트 하나이고 고른 사람만 그 선택을 가집니다");
 }
-if (!shell.includes(`content="\${esc(BRAND.ivory)}"`)) {
+if (!shell.includes('content="${esc(themeColor("light"))}"') || themeColor("light") !== DESIGN.theme.light.canvas) {
   add("shell.ts", "theme-color 기본값이 라이트 바탕이 아닙니다");
 }
 
 if (problems.length) {
-  console.error("브랜드 토큰이 갈라졌습니다.\n");
+  console.error("디자인 토큰이 갈라졌습니다.\n");
   for (const p of problems) console.error("  " + p);
-  console.error("\n정본은 src/brand.ts 의 TOKENS 입니다.");
+  console.error("\n정본은 src/design.ts 의 DESIGN입니다.");
   process.exit(1);
 }
 
-console.log(`brand ok: 토큰 ${Object.keys(expected).length}개, 표면 ${SCAN.length}곳`);
+console.log(`design ok: 단일 토큰 정본, 표면 ${SCAN.length}곳`);

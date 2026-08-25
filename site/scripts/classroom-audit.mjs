@@ -60,14 +60,22 @@ async function cleanup() {
  * 키는 data-cell 의 이름이고 값은 결과 칸에 들어 있어야 하는 글자다.
  */
 const EXPECT = {
+  "expense-text": ["영업팀, 사번 0012"],
+  "expense-numbers": ["합계 270,000원", "비율 금액 27,000원"],
+  "expense-text-to-number": ["120,000원 + 80,000원 = 200,000원"],
+  "expense-boolean": ["증빙 있음: True", "승인 완료: False"],
+  "expense-none": ["승인일 없음"],
   "expense-variables": ["영업팀: 120,000원, 기준 100,000원"],
-  "expense-list-total": ["3건, 합계 250,000원"],
+  "expense-list-total": ["4건, 합계 280,000원"],
   "expense-column-map": ["사용금액 -> 금액"],
+  "expense-comparisons": ["같다", "다르다", "크거나 같다", "작거나 같다"],
   "expense-condition": ["120,000원: 확인필요"],
   "expense-loop": ["50,000원: 정상", "120,000원: 확인필요", "80,000원: 정상"],
   "expense-function": ["정상", "확인필요"],
-  "expense-syntax-together": ["합계 250,000원", "확인필요 1건", "관리팀: 120,000원, 확인필요"],
+  "expense-syntax-together": ["합계 250,000원", "확인 대상 1건", "관리팀: 120,000원, 확인필요"],
   "expense-sheet-classify": ["합계 250,000원", "확인필요 1건", "관리팀: 120,000원, 확인필요"],
+  "cell-address-build": ["C2 에 정상", "C3 에 확인필요", "C4 에 정상"],
+  "column-name-sum": ["금액 열 합계 250,000원", "관리팀 120,000원"],
 };
 
 /** 교안 실측. 자리표시자를 뺀 캡션 수와 섹션 수는 원본 md 에서 센다. 기대값을 손으로 적지 않는다. */

@@ -17,7 +17,7 @@ import { call } from "./rooms";
 import { course } from "./course";
 import { checkToken, clearCookie, cookie, hmac, issueToken, readCookie, safeEqual } from "./auth";
 import { header, page } from "./shell";
-import { TOKENS } from "./src/brand";
+import { DESIGN } from "./src/design";
 import type { Env } from "./env";
 
 /** 운영자 쿠키. 수강생 쿠키와 이름도 경로도 겹치지 않는다. */
@@ -49,7 +49,7 @@ const ADMIN_ACTIONS = new Set([
 /**
  * 운영장 화면 CSS.
  *
- * 색을 여기서 적지 않는다. `src/brand.ts` 의 TOKENS 가 정본이고 shell.ts 가 변수를 깔아
+ * 색을 여기서 적지 않는다. `src/design.ts` 의 DESIGN이 정본이고 shell.ts가 변수를 깔아
  * 두었다. `scripts/check-brand.mjs` 가 이 파일에 hex 가 나타나면 배포를 막는다.
  */
 const ADMIN_STYLE = `
@@ -89,7 +89,7 @@ const ADMIN_STYLE = `
 .field input { width:100%; color:var(--eddm-ivory); }
 .url-input { display:grid; grid-template-columns:auto minmax(7rem,1fr); align-items:center; border:1px solid var(--eddm-line-strong);
   height:var(--adm-control-h); border-radius:.5rem; background:var(--eddm-raise); overflow:hidden; }
-.url-input span { padding:0 0 0 .75rem; color:var(--eddm-text-faint); font-family:${TOKENS.font.mono};
+.url-input span { padding:0 0 0 .75rem; color:var(--eddm-text-faint); font-family:${DESIGN.font.mono};
   font-size:.78rem; white-space:nowrap; }
 .url-input input { height:100%; border:0; border-radius:0; background:transparent; }
 .rooms-section { margin-top:2rem; }
@@ -105,7 +105,7 @@ const ADMIN_STYLE = `
 .delete-action svg { width:.9rem; height:.9rem; }
 .lock-note { flex:0 0 auto; font-size:.72rem; color:var(--eddm-danger); }
 .addr-row { display:flex; align-items:center; gap:.25rem; min-width:0; margin-top:.2rem; }
-.addr { min-width:0; font-family:${TOKENS.font.mono}; font-size:.78rem; color:var(--eddm-text-muted);
+.addr { min-width:0; font-family:${DESIGN.font.mono}; font-size:.78rem; color:var(--eddm-text-muted);
   text-decoration:none; overflow-wrap:anywhere; }
 .addr:hover { color:var(--eddm-sand); }
 .adm .copy-icon { display:inline-grid; place-items:center; flex:0 0 auto; width:1.8rem; height:1.8rem;
