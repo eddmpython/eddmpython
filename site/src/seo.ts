@@ -161,6 +161,8 @@ export function homeMeta(): PageMeta {
 export function blogMeta(): PageMeta {
   const path = "/blog";
   const url = `${ORIGIN}${path}`;
+  const description =
+    "Python 도구와 AI 작업 환경을 다룬 글을 모았습니다. 실행 방법과 글쓰기, 자동화 예제를 각 글에서 바로 확인할 수 있습니다.";
   const breadcrumbId = `${url}#breadcrumb`;
   const blogPosts = POSTS.map((post) => ({
     "@type": "BlogPosting",
@@ -174,8 +176,7 @@ export function blogMeta(): PageMeta {
     path,
     title: "블로그 · eddmpython",
     socialTitle: "eddmpython 블로그",
-    description:
-      "Python 기초부터 Excel 자동화, AI 협업, 결과 검증까지 40개 글을 학습 순서로 모았습니다.",
+    description,
     type: "website",
     image: DEFAULT_IMAGE,
     imageAlt: "eddmpython 블로그",
@@ -192,8 +193,7 @@ export function blogMeta(): PageMeta {
           "@id": url,
           url,
           name: "eddmpython 블로그",
-          description:
-            "Python 기초부터 Excel 자동화, AI 협업, 결과 검증까지 40개 글을 학습 순서로 모았습니다.",
+          description,
           inLanguage: "ko-KR",
           isPartOf: { "@id": SITE_ID },
           breadcrumb: { "@id": breadcrumbId },
