@@ -207,12 +207,18 @@ for (const entry of agentSkillDirs) {
     if (!yaml.includes(`$${entry.name}`)) {
       errors.push(`${rel}: agents/openai.yaml 기본 요청에 $${entry.name} 이 없다`);
     }
+    if (entry.name === "eddmpython-blog-writing" && !yaml.includes("$blog-writing")) {
+      errors.push(`${rel}: 블로그 기본 요청에 전역 $blog-writing 이 없다`);
+    }
     for (const { re, why } of BANNED) {
       if (re.test(yaml)) errors.push(`${relative(REPO, openaiYaml).replace(/\\/g, "/")}: ${why}`);
     }
   }
 
   const rawBody = text.slice(match[0].length);
+  if (entry.name === "eddmpython-blog-writing" && !rawBody.includes("`$blog-writing`을 먼저 사용한다")) {
+    errors.push(`${rel}: 전역 $blog-writing 을 먼저 쓰는 규칙이 없다`);
+  }
   if (unclosedFence(rawBody)) errors.push(`${rel}: 코드 펜스가 닫히지 않았다`);
   const body = stripFencedCode(rawBody);
   for (const [, target] of body.matchAll(/\]\(([^)]+)\)/g)) {
@@ -222,6 +228,10 @@ for (const entry of agentSkillDirs) {
       errors.push(`${rel}: 깨진 링크 ${target}`);
     }
   }
+}
+
+if (existsSync(join(AGENT_SKILLS, "blog-writing"))) {
+  errors.push(".agents/skills/blog-writing: 전역 $blog-writing 의 저장소 복사본을 두지 않는다");
 }
 
 if (errors.length) {

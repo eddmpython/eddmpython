@@ -1,4 +1,4 @@
 interface:
   display_name: "eddmpython 블로그 작가"
   short_description: "전역 집필 규칙에 eddmpython 발행 계약을 덧붙입니다"
-  default_prompt: "$blog-writing과 $eddmpython-blog-writing을 사용해 eddmpython 블로그를 쉬운 말로 만들거나 고쳐 주세요"
+  default_prompt: "먼저 $blog-writing을 사용하고, $eddmpython-blog-writing으로 eddmpython 발행 계약을 적용해 블로그를 만들거나 고쳐 주세요"

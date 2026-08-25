@@ -98,8 +98,8 @@ status: observed
   `compare`에 비교 효과가 없거나 `demo`에 실행 대상과 실행 효과가 없으면 교안 검사가 막는다
 - 이전, 다음, 노트, 닫기 조작은 아이콘과 글자를 함께 보여 주고 모바일에서는 아이콘만 남긴다
 
-효과 이름과 작성 판단은 비공개 저장소 `memory/rules/blogWriter.md`가 사람용 정본이고,
-허용 형식과 번호 검사는 `scripts/course-scene.mjs`가 기계 정본이다. 이 저장소는
+글은 전역 `$blog-writing`으로 쓰고, 효과 이름과 허용 형식과 번호는
+`scripts/course-scene.mjs`가 검사한다. 이 저장소는
 `site/classroom.ts`에서 검사가 끝난 `enter`, `replace`, `focus`, `compare`, `annotate`,
 `run`, `simulate`만 실행한다. 교안이 임의 JavaScript나 CSS 선택자를 실행 효과로 보내지 못한다.
 

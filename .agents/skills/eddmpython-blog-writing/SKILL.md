@@ -5,38 +5,28 @@ description: 전역 blog-writing 규칙에 eddmpython의 한국어 블로그 발
 
 # eddmpython 블로그 쓰기
 
-이 파일은 저장소 전용 확장이다. 일반 집필 규칙은 전역 `$blog-writing`을 먼저 사용한다. 이 파일에는 eddmpython에서만 필요한 정본과 검사 순서만 둔다.
+이 파일은 저장소 전용 확장이다. `blog/posts/*/index.md`를 쓰거나 전체 교정할 때는 전역
+`$blog-writing`을 먼저 사용한다. 공통 집필 규칙을 이 저장소에 복사하지 않는다. 전역 스킬을
+열 수 없으면 작업을 이어 가지 말고 해당 경로를 보고한다.
 
-집필 규칙 문서가 다섯 개로 갈라져 서로 어긋난 적이 있다. 2026-08-19 에 하나로 합쳤다.
-eddmpython에서 새로 알아낸 규칙은 `../eddmpython-course/memory/rules/blogWriter.md`에 넣는다. 다른 저장소에도 필요한 일반 규칙은 전역 `$blog-writing`을 고친다.
+## 필요한 문서만 연다
 
-## 열 순서
+1. **전역 `$blog-writing`** 쉬운 말, 글의 구조, 사실과 문체, AI가 실행할 수 있는 글
+2. **`$human-voice`** 한국어 글을 전체 교정하거나 발행 전 문체를 검사할 때
+3. **`skills/specs/operation/blogCopy.md`** 제목, summary, 도입을 고칠 때
+4. **`skills/specs/operation/blogPublishing.md`** 글 파일, frontmatter, 검사와 발행 순서
+5. **`skills/specs/operation/blogMedia.md`** 이미지나 영상을 추가하거나 바꿀 때
+6. **`skills/specs/operation/productMarketing.md`** 제품 이름, 기능, 수치를 쓸 때
 
-1. **전역 `$blog-writing`** 모든 저장소에서 쓰는 쉬운 말, 직접 쓰기, 사실과 문체 규칙
-2. **`../eddmpython-course/memory/rules/blogWriter.md`** eddmpython 글쓰기 규칙 정본. 강행 조항, 섹션 뼈대를 먼저 세우는 순서,
-   절마다 하는 일 네 가지, 한 문장으로 남는 것, 다른 눈이 보는 네 가지, 닫는 법, 함정
-3. **`../eddmpython-course/memory/evidence/writingVoice.md`** 문체 실측 근거. 규칙은 2번에 있다
-4. **`skills/specs/operation/blogPublishing.md`** 발행 계약. 파일 이름, frontmatter, 검사, 배포
-5. `skills/specs/operation/blogMedia.md` 이미지 계약. media.json, 색상, Hugging Face
-6. `skills/specs/operation/blogCopy.md` 제목과 summary. 유입 패키징 게이트
-7. `skills/specs/operation/productMarketing.md` 제품 맥락과 쓰지 말 말
-
-규칙 문서의 전체 인덱스는 `../eddmpython-course/memory/MEMORY.md` 다.
-
-## 이 폴더의 참고 자료
-
-규칙이 아니라 eddmpython 본보기다. 저장소 작법과 어긋나면 `memory/rules/blogWriter.md`가 이기고,
-쉬운 말과 직접 쓰기가 어긋나면 전역 `$blog-writing`이 이긴다.
-
-- [article-template.md](references/article-template.md) 글 한 편의 전체 양식
-- [image-brief.md](references/image-brief.md) 이미지 선택 기준
-- [readability-cases.md](references/readability-cases.md) 고치기 전과 후의 예
+해당하지 않는 문서는 열지 않는다. eddmpython에서만 필요한 운영 계약은 `skills/specs/`에 두고,
+다른 저장소에도 필요한 집필 규칙은 전역 `$blog-writing`만 고친다.
 
 ## 검사
 
 ```powershell
-npm run check:post -- <파일 경로>
+cd site
+npm run check:post -- <글 폴더 이름>
 ```
 
 검사가 통과해도 독립성, 깊이, 글맛, 이미지 의미가 자동으로 보장되지 않는다.
-`../eddmpython-course/memory/rules/blogWriter.md` 의 관문은 사람이 읽어서 통과시킨다.
+전역 `$blog-writing`의 문장 검사와 AI 실행 문서 여섯 항목은 사람이 읽어서 확인한다.
