@@ -3,20 +3,20 @@
   "promptContract": "section-grounded-v2",
   "assets": {
     "half-caught": {
-      "alt": "어두운 바탕에 놓인 접시 안에 잘라 낸 작은 종이 조각 아홉 개가 모여 있고 그 옆에는 아무것도 잘리지 않은 종이 한 장이 그대로 놓여 있는 화면",
-      "contentAnchor": "글 파일에서 번역투와 관용구를 모두 걷어내도 글쓴이의 질문과 실패와 판단이 비어 있으면 기계 문장만 남습니다.",
-      "narrativeUse": "걸러 낼 수 있는 것을 다 걷어내도 손대지 않은 쪽이 그대로 남는다는 것을 한 화면에 보여 빼기만으로 부족하다는 말이 눈으로 읽힌다.",
+      "alt": "잘라 낸 종이 조각 옆에 아직 손대지 않은 종이가 남아 있는 모습",
+      "contentAnchor": "AI가 자주 쓰는 표현은 목록에서 개수를 세지 않고 문맥을 보고 판단합니다.",
+      "narrativeUse": "눈에 띄는 표현을 지우는 일만으로는 글의 질문과 판단을 고칠 수 없다는 점을 보여 준다.",
       "palettePolicy": "eddmpython-carbon-ivory-sand-v1",
       "placement": "H3 부제 바로 뒤",
       "prompt": "Create a wide 3:2 minimal studio still life on a matte charcoal surface. A single long ivory paper strip runs left to right across the frame. In the left half, several small rectangular pieces have been cut out of the strip and lie neatly separated on a shallow tray beside it, leaving clean empty gaps in the strip. In the right half, the same strip continues completely whole and untouched, with no cuts and no gaps. One simple rigid cutting guide sits at the midpoint where the cutting stops. Soft restrained studio lighting, shallow depth, clear physical materials. Muted charcoal and warm ivory tones only, no saturated accent colors. Absolutely no text, letters, numbers, glyphs, screens, logos, brands, people, robots, watermarks, decorative scenery, or unrelated objects.",
       "role": "section",
-      "sectionHeading": "사람 글에 남는 것",
-      "sectionSubtitle": "질문과 실제 실패와 판단과 확인 범위는 문자열 검색으로 만들 수 없습니다",
+      "sectionHeading": "AI 표현을 걷어 냅니다",
+      "sectionSubtitle": "금지어를 모두 지워도 질문과 판단이 없으면 어색합니다",
       "sourceKind": "imagegen",
       "sourcePolicy": "auto",
       "visualProfile": "eddmpython-dark-v2",
-      "visualRelationship": "접시에 모인 조각은 목록이 잡아낸 것이고 옆의 온전한 종이는 목록이 닿지 못한 것이다",
-      "visualSubject": "걸러 낸 조각을 담은 접시 하나와 손대지 않은 종이 한 장이 나란히 놓인 화면"
+      "visualRelationship": "잘라 낸 조각은 지운 AI 표현이고 손대지 않은 종이는 아직 읽어야 할 질문과 판단이다",
+      "visualSubject": "잘라 낸 종이 조각을 담은 접시와 아직 손대지 않은 종이 한 장"
     }
   }
 }

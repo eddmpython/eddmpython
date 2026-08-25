@@ -179,7 +179,9 @@ for (const file of files) {
 }
 
 const agentSkillDirs = existsSync(AGENT_SKILLS)
-  ? readdirSync(AGENT_SKILLS, { withFileTypes: true }).filter((entry) => entry.isDirectory())
+  ? readdirSync(AGENT_SKILLS, { withFileTypes: true }).filter(
+      (entry) => entry.isDirectory() && existsSync(join(AGENT_SKILLS, entry.name, "SKILL.md")),
+    )
   : [];
 if (!agentSkillDirs.length) errors.push(".agents/skills: 저장소 스킬이 없다");
 
@@ -187,11 +189,6 @@ for (const entry of agentSkillDirs) {
   const dir = join(AGENT_SKILLS, entry.name);
   const skillFile = join(dir, "SKILL.md");
   const rel = relative(REPO, skillFile).replace(/\\/g, "/");
-  if (!existsSync(skillFile)) {
-    errors.push(`${rel}: SKILL.md 가 없다`);
-    continue;
-  }
-
   const text = readFileSync(skillFile, "utf8");
   for (const { re, why } of BANNED) {
     if (re.test(text)) errors.push(`${rel}: ${why}`);

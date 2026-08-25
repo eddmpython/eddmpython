@@ -1,15 +1,12 @@
 import { existsSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
-import { lintBlogStyle, lintProseTexture, lintSourceWrapping } from "./blog-style.mjs";
 import {
   h2Sections,
   lintImageBrief,
   lintImagePolicy,
-  lintSectionPackages,
-  lintSeoPackage,
   parseSectionParts,
-} from "./blog-package.mjs";
+} from "./blog-media-package.mjs";
 
 /*
  * 글 하나가 폴더 하나다.
@@ -26,14 +23,14 @@ import {
  * 폴더를 훑는다. 2026-08-24 전에는 이미지 계획이 `blog/media/plan.json`, 도구 등록이
  * `blog/embeds/tools.json`, 실습 칸이 `blog/embeds/codaro-cells.json` 에 따로 있었다.
  */
-// 인자로 폴더 이름이나 파일 경로를 주면 그 한 편만 검사한다. 글을 쓰는 동안 도는 게이트다.
-// 인자가 없으면 전편을 검사한다. STRICT 로 꺼지는 다섯 개만 빠지고 문장 품질도 함께 잰다.
+// 인자로 폴더 이름이나 파일 경로를 주면 그 한 편만 검사한다.
+// 글의 자연스러움과 구조는 세 명 이상의 독립 평가자가 읽고 판정한다.
+// 이 스크립트는 파일, 메타데이터, 미디어와 공개 경로처럼 기계가 확정할 수 있는 계약만 본다.
 // 경로를 통째로 받아도 되게 슬래시와 역슬래시 둘 다 자른다. PowerShell 이 역슬래시를 준다.
 const rawTarget = process.argv[2]
   ? process.argv[2].split(/[\\/]/).filter((part) => part && part !== "index.md").pop()
   : null;
 const targetPost = rawTarget ? rawTarget.replace(/\.md$/, "") : null;
-const STRICT = Boolean(targetPost);
 
 const blogDir = resolve(process.cwd(), "../blog");
 const postsDirName = "posts";
@@ -128,26 +125,6 @@ function parseFrontmatter(file, raw) {
     if (!meta.get(key)) fail(file, `${key} 필드가 비었습니다`);
   }
   return { meta, body: match[2].trim() };
-}
-
-function proseParagraphs(body) {
-  return body
-    .replace(/```[\s\S]*?```/g, " ")
-    .split(/(?:\r?\n){2,}/)
-    .map((block) => block.replace(/\r?\n/g, " ").replace(/\s+/g, " ").trim())
-    .filter(
-      (block) =>
-        block &&
-        !/^(?:#{1,6}\s|!\[|(?:\d+\.|[-*+])\s|>|\||https?:\/\/)/.test(block) &&
-        !block.split("|").every((part) => /^:?-+:?$/.test(part.trim())),
-    )
-    .map((block) =>
-      block
-        .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
-        .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
-        .replace(/[*_`]/g, "")
-        .trim(),
-    );
 }
 
 async function filesUnder(dir) {
@@ -540,25 +517,10 @@ for (const post of targetPosts) {
   if (/^\d{4}-\d{2}-\d{2}/.test(slug)) fail(file, "공개 slug에 발행일을 넣지 않습니다");
   if (slugs.has(slug)) fail(file, `${slugs.get(slug)}와 slug가 같습니다`);
   slugs.set(slug, file);
-  if (meta.get("title").length < 10 || meta.get("title").length > 70) {
-    fail(file, "title은 10자 이상 70자 이하로 씁니다");
-  }
   if (meta.get("author").length > 80) fail(file, "author가 80자를 넘습니다");
   if (meta.get("section").length > 50) fail(file, "section이 50자를 넘습니다");
-  if (meta.get("summary").length < 40 || meta.get("summary").length > 180) {
-    fail(file, "summary는 40자 이상 180자 이하로 씁니다");
-  }
-  if (!meta.get("readerQuestion").endsWith("?")) {
-    fail(file, "readerQuestion은 물음표로 끝나는 질문이어야 합니다");
-  }
   if (!readerLevels.has(meta.get("readerLevel"))) {
     fail(file, "readerLevel은 beginner, working, advanced 중 하나여야 합니다");
-  }
-  if (
-    meta.get("readerStartingPoint").length < 20 ||
-    meta.get("readerStartingPoint").length > 180
-  ) {
-    fail(file, "readerStartingPoint는 20자 이상 180자 이하로 씁니다");
   }
   if (titles.has(meta.get("title"))) {
     fail(file, `${titles.get(meta.get("title"))}와 제목이 같습니다`);
@@ -571,75 +533,12 @@ for (const post of targetPosts) {
     fail(file, "본문 H1은 쓰지 않습니다. 제목은 frontmatter가 맡습니다");
   }
   const sections = h2Sections(body);
-  if (sections.length < 3) fail(file, "독자 흐름을 나누는 H2가 3개보다 적습니다");
-  const metaObject = Object.fromEntries(meta);
   if ((body.match(/^```/gm) ?? []).length % 2 !== 0) fail(file, "코드 펜스가 닫히지 않았습니다");
   if (/[\u2013\u2014]/u.test(raw)) fail(file, "em dash 또는 en dash가 있습니다");
   if (/(?:세요|십시오|ㅂ시다|해라|하자)\.(?=\s|$)/u.test(raw)) {
     fail(file, "명령형 또는 권유형 문장 뒤에 마침표가 있습니다");
   }
   if (/\b(?:TODO|TBD)\b/.test(raw)) fail(file, "미완성 표식이 남았습니다");
-
-  const packageIssues = [
-    ...lintSeoPackage(metaObject, body, sections),
-    ...lintSectionPackages(sections, {
-      requireCodeLabels: STRICT,
-      strictLead: false,
-      openLabels: STRICT,
-      checkLabels: STRICT,
-    }),
-  ];
-  if (packageIssues.length) {
-    fail(
-      file,
-      `글 패키지 검사 실패 ${packageIssues.length}건\n${packageIssues
-        .map((issue) => `  - ${issue.location}: ${issue.message} (${issue.excerpt})`)
-        .join("\n")}`,
-    );
-  }
-
-  const styleIssues = [
-    ...lintBlogStyle({
-      fields: {
-        summary: meta.get("summary"),
-        readerTakeaway: meta.get("readerTakeaway"),
-      },
-      body,
-      sections,
-      strictAnchor: STRICT,
-    }),
-    ...(STRICT ? lintProseTexture(body) : []),
-    ...lintSourceWrapping(body),
-  ];
-  if (styleIssues.length) {
-    fail(
-      file,
-      `문장 품질 검사 실패 ${styleIssues.length}건\n${styleIssues
-        .map((issue) => `  - ${issue.location}: ${issue.message} (${issue.excerpt})`)
-        .join("\n")}`,
-    );
-  }
-
-  if (meta.get("readerLevel") === "beginner") {
-    for (const section of sections) {
-      if (section.heading.length > 32) {
-        fail(file, `beginner 글의 H2가 32자를 넘습니다: ${section.heading}`);
-      }
-    }
-    for (const paragraph of proseParagraphs(body)) {
-      if (paragraph.length > 220) {
-        fail(file, `beginner 글의 문단이 220자를 넘습니다: ${paragraph.slice(0, 40)}...`);
-      }
-      const sentences = paragraph
-        .split(/(?<=[.!?])\s+/u)
-        .map((sentence) => sentence.trim())
-        .filter(Boolean);
-      const longSentence = sentences.find((sentence) => sentence.length > 160);
-      if (longSentence) {
-        fail(file, `beginner 글의 문장이 160자를 넘습니다: ${longSentence.slice(0, 40)}...`);
-      }
-    }
-  }
 
   /*
    * 실행 칸과 도구 마커는 나타난 자리를 전부 본다.
@@ -709,16 +608,6 @@ for (const post of targetPosts) {
       sectionAssets.add(id);
     }
 
-    const prose = parsed.remainder
-      .replace(/```[\s\S]*?```/g, " ")
-      .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
-      .replace(/<[^>]+>/g, " ")
-      .replace(/[#*_`>|\[\]-]/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-    if (prose.length < 120) {
-      fail(file, `섹션의 설명이 120자보다 짧습니다: ${section.heading}`);
-    }
   }
   /*
    * hero 이미지의 계획이 본문과 붙어 있는지 본다.

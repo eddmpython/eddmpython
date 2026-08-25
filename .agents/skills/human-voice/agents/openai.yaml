@@ -1,4 +1,0 @@
-interface:
-  display_name: "사람 목소리 진단"
-  short_description: "한국어 글의 AI 티와 문법 문제 후보를 세어서 찾습니다"
-  default_prompt: "$blog-writing과 $human-voice를 함께 사용해 한국어 글의 AI 티와 문법 문제 후보를 찾고, 뜻을 유지하며 자연스럽게 고쳐 주세요"

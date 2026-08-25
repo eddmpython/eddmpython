@@ -12,7 +12,7 @@ whenToUse:
   - copywriting
   - copy editing
 verify:
-  - cd site && npm run test:blog-style
+  - cd site && npm run test:blog-media
   - cd site && npm run check:blog
 status: curated
 ---
@@ -26,9 +26,9 @@ status: curated
 
 1. [productMarketing.md](productMarketing.md) 의 제품 표와 쓰지 말 말
 2. 해당 글의 `readerStartingPoint`, `readerQuestion`
-3. 아래 유입 패키징 게이트 세 문항
+3. 아래 유입 확인 질문 세 문항
 
-## 유입 패키징 게이트
+## 유입 확인 질문
 
 제목과 summary 를 쓰기 전에 세 문항을 모두 통과해야 한다. 하나라도 실패하면 제목을 고친다.
 **제품 이름보다 독자의 문제나 결과가 먼저 나와야 한다.**
@@ -50,7 +50,7 @@ status: curated
 - 제품 이름보다 독자가 검색할 문제나 결과가 앞에 온다.
 - 브랜드를 지워도 의미가 남는지 확인한다.
 - `primaryKeyword`의 주요 단어를 모두 넣고 `searchIntent`에 맞는 후크를 쓴다.
-- 제목은 15자 이상 60자 이하로 쓰고 summary와 도입 두 문단이 같은 약속에 답하게 한다.
+- 제목과 summary와 도입 두 문단이 같은 약속에 답하게 한다.
 - 예:
   - 나쁨: `Codaro 사용법: 첫 코드 실행부터 내 파일 다루기`
   - 좋음: `설치 없이 Python 첫 코드를 실행하는 방법`
@@ -77,18 +77,18 @@ status: curated
 - 기능보다 독자 행동과 화면에 보이는 결과.
 - 모호한 말(`최적화`, `효율적`, `강력한`) 대신 구체적 행동.
 - 수동태와 수식어를 줄인다.
-- beginner 글은 [blogPublishing.md](blogPublishing.md) 의 길이 한도를 지킨다.
+- 어려운 용어는 독자가 아는 일반적인 말로 바꾼다.
 
 본문을 새로 쓰거나 전체 교정할 때는 전역 `$blog-writing`을 반드시 사용한다. 파일 형식과 발행
 순서는 [blogPublishing.md](blogPublishing.md)에서 직접 확인한다.
-`cd site && npm run test:blog-style`과 `npm run test:blog-package`로 검사 규칙 표본을 먼저 확인하고
-`npm run check:blog`로 실제 글을 검사한다.
+문장과 구조는 `$blog-writing`에 적힌 세 명 이상의 독립 평가와 개선 반복으로 확인한다.
+`cd site && npm run test:blog-media`와 `npm run check:blog`는 미디어와 파일 연결만 검사한다.
 
 ## 편집 순서
 
 초안이 있으면 아래만 고친다.
 
-1. 제목과 summary 에 위 유입 패키징 게이트 세 문항 적용
+1. 제목과 summary 에 위 유입 확인 질문 세 문항 적용
 2. 첫 두 문단에서 브랜드 선행 제거
 3. CTA를 `시작하기` 대신 열 화면과 누를 버튼으로 바꿈
 4. 사실과 다른 약속 삭제
