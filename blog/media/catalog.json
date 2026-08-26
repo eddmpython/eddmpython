@@ -71,6 +71,24 @@
       "path": "objects/sha256/15/159e3259346a2f8fed48fd874fe2a479214a12f3a3d40ea6645308d505f199ad.webp",
       "post": "004-dataframe-libraries",
       "sha256": "159e3259346a2f8fed48fd874fe2a479214a12f3a3d40ea6645308d505f199ad"
+    },
+    "005-python-history/gil": {
+      "assetKey": "gil",
+      "path": "objects/sha256/bc/bc6d287b4a9a6edb25e2a55975d68a281ff08dfe12ce146fc7adb898d6e3c39b.webp",
+      "post": "005-python-history",
+      "sha256": "bc6d287b4a9a6edb25e2a55975d68a281ff08dfe12ce146fc7adb898d6e3c39b"
+    },
+    "005-python-history/hero": {
+      "assetKey": "hero",
+      "path": "objects/sha256/2d/2d262b3f368695458f52a10d478faf6064f6cdfaf03308fa0fe079173b18429c.webp",
+      "post": "005-python-history",
+      "sha256": "2d262b3f368695458f52a10d478faf6064f6cdfaf03308fa0fe079173b18429c"
+    },
+    "005-python-history/the-break": {
+      "assetKey": "the-break",
+      "path": "objects/sha256/dd/dd263228b071495adb445023a0ceb12bbabdb1c6f58eb5479d2adf5e8475af91.webp",
+      "post": "005-python-history",
+      "sha256": "dd263228b071495adb445023a0ceb12bbabdb1c6f58eb5479d2adf5e8475af91"
     }
   },
   "objectPrefix": "objects/sha256",
@@ -694,6 +712,16 @@
       "sourcePost": "036-structured-error-report",
       "visualSubject": "잠긴 대형 원본 Excel과 오류 조건만 남긴 두 행 합성 Excel",
       "width": 1536
+    },
+    "2d262b3f368695458f52a10d478faf6064f6cdfaf03308fa0fe079173b18429c": {
+      "alt": "어두운 책상 위에 금속 덩이 하나가 놓여 있고 왼쪽 면은 심하게 삭아 얽어 있으며 오른쪽 면은 매끈한데 가운데를 가로지르는 홈 하나가 양쪽으로 끊김 없이 이어진 장면",
+      "bytes": 121102,
+      "height": 832,
+      "mime": "image/webp",
+      "path": "objects/sha256/2d/2d262b3f368695458f52a10d478faf6064f6cdfaf03308fa0fe079173b18429c.webp",
+      "sourcePost": "005-python-history",
+      "visualSubject": "한쪽은 삭고 한쪽은 매끈한 금속 덩이와 그 위를 끊김 없이 가로지르는 홈",
+      "width": 1216
     },
     "2dac884ce5bf6a1d53ab44509dd17c5a255f3c8f64589d01d3741c9503e119d8": {
       "alt": "정상 합계와 네 키 누락과 잘못된 금액 및 원본 보존 네 검사가 모두 통과한 결과판",
@@ -2345,6 +2373,16 @@
       "visualSubject": "원본 Excel 세 개에서 만든 기대 표와 결과 통합 문서에서 읽은 실제 표 및 중앙 행별 비교 프레임",
       "width": 1536
     },
+    "bc6d287b4a9a6edb25e2a55975d68a281ff08dfe12ce146fc7adb898d6e3c39b": {
+      "alt": "어두운 바닥이 넓은 판으로 갈라져 있고 그 사이를 지나는 아주 좁은 통로 하나만 멀리까지 이어지며 그 안에 작은 불빛이 켜진 장면",
+      "bytes": 165076,
+      "height": 832,
+      "mime": "image/webp",
+      "path": "objects/sha256/bc/bc6d287b4a9a6edb25e2a55975d68a281ff08dfe12ce146fc7adb898d6e3c39b.webp",
+      "sourcePost": "005-python-history",
+      "visualSubject": "넓은 판으로 갈라진 바닥과 그 사이를 멀리까지 지나는 좁은 통로 하나",
+      "width": 1216
+    },
     "bd1d023793222e742f3deed27ed46ff9b553aee5514807e5dcdce26bfd5e81cf": {
       "alt": "여러 조사 카드가 하나의 수정 작업대로 모이고 격리된 두 작업대는 서로 다른 파일 상자를 다루는 장면",
       "bytes": 1798306,
@@ -2584,6 +2622,16 @@
       "sourcePost": "023-excel-dataframe-map",
       "visualSubject": "DataFrame 표의 날짜와 부서 및 금액 열과 각 자료형 결과 카드 및 문자열이 섞인 금액 셀 오류",
       "width": 1536
+    },
+    "dd263228b071495adb445023a0ceb12bbabdb1c6f58eb5479d2adf5e8475af91": {
+      "alt": "어두운 바닥에 놓인 넓은 판 하나가 가운데에서 갈라져 두 조각으로 벌어져 있고 그 틈을 가로질러 가는 다리 하나가 밝게 놓인 장면",
+      "bytes": 182498,
+      "height": 832,
+      "mime": "image/webp",
+      "path": "objects/sha256/dd/dd263228b071495adb445023a0ceb12bbabdb1c6f58eb5479d2adf5e8475af91.webp",
+      "sourcePost": "005-python-history",
+      "visualSubject": "가운데가 갈라져 벌어진 넓은 판과 그 틈을 가로지르는 좁은 다리",
+      "width": 1216
     },
     "dd5a96a25eeccc5992763908b57ee0eb84bf0222df9917af95d4971407e38195": {
       "alt": "띄어쓰기와 약어가 다른 부서 값과 서로 다른 날짜 표기가 표준 부서와 날짜로 정리되는 모습",

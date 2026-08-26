@@ -1,0 +1,54 @@
+{
+  "assets": {
+    "gil": {
+      "alt": "어두운 바닥이 넓은 판으로 갈라져 있고 그 사이를 지나는 아주 좁은 통로 하나만 멀리까지 이어지며 그 안에 작은 불빛이 켜진 장면",
+      "contentAnchor": "그래서 스레드를 열여섯 개로 쪼개도 코어 하나만 씁니다.",
+      "narrativeUse": "코어가 여럿이어도 한 번에 하나만 지나간다는 것을 통로의 모양으로 보여 준다",
+      "palettePolicy": "eddmpython-gray-master-v1",
+      "placement": "H3 부제 바로 뒤",
+      "prompt": "Wide 3:2 editorial still life on a dark matte floor, shot from a low angle looking along the floor. Six wide parallel channels are carved into the floor and all of them taper inward and converge toward the exact center of the frame, where they meet at one single very narrow slot. The narrow slot is much smaller than any one of the incoming channels and it is the only lit thing in the frame. The funnel shape is unmistakable: many wide ways in, one thin way through. Shallow depth of field, honest cut concrete and metal. The frame is filled edge to edge with the floor and there are no black bars or borders. No readable text, letters, numbers, glyphs, screens, logos, brands, people, hands, or decorative scenery.",
+      "role": "section",
+      "sectionHeading": "지금 파이썬이 빨라지는 중",
+      "sectionSubtitle": "한꺼번에 손보는 세 군데",
+      "sourceKind": "imagegen",
+      "sourcePolicy": "auto",
+      "visualProfile": "eddmpython-dark-v2",
+      "visualRelationship": "바닥은 넓은데 실제로 지나갈 수 있는 자리는 그 좁은 통로 하나뿐이라는 대비",
+      "visualSubject": "넓은 판으로 갈라진 바닥과 그 사이를 멀리까지 지나는 좁은 통로 하나"
+    },
+    "hero": {
+      "alt": "어두운 책상 위에 금속 덩이 하나가 놓여 있고 왼쪽 면은 심하게 삭아 얽어 있으며 오른쪽 면은 매끈한데 가운데를 가로지르는 홈 하나가 양쪽으로 끊김 없이 이어진 장면",
+      "contentAnchor": "셋 다 지금 살아 있는 최신 조사이고 셋 다 맞습니다.",
+      "narrativeUse": "아주 오래된 것과 방금 만든 것이 같은 모양을 하고 있다는 것을 한 장면으로 보여 준다",
+      "palettePolicy": "eddmpython-gray-master-v1",
+      "placement": "도입 문단 바로 뒤",
+      "prompt": "Wide 3:2 editorial still life on a dark matte desk, shot from directly above. Two cast metal blocks of exactly the same size and shape sit pushed together edge to edge in the center. The left block is heavily corroded and pitted with rounded worn-down edges. The right block is freshly machined, bright and clean with sharp square edges. A single deep engraved groove pattern runs across both blocks and lines up perfectly where they meet, so the pattern reads as one continuous line crossing from the old block into the new one. Raking side light along the groove, shallow depth of field, honest metal. The frame is filled edge to edge with the desk surface and there are no black bars or borders. No readable text, letters, numbers, glyphs, screens, logos, brands, people, hands, or decorative scenery.",
+      "role": "hero",
+      "sectionHeading": "파이썬 역사의 시작, 1989년 크리스마스",
+      "sectionSubtitle": "깨지는 곳은 넷이고 나머지는 그대로입니다",
+      "sourceKind": "imagegen",
+      "sourcePolicy": "auto",
+      "visualProfile": "eddmpython-dark-v2",
+      "visualRelationship": "삭은 쪽과 매끈한 쪽의 시간 차이가 큰데 홈은 둘을 가로질러 하나로 이어진다는 관계",
+      "visualSubject": "한쪽은 삭고 한쪽은 매끈한 금속 덩이와 그 위를 끊김 없이 가로지르는 홈"
+    },
+    "the-break": {
+      "alt": "어두운 바닥에 놓인 넓은 판 하나가 가운데에서 갈라져 두 조각으로 벌어져 있고 그 틈을 가로질러 가는 다리 하나가 밝게 놓인 장면",
+      "contentAnchor": "3.0이 2008년 12월에 나왔고 2.7 지원이 2020년 1월 1일에 끝났으니 두 판이 11년 넘게 함께 살았습니다.",
+      "narrativeUse": "일부러 갈라 놓은 틈과 그 위에 걸쳐 둔 건너갈 길을 함께 보여 준다",
+      "palettePolicy": "eddmpython-gray-master-v1",
+      "placement": "H3 부제 바로 뒤",
+      "prompt": "Wide 3:2 editorial still life on a dark matte floor. One wide slab lies flat and is split clean through the middle, the two halves pulled apart to leave a visible gap between them. A single narrow plank spans that gap, resting on both halves, and it catches a bright pool of light while the slab stays dark. The split edges are sharp and deliberate rather than shattered. Shallow depth of field, honest stone and timber. No readable text, letters, numbers, glyphs, screens, logos, brands, people, hands, or decorative scenery.",
+      "role": "section",
+      "sectionHeading": "2에서 3으로 건너가는 데 걸린 11년",
+      "sectionSubtitle": "잘 돌던 코드를 일부러 깨뜨린 판",
+      "sourceKind": "imagegen",
+      "sourcePolicy": "auto",
+      "visualProfile": "eddmpython-dark-v2",
+      "visualRelationship": "갈라진 것은 사고가 아니라 일부러 낸 틈이고 그 위에 건너갈 길이 놓여 있다는 관계",
+      "visualSubject": "가운데가 갈라져 벌어진 넓은 판과 그 틈을 가로지르는 좁은 다리"
+    }
+  },
+  "promptContract": "section-grounded-v2",
+  "version": 1
+}

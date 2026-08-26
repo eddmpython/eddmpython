@@ -1,0 +1,26 @@
+{
+  "examples": {
+    "py-1991-syntax": {
+      "code": "# 1991년 파이썬 0.9.1 튜토리얼에 실린 코드 그대로\n옛코드 = \"\"\"class Set():\n    def new(self):\n        self.elements = []\n        return self\n\n    def remove(self, e):\n        for i in range(len(self.elements)):\n            if self.elements[i] = e:\n                del self.elements[i]\n                break\n\"\"\"\n\ntry:\n    compile(옛코드, \"1991.py\", \"exec\")\n    print(\"오늘 파이썬이 그대로 읽었습니다\")\nexcept SyntaxError as e:\n    print(\"멈춘 자리:\", e.msg)\n    print(\"멈춘 줄  :\", e.text.strip())\n\n# 같은지 비교하는 기호 하나만 오늘 것으로 바꿔 봅니다\n새코드 = 옛코드.replace(\"[i] = e\", \"[i] == e\")\n\ntry:\n    compile(새코드, \"1991.py\", \"exec\")\n    print()\n    print(\"= 를 == 로 고치자 통과했습니다\")\nexcept SyntaxError as e:\n    print(\"아직 멈춤:\", e.msg)\n",
+      "description": "파이썬 0.9.1 튜토리얼에 실린 코드를 그대로 넣고 오늘 파이썬이 읽는지 봅니다. 그다음 같은지 비교하는 기호 하나만 고쳐 다시 봅니다.",
+      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor",
+      "hint": "옛코드 안에 `print x` 나 `raise Error, '메시지'` 를 넣어 보면 1991년 문법이 또 어디서 걸리는지 볼 수 있습니다",
+      "title": "1991년 코드는 오늘 어디서 멈추나"
+    },
+    "py-gil-check": {
+      "code": "import sys\nimport sysconfig\n\nprint(\"이 파이썬     \", sys.version.split()[0])\nprint(\"GIL 켜져 있나 \", sys._is_gil_enabled())\nprint(\"GIL 없는 빌드 \", bool(sysconfig.get_config_var(\"Py_GIL_DISABLED\")))\n",
+      "description": "GIL 은 한 번에 한 줄만 실행되도록 잡아 두는 자물쇠입니다. 지금 쓰는 파이썬에 그것이 걸려 있는지 세 줄로 봅니다.",
+      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor",
+      "hint": "브라우저 안의 파이썬도 자물쇠가 걸린 보통 빌드입니다. 내 컴퓨터에서 돌리면 거기 깔린 판의 값이 나옵니다",
+      "title": "내 파이썬에 GIL 이 걸려 있나"
+    },
+    "py-two-to-three": {
+      "code": "# 파이썬 2 에서는 print 가 문이었습니다\n코드 = 'print \"안녕\"'\n\ntry:\n    exec(코드)\nexcept SyntaxError as e:\n    print(\"SyntaxError:\", e.msg)\n\nprint()\nprint(\"3 에서는 함수입니다:\", end=\" \")\nprint(\"안녕\")\n",
+      "description": "2 에서 print 는 문법 요소였고 3 에서는 함수입니다. 이 실수가 흔해서 CPython 이 이 경우만을 위한 안내 문구를 넣어 두었습니다.",
+      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor",
+      "hint": "코드 변수에 다른 2 문법을 넣어 봐도 됩니다. `exec` 는 문자열을 그 자리에서 파이썬 코드로 읽습니다",
+      "title": "파이썬 2 문법이 3 에서 내는 오류"
+    }
+  },
+  "version": 1
+}

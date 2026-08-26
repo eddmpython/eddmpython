@@ -20,6 +20,18 @@
     "004-dataframe-libraries/pyarrow": {
       "at": "2026-08-26",
       "value": "25.0.1"
+    },
+    "005-python-history/accepted-peps": {
+      "value": "458,658,714,739,752,783,794,808,828",
+      "at": "2026-08-26"
+    },
+    "005-python-history/insider": {
+      "value": "https://blog.python.org/2026/08/riscv-now-officially-supported/",
+      "at": "2026-08-26"
+    },
+    "005-python-history/python-latest": {
+      "value": "3.14.7",
+      "at": "2026-08-26"
     }
   }
 }
