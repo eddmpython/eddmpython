@@ -19,6 +19,11 @@ on:
   schedule:
     - cron: "43 20 * * *"
   workflow_dispatch:
+    inputs:
+      drill:
+        description: "훈련. 검증 결과와 무관하게 알림 경로를 울려 본다"
+        type: boolean
+        default: false
 
 concurrency:
   group: media
@@ -44,8 +49,14 @@ jobs:
         run: |
           set +e
           python -X utf8 blog/scripts/publish_media.py --verify > "$RUNNER_TEMP/media.txt" 2>&1
-          echo "code=$?" >> "$GITHUB_OUTPUT"
+          code=$?
           set -e
+          # 한 번도 안 울려 본 알림은 작동하는지 모른다. 손으로 울려 볼 길을 열어 둔다.
+          if [ "${{ inputs.drill }}" = "true" ]; then
+            sed -i '1i 훈련입니다. 아래는 실제 검증 결과이고 이 이슈는 알림 경로 시험입니다.'               "$RUNNER_TEMP/media.txt"
+            code=1
+          fi
+          echo "code=$code" >> "$GITHUB_OUTPUT"
           cat "$RUNNER_TEMP/media.txt"
 
       # 매일 새 이슈를 열면 알림이 무뎌진다. 열린 것이 있으면 거기에 댓글로 잇는다.
