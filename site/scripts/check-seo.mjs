@@ -248,8 +248,21 @@ for (const { file, abs, slug, path } of postRoutes) {
 }
 
 const sitemap = await readFile(resolve(distRoot, "sitemap.xml"), "utf8");
-if ((sitemap.match(/<loc>/g) ?? []).length !== pages.length) {
-  fail("sitemap.xml", "페이지 수와 URL 수가 다릅니다");
+
+/*
+ * sitemap 을 실제로 만들어진 페이지와 대조한다.
+ *
+ * 예전에는 위의 `pages` 와 개수를 견줬다. 그 목록은 `/` 와 `/blog` 와 글들을 손으로 적어 둔
+ * 것이라, sitemap 을 만드는 `src/seo.ts` 에 페이지가 하나 늘면 여기만 낡는다. 2026-08-26 에
+ * `/brand` 가 생기면서 실제로 그 일이 났고 빌드가 막혔다. 페이지 목록의 정본은 `seo.ts` 이고
+ * 그 결과가 프리렌더된 파일이므로, 손으로 적은 목록 대신 그 파일을 센다.
+ */
+const rendered = (await readdir(distRoot, { recursive: true, withFileTypes: true }))
+  .filter((entry) => entry.isFile() && entry.name === "index.html")
+  .length;
+const locs = (sitemap.match(/<loc>/g) ?? []).length;
+if (locs !== rendered) {
+  fail("sitemap.xml", `URL ${locs}개인데 만들어진 페이지는 ${rendered}개입니다`);
 }
 if (sitemap.includes("<lastmod>")) {
   fail("sitemap.xml", "날짜가 남아 있습니다");
