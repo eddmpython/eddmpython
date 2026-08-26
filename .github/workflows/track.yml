@@ -1,19 +1,28 @@
 # 글이 지목한 외부 사실이 아직 그대로인지 주기적으로 본다.
 #
-# 무엇을 하는지와 왜 본문을 고치지 않는지는 site/scripts/track.mjs 의 머리주석이 정본이다.
+# 무엇을 하는지와 무엇을 기본값으로 두지 않는지는 site/scripts/track.mjs 의 머리주석이 정본이다.
 # 감시 계획은 각 글 폴더의 track.json 이 소유한다. 파일이 없는 글은 추적하지 않는다.
 #
-# 이 워크플로가 바꾸는 파일은 blog/track-state.json 하나뿐이다. 본문과 사이트는 건드리지
-# 않는다. 이 저장소는 git push 가 아니라 npm run deploy 로 배포되므로 봇 커밋이 공개
-# 화면을 바꿀 경로 자체가 없다.
+# 이 워크플로는 blog/track-state.json 을 바로 커밋하고, update 를 단 감시가 움직였을 때만
+# 본문을 고쳐 그 감시가 고른 mode 대로 PR 이나 커밋으로 낸다. update 를 단 글이 하나도
+# 없으면 아래 세 단계는 조건에서 걸러져 아무 일도 하지 않는다.
+#
+# 사이트는 어느 경우에도 건드리지 않는다. 이 저장소는 git push 가 아니라 npm run deploy 로
+# 배포되므로 봇 커밋이 공개 화면을 바꿀 경로 자체가 없다. 본문이 바뀌어도 사람이 배포해야
+# 독자에게 보인다.
 name: track
 
 on:
-  # 주 1회. 한국 시간 월요일 아침을 노리지만 정시성은 약속하지 않는다.
+  # 하루 1회. 한국 시간 아침을 노리지만 정시성은 약속하지 않는다.
   # GitHub 문서가 예약 실행의 지연과 드롭을 명시하고 실제로 몇 시간씩 밀린다.
   # 정각은 큐가 가장 붐비는 시각이라 피한다.
+  #
+  # 주 1 회로 시작했다가 005 를 쓰면서 매일로 바꿨다. 005 가 보는 것은 버전만이 아니라
+  # PEP 의 상태와 core 팀 블로그의 맨 위 글이고, 그것은 주 단위로 보면 이미 지난 소식이다.
+  # 버전 감시를 매일 찍어도 값이 그대로면 아무 일도 안 일어나므로 잃는 것이 없다.
+  # 비용도 HTTP GET 몇 번이다.
   schedule:
-    - cron: "17 21 * * 0"
+    - cron: "17 21 * * *"
   workflow_dispatch:
 
 # 예약 워크플로는 저장소가 60일 동안 조용하면 자동으로 멈춘다. 그때는 위의
@@ -22,9 +31,13 @@ concurrency:
   group: track
   cancel-in-progress: false
 
+# discussions 는 댓글 채널이 쓴다. 자동화가 그 글의 스레드를 찾거나 만들고 댓글을 단다.
+# pull-requests 는 본문 갱신 mode 가 pr 일 때 쓴다.
 permissions:
   contents: write
   issues: write
+  discussions: write
+  pull-requests: write
 
 jobs:
   track:
@@ -37,35 +50,78 @@ jobs:
           node-version: "22"
 
       # 추적기는 의존성이 없다. node 내장 fetch 만 쓴다. 그래서 npm ci 를 돌리지 않는다.
-      - name: 감시 확인
+      # 알림 채널은 각 글의 track.json 이 고른다. 여기서 gh issue create 로 이슈를 직접 열면
+      # 그 선택이 무시되고 comment 를 고른 글도 이슈로만 간다. 그래서 알림을 추적기에 맡긴다.
+      - name: 감시 확인과 알림
         id: probe
         working-directory: site
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set +e
-          node scripts/track.mjs --write --report > "$RUNNER_TEMP/report.md"
+          node scripts/track.mjs --write --notify --apply-update --json > "$RUNNER_TEMP/result.json"
           code=$?
           set -e
-          cat "$RUNNER_TEMP/report.md"
+          cat "$RUNNER_TEMP/result.json"
           # 2 는 추적기 자체가 깨진 것이다. 조용히 넘어가면 다음 변화도 영영 못 잡는다.
           if [ "$code" -eq 2 ]; then
             echo "추적기가 실행 중에 죽었습니다"
             exit 2
           fi
-          # 1 은 변화나 확인 실패가 있다는 뜻이다. 소스가 죽는 것도 소식이라 함께 알린다.
-          if [ "$code" -eq 1 ]; then
-            echo "found=1" >> "$GITHUB_OUTPUT"
-          fi
+          # update 를 단 감시가 움직였을 때만 값이 찬다. 지금은 그런 글이 없어서 빈 문자열이고
+          # 아래 세 단계가 전부 건너뛰어진다. 쓰는 글이 생기면 그날 바로 돈다.
+          mode=$(node -e "
+            const r = require('$RUNNER_TEMP/result.json');
+            process.stdout.write(r.update && r.update.files.length ? r.update.mode : '');
+          ")
+          echo "update_mode=$mode" >> "$GITHUB_OUTPUT"
 
-      - name: 이슈 열기
-        if: steps.probe.outputs.found == '1'
+      # 갱신한 본문이 게이트를 통과하는지 본다. anchor 와 find 를 함께 옮기는 로직이 틀리면
+      # 여기서 걸린다. 깨진 글을 PR 로 내보내거나 커밋하는 것보다 여기서 멈추는 것이 낫다.
+      - name: 갱신한 글 검사
+        if: steps.probe.outputs.update_mode != ''
+        working-directory: site
+        run: node scripts/check-blog.mjs
+
+      # mode 가 pr 이면 사람이 읽고 머지한다. 바뀐 것은 정해진 문자열뿐이고 그 값으로 잰 다른
+      # 수치는 그대로이므로, 글의 주장이 그 값에 기대고 있으면 사람이 다시 재야 한다.
+      - name: 본문 갱신 PR
+        if: steps.probe.outputs.update_mode == 'pr'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh issue create \
-            --title "글이 지켜보던 것이 움직였습니다 ($(date -u +%Y-%m-%d))" \
-            --body-file "$RUNNER_TEMP/report.md"
+          branch="track/update-$(date -u +%Y%m%d-%H%M%S)"
+          node -e "
+            const r = require('$RUNNER_TEMP/result.json');
+            require('node:fs').writeFileSync(process.env.RUNNER_TEMP + '/pr.md', r.update.body);
+          "
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          node -e "
+            const r = require('$RUNNER_TEMP/result.json');
+            process.stdout.write(r.update.files.join('\n'));
+          " | xargs git add
+          git commit -m "감시가 잡은 값으로 본문을 고친다"
+          git push origin "$branch"
+          gh pr create \
+            --title "감시가 잡은 값으로 본문을 고칩니다" \
+            --body-file "$RUNNER_TEMP/pr.md" \
+            --base main --head "$branch"
+          git switch main
+
+      # mode 가 commit 이면 바로 올린다. 숫자 한 줄만 바뀌고 그 값으로 잰 것이 없는 글이다.
+      - name: 본문 갱신 커밋
+        if: steps.probe.outputs.update_mode == 'commit'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          node -e "
+            const r = require('$RUNNER_TEMP/result.json');
+            process.stdout.write(r.update.files.join('\n'));
+          " | xargs git add
+          git commit -m "감시가 잡은 값으로 본문을 고친다"
+          git push
 
       # 본 값을 저장소에 적는다. actions/cache 는 7 일 안 쓰면 지워지고, 지워진 다음 실행이
       # 모든 감시를 처음 보는 것으로 착각해 기준선을 다시 잡는다. 그러면 그 사이에 일어난

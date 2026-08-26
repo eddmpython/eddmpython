@@ -7,8 +7,9 @@ import {
   lintImagePolicy,
   parseSectionParts,
 } from "./blog-media-package.mjs";
-/* 감시 종류의 정본은 추적기다. 여기에 목록을 다시 적으면 둘이 조용히 갈라진다. */
-import { KINDS as trackKinds } from "./track.mjs";
+/* 감시 종류와 알림 채널의 정본은 추적기다. 여기에 목록을 다시 적으면 둘이 조용히 갈라진다. */
+import { CHANNELS as trackChannels, KINDS as trackKinds } from "./track.mjs";
+import { validateUpdate } from "./track-update.mjs";
 
 /*
  * 글 하나가 폴더 하나다.
@@ -671,6 +672,51 @@ for (const post of targetPosts) {
       const anchor = String(watch.anchor ?? "").trim();
       if (anchor && !body.includes(anchor)) {
         fail(trackLabel, `${id} 의 anchor 가 본문에 없습니다: ${anchor.slice(0, 40)}`);
+      }
+
+      /*
+       * 알림 채널.
+       *
+       * 안 적으면 글쓴이에게만 간다. 오타는 조용히 무시되면 안 된다. `comment` 를 `comments`
+       * 로 적어 두고 독자에게 알리고 있다고 믿는 상태가 가장 나쁘다.
+       */
+      if (watch.notify !== undefined) {
+        if (!Array.isArray(watch.notify) || !watch.notify.length) {
+          fail(trackLabel, `${id} 의 notify 는 비어 있지 않은 배열입니다`);
+        }
+        const unknown = watch.notify.filter((c) => !trackChannels.includes(c));
+        if (unknown.length) {
+          fail(
+            trackLabel,
+            `${id} 의 notify 에 모르는 채널이 있습니다: ${unknown.join(", ")}. 아는 것: ${trackChannels.join(", ")}`,
+          );
+        }
+      }
+
+      /*
+       * 본문 갱신 규칙.
+       *
+       * `find` 가 본문에 없으면 그 감시가 움직이는 날 갱신이 실패한다. 그날은 몇 달 뒤일 수
+       * 있고, 그때 실패를 보는 것보다 지금 막는 것이 싸다. anchor 와 같은 이유다.
+       */
+      if (watch.update !== undefined) {
+        const problem = validateUpdate(watch.update);
+        if (problem) fail(trackLabel, `${id} 의 update 계약이 잘못됐습니다: ${problem}`);
+        const find = String(watch.update.find);
+        if (!body.includes(find)) {
+          fail(trackLabel, `${id} 의 update.find 가 본문에 없습니다: ${find.slice(0, 40)}`);
+        }
+        /*
+         * 치환 결과가 본문의 다른 자리를 또 건드리지 않는지 본다. find 가 replace 결과의
+         * 일부이면 두 번째 실행이 이미 바꾼 자리를 다시 바꿔 문자열이 겹쳐 쌓인다.
+         */
+        const sample = String(watch.update.replace).replaceAll("{version}", "0.0.0");
+        if (sample.includes(find)) {
+          fail(
+            trackLabel,
+            `${id} 의 update.replace 가 update.find 를 품고 있습니다. 다음 회차가 같은 자리를 또 바꿉니다`,
+          );
+        }
       }
     }
   }

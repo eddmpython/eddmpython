@@ -24,19 +24,25 @@ import { useEffect, useRef } from "react";
  */
 
 /*
- * GitHub 이 정본이고 이 셋은 복사본이다. 비밀이 아니라 공개 식별자다.
+ * 저장소 식별자는 `blog/discussions.json` 하나가 소유한다.
  *
- * 다시 얻으려면:
+ * 이 화면만 쓰는 값이 아니다. 감시가 잡은 변화를 이 글의 스레드에 댓글로 다는 추적기
+ * (`scripts/track-notify.mjs`) 가 같은 값을 쓴다. 둘이 따로 적으면 한쪽만 고쳤을 때 댓글이
+ * 엉뚱한 곳에 달리거나 위젯이 스레드를 못 찾는다.
+ *
+ * 비밀이 아니라 공개 식별자다. 다시 얻으려면:
  *   gh api graphql -f query='query { repository(owner: "eddmpython", name: "eddmpython") {
  *     id discussionCategories(first: 20) { nodes { id name } } } }'
  *
- * Announcements 를 쓰는 이유는 그 형식이어야 새 discussion 을 관리자와 giscus 만 만들 수
- * 있기 때문이다. 다른 형식이면 아무나 글과 무관한 discussion 을 만들어 붙일 수 있다.
+ * Announcements 를 쓰는 이유는 그 형식이어야 새 스레드를 관리자와 giscus 만 만들 수 있기
+ * 때문이다. 다른 형식이면 아무나 글과 무관한 스레드를 만들어 붙일 수 있다.
  */
-const REPO = "eddmpython/eddmpython";
-const REPO_ID = "R_kgDOTwChOw";
-const CATEGORY = "Announcements";
-const CATEGORY_ID = "DIC_kwDOTwChO84DC5oO";
+import discussions from "../../../blog/discussions.json";
+
+const REPO = discussions.repo;
+const REPO_ID = discussions.repoId;
+const CATEGORY = discussions.category;
+const CATEGORY_ID = discussions.categoryId;
 
 /*
  * 테마는 우리가 서빙한다. worker.ts 의 `/giscus.css` 가 design.ts 에서 만들어 낸다.
