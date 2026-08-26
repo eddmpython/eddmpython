@@ -8,6 +8,8 @@ import {
   lintImagePolicy,
   parseSectionParts,
 } from "./blog-media-package.mjs";
+/* 평가자 루프의 종료 조건은 전역 $blog-writing 이 정한다. 여기서는 그 루프가 돌았는지만 본다. */
+import { reviewName, reviewProblems } from "./check-blog-review.mjs";
 /* 감시 종류와 알림 채널의 정본은 추적기다. 여기에 목록을 다시 적으면 둘이 조용히 갈라진다. */
 import { CHANNELS as trackChannels, KINDS as trackKinds } from "./track.mjs";
 import { validateUpdate } from "./track-update.mjs";
@@ -28,8 +30,14 @@ import { validateUpdate } from "./track-update.mjs";
  * `blog/embeds/tools.json`, 실습 칸이 `blog/embeds/codaro-cells.json` 에 따로 있었다.
  */
 // 인자로 폴더 이름이나 파일 경로를 주면 그 한 편만 검사한다.
-// 글의 자연스러움과 구조는 세 명 이상의 독립 평가자가 읽고 판정한다.
-// 이 스크립트는 파일, 메타데이터, 미디어와 공개 경로처럼 기계가 확정할 수 있는 계약만 본다.
+//
+// 글의 자연스러움과 구조는 전역 $blog-writing 의 `여러 명이 따로 읽고 다시 고치기` 가 판정한다.
+// 평가자의 수와 역할 이름은 그 스킬이 정본이라 여기 적지 않는다. 한때 이 자리에 `세 명 이상`
+// 이라고 적혀 있었고 스킬은 네 역할을 말하고 있었다. 규칙을 복사하면 그렇게 갈라진다.
+//
+// 이 스크립트는 기계가 확정할 수 있는 계약만 본다. 파일, 메타데이터, 미디어, 공개 경로,
+// 그리고 그 루프가 실제로 돌았는지다. 평가의 내용은 못 보지만 루프를 건너뛴 것은 잡는다.
+// 판정은 check-blog-review.mjs 에 있다.
 // 경로를 통째로 받아도 되게 슬래시와 역슬래시 둘 다 자른다. PowerShell 이 역슬래시를 준다.
 const rawTarget = process.argv[2]
   ? process.argv[2].split(/[\\/]/).filter((part) => part && part !== "index.md").pop()
@@ -503,6 +511,25 @@ for (const post of targetPosts) {
   const slug = meta.get("slug");
   if (meta.has("date") || meta.has("modified")) {
     fail(file, "발행 날짜 대신 폴더 순번만 사용합니다");
+  }
+
+  /*
+   * 이 글에 평가자 루프가 돌았는가.
+   *
+   * 2026-08-27 에 004 가 첫 문단이 안 읽히는 상태로 나갔다. 규칙은 CLAUDE.md 와 스킬
+   * 포인터에 있었지만 기계가 아무것도 확인하지 않았다. 루프의 내용은 여전히 사람이 보고,
+   * 여기서는 루프가 돌았다는 사실과 집은 자리를 실제로 고쳤는지만 본다.
+   */
+  const reviewPath = join(post.dir, reviewName);
+  if (!existsSync(reviewPath)) {
+    fail(
+      `${postsDirName}/${postId}/${reviewName}`,
+      "평가 기록이 없습니다. 전역 $blog-writing 의 `여러 명이 따로 읽고 다시 고치기` 를 돌리고 그 결과를 남깁니다",
+    );
+  }
+  const review = await loadJson(reviewPath, `${postsDirName}/${postId}/${reviewName}`);
+  for (const problem of reviewProblems(review, body, postId)) {
+    fail(`${postsDirName}/${postId}/${reviewName}`, problem);
   }
 
   /*

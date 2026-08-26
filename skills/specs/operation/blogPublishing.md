@@ -11,11 +11,16 @@ whenToUse:
   - sitemap 에 글이 안 들어간다
   - 발행 전 검사
   - 글 내리기
+  - 평가자 루프 기록
+  - 운영자 승인
+  - 블로그 본문 쓰기가 막힐 때
 verify:
   - cd site && npm run check:blog
+  - cd site && npm run check:hooks
   - cd site && npm run verify:media
   - cd site && npm run build
   - cd site && npm run verify:visual
+  - cd site && npm run check:approved
 status: observed
 ---
 
@@ -31,6 +36,7 @@ status: observed
 blog/posts/<NNN-kebab>/
   index.md      글
   media.json    이 글의 이미지 계획
+  review.json   이 글에 평가자 루프가 돈 기록
   tool/         이 글이 품는 도구 (선택)
   cells.json    이 글의 실습 칸 (선택)
 ```
@@ -104,6 +110,7 @@ frontmatter 파서는 `^([A-Za-z][A-Za-z0-9]*):\s*(.*)$` 한 줄 정규식이다
 | 공개 URL | frontmatter `slug` |
 | 목록에서 뺄지 | frontmatter `archived` 와 `archivedNote` |
 | 이 글의 이미지 계획 | 그 폴더의 `media.json` |
+| 이 글에 루프가 돈 기록 | 그 폴더의 `review.json` |
 | 이 글이 품는 도구 | 그 폴더의 `tool/index.tsx` |
 | 도구를 부르는 이름 | 폴더 이름에서 순번을 뗀 것 |
 | 이 글의 실습 칸 | 그 폴더의 `cells.json` |
@@ -178,12 +185,54 @@ archivedNote: 도구를 갈아엎는 동안 목록에서 내린다
 구조이고 2026-08-21 에 현재 구조로 고쳤다. 글쓰기 규칙 자체는 블로그든 교안이든
 전역 `$blog-writing` 하나를 따른다.
 
-## 글은 사람이 읽고, 스크립트는 파일만 확인한다
+## 글은 사람이 읽고, 스크립트는 그 루프가 돌았는지 확인한다
 
 문장의 자연스러움과 글의 구조를 정규식, 글자 수, 문장 길이로 판정하지 않는다. 본문을 쓰거나
 고칠 때는 전역 `$blog-writing`의 순서에 따라 여러 명이 따로 읽는다. **평가자의 수와 역할과
 종료 조건은 그 스킬이 정본이다.** 이 문서에 역할 이름을 다시 적지 않는다. 한때 여기에 세 역할을
 복사해 두었고 스킬이 네 역할로 바뀌자 이 문서만 낡은 채로 남았다.
+
+**평가의 내용은 기계가 못 보지만 그 루프가 돌았는지는 기계가 확정할 수 있다.** 2026-08-27 에
+004 가 첫 문단이 안 읽히는 상태로 나갔다. 규칙은 있었고 강제가 없었다. 그래서 세 겹을 걸었다.
+
+| 무엇 | 어디 | 무엇을 막나 |
+|---|---|---|
+| 본문 쓰기 차단 | `hooks/blogWritingGate.mjs` (`pre`) | 전역 `$blog-writing`의 `SKILL.md`를 안 연 세션이 `index.md`를 쓰는 것 |
+| 턴 종료 차단 | 같은 훅 (`stop`) | 본문을 고쳐 놓고 그 글의 `review.json`을 안 만진 채 끝내는 것 |
+| 발행 차단 | `site/scripts/check-blog-review.mjs` | 루프를 건너뛴 글과, 집어 놓고 본문을 안 고친 글 |
+
+훅 등록은 `.claude/settings.json`에 있다. `.gitignore`가 `.claude/`를 항목 단위로 무시하고 그
+파일만 예외로 추적한다. 로컬 상태가 아니라 강행 계약이라 클론에도 따라가야 하기 때문이다.
+
+`review.json`은 그 글에 루프가 돈 기록이다.
+
+```json
+{
+  "version": 1,
+  "rounds": [
+    { "reviewers": [ { "role": "<역할>", "findings": [ { "quote": "", "why": "", "fix": "" } ] } ] },
+    { "reviewers": [ { "role": "<역할>", "findings": [] } ] }
+  ],
+  "kept": [ { "quote": "", "why": "고치지 않기로 한 이유" } ],
+  "edits": [ { "what": "루프를 새로 돌 것 없는 작은 수정" } ]
+}
+```
+
+검사기는 라운드가 두 번 이상 세 번 이하인지, 라운드 사이에 평가자 수가 같은지, 마지막 라운드에
+새 지적이 없는지를 본다. **평가자가 몇 명인지는 묻지 않는다.** 그 수는 스킬이 정하고 여기에
+복사하면 또 갈라진다.
+
+가장 중요한 검사는 마지막 하나다. **앞선 라운드가 집은 인용문이 본문에 그대로 남아 있으면
+실패한다.** 지적해 놓고 안 고친 것이 그렇게 걸린다. 고치지 않기로 했다면 `kept`에 이유와 함께
+적고, 그 자리를 다음 라운드가 또 집으면 그 판단이 틀린 것으로 본다.
+
+못 막는 것도 적어 둔다. **스킬을 열고도 안 지키는 것과 기록을 형식적으로 채우는 것은 못 막는다.**
+완전 강제는 불가능하다. 이 장치는 무의식적으로 건너뛰는 것을 막는 것이지 작정하고 뚫는 것을
+막지 못한다.
+
+`loop: "not-run"`은 이 장치를 걸기 전에 이미 발행된 다섯 편만 쓸 수 있다. 그 목록은
+`check-blog-review.mjs`의 `legacyPosts`에 못 박혀 있고 **여기에 글을 더하지 않는다.** 006부터는
+그 상태 자체가 불가능하다. 면제를 코드에 숨기지 않고 공개 기록으로 남기려고 이 모양으로 뒀다.
 
 `npm run check:post -- <글 폴더 이름>`은 한 편의 파일 계약을 확인한다. `npm run check:blog`는
 모든 글의 계약을 확인한다. 두 명령은 frontmatter 필드, slug와 폴더 순번, 코드 펜스, 이미지와
@@ -246,16 +295,45 @@ Web Run 링크에서 쓸 수 있다고 정확히 적는다.
 7. `npm run build`
 8. `npm run verify:visual` 로 모든 페이지의 데스크톱과 모바일 화면을 만들고 **직접 읽는다**
 9. `npm run approve:visual -- --run=<run-id>` 로 확인한 빌드를 승인한다
-10. `npm run deploy`
-11. 캐시버스터를 붙인 글 페이지에서 H2별 본문 이미지 수와 URL, `og:image`, `twitter:image` 를
+10. **운영자에게 글을 통과시켜 달라고 알린다.** 운영자가 자기 터미널에서
+    `cd site && npm run approve:blog` 를 돌려 글을 읽고 통과시킨다. **이 단계는 AI 가 대신할 수
+    없고 대신하려 해서도 안 된다.** 아래 `운영자가 통과시킨 판본만 나간다` 를 본다
+11. `npm run deploy`
+12. 캐시버스터를 붙인 글 페이지에서 H2별 본문 이미지 수와 URL, `og:image`, `twitter:image` 를
     plan 과 catalog 의 기대값에 대조한다
-12. `/blog`, `rss.xml`, `sitemap.xml` 의 반영과 홈, favicon, 404, `xlpod.eddmpython.com` 의
+13. `/blog`, `rss.xml`, `sitemap.xml` 의 반영과 홈, favicon, 404, `xlpod.eddmpython.com` 의
     상태를 확인한다
 
-**1단계부터 12단계까지가 한 번의 발행이다.** Git push, Hugging Face 업로드, 빌드 성공은 각각
+**1단계부터 13단계까지가 한 번의 발행이다.** Git push, Hugging Face 업로드, 빌드 성공은 각각
 중간 단계다. 메인 사이트는 Cloudflare Worker 이므로 Git push 만으로는 공개 화면이 바뀌지 않는다.
 초안이나 검토만 요청받은 경우를 빼고, 공개 글을 고쳤거나 발행했다면 별도 지시를 기다리지 않고
 이 절차를 끝낸다.
+
+**10단계는 예외다.** 거기서 운영자를 기다린다. 나머지를 다 해 놓고 통과를 요청한 뒤 멈추는 것이
+정상이고, 통과가 없는 채로 11단계를 시도하면 `deploy` 가 스스로 선다. 기다리는 동안 할 일이
+남아 있으면 그것을 하고, 없으면 무엇을 통과시켜야 하는지 정확히 알리고 끝낸다.
+
+## 운영자가 통과시킨 판본만 나간다
+
+**공개 글은 운영자가 직접 읽고 통과시킨 판본만 배포된다.** 2026-08-27 에 운영자가 정했다.
+글이 나쁘게 나간 뒤에 고치는 것보다 나가기 전에 사람이 한 번 읽는 것이 싸다.
+
+```bash
+cd site
+npm run approve:blog     # 운영자가 자기 터미널에서 돌린다
+```
+
+통과를 기다리는 글을 하나씩 보여 주고 `y` 를 받는다. 통과한 판본의 SHA-256 이
+`blog/approved.json` 에 남고 `npm run deploy` 가 그 값을 대조한다. 통과 뒤에 본문이 한 글자라도
+바뀌면 다시 물어본다.
+
+**이 문은 AI 가 넘을 수 없다.** `approve-blog.mjs` 는 `process.stdin.isTTY` 가 참일 때만 승인을
+받는다. AI 의 셸 도구는 stdin 이 null device 라 TTY 가 없고, 그래서 그 스크립트를 아무리 돌려도
+승인이 만들어지지 않는다. 승인을 파일의 `approved: true` 같은 값으로 뒀다면 AI 가 그 값을 적으면
+그만이라 문이 아니었을 것이다. 그래서 문을 사람이 붙어 있는 터미널 하나로 좁혔다.
+
+남는 구멍은 `blog/approved.json` 을 손으로 쓰는 것 하나다. `hooks/blogWritingGate.mjs` 가 그
+파일을 쓰기 도구로 건드리는 것을 막는다. **AI 는 어떤 이유로도 이 파일을 쓰지 않는다.**
 
 `verify:visual` 은 sitemap 의 모든 페이지를 데스크톱과 모바일 폭으로 렌더하고 가로 넘침, 깨진
 이미지, 브라우저 오류, H2 와 이미지 수를 검사한다. 저장소 밖에 생성된 두 화면 폭의 전체
@@ -263,17 +341,26 @@ Web Run 링크에서 쓸 수 있다고 정확히 적는다.
 뒤 그 run id 를 승인한다. **승인 뒤 빌드가 바뀌면 `deploy` 는 중단된다.** 자세한 것은
 [visualVerification.md](visualVerification.md) 다.
 
-## 옛 글은 저장소 밖에 있다
+## 옛 글은 Git 이력에 있다
 
-2026-08-19 에 커리큘럼을 다시 열면서 옛 글 39편을 저장소에서 내렸다. 지운 것이 아니라 옮겼다.
+2026-08-19 에 커리큘럼을 다시 열면서 옛 글을 저장소에서 내렸다. **정본은 Git 이력이다.**
 
-```text
-../eddmpython.out/blog-archive/     옛 글 39편, old-plan.json, old-catalog.json
+```bash
+git ls-tree -r --name-only 'e937827^' -- blog/work-process-automation
+git show 'e937827^:blog/work-process-automation/026-pandas-missing-duplicates.md'
 ```
 
+`001-what-is-python.md` 부터 `040-thirty-day-plan.md` 까지 40편이 그 시점에 그대로 있다.
+2026-08-26 에 40편 전부와 본문 추출을 실측해 확인했다. 지금 글 구조(`blog/posts/<id>/index.md`)
+와 달리 그때는 `blog/work-process-automation/NNN-이름.md` 평면 구조였다. 경로를 헷갈리면
+못 찾는다.
+
+한때 `../eddmpython.out/blog-archive/` 에 사본을 뒀는데 2026-08-26 에 지웠다. 산출물 폴더는
+검사받지 않는 곳이라 정본이 있을 자리가 아니다. 이미지는 이미 허깅페이스 catalog 에 있으므로
+`--find` 로 찾는다.
+
 **참고용이다. 공개 표면이 아니다.** 새 글을 쓸 때 그때 뭘 어떻게 설명했는지 보고, 쓸 만한
-이미지가 있으면 `--find` 로 찾아 다시 쓴다. 저장소로 되돌리지 않는다. Git 이력의
-`e937827^` 에도 그대로 있다.
+이미지가 있으면 `--find` 로 찾아 다시 쓴다. 저장소로 되돌리지 않는다.
 
 ## 롤백
 

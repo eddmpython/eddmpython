@@ -17,7 +17,11 @@ secrets/
 *.keystore
 
 # Local agent and editor state
-.claude/
+# .claude/settings.json 만 예외다. 그것은 로컬 상태가 아니라 이 저장소의 강행 계약이고
+# (blog/posts/*/index.md 를 전역 $blog-writing 없이 못 쓰게 막는다) 클론에도 따라가야 한다.
+# 디렉터리를 통째로 무시하면 그 안의 파일을 되살릴 수 없어 항목 단위로 무시한다.
+.claude/*
+!.claude/settings.json
 .codex/
 .agents/
 !.agents/

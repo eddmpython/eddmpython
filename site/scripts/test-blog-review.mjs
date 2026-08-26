@@ -1,0 +1,215 @@
+/*
+ * check-blog-review.mjs 의 자기 검사.
+ *
+ * 이 검사기가 헐거우면 루프를 안 돌고도 통과하고, 빡빡하면 정직하게 돌린 기록이 막힌다.
+ * 둘 다 조용히 일어나므로 통과해야 할 것과 막아야 할 것을 같은 수로 본다.
+ */
+import { reviewProblems } from "./check-blog-review.mjs";
+
+const LEGACY = "004-dataframe-libraries";
+const NEW = "006-some-new-post";
+
+let failed = 0;
+
+function pass(name, record, body, post = NEW) {
+  const problems = reviewProblems(record, body, post);
+  if (problems.length) {
+    failed += 1;
+    console.error(`  FAIL ${name}\n    통과해야 하는데 막았습니다: ${problems.join(" / ")}`);
+  }
+}
+
+function block(name, record, body, hint, post = NEW) {
+  const problems = reviewProblems(record, body, post);
+  if (!problems.length) {
+    failed += 1;
+    console.error(`  FAIL ${name}\n    막아야 하는데 통과시켰습니다`);
+    return;
+  }
+  if (hint && !problems.some((problem) => problem.includes(hint))) {
+    failed += 1;
+    console.error(`  FAIL ${name}\n    막긴 했는데 이유가 다릅니다\n    기대한 말 ${hint}\n    실제 ${problems.join(" / ")}`);
+  }
+}
+
+/** 두 라운드를 돌고 끝난 정상 기록. 1 라운드가 집은 문장은 본문에서 사라졌다. */
+const finished = () => ({
+  version: 1,
+  rounds: [
+    {
+      reviewers: [
+        { role: "첫 독자", findings: [{ quote: "물어볼 것은 한 줄짜리입니다", why: "뜻이 안 잡힌다", fix: "무엇을 묻는지 그대로 쓴다" }] },
+        { role: "구조 편집자", findings: [] },
+      ],
+    },
+    {
+      reviewers: [
+        { role: "첫 독자", findings: [] },
+        { role: "구조 편집자", findings: [] },
+      ],
+    },
+  ],
+});
+const fixedBody = "서울 지역 수량이 전부 몇 개인지 묻습니다.";
+const unfixedBody = "물어볼 것은 한 줄짜리입니다. 서울 지역 수량이 전부 몇 개일까요?";
+
+/* 통과해야 하는 것 */
+
+pass("루프를 돌고 끝난 기록", finished(), fixedBody);
+pass("루프 이전에 발행된 글", { version: 1, loop: "not-run", why: "강제 이전에 나갔다" }, unfixedBody, LEGACY);
+pass("세 라운드까지는 허용", {
+  version: 1,
+  rounds: [
+    { reviewers: [{ role: "첫 독자", findings: [{ quote: "가", why: "나", fix: "다" }] }] },
+    { reviewers: [{ role: "첫 독자", findings: [{ quote: "라", why: "마", fix: "바" }] }] },
+    { reviewers: [{ role: "첫 독자", findings: [] }] },
+  ],
+}, "고친 본문");
+pass("고치지 않기로 하고 이유를 남김", {
+  ...finished(),
+  kept: [{ quote: "물어볼 것은 한 줄짜리입니다", why: "다음 절의 말장난이 이 문장에 걸려 있어 그대로 둔다" }],
+}, unfixedBody);
+pass("한 평가자가 여러 건을 집음", {
+  version: 1,
+  rounds: [
+    {
+      reviewers: [
+        {
+          role: "첫 독자",
+          findings: [
+            { quote: "가", why: "나", fix: "다" },
+            { quote: "라", why: "마", fix: "바" },
+          ],
+        },
+      ],
+    },
+    { reviewers: [{ role: "첫 독자", findings: [] }] },
+  ],
+}, "전부 고쳤다");
+
+/* 막아야 하는 것 */
+
+block("기록이 객체가 아님", [], fixedBody, "JSON 객체가 아닙니다");
+block("version 이 다름", { ...finished(), version: 2 }, fixedBody, "version");
+block("rounds 가 없음", { version: 1 }, fixedBody, "rounds 배열이 없습니다");
+block("rounds 가 비어 있음", { version: 1, rounds: [] }, fixedBody, "rounds 배열이 없습니다");
+block(
+  "한 라운드만 돌고 끝냄",
+  { version: 1, rounds: [{ reviewers: [{ role: "첫 독자", findings: [] }] }] },
+  fixedBody,
+  "같은 수의 평가자가 다시 읽습니다",
+);
+block("네 라운드를 돌아도 의견이 남음", {
+  version: 1,
+  rounds: [
+    { reviewers: [{ role: "첫 독자", findings: [{ quote: "가", why: "나", fix: "다" }] }] },
+    { reviewers: [{ role: "첫 독자", findings: [{ quote: "라", why: "마", fix: "바" }] }] },
+    { reviewers: [{ role: "첫 독자", findings: [{ quote: "사", why: "아", fix: "자" }] }] },
+    { reviewers: [{ role: "첫 독자", findings: [] }] },
+  ],
+}, "고친 본문", "억지로 통과시키지 말고");
+block("두 번째 라운드에 평가자가 줄어듦", {
+  version: 1,
+  rounds: [
+    {
+      reviewers: [
+        { role: "첫 독자", findings: [] },
+        { role: "구조 편집자", findings: [] },
+      ],
+    },
+    { reviewers: [{ role: "첫 독자", findings: [] }] },
+  ],
+}, fixedBody, "같은 수의 평가자가 다시 읽습니다");
+block("마지막 라운드에 지적이 남음", {
+  version: 1,
+  rounds: [
+    { reviewers: [{ role: "첫 독자", findings: [] }] },
+    { reviewers: [{ role: "첫 독자", findings: [{ quote: "가", why: "나", fix: "다" }] }] },
+  ],
+}, "본문", "새 지적을 내지 못할 때 끝냅니다");
+block("같은 라운드에 역할이 겹침", {
+  version: 1,
+  rounds: [
+    {
+      reviewers: [
+        { role: "첫 독자", findings: [] },
+        { role: "첫 독자", findings: [] },
+      ],
+    },
+    {
+      reviewers: [
+        { role: "첫 독자", findings: [] },
+        { role: "구조 편집자", findings: [] },
+      ],
+    },
+  ],
+}, fixedBody, "겹칩니다");
+block("역할 이름이 없음", {
+  version: 1,
+  rounds: [
+    { reviewers: [{ findings: [] }] },
+    { reviewers: [{ role: "첫 독자", findings: [] }] },
+  ],
+}, fixedBody, "role");
+block("findings 가 배열이 아님", {
+  version: 1,
+  rounds: [
+    { reviewers: [{ role: "첫 독자" }] },
+    { reviewers: [{ role: "첫 독자", findings: [] }] },
+  ],
+}, fixedBody, "findings 배열이 없습니다");
+block("인용 없이 지적함", {
+  version: 1,
+  rounds: [
+    { reviewers: [{ role: "첫 독자", findings: [{ why: "이상하다", fix: "고쳤다" }] }] },
+    { reviewers: [{ role: "첫 독자", findings: [] }] },
+  ],
+}, fixedBody, "quote");
+block("고친 문장을 안 적음", {
+  version: 1,
+  rounds: [
+    { reviewers: [{ role: "첫 독자", findings: [{ quote: "가", why: "나" }] }] },
+    { reviewers: [{ role: "첫 독자", findings: [] }] },
+  ],
+}, "고친 본문", "fix");
+
+// 이것이 이 검사기의 핵심이다.
+block("집어 놓고 본문을 안 고침", finished(), unfixedBody, "본문에 그대로 남아 있습니다");
+block(
+  "남기기로 한 자리를 다음 평가자가 다시 집음",
+  {
+    version: 1,
+    rounds: [
+      { reviewers: [{ role: "첫 독자", findings: [{ quote: "같은 자리", why: "가", fix: "나" }] }] },
+      { reviewers: [{ role: "첫 독자", findings: [{ quote: "같은 자리", why: "다", fix: "라" }] }] },
+      { reviewers: [{ role: "첫 독자", findings: [] }] },
+    ],
+    kept: [{ quote: "같은 자리", why: "그대로 두기로 했다" }],
+  },
+  "같은 자리 가 본문에 있다",
+  "다시 집었습니다",
+);
+block("kept 에 이유가 없음", {
+  ...finished(),
+  kept: [{ quote: "물어볼 것은 한 줄짜리입니다" }],
+}, unfixedBody, "kept[0].why");
+block("kept 가 어느 라운드에도 없는 문장", {
+  ...finished(),
+  kept: [{ quote: "아무도 집지 않은 문장", why: "그래도 남긴다" }],
+}, fixedBody, "어느 라운드에도 없습니다");
+
+// 면제는 이미 발행된 글에만 있고 새 글로 번지지 않는다.
+block(
+  "새 글이 면제를 흉내냄",
+  { version: 1, loop: "not-run", why: "귀찮다" },
+  unfixedBody,
+  "평가자 루프 강제 이전에 발행된 글만",
+);
+block("면제인데 경위를 안 적음", { version: 1, loop: "not-run" }, unfixedBody, "why", LEGACY);
+block("loop 에 이상한 값", { ...finished(), loop: "skipped" }, fixedBody, 'loop 에 쓸 수 있는 값은');
+
+if (failed) {
+  console.error(`\nblog review 자기 검사 ${failed}건 실패`);
+  process.exit(1);
+}
+console.log("blog review 자기 검사 통과");

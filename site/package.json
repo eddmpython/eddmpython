@@ -21,9 +21,12 @@
     "build": "npm run test && vite build && npm run verify:seo",
     "og": "node --experimental-strip-types scripts/og.mjs",
     "preview": "vite preview",
-    "test": "npm run test:blog-media && npm run test:blog-env && npm run test:hash-navigation && npm run test:visual-plan && npm run test:classroom-render && npm run test:qr && npm run check:blog && npm run check:design && npm run check:secrets && npm run check:skills && tsc --noEmit",
-    "deploy": "npm run build && npm run check:leak && npm run check:visual && wrangler deploy",
+    "test": "npm run test:blog-media && npm run test:blog-env && npm run test:hash-navigation && npm run test:visual-plan && npm run test:classroom-render && npm run test:qr && npm run check:blog && npm run check:hooks && npm run check:design && npm run check:secrets && npm run check:skills && npm run check:workspace && tsc --noEmit",
+    "deploy": "npm run build && npm run check:leak && npm run check:approved && npm run check:visual && wrangler deploy",
     "check:post": "node scripts/check-blog.mjs",
+    "check:hooks": "node ../hooks/tests/checkBlogWritingGate.mjs && node scripts/test-blog-review.mjs",
+    "approve:blog": "node scripts/approve-blog.mjs",
+    "check:approved": "node scripts/check-blog-approved.mjs",
     "track": "node scripts/track.mjs",
     "check:leak": "node scripts/check-leak.mjs",
     "classroom:dev": "wrangler dev --port 8787 --persist-to ../../eddmpython.out/wrangler-state",
@@ -35,7 +38,8 @@
     "blog:shot": "node scripts/blog-shot.mjs",
     "check:design": "node --experimental-strip-types scripts/check-brand.mjs",
     "check:brand": "npm run check:design",
-    "check:secrets": "node scripts/check-secrets.mjs"
+    "check:secrets": "node scripts/check-secrets.mjs",
+    "check:workspace": "node scripts/check-workspace.mjs"
   },
   "dependencies": {
     "pyproc": "0.0.21",
