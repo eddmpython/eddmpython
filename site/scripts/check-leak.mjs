@@ -110,7 +110,15 @@ function phrasesFrom(text, isJson = false) {
       // 교안과 블로그가 같은 공개 주소를 가리키는 것은 정상이고 누출이 아니다. 2026-08-26 에
       // 블로그 003 이 교안과 같은 Codaro Web Run 주소를 쓴다는 이유로 배포가 막혔다.
       if (/^https?:\/\/\S+$/.test(phrase)) continue;
-      if (phrase.length >= MIN_PHRASE && /[가-힣A-Za-z]/.test(phrase)) found.push(phrase);
+      // 한글이 없는 줄은 교안 고유 문장이 아니다.
+      //
+      // 교안은 한국어로 쓰였고 파는 것은 그 설명이다. 한글이 한 글자도 없는 줄은 코드이거나
+      // 명령이거나 남의 공개 글 인용이다. 2026-08-26 에 `import pandas as pd` 한 줄 때문에
+      // 파이썬 블로그 글의 배포가 막혔다. 그것은 누출이 아니라 파이썬을 쓰면 누구나 적는 줄이다.
+      // 이 규칙을 넣어도 검사 대상 문장은 5,743 개에서 5,219 개로 줄 뿐이고, 빠지는 524 개는
+      // 전부 코드 조각과 파이썬 예약어 목록과 공개 인용문이었다.
+      if (!/[가-힣]/.test(phrase)) continue;
+      if (phrase.length >= MIN_PHRASE) found.push(phrase);
     }
   }
   const unique = [...new Set(found)];

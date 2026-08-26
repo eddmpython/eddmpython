@@ -48,7 +48,7 @@ assert.deepEqual(
   lintImagePolicy({
     sourceKind: "imagegen",
     visualProfile: "eddmpython-dark-v2",
-    palettePolicy: "eddmpython-carbon-ivory-sand-v1",
+    palettePolicy: "eddmpython-gray-master-v1",
     prompt: "Tactile graphite objects on a carbon background with one sand accent.",
   }),
   [],

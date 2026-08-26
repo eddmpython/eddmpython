@@ -10,8 +10,8 @@ readerLevel: working
 readerStartingPoint: 파이썬으로 print 정도는 돌려 봤지만 터미널에서 파이썬 파일을 실행하거나 외부 라이브러리를 설치해 본 적은 없다.
 primaryKeyword: 파이썬 QR코드
 searchIntent: how-to
-ogImage: https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/17/17e97599ef2ac51854f63acd7d52026fa0af03556885fdb76e1cdc597a99ce3d.webp
-ogImageAlt: 어두운 책상 위에서 휴대폰이 작은 타일 격자 카드를 비추자 카드에서 가는 리본 하나가 흘러나와 화면으로 이어지는 장면
+ogImage: https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/52/529e7d7cb675862be6442f9ecbbb691da4a5ff7dc7c387f1837c9f44533eaf45.webp
+ogImageAlt: 어두운 바닥에 놓인 휴대폰 화면이 작은 사각 타일 격자로 덮여 있고 그 위에서 가는 리본 한 줄이 들려 올라오는 장면
 ogImageWidth: 1216
 ogImageHeight: 832
 ogImageType: image/webp
@@ -25,7 +25,7 @@ https://eddmpython.com/tool/python-qr
 
 파이썬을 설치한 윈도우 컴퓨터에서 터미널로 진행합니다. 깔려 있는지 확인하는 방법과 없을 때 받는 곳도 아래에서 같이 다룹니다. 코드는 `segno` 를 씁니다. 검색해서 나오는 예제는 대부분 `qrcode` 라이브러리를 쓰는데, 안내대로 `pip install qrcode` 만 하고 실행하면 `ModuleNotFoundError: No module named 'PIL'` 이 뜹니다. PNG로 저장하는 일을 `qrcode` 가 아니라 `PIL` 이라는 그림 라이브러리가 맡기 때문입니다. `segno` 는 설치 한 줄이면 다른 패키지 없이 PNG와 SVG를 바로 저장합니다.
 
-![어두운 책상 위에서 휴대폰이 작은 타일 격자 카드를 비추자 카드에서 가는 리본 하나가 흘러나와 화면으로 이어지는 장면](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/17/17e97599ef2ac51854f63acd7d52026fa0af03556885fdb76e1cdc597a99ce3d.webp "링크 하나가 휴대폰이 읽는 타일 패턴으로 바뀝니다")
+![어두운 바닥에 놓인 휴대폰 화면이 작은 사각 타일 격자로 덮여 있고 그 위에서 가는 리본 한 줄이 들려 올라오는 장면](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/52/529e7d7cb675862be6442f9ecbbb691da4a5ff7dc7c387f1837c9f44533eaf45.webp "링크 하나가 휴대폰이 읽는 타일 패턴으로 바뀝니다")
 
 ## segno 설치하고 QR코드 파일 만들기
 

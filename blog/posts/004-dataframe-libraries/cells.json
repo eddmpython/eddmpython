@@ -1,0 +1,48 @@
+{
+  "examples": {
+    "df-arrow-handoff": {
+      "code": "import polars as pl\nimport pyarrow, duckdb, random\n\nrandom.seed(7)\n지역 = [\"서울\", \"부산\", \"대구\", \"인천\"]\n\n판매 = pl.DataFrame({\n    \"region\": [random.choice(지역) for _ in range(200_000)],\n    \"qty\": [random.randint(1, 20) for _ in range(200_000)],\n})\n\n합계 = duckdb.sql(\"\"\"\n    SELECT region, sum(qty) AS 수량\n    FROM 판매\n    GROUP BY region\n    ORDER BY 수량 DESC\n\"\"\")\n\nprint(\"polars 로 받기:\", type(합계.pl()).__name__)\nprint(\"pandas 로 받기:\", type(합계.df()).__name__)\nprint()\nprint(합계.pl())\n",
+      "description": "Polars로 만든 판매 표를 SQL의 FROM 절에 그대로 적고, 결과를 Polars와 pandas 양쪽으로 받아 봅니다.",
+      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor",
+      "hint": "pyarrow 를 함께 설치해야 Polars와 DuckDB 사이가 열립니다. 넷을 처음 받느라 20초쯤 걸립니다",
+      "packages": [
+        "pandas",
+        "polars",
+        "duckdb",
+        "pyarrow"
+      ],
+      "title": "Polars 표를 DuckDB에게 그대로 넘기기"
+    },
+    "df-duckdb-parquet": {
+      "code": "import duckdb, os, random\n\nrandom.seed(7)\n지역 = [\"서울\", \"부산\", \"대구\", \"인천\"]\n\nwith open(\"sales.csv\", \"w\", encoding=\"utf-8\") as f:\n    print(\"region,item,qty\", file=f)\n    for _ in range(200_000):\n        print(f\"{random.choice(지역)},P{random.randint(1, 500):04d},{random.randint(1, 20)}\", file=f)\n\nduckdb.sql(\"COPY (SELECT * FROM 'sales.csv') TO 'sales.parquet' (FORMAT parquet)\")\n\nfor 이름 in (\"sales.csv\", \"sales.parquet\"):\n    print(f\"{이름:14} {os.path.getsize(이름) / 1048576:5.2f} MB\")\n\nprint()\nprint(duckdb.sql(\"\"\"\n    SELECT region, sum(qty) AS 수량\n    FROM 'sales.parquet'\n    GROUP BY region\n    ORDER BY 수량 DESC\n\"\"\"))\n",
+      "description": "20만 줄 CSV를 만들고 DuckDB가 그 파일을 Parquet으로 바꿉니다. 두 파일 크기를 찍은 뒤 Parquet에 SQL을 던집니다.",
+      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor",
+      "hint": "여기서 만든 파일은 브라우저 안에만 있고 새로고침하면 사라집니다. 내 컴퓨터에서 돌리면 같은 자리에 sales.parquet 이 실제로 생깁니다",
+      "packages": [
+        "duckdb"
+      ],
+      "title": "CSV를 Parquet으로 바꾸고 크기 비교하기"
+    },
+    "df-pandas-memory": {
+      "code": "import pandas as pd\nimport random\n\nrandom.seed(7)\n지역 = [\"서울\", \"부산\", \"대구\", \"인천\"]\n줄수 = 200_000\n\ndf = pd.DataFrame({\n    \"region\": [random.choice(지역) for _ in range(줄수)],\n    \"item\": [f\"P{random.randint(1, 500):04d}\" for _ in range(줄수)],\n    \"qty\": [random.randint(1, 20) for _ in range(줄수)],\n})\n\nprint(\"줄 수  \", f\"{len(df):,}\")\nprint(\"표 메모리\", round(df.memory_usage(deep=True).sum() / 1048576, 1), \"MB\")\nprint(\"서울 수량\", df[df[\"region\"] == \"서울\"][\"qty\"].sum())\n",
+      "description": "20만 줄짜리 표를 만들고 실제로 차지하는 메모리와 서울 수량을 함께 찍습니다. 줄수를 바꾸면 메모리가 같이 늘어납니다.",
+      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor",
+      "hint": "내 컴퓨터에서는 이 표를 만드는 대신 pd.read_csv 로 파일을 읽습니다. 그때는 표 메모리 위에 파일을 해석하는 자리가 더 붙습니다",
+      "packages": [
+        "pandas"
+      ],
+      "title": "pandas 표가 메모리를 얼마나 쓰나"
+    },
+    "df-polars-group": {
+      "code": "import polars as pl\nimport random\n\nrandom.seed(7)\n지역 = [\"서울\", \"부산\", \"대구\", \"인천\"]\n줄수 = 200_000\n\n판매 = pl.DataFrame({\n    \"region\": [random.choice(지역) for _ in range(줄수)],\n    \"item\": [f\"P{random.randint(1, 500):04d}\" for _ in range(줄수)],\n    \"qty\": [random.randint(1, 20) for _ in range(줄수)],\n})\n\nprint(\"서울 수량\", 판매.filter(pl.col(\"region\") == \"서울\")[\"qty\"].sum())\nprint()\nprint(판매.group_by(\"region\").agg(pl.col(\"qty\").sum()).sort(\"qty\", descending=True))\n",
+      "description": "같은 20만 줄을 Polars 표로 만들어 서울 수량과 지역별 합계를 구합니다. group_by 뒤에는 agg 가 붙고 정렬은 sort 로 합니다.",
+      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor",
+      "hint": "브라우저에 실린 Polars는 즉시 실행판이라 scan_csv 와 collect 와 explain 이 없습니다. 본문의 지연 실행 코드는 내 컴퓨터에 설치한 Polars에서 돕니다",
+      "packages": [
+        "polars"
+      ],
+      "title": "Polars로 지역별 수량 구하기"
+    }
+  },
+  "version": 1
+}

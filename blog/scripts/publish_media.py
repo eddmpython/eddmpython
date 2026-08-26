@@ -42,7 +42,9 @@ ASSET_ID_RE = re.compile(
 )
 SHA256_RE = re.compile(r"[0-9a-f]{64}")
 IMAGEGEN_V2 = "eddmpython-dark-v2"
-IMAGEGEN_PALETTE = "eddmpython-carbon-ivory-sand-v1"
+IMAGEGEN_PALETTE = "eddmpython-gray-master-v1"
+# 옛 값. 새로 발행하지 않는다. 이미 올라간 자산의 계획을 읽기 위해서만 받는다.
+LEGACY_IMAGEGEN_PALETTES = {"eddmpython-carbon-ivory-sand-v1"}
 
 
 SKIP_DIRS = frozenset({"media", "scripts", "embeds"})
@@ -114,7 +116,6 @@ def plan_entry(
         "narrativeUse",
         "sourcePolicy",
         "sourceKind",
-        "sectionSubtitle",
         "contentAnchor",
         "visualSubject",
         "visualRelationship",
@@ -131,8 +132,21 @@ def plan_entry(
         raise ValueError(f"지원하지 않는 이미지 role: {asset_id}: {role}")
     if role == "section" and not str(entry.get("sectionHeading") or "").strip():
         raise ValueError(f"section 이미지 계획에는 sectionHeading이 필요함: {asset_id}")
-    if role == "section" and entry.get("placement") != "H3 부제 바로 뒤":
-        raise ValueError(f"section 이미지 placement는 H3 부제 바로 뒤여야 함: {asset_id}")
+    # 부제가 있는 절이면 이미지는 부제 아래, 없는 절이면 H2 아래에 붙는다.
+    #
+    # 예전에는 role이 section이면 sectionSubtitle을 필수로 두고 placement를 "H3 부제 바로 뒤"
+    # 하나로 강제했다. 그러면 부제가 필요 없는 절에 부제를 지어내야 이미지를 붙일 수 있다.
+    # 글쓰기 정본은 같은 뜻을 되풀이하는 소제목을 지우라고 하므로 두 규칙이 정면으로 부딪혔다.
+    # 001의 절들이 실제로 그 자리에 있었다. 그래서 부제의 유무를 본문에 맡기고, 이 검사는
+    # 부제가 있을 때와 없을 때 이미지가 앉을 자리만 가른다. check-blog.mjs와 같은 판정이다.
+    if role == "section":
+        hasSubtitle = bool(str(entry.get("sectionSubtitle") or "").strip())
+        expected = "H3 부제 바로 뒤" if hasSubtitle else "H2 제목 바로 뒤"
+        if entry.get("placement") != expected:
+            raise ValueError(
+                f"section 이미지 placement는 {expected}여야 함: {asset_id}"
+                f" (부제 {'있음' if hasSubtitle else '없음'})"
+            )
     source_kind = str(entry["sourceKind"])
     if source_kind not in {"imagegen", "screenshot", "official", "licensed", "recording"}:
         raise ValueError(f"지원하지 않는 sourceKind: {asset_id}: {source_kind}")
@@ -145,7 +159,9 @@ def plan_entry(
     }[source_kind]
     if entry["visualProfile"] not in expected_profiles:
         raise ValueError(f"지원하지 않는 visualProfile: {asset_id}: {entry['visualProfile']}")
-    if entry["visualProfile"] == IMAGEGEN_V2 and entry.get("palettePolicy") != IMAGEGEN_PALETTE:
+    if entry["visualProfile"] == IMAGEGEN_V2 and entry.get("palettePolicy") not in (
+        {IMAGEGEN_PALETTE} | LEGACY_IMAGEGEN_PALETTES
+    ):
         raise ValueError(f"{IMAGEGEN_V2}에는 {IMAGEGEN_PALETTE}가 필요함: {asset_id}")
     if source_kind == "imagegen" and not str(entry.get("prompt") or "").strip():
         raise ValueError(f"ImageGen 계획에는 prompt가 필요함: {asset_id}")

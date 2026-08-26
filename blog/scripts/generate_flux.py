@@ -5,7 +5,9 @@
   blog/posts/<글 폴더>/media.json 이 그 글의 이미지 계획 정본이다.
 - 교안은 --plan ../eddmpython-course/curriculum/<카테고리>/plan.json 을 준다. 본문 문장이 공개 저장소로
   새지 않게 plan만 갈라 두었고 이미지와 catalog는 블로그와 공유한다.
-- 출력: ../eddmpython.out/blog-media/<post-id>/<assetKey>.webp (Git 밖, 검수 후 publish_media.py로 HF 발행)
+- 출력: ../eddmpython.out/blog-media/<post-id>/<assetKey>.master.png (색 없는 회색 원본, Git 밖)
+- 이 스크립트는 색을 만들지 않는다. 강조색은 paint_media.py 가 site/src/design.ts 에서 읽어 입힌다.
+  강조색이 바뀌면 원본은 그대로 두고 paint_media.py 만 다시 돌린다.
 - 키: 저장소 루트 .env의 REPLICATE_API_TOKEN. 값은 어디에도 출력하지 않는다.
 - 속도: Replicate 계정 분당 제한을 고려해 생성 사이 12초 간격.
 """
@@ -31,14 +33,14 @@ API = "https://api.replicate.com/v1/predictions"
 MODEL = "black-forest-labs/flux-1.1-pro"
 GEN_INTERVAL_SEC = 12
 COLOR_PROFILE = "eddmpython-dark-v2"
-PALETTE_POLICY = "eddmpython-carbon-ivory-sand-v1"
+PALETTE_POLICY = "eddmpython-gray-master-v1"
+MASTER_SUFFIX = ".master.png"
 
 
 def composePrompt(asset: dict[str, object]) -> str:
     """본문 주장과 실제 피사체를 자유 장면 지시보다 높은 우선순위로 붙인다."""
     required = (
         "sectionHeading",
-        "sectionSubtitle",
         "contentAnchor",
         "visualSubject",
         "visualRelationship",
@@ -47,11 +49,13 @@ def composePrompt(asset: dict[str, object]) -> str:
     missing = [key for key in required if not str(asset.get(key) or "").strip()]
     if missing:
         raise ValueError(f"섹션 기반 이미지 필드가 비었다: {', '.join(missing)}")
+    # 부제는 본문에 있을 때만 붙인다. 없는 절에 부제를 지어내면 글쓰기 정본과 부딪힌다.
+    subtitle = str(asset.get("sectionSubtitle") or "").strip()
     lines = [
         str(asset["prompt"]).strip(),
         "Mandatory semantic grounding. If an earlier scene instruction conflicts, this block wins.",
         f"Article section title: {asset['sectionHeading']}",
-        f"Section subtitle: {asset['sectionSubtitle']}",
+        *([f"Section subtitle: {subtitle}"] if subtitle else []),
         f"Exact article claim: {asset['contentAnchor']}",
         f"Concrete subject that must be visibly recognizable: {asset['visualSubject']}",
         f"Relationship the image must explain: {asset['visualRelationship']}",
@@ -63,13 +67,18 @@ def composePrompt(asset: dict[str, object]) -> str:
             raise ValueError(f"{COLOR_PROFILE}에는 {PALETTE_POLICY}가 필요하다")
         lines.extend(
             (
-                "Mandatory brand palette. This block overrides every earlier color instruction.",
-                "Use carbon #101514 for the background and largest surfaces.",
-                "Use ivory #f5f3ee for primary subjects and light surfaces.",
-                "Use sand #d8be91 as the only small accent color.",
-                "All remaining colors must be nearly desaturated black, graphite, or warm gray.",
-                "Do not use blue, cyan, green, purple, pink, red, gold, rainbow colors, or neon light.",
-                "Show success, failure, selection, and direction through shape, line weight, value contrast, and position instead of extra hues.",
+                "Mandatory rendering mode. This block overrides every earlier color instruction.",
+                "This is a physical photograph of real objects on a surface. It is not an illustration, diagram, interface, or screen capture.",
+                "Render in neutral grayscale only. No hue anywhere in the frame.",
+                "Keep the frame dark overall. Background and largest surfaces sit near black.",
+                "Light one small part of the concrete subject brightly so it is the brightest area in the frame.",
+                "Nothing else in the frame reaches that brightness. Keep every other light surface in the middle gray range.",
+                "Show success, failure, selection, and direction through shape, line weight, value contrast, and position.",
+                # 이 세 줄은 앞에도 한 번 나온다. 2026-08-26 에 001 을 다시 만들었더니 일곱 장 중
+                # 넷이 가짜 코드 글자와 사람과 로봇을 그렸다. 금지를 한 번만 적으면 모델이 흘린다.
+                "There are no people, no faces, no hands, and no robots anywhere in this image.",
+                "There are no screens, monitors, windows, panels, or user interfaces anywhere in this image.",
+                "There is no text of any kind. No words, no letters, no numbers, no code, no labels, no pseudo-text, no scribbles that resemble writing.",
             )
         )
     lines.extend(
@@ -95,8 +104,9 @@ def create(headers: dict[str, str], prompt: str) -> str:
         "input": {
             "prompt": prompt,
             "aspect_ratio": "3:2",
-            "output_format": "webp",
-            "output_quality": 90,
+            # 원본은 무손실 PNG 다. 강조색을 바꿀 때마다 다시 칠하므로 여기서 손실을
+            # 먹으면 칠할 때마다 조금씩 더 나빠진다. 발행본만 WebP 로 줄인다.
+            "output_format": "png",
             "safety_tolerance": 2,
         },
     }
@@ -161,7 +171,7 @@ def main() -> None:
     done = 0
     for asset in targets:
         key = asset["assetKey"]
-        dest = outDir / f"{key}.webp"
+        dest = outDir / f"{key}{MASTER_SUFFIX}"
         if dest.exists() and not args.force:
             print(f"skip {key}: 이미 있음")
             continue
@@ -176,6 +186,9 @@ def main() -> None:
         done += 1
         time.sleep(GEN_INTERVAL_SEC)
     print(f"완료: {done}건 생성, 경로 {outDir}")
+    if done:
+        print("회색 원본이다. 강조색을 입혀야 발행본이 된다.")
+        print(f"  python -X utf8 blog/scripts/paint_media.py {args.post}")
 
 
 if __name__ == "__main__":

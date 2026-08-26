@@ -50,9 +50,27 @@
     },
     "003-python-qr/hero": {
       "assetKey": "hero",
-      "path": "objects/sha256/17/17e97599ef2ac51854f63acd7d52026fa0af03556885fdb76e1cdc597a99ce3d.webp",
+      "path": "objects/sha256/52/529e7d7cb675862be6442f9ecbbb691da4a5ff7dc7c387f1837c9f44533eaf45.webp",
       "post": "003-python-qr",
-      "sha256": "17e97599ef2ac51854f63acd7d52026fa0af03556885fdb76e1cdc597a99ce3d"
+      "sha256": "529e7d7cb675862be6442f9ecbbb691da4a5ff7dc7c387f1837c9f44533eaf45"
+    },
+    "004-dataframe-libraries/hero": {
+      "assetKey": "hero",
+      "path": "objects/sha256/ef/ef0ebfa270d6567d90fdd3f14576e1e77a58d17226e7739bed8043f20def0469.webp",
+      "post": "004-dataframe-libraries",
+      "sha256": "ef0ebfa270d6567d90fdd3f14576e1e77a58d17226e7739bed8043f20def0469"
+    },
+    "004-dataframe-libraries/one-table-three-tools": {
+      "assetKey": "one-table-three-tools",
+      "path": "objects/sha256/69/69f86a5f36d0171f7a1c4cff45560283c7afb9133269c10e30abac524ab8c905.webp",
+      "post": "004-dataframe-libraries",
+      "sha256": "69f86a5f36d0171f7a1c4cff45560283c7afb9133269c10e30abac524ab8c905"
+    },
+    "004-dataframe-libraries/two-of-five-columns": {
+      "assetKey": "two-of-five-columns",
+      "path": "objects/sha256/15/159e3259346a2f8fed48fd874fe2a479214a12f3a3d40ea6645308d505f199ad.webp",
+      "post": "004-dataframe-libraries",
+      "sha256": "159e3259346a2f8fed48fd874fe2a479214a12f3a3d40ea6645308d505f199ad"
     }
   },
   "objectPrefix": "objects/sha256",
@@ -336,6 +354,16 @@
       "sourcePost": "012-vscode-python-project",
       "visualSubject": "코드 편집기 줄 번호 옆 중단점, 일시 정지 표시, 세 행이 펼쳐진 변수 화면, 합계 결과 막대",
       "width": 1536
+    },
+    "159e3259346a2f8fed48fd874fe2a479214a12f3a3d40ea6645308d505f199ad": {
+      "alt": "세로로 빽빽하게 꽂힌 얇은 판 다섯 줄 가운데 두 줄만 위로 뽑혀 나와 있고 나머지 세 줄은 꽂힌 자리에 그대로 있는 장면",
+      "bytes": 35444,
+      "height": 832,
+      "mime": "image/webp",
+      "path": "objects/sha256/15/159e3259346a2f8fed48fd874fe2a479214a12f3a3d40ea6645308d505f199ad.webp",
+      "sourcePost": "004-dataframe-libraries",
+      "visualSubject": "나란히 꽂힌 얇은 세로 판 다섯 개와 그중 위로 뽑혀 올라온 두 개",
+      "width": 1216
     },
     "16066535c61a7e50cf7fd8729f0f7c24c1d6d46285a1765d0998085dc5eb024b": {
       "alt": "결과 Excel의 여섯 시트와 행 수 및 금액 합계가 인수인계서 기대값과 맞는 모습",
@@ -1077,6 +1105,16 @@
       "visualSubject": "지출 금액 카드와 기준금액 카드 및 비교 코드와 두 분류 결과 카드",
       "width": 1536
     },
+    "529e7d7cb675862be6442f9ecbbb691da4a5ff7dc7c387f1837c9f44533eaf45": {
+      "alt": "어두운 바닥에 놓인 휴대폰 화면이 작은 사각 타일 격자로 덮여 있고 그 위에서 가는 리본 한 줄이 들려 올라오는 장면",
+      "bytes": 61524,
+      "height": 832,
+      "mime": "image/webp",
+      "path": "objects/sha256/52/529e7d7cb675862be6442f9ecbbb691da4a5ff7dc7c387f1837c9f44533eaf45.webp",
+      "sourcePost": "003-python-qr",
+      "visualSubject": "사각 타일 격자로 덮인 휴대폰 화면과 그 위로 들려 올라오는 가는 리본 한 줄",
+      "width": 1216
+    },
     "55a220cf9be84a9c621ad2d28487d6d5bfeb0fa504f355905e7398fb27427dc7": {
       "alt": "같은 함수가 두 번 호출될 때 서로 분리된 지역 변수 공간이 각각 생기는 모습",
       "bytes": 1165076,
@@ -1326,6 +1364,16 @@
       "sourcePost": "011-python-import-libraries",
       "visualSubject": "세 가격 입력이 있는 main Python 파일과 두 계산 함수가 있는 규칙 파일 및 최종 영수증",
       "width": 1536
+    },
+    "69f86a5f36d0171f7a1c4cff45560283c7afb9133269c10e30abac524ab8c905": {
+      "alt": "매끈한 판 하나를 가운데 두고 생김새가 서로 다른 공구 세 개가 각각 다른 방향에서 그 판의 같은 면에 닿아 있는 장면",
+      "bytes": 266836,
+      "height": 832,
+      "mime": "image/webp",
+      "path": "objects/sha256/69/69f86a5f36d0171f7a1c4cff45560283c7afb9133269c10e30abac524ab8c905.webp",
+      "sourcePost": "004-dataframe-libraries",
+      "visualSubject": "가운데 놓인 판 하나와 서로 다른 방향에서 그 판에 닿아 있는 공구 세 개",
+      "width": 1216
     },
     "6ada0be533bce8265fba47e89edf008c0de344fc6845a6dd045e805544fc7238": {
       "alt": "변형 열과 금액 형식 및 경계와 취소와 오류가 섞인 처음 보는 7행 Excel",
@@ -2716,6 +2764,16 @@
       "sourcePost": "013-uv-python-environment",
       "visualSubject": "같은 코드 파일, 서로 다른 Python 실행기 파일, 완전한 패키지 목록, 빈 패키지 칸, 결과 파일과 오류 윤곽",
       "width": 1536
+    },
+    "ef0ebfa270d6567d90fdd3f14576e1e77a58d17226e7739bed8043f20def0469": {
+      "alt": "어두운 책상 위에 두꺼운 종이 뭉치가 쌓여 있고 그 옆면에서 얇은 종이 띠 두 장만 뽑혀 나와 밝게 놓인 장면",
+      "bytes": 58336,
+      "height": 832,
+      "mime": "image/webp",
+      "path": "objects/sha256/ef/ef0ebfa270d6567d90fdd3f14576e1e77a58d17226e7739bed8043f20def0469.webp",
+      "sourcePost": "004-dataframe-libraries",
+      "visualSubject": "층층이 쌓인 두꺼운 종이 뭉치와 그 옆면에서 뽑혀 나온 얇은 종이 띠 두 장",
+      "width": 1216
     },
     "ef81136ea9888a1a0adbc3bbe58d50bcde31a6c912972bcedca944499d489431": {
       "alt": "공통 처리 함수가 두 개의 서로 다른 분류 함수 중 하나를 입력으로 받아 실행하는 모습",

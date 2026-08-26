@@ -2,7 +2,13 @@ const SUBTITLE_LEAD = /^###[ \t]+([^\r\n]+)\r?\n\r?\n/u;
 const IMAGE_LEAD =
   /^!\[([^\]]+)\]\(\s*<?([^\s)>]+)>?\s+["']([^"']+)["']\s*\)\s*(?:\r?\n|$)/u;
 const IMAGEGEN_V2 = "eddmpython-dark-v2";
-const IMAGEGEN_PALETTE = "eddmpython-carbon-ivory-sand-v1";
+const IMAGEGEN_PALETTE = "eddmpython-gray-master-v1";
+/**
+ * 옛 값. 이미지 모델에게 강조색을 직접 그리게 하던 시절의 자산이 이 값을 들고 있다.
+ * 그 이미지의 픽셀에는 지금 금지된 색이 굳어 있어서 새 정책 이름을 붙이면 데이터가
+ * 픽셀과 어긋난다. 새 작업에는 고르지 않고 옛 자산을 알아보기 위해서만 받는다.
+ */
+const LEGACY_IMAGEGEN_PALETTES = new Set(["eddmpython-carbon-ivory-sand-v1"]);
 const BANNED_IMAGEGEN_COLORS = /\b(?:blue|cyan|green|purple|pink|red|gold|amber|rainbow|neon)\b/iu;
 
 function issue(location, message, excerpt = "") {
@@ -91,7 +97,7 @@ export function lintImageBrief(entry, section, parsed) {
 export function lintImagePolicy(entry) {
   const issues = [];
   if (entry.sourceKind !== "imagegen" || entry.visualProfile !== IMAGEGEN_V2) return issues;
-  if (entry.palettePolicy !== IMAGEGEN_PALETTE) {
+  if (entry.palettePolicy !== IMAGEGEN_PALETTE && !LEGACY_IMAGEGEN_PALETTES.has(String(entry.palettePolicy))) {
     issues.push(
       issue(
         "palettePolicy",
