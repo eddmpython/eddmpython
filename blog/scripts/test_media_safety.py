@@ -147,9 +147,103 @@ def fetchRejectsWrongBytes() -> None:
     print("  원본 회수: 로컬과 원격 바이트를 모두 대조한다")
 
 
+def verifyCatchesRemoteDrift() -> None:
+    """원격 검증은 존재만이 아니라 내용 해시를 본다."""
+    published = b"published bytes"
+    master = b"gray master bytes"
+    pubSha, masSha = sha(published), sha(master)
+
+    def catalog(root: Path) -> Path:
+        path = root / "catalog.json"
+        path.write_text(
+            json.dumps(
+                {
+                    "version": 1,
+                    "objectPrefix": publish_media.OBJECT_PREFIX,
+                    "repo": "example/none",
+                    "objects": {
+                        pubSha: {"path": f"objects/sha256/{pubSha[:2]}/{pubSha}.webp",
+                                 "bytes": len(published)},
+                        masSha: {"path": f"objects/sha256/{masSha[:2]}/{masSha}.png",
+                                 "bytes": len(master), "role": "master"},
+                    },
+                    "assets": {
+                        "999-test/hero": {
+                            "post": "999-test", "assetKey": "hero",
+                            "sha256": pubSha,
+                            "masterSha256": masSha,
+                            "masterPath": f"objects/sha256/{masSha[:2]}/{masSha}.png",
+                        }
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+        return path
+
+    def tree(entries):
+        def fake(request, timeout=0):  # noqa: ARG001
+            return _FakeResponse(json.dumps(entries).encode("utf-8"))
+        return fake
+
+    def entry(digest, ext, size, oid=None):
+        return {"type": "file", "path": f"objects/sha256/{digest[:2]}/{digest}.{ext}",
+                "size": size, "lfs": {"oid": digest if oid is None else oid}}
+
+    whole = [entry(pubSha, "webp", len(published)), entry(masSha, "png", len(master))]
+
+    original_urlopen = urllib.request.urlopen
+    original_catalog = publish_media.CATALOG_PATH
+    original_token = publish_media.optional_token
+    publish_media.optional_token = lambda: ""
+    try:
+        with tempfile.TemporaryDirectory(prefix="eddm-verify-") as temp:
+            publish_media.CATALOG_PATH = catalog(Path(temp))
+
+            urllib.request.urlopen = tree(whole)
+            with contextlib.redirect_stdout(io.StringIO()) as out:
+                publish_media.verify_remote()
+            assert "295" not in out.getvalue()
+            assert "일치" in out.getvalue()
+
+            # 죽는 것만으로는 부족하다. 비상 상황에서 무엇이 잘못됐는지 다른 말로 알려야 한다.
+            # 원본이 사라진 것과 해시를 못 본 것은 대응이 다르다.
+            cases = {
+                "원본이 사라짐": ([whole[0]], "원본 없음"),
+                "원본 내용이 바뀜": (
+                    [whole[0], entry(masSha, "png", len(master), oid=pubSha)],
+                    "원본 내용이 다름",
+                ),
+                "해시를 못 봄": (
+                    [whole[0], {"type": "file", "size": len(master),
+                                "path": f"objects/sha256/{masSha[:2]}/{masSha}.png"}],
+                    "원본 해시 확인 못 함",
+                ),
+                "크기가 다름": ([whole[0], {**entry(masSha, "png", 1)}], "원본 크기가 다름"),
+            }
+            for label, (entries, expect) in cases.items():
+                urllib.request.urlopen = tree(entries)
+                raised = False
+                with contextlib.redirect_stdout(io.StringIO()) as out:
+                    try:
+                        publish_media.verify_remote()
+                    except RuntimeError:
+                        raised = True
+                assert raised, f"{label} 을 통과시켰다"
+                assert expect in out.getvalue(), (
+                    f"{label} 을 잡았지만 진단이 다르다. 기대 '{expect}', 실제 {out.getvalue()!r}"
+                )
+    finally:
+        urllib.request.urlopen = original_urlopen
+        publish_media.CATALOG_PATH = original_catalog
+        publish_media.optional_token = original_token
+    print("  원격 검증: 사라짐, 내용 바뀜, 해시 없음, 크기 불일치를 모두 잡는다")
+
+
 def main() -> None:
     pruneRefusesWhenCourseUnreadable()
     fetchRejectsWrongBytes()
+    verifyCatchesRemoteDrift()
     print("이미지 원본 안전 계약 통과")
 
 

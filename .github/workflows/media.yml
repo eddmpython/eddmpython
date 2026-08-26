@@ -1,0 +1,71 @@
+# 발행한 이미지가 원격에 그대로 있는지 매일 본다.
+#
+# track.yml 과 나눠 둔 이유는 실패의 뜻이 다르기 때문이다. track 이 실패하면 글이 지목한
+# 바깥 사실이 움직인 것이고 사람이 읽고 판단하면 된다. 여기가 실패하면 우리가 발행한
+# 바이트가 사라졌거나 바뀐 것이다. 특히 회색 원본은 다른 사본이 없다.
+#
+# 2026-08-26 까지 원본은 한 사람의 기계에만 있었고 아무도 그것을 몰랐다. 지금은 허깅페이스에
+# 있는데, 그러면 그곳이 유일본이 된다. 유일본을 감시 없이 두면 옮긴 의미가 없다. 원본을 잃으면
+# 그 이미지는 다시 만들 수 없다. 발행된 webp 에서 되돌리는 것은 실패한다 (평균 차이 11.3/255,
+# 화소의 68%가 8/255 넘게 어긋난다).
+#
+# 검증기는 HF 트리 API 를 한 번 호출해 파일 목록과 LFS oid 를 받는다. oid 가 그 파일 내용의
+# sha256 이고 우리 객체 주소가 바로 그 값이라, 바이트를 하나도 안 받고 대조한다. 인증도
+# 의존성도 필요 없다. 실측으로 객체 295개를 요청 1회, 0.4초에 확인한다.
+name: media
+
+on:
+  # track 과 시간을 겹치지 않게 둔다. 정각은 큐가 붐벼서 피한다.
+  schedule:
+    - cron: "43 20 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: media
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      # 표준 라이브러리만 쓴다. huggingface-hub 도 토큰도 필요 없다.
+      - name: 원격 객체 검증
+        id: verify
+        run: |
+          set +e
+          python -X utf8 blog/scripts/publish_media.py --verify > "$RUNNER_TEMP/media.txt" 2>&1
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+          set -e
+          cat "$RUNNER_TEMP/media.txt"
+
+      # 매일 새 이슈를 열면 알림이 무뎌진다. 열린 것이 있으면 거기에 댓글로 잇는다.
+      - name: 어긋나면 알린다
+        if: steps.verify.outputs.code != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          body="$(cat "$RUNNER_TEMP/media.txt")"
+          existing="$(gh issue list --label media-integrity --state open --limit 1 --json number --jq '.[0].number')"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$(printf '아직 어긋나 있습니다.\n\n```\n%s\n```' "$body")"
+          else
+            gh label create media-integrity --description "발행한 이미지가 원격에서 어긋남" --color B60205 --force
+            gh issue create \
+              --title "발행한 이미지가 원격에서 어긋났습니다" \
+              --label media-integrity \
+              --body "$(printf '`publish_media.py --verify` 가 실패했습니다.\n\n```\n%s\n```\n\n원본(role master)이 섞여 있으면 그 이미지는 다시 만들 수 없습니다. 로컬에 사본이 남아 있는지 먼저 확인하세요.\n\n계약은 `skills/specs/operation/blogMedia.md` 입니다.' "$body")"
+          fi
+
+      - name: 실패로 표시
+        if: steps.verify.outputs.code != '0'
+        run: exit 1

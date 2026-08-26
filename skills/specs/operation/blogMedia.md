@@ -207,6 +207,38 @@ python -X utf8 blog/scripts/publish_media.py --asset <id> --reviewed
 `check:blog` 가 `palettePolicy: eddmpython-gray-master-v1` 인 자산에 `masterSha256` 이 없으면
 막는다. `--prune-objects` 도 `masterSha256` 을 참조로 세므로 원본을 지우지 않는다.
 
+### 유일본을 감시 없이 두지 않는다
+
+원본을 허깅페이스로 옮기면 **그곳이 유일본**이 된다. 감시가 없으면 옮긴 의미가 없다.
+사라진 것을 다시 칠하려 할 때 알게 되고, 그때는 몇 년 뒤일 수 있다.
+
+`--verify` 가 그 감시다. HF 트리 API 를 한 번 불러 파일 목록과 LFS oid 를 받는다. oid 가 그
+파일 내용의 sha256 이고 우리 객체 주소가 바로 그 값이라, **바이트를 하나도 안 받고 콘텐츠 주소
+계약 자체를 검증한다.** 인증도 `huggingface-hub` 도 필요 없다. 실측으로 객체 295개를 요청 1회,
+0.4초에 확인한다.
+
+```bash
+python -X utf8 blog/scripts/publish_media.py --verify
+```
+
+존재만 보지 않는다. 네 가지를 나눠 잡고 각각 다른 말로 알린다.
+
+| 무엇 | 뜻 |
+|---|---|
+| 없음 | 그 바이트가 원격에서 사라졌다 |
+| 내용이 다름 | 같은 주소에 다른 파일이 있다. 콘텐츠 주소 계약이 깨졌다 |
+| 해시 확인 못 함 | 파일은 있는데 내용을 대조할 수 없다. 통과로 세지 않는다 |
+| 크기가 다름 | catalog 의 `bytes` 와 어긋난다 |
+
+`.github/workflows/media.yml` 이 매일 돌리고 어긋나면 `media-integrity` 라벨로 이슈를 연다.
+이미 열린 것이 있으면 새로 열지 않고 댓글로 잇는다. 매일 새 이슈를 열면 알림이 무뎌진다.
+
+**원본이 섞여 있으면 그 이미지는 다시 만들 수 없다.** 그래서 보고가 원본과 발행본을 나눠 센다.
+
+원본을 받아 오는 쪽도 대조한다. `paint_media.py` 는 내려받은 바이트와 이미 있는 로컬 파일 모두
+`masterSha256` 과 견주고, 다르면 다시 받거나 죽는다. 잘린 파일이 유일본 자리를 조용히 차지하는
+것을 막는다. 부정 대조는 `blog/scripts/test_media_safety.py` 에 있다.
+
 ### 어디에 무슨 색이 앉나
 
 `paint_media.py` 가 `site/src/design.ts` 의 `DESIGN.palette` 를 실행 시점에 읽는다.

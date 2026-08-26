@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import urllib.request
 import os
 import re
 import struct
@@ -426,6 +427,17 @@ def updated_post(
     )
 
 
+def optional_token() -> str | None:
+    """있으면 쓰고 없으면 안 쓴다. 검증은 공개 데이터셋이라 익명으로도 된다.
+
+    `resolve_token` 은 토큰이 없으면 huggingface_hub 를 요구하고 없으면 죽는다. 올리는
+    쪽은 그래야 맞지만 검증은 아니다. 검증이 의존성과 토큰을 요구하면 CI 에서 매일 돌릴 수
+    없고, 매일 안 돌면 원본이 사라져도 아무도 모른다.
+    """
+    load_project_env()
+    return os.environ.get("HF_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN")
+
+
 def resolve_token() -> str | None:
     load_project_env()
     token = os.environ.get("HF_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN")
@@ -614,34 +626,83 @@ def publish(
 
 
 def verify_remote() -> None:
+    """catalog 의 객체가 원격에 그대로 있는지 본다.
+
+    HF 트리 API 는 인증 없이 요청 한 번으로 저장소의 모든 파일과 그 LFS oid 를 준다.
+    LFS oid 는 그 파일 내용의 sha256 이고, 우리 객체 주소가 바로 그 값이다. 그래서 바이트를
+    하나도 안 받고 콘텐츠 주소 계약 자체를 검증할 수 있다. 실측으로 649개 항목이 0.4초에 온다.
+
+    존재만 보는 것으로는 부족하다. 발행본은 잃어도 원본에서 다시 칠하면 되지만 **원본은
+    그곳이 유일본이다.** 로컬 사본을 두지 않기로 했으므로 여기가 유일한 감시 지점이다.
+    """
     catalog = load_json(CATALOG_PATH)
     repo = str(catalog.get("repo") or "")
     objects = catalog.get("objects")
+    assets = catalog.get("assets") or {}
     if catalog.get("version") != 1 or catalog.get("objectPrefix") != OBJECT_PREFIX:
         raise ValueError("blog/media/catalog.json 계약 위반")
     if not repo or not isinstance(objects, dict):
         raise ValueError("catalog.json repo 또는 objects 계약 위반")
-    paths = sorted(
-        {str(record.get("path") or "") for record in objects.values() if isinstance(record, dict)}
-    )
-    if not paths:
+    if not objects:
         print("블로그 미디어 원격 검증: 객체 0개")
         return
-    try:
-        from huggingface_hub import HfApi
-    except ImportError as exc:
-        raise ValueError(
-            "huggingface-hub가 필요함: python -m pip install -r blog/requirements.txt"
-        ) from exc
-    api = HfApi(token=resolve_token())
-    missing = [
-        path
-        for path in paths
-        if not api.file_exists(repo_id=repo, filename=path, repo_type="dataset")
-    ]
-    if missing:
-        raise RuntimeError(f"HF 원격 객체가 없음: {', '.join(missing)}")
-    print(f"블로그 미디어 원격 검증: 객체 {len(paths)}개")
+
+    url = f"https://huggingface.co/api/datasets/{repo}/tree/main?recursive=true"
+    headers = {"User-Agent": "eddmpython-verify"}
+    token = optional_token()
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    request = urllib.request.Request(url, headers=headers)
+    with urllib.request.urlopen(request, timeout=120) as response:
+        tree = json.loads(response.read())
+    remote = {
+        str(item.get("path")): item
+        for item in tree
+        if isinstance(item, dict) and item.get("type") == "file"
+    }
+
+    master_sha = {
+        str(record["masterSha256"])
+        for record in assets.values()
+        if isinstance(record, dict) and record.get("masterSha256")
+    }
+    problems: list[str] = []
+    checked = 0
+    for sha, record in sorted(objects.items()):
+        if not isinstance(record, dict):
+            continue
+        checked += 1
+        kind = "원본" if sha in master_sha else "발행본"
+        path = str(record.get("path") or "")
+        item = remote.get(path)
+        if item is None:
+            problems.append(f"{kind} 없음: {path}")
+            continue
+        lfs = item.get("lfs") or {}
+        oid = str(lfs.get("oid") or lfs.get("sha256") or "")
+        if not oid:
+            # 존재는 하는데 내용 해시를 못 봤다. 통과로 세지 않는다
+            problems.append(f"{kind} 해시 확인 못 함: {path}")
+            continue
+        if oid != sha:
+            problems.append(f"{kind} 내용이 다름: {path} (원격 {oid[:12]}, catalog {sha[:12]})")
+            continue
+        size = item.get("size")
+        want = record.get("bytes")
+        if isinstance(want, int) and isinstance(size, int) and size != want:
+            problems.append(f"{kind} 크기가 다름: {path} (원격 {size}, catalog {want})")
+
+    if problems:
+        for line in problems:
+            print(f"  {line}")
+        raise RuntimeError(
+            f"원격 검증 실패 {len(problems)}건. 원본이 섞여 있으면 그 이미지는 다시 못 만든다"
+        )
+    print(
+        f"블로그 미디어 원격 검증: 객체 {checked}개 내용 해시 일치 "
+        f"(원본 {len(master_sha)}개 포함, 요청 1회)"
+    )
+
 
 
 def course_referenced_sha(strict: bool = False) -> set[str]:
