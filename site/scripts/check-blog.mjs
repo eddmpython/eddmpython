@@ -550,7 +550,7 @@ for (const post of targetPosts) {
    */
   const embedKinds = [
     {
-      label: "Codaro 실습 셀",
+      label: "실습 셀",
       any: /https:\/\/eddmpython\.com\/codaro\/run\/\?example=([a-z0-9-]*)/g,
       line: codaroEmbedRef,
       known: (id) => Boolean(codaroEmbeds.examples[id]),

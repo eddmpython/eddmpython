@@ -83,7 +83,7 @@ export function Showcase({ active, onActiveChange, onRotate }: Props) {
             aria-pressed={i === active}
             className={`cursor-pointer rounded-full border px-3 py-1 text-[13px] transition-colors ${
               i === active
-                ? "border-white/25 bg-white/10 text-ivory"
+                ? "border-[var(--eddm-accent-line)] bg-[var(--eddm-accent-bg)] text-[var(--eddm-accent)]"
                 : "border-white/10 text-ivory/50 hover:border-white/20 hover:text-ivory"
             }`}
           >

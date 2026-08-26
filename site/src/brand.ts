@@ -50,7 +50,7 @@ export const BRAND = {
    * 예외로 둔다. 이 값이 그 예외이며 마크 밖으로 넓히지 않는다. 워드마크의 `.py` 가
    * 같은 값을 쓰는 것은 로고 락업 안이라 예외 범위에 든다.
    */
-  dot: DESIGN.palette.dot,
+  dot: DESIGN.palette.brand,
 } as const;
 
 /**

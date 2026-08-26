@@ -67,7 +67,7 @@ const ADMIN_STYLE = `
 .adm button { height:var(--adm-control-h); min-height:var(--adm-control-h); padding:.4rem .72rem; font-size:.84rem; white-space:nowrap; }
 .adm input::placeholder { color:var(--eddm-text-faint); }
 .row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; margin-top:.85rem; }
-.adm .go { border-color:var(--eddm-accent-line); background:var(--eddm-accent-bg); color:var(--eddm-sand); }
+.adm .go { border-color:var(--eddm-accent-line); background:var(--eddm-accent-bg); color:var(--eddm-accent); }
 .adm .danger { border-color:var(--eddm-danger-line); background:transparent; color:var(--eddm-danger); }
 .adm .danger:hover { background:var(--eddm-danger-line); }
 .note { color:var(--eddm-text-dim); font-size:.85rem; margin:.4rem 0 0; }
@@ -107,10 +107,10 @@ const ADMIN_STYLE = `
 .addr-row { display:flex; align-items:center; gap:.25rem; min-width:0; margin-top:.2rem; }
 .addr { min-width:0; font-family:${DESIGN.font.mono}; font-size:.78rem; color:var(--eddm-text-muted);
   text-decoration:none; overflow-wrap:anywhere; }
-.addr:hover { color:var(--eddm-sand); }
+.addr:hover { color:var(--eddm-accent); }
 .adm .copy-icon { display:inline-grid; place-items:center; flex:0 0 auto; width:1.8rem; height:1.8rem;
   min-height:1.8rem; padding:.3rem; border-color:transparent; background:transparent; color:var(--eddm-text-muted); }
-.copy-icon:hover, .copy-icon[data-copied="1"] { border-color:var(--eddm-line-base); background:var(--eddm-hover); color:var(--eddm-sand); }
+.copy-icon:hover, .copy-icon[data-copied="1"] { border-color:var(--eddm-line-base); background:var(--eddm-hover); color:var(--eddm-accent); }
 .copy-icon svg { width:1rem; height:1rem; }
 .room-settings { display:grid; grid-template-columns:minmax(11rem,.9fr) minmax(14rem,1.3fr) auto;
   gap:.55rem; align-items:end; margin-top:.85rem; padding-top:.85rem; border-top:1px solid var(--eddm-line); }
@@ -122,7 +122,7 @@ const ADMIN_STYLE = `
 .cat { display:flex; align-items:center; gap:.75rem; padding:.55rem .1rem; cursor:pointer;
   border-bottom:1px solid var(--eddm-line); }
 .cat:last-child { border-bottom:0; }
-.cat:hover { color:var(--eddm-sand); }
+.cat:hover { color:var(--eddm-accent); }
 .cat > span:first-child { flex:1 1 12rem; font-size:.92rem; }
 .cat .num { color:var(--eddm-text-faint); font-size:.8rem; font-variant-numeric:tabular-nums; }
 .cat input[type="checkbox"] { width:1.2rem; height:1.2rem; margin:0; accent-color:var(--eddm-ivory); cursor:pointer; }

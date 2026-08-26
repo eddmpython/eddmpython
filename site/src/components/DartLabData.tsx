@@ -45,7 +45,7 @@ export function DartLabData() {
                   href={SOCIAL.dartlabData}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-ivory px-4 py-2.5 text-sm font-medium text-carbon transition-colors hover:bg-white"
+                  className="eddm-button-primary inline-flex cursor-pointer items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors"
                 >
                   Hugging Face 데이터셋 열기
                   <span aria-hidden="true">↗</span>

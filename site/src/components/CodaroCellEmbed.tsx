@@ -45,7 +45,7 @@ export function CodaroCellEmbed({ exampleId }: { exampleId: string }) {
    */
   if (!example) {
     return (
-      <aside className="my-8 rounded-2xl border border-[#e0908a]/40 bg-white/[0.025] px-4 py-4 text-sm text-[#e0908a]">
+      <aside className="my-8 rounded-2xl border border-[var(--eddm-danger-line)] bg-white/[0.025] px-4 py-4 text-sm text-[var(--eddm-danger)]">
         실행 칸을 찾지 못했습니다
         <span className="mt-1 block font-mono text-xs text-ivory/45">{exampleId}</span>
       </aside>
@@ -54,12 +54,12 @@ export function CodaroCellEmbed({ exampleId }: { exampleId: string }) {
 
   return (
     <aside
-      aria-label={`Codaro 실습 셀: ${example.title}`}
-      className="my-8 overflow-hidden rounded-2xl border border-codaro/25 bg-white/[0.025]"
+      aria-label={`실습 셀: ${example.title}`}
+      className="my-8 overflow-hidden rounded-2xl border border-white/11 bg-white/[0.025]"
     >
       <header className="border-b border-white/10 px-4 py-4 md:px-5">
-        <p className="font-mono text-[11px] tracking-[0.14em] text-codaro uppercase">
-          Codaro 실습 셀
+        <p className="font-mono text-[11px] tracking-[0.14em] text-ivory/38 uppercase">
+          실습 셀
         </p>
         <h3 className="mt-2 text-base font-medium text-ivory md:text-lg">
           {example.title}
@@ -83,7 +83,7 @@ export function CodaroCellEmbed({ exampleId }: { exampleId: string }) {
           href={example.fullUrl}
           target="_blank"
           rel="noreferrer"
-          className="shrink-0 text-ivory underline decoration-white/25 underline-offset-4 transition-colors hover:decoration-white/60"
+          className="shrink-0 text-ivory underline decoration-[var(--eddm-accent-line)] underline-offset-4 transition-colors hover:decoration-[var(--eddm-accent)]"
         >
           전체 화면 열기
         </a>

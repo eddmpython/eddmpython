@@ -188,7 +188,7 @@ export function SheetCell() {
                             numeric ? "text-right" : ""
                           } ${
                             typeof v === "string" && v.startsWith("#")
-                              ? "text-[#e0908a]"
+                              ? "text-[var(--eddm-danger)]"
                               : isFormula
                                 ? "text-xlpod"
                                 : "text-ivory/85"

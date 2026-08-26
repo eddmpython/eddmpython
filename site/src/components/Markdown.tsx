@@ -192,7 +192,7 @@ function YouTube({
           href={watchUrl}
           target="_blank"
           rel="noreferrer"
-          className="shrink-0 text-ivory/72 underline decoration-white/20 underline-offset-4 hover:decoration-white/55"
+          className="shrink-0 text-ivory/72 underline decoration-[var(--eddm-accent-line)] underline-offset-4 hover:decoration-[var(--eddm-accent)]"
         >
           YouTube에서 열기
         </a>
@@ -461,7 +461,7 @@ export function Markdown({ children }: { children: string }) {
             href={href}
             target={href?.startsWith("http") ? "_blank" : undefined}
             rel={href?.startsWith("http") ? "noreferrer" : undefined}
-            className="text-ivory underline decoration-white/25 underline-offset-4 transition-colors hover:decoration-white/60"
+            className="text-ivory underline decoration-[var(--eddm-accent-line)] underline-offset-4 transition-colors hover:decoration-[var(--eddm-accent)]"
           >
             {k}
           </a>

@@ -152,16 +152,13 @@ for (const line of classroom.split(/\r?\n/)) {
 }
 
 /**
- * 마크의 점 색은 로고 락업 안에만 남는다.
+ * 브랜드 색과 그 진한 판을 화면 파일에 다시 적지 않는다.
  *
- * 강조색과 별개인 이 색을 위의 BRAND_HEX 검사가 보지 않으므로 따로 확인한다.
- * 저장소 강행규칙이 붉은 계열을 주요 색상에서 막고 브랜드 마크의 포인트 하나만 예외로
- * 두었다. 그 예외가 화면 강조로 번지는 것을 막으려면 값 자체를 걸어야 한다.
- *
- * 2026-08-26 에 심볼을 뱀 매듭에서 e 와 점으로 바꾸면서 이 검사도 눈 색에서 점 색으로
- * 옮겼다. 값만 갈면 이름이 남아 다음 사람이 무엇을 막는 검사인지 오해한다.
+ * 2026-08-26 에 강조색을 흑백에서 브랜드 코랄로 바꿨다. 값이 한 곳에서만 나오지 않으면
+ * 다음에 강조색을 갈 때 여기 적힌 자리만 옛 색으로 남는다. 화면은 `--eddm-accent` 와 그
+ * 파생 변수를 소비하고, 정적 SVG 처럼 CSS 변수를 못 읽는 자리만 `DESIGN` 을 직접 읽는다.
  */
-const DOT = DESIGN.palette.dot;
+const BRAND_TONES = [DESIGN.palette.brand, DESIGN.palette.brandDeep];
 for (const rel of SCAN) {
   let text;
   try {
@@ -169,8 +166,36 @@ for (const rel of SCAN) {
   } catch {
     continue;
   }
-  const hits = text.match(new RegExp(DOT + "([0-9a-f]{2})?", "gi"));
-  if (hits) add(rel, `마크 점 색 ${DOT} 를 썼습니다 (${hits.length}곳). 이 색은 로고 락업 안에만 남습니다`);
+  for (const tone of BRAND_TONES) {
+    const hits = text.match(new RegExp(tone + "([0-9a-f]{2})?", "gi"));
+    if (hits) {
+      add(
+        rel,
+        `브랜드 색 ${tone} 를 직접 적었습니다 (${hits.length}곳). 화면은 var(--eddm-accent) 를 씁니다`,
+      );
+    }
+  }
+}
+
+/**
+ * 골드는 화면에서 쓰지 않는다.
+ *
+ * 2026-08-26 에 운영자가 전면 금지했다. 그전 심볼의 눈 색이 모래빛이었고 그 색조가
+ * 강조와 링크로 번져 있었다. 제품 마크의 Codaro 색은 그 제품의 아이덴티티라 이 금지의
+ * 대상이 아니지만, `--eddm-codaro` 를 제품 표시 밖에서 강조로 쓰는 것은 막는다.
+ */
+const GOLD_TONES = ["#d8be91", "#c9a227", "#d4af37", "#e2b857"];
+for (const rel of SCAN) {
+  let text;
+  try {
+    text = await readFile(join(SITE, rel), "utf8");
+  } catch {
+    continue;
+  }
+  for (const tone of GOLD_TONES) {
+    const hits = text.match(new RegExp(tone + "([0-9a-f]{2})?", "gi"));
+    if (hits) add(rel, `골드 ${tone} 를 썼습니다 (${hits.length}곳). 골드는 화면에서 쓰지 않습니다`);
+  }
 }
 
 /** 로그인과 조종 화면이 `강의 관리`라는 같은 제품 이름을 쓴다. */

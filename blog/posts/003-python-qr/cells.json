@@ -2,10 +2,10 @@
   "version": 1,
   "examples": {
     "qr-first": {
-      "title": "주소를 바꿔 QR코드 그려 보기",
-      "description": "따옴표 안의 주소를 안내문에 넣을 주소로 바꾸고 실행합니다. QR코드가 화면에 그려지고 저장했을 때의 픽셀 크기가 함께 나옵니다.",
-      "code": "import segno\n\nqr = segno.make_qr(\"https://eddmpython.com\")\nqr.terminal(compact=True)\nprint(\"이 QR코드는\", qr.symbol_size(scale=8, border=4), \"픽셀로 저장됩니다\")\n",
-      "hint": "브라우저에서는 파일을 저장할 수 없어 화면에 그립니다. 내 컴퓨터에서는 같은 코드에 qr.save(\"link.png\", scale=8, border=4) 를 씁니다",
+      "title": "내 주소가 몇 칸이고 몇 픽셀이 되는지 보기",
+      "description": "따옴표 안을 안내문에 넣을 주소로 바꾸고 실행합니다. 주소가 길수록 칸이 늘고 파일도 커집니다. 브라우저에서는 파일을 만들 수 없어 크기만 나옵니다. 실제 PNG는 이 글 맨 위의 입력칸에서 만들어 내려받습니다.",
+      "code": "import segno\n\nqr = segno.make_qr(\"https://eddmpython.com\")\n\nprint(\"가로\", qr.symbol_size(border=0)[0], \"칸\")\nprint(\"scale=8  ->\", qr.symbol_size(scale=8, border=4), \"픽셀\")\nprint(\"scale=20 ->\", qr.symbol_size(scale=20, border=4), \"픽셀\")\n",
+      "hint": "내 컴퓨터에서는 같은 qr 에 qr.save(\"link.png\", scale=8, border=4) 를 붙여 파일로 만듭니다",
       "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor",
       "packages": [
         "segno"
@@ -22,10 +22,10 @@
       ]
     },
     "qr-many": {
-      "title": "여러 주소를 한 번에 만들기",
-      "description": "목록에 주소를 추가하거나 고쳐서 실행합니다. 이름과 주소가 짝지어 처리되는 것을 확인할 수 있습니다.",
-      "code": "import segno\n\nlinks = {\n    \"home\": \"https://eddmpython.com\",\n    \"blog\": \"https://eddmpython.com/blog\",\n}\n\nfor name, url in links.items():\n    qr = segno.make_qr(url)\n    size = qr.symbol_size(scale=8, border=4)\n    print(name + \".png\", size, url)\n",
-      "hint": "내 컴퓨터에서는 print 자리에 qr.save(name + \".png\", scale=8, border=4) 가 들어갑니다",
+      "title": "여러 주소의 크기를 한 번에 보기",
+      "description": "목록에 주소를 추가하거나 고쳐서 실행합니다. 이름과 주소가 짝지어 처리되는 것과 주소마다 크기가 달라지는 것을 확인할 수 있습니다.",
+      "code": "import segno\n\nlinks = {\n    \"home\": \"https://eddmpython.com\",\n    \"blog\": \"https://eddmpython.com/blog\",\n}\n\nfor name, url in links.items():\n    qr = segno.make_qr(url)\n    print(name + \".png\", qr.symbol_size(scale=8, border=4), url)\n",
+      "hint": "내 컴퓨터에서는 print 자리에 qr.save(name + \".png\", scale=8, border=4) 가 들어가 파일이 만들어집니다",
       "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor",
       "packages": [
         "segno"

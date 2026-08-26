@@ -184,7 +184,7 @@ export function PyCell({
           type="button"
           onClick={run}
           disabled={busy || state === "unsupported"}
-          className="rounded-lg bg-ivory px-3.5 py-1.5 text-sm font-medium text-carbon transition-colors hover:bg-white disabled:opacity-50"
+          className="eddm-button-primary rounded-lg px-3.5 py-1.5 text-sm font-medium transition-colors disabled:opacity-50"
         >
           {busy ? status : "실행"}
         </button>
@@ -205,7 +205,7 @@ export function PyCell({
       <output
         className={`block max-h-72 overflow-auto border-t border-white/10 px-4 py-4 font-mono text-[12px] leading-5 break-words whitespace-pre-wrap ${
           state === "error" || state === "unsupported"
-            ? "text-[#e0908a]"
+            ? "text-[var(--eddm-danger)]"
             : "text-ivory/70"
         }`}
       >

@@ -139,16 +139,16 @@ const ROUTE_RULES = [
     id: "python-types",
     checks: [
       TEXT("article#content h1", "Python 실행 순서와 자료형"),
-      COUNT('aside[aria-label^="Codaro 실습 셀:"]', { exact: 3 }),
+      COUNT('aside[aria-label^="실습 셀:"]', { exact: 3 }),
       VISIBLE(
-        'aside[aria-label="Codaro 실습 셀: 문자 금액을 계산 가능한 숫자로 바꾸기"] textarea',
+        'aside[aria-label="실습 셀: 문자 금액을 계산 가능한 숫자로 바꾸기"] textarea',
       ),
     ],
     captures: [
       {
         id: "amount-conversion-cell",
         selector:
-          'aside[aria-label="Codaro 실습 셀: 문자 금액을 계산 가능한 숫자로 바꾸기"]',
+          'aside[aria-label="실습 셀: 문자 금액을 계산 가능한 숫자로 바꾸기"]',
       },
     ],
     interactions: [
@@ -156,9 +156,9 @@ const ROUTE_RULES = [
         id: "run-amount-conversion",
         type: "click-until-text",
         click:
-          'aside[aria-label="Codaro 실습 셀: 문자 금액을 계산 가능한 숫자로 바꾸기"] button',
+          'aside[aria-label="실습 셀: 문자 금액을 계산 가능한 숫자로 바꾸기"] button',
         target:
-          'aside[aria-label="Codaro 실습 셀: 문자 금액을 계산 가능한 숫자로 바꾸기"] output',
+          'aside[aria-label="실습 셀: 문자 금액을 계산 가능한 숫자로 바꾸기"] output',
         includes: "합계 150,000원",
         timeoutMs: 120_000,
       },
@@ -169,22 +169,22 @@ const ROUTE_RULES = [
     id: "codaro-guide",
     checks: [
       TEXT("article#content h1", "설치 없이 Python 첫 코드를 실행하는 방법"),
-      COUNT('aside[aria-label^="Codaro 실습 셀:"]', { exact: 1 }),
+      COUNT('aside[aria-label^="실습 셀:"]', { exact: 1 }),
       VISIBLE('textarea[aria-label="Python 코드"]'),
-      TEXT('aside[aria-label^="Codaro 실습 셀:"] button', "실행"),
+      TEXT('aside[aria-label^="실습 셀:"] button', "실행"),
     ],
     captures: [
       {
         id: "codaro-cell",
-        selector: 'aside[aria-label^="Codaro 실습 셀:"]',
+        selector: 'aside[aria-label^="실습 셀:"]',
       },
     ],
     interactions: [
       {
         id: "run-example",
         type: "click-until-text",
-        click: 'aside[aria-label^="Codaro 실습 셀:"] button',
-        target: 'aside[aria-label^="Codaro 실습 셀:"] output',
+        click: 'aside[aria-label^="실습 셀:"] button',
+        target: 'aside[aria-label^="실습 셀:"] output',
         includes: "1위: 서울",
         timeoutMs: 120_000,
       },

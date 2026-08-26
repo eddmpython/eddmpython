@@ -52,7 +52,7 @@ const CLASSROOM_STYLE = `
   color:var(--eddm-text-muted); text-decoration:none; line-height:1.5; }
 .nav-post b { color:var(--eddm-text-faint); font-weight:500; font-variant-numeric:tabular-nums; }
 .nav-post:hover { background:var(--eddm-raise); color:var(--eddm-ivory); }
-.nav-post.on { background:var(--eddm-accent-bg); color:var(--eddm-sand); }
+.nav-post.on { background:var(--eddm-accent-bg); color:var(--eddm-accent); }
 .nav-post.on b { color:var(--eddm-accent-dim); }
 .toc-h { display:flex; align-items:baseline; justify-content:space-between; gap:.5rem;
   list-style:none; cursor:default; }
@@ -62,10 +62,10 @@ const CLASSROOM_STYLE = `
   color:var(--eddm-text-muted); text-decoration:none; line-height:1.5; }
 .toc a b { flex:0 0 auto; font-weight:500; opacity:.55; font-variant-numeric:tabular-nums; }
 .toc a:hover { color:var(--eddm-ivory); border-left-color:var(--eddm-line-strong); }
-.toc a.on { color:var(--eddm-sand); border-left-color:var(--eddm-sand); }
+.toc a.on { color:var(--eddm-accent); border-left-color:var(--eddm-accent); }
 /* 읽은 만큼 차는 띠. 글이 길어서 어디쯤인지 감이 없으면 지친다. */
 .prog { position:fixed; top:0; left:0; right:0; height:2px; z-index:20; pointer-events:none; }
-.prog i { display:block; height:100%; width:0; background:var(--eddm-sand); opacity:.55;
+.prog i { display:block; height:100%; width:0; background:var(--eddm-accent); opacity:.55;
   transition:width .1s linear; }
 /* 섹션을 닫는 질문. 본문에 묻히지 않게 한 단 밝게 둔다. */
 article .q { font-style:normal; color:var(--eddm-ivory); }
@@ -75,9 +75,9 @@ article .q { font-style:normal; color:var(--eddm-ivory); }
 .body-title { min-width:0; }
 .lecture-open { flex:0 0 auto; display:inline-flex; align-items:center; gap:.5rem; margin-top:.15rem;
   padding:.55rem .8rem; border:1px solid var(--eddm-accent-line); border-radius:.6rem;
-  background:var(--eddm-accent-bg); color:var(--eddm-sand); font-size:.82rem; font-weight:500; }
+  background:var(--eddm-accent-bg); color:var(--eddm-accent); font-size:.82rem; font-weight:500; }
 .lecture-open svg { width:16px; height:16px; }
-.lecture-open:hover { border-color:var(--eddm-sand); }
+.lecture-open:hover { border-color:var(--eddm-accent); }
 @media (max-width:640px) {
   .body-top { display:block; }
   .lecture-open { margin:0 0 1.5rem; }
@@ -90,7 +90,7 @@ article .q { font-style:normal; color:var(--eddm-ivory); }
 .pager a:hover { border-color:var(--eddm-accent-line); }
 .pager .nx { text-align:right; }
 .pager span { display:block; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;
-  color:var(--eddm-sand); margin-bottom:.35rem; }
+  color:var(--eddm-accent); margin-bottom:.35rem; }
 .pager b { font-weight:400; font-size:.9rem; color:var(--eddm-text); line-height:1.5; }
 .pager i { flex:1; }
 
@@ -100,7 +100,7 @@ article .q { font-style:normal; color:var(--eddm-ivory); }
   .toc { order:-1; border:1px solid var(--eddm-line); border-radius:.7rem; padding:.5rem 1rem; }
   .toc[open] { padding-bottom:1rem; }
   .toc-h { cursor:pointer; padding:.5rem 0; }
-  .toc-h::after { content:"펼치기"; font-size:.7rem; color:var(--eddm-sand); letter-spacing:0; }
+  .toc-h::after { content:"펼치기"; font-size:.7rem; color:var(--eddm-accent); letter-spacing:0; }
   .toc[open] .toc-h::after { content:"접기"; }
   .side { display:flex; flex-wrap:wrap; gap:.4rem; align-items:center; }
   .side .side-h { width:100%; margin:.5rem 0 0; }
@@ -111,19 +111,19 @@ article .q { font-style:normal; color:var(--eddm-ivory); }
 .cat-n { font-size:.78rem; font-weight:500; color:var(--eddm-accent-dim); font-variant-numeric:tabular-nums; }
 .cat h2 { margin:0; font-size:1.1rem; font-weight:500; letter-spacing:-.01em; flex-grow:1; }
 .state { flex:0 0 auto; font-size:.7rem; letter-spacing:.06em; padding:.15rem .6rem; border-radius:99px; }
-.state.on { background:var(--eddm-accent-bg); color:var(--eddm-sand); }
+.state.on { background:var(--eddm-accent-bg); color:var(--eddm-accent); }
 /* 이 카테고리를 덮으면 무엇이 되는지. 왜 듣는지가 목록에서 보여야 한다. */
 .goal { margin:.5rem 0 1rem 2.1rem; font-size:.87rem; color:var(--eddm-text-muted); line-height:1.7; }
 /* 잠긴 카테고리. 가리지 않고 이름만 보여 준다. 본문은 여전히 안 내려간다. */
 .later { border:1px solid var(--eddm-line); border-radius:.85rem; padding:1.1rem 1.5rem; opacity:.6; }
 .later-h { margin:0 0 .7rem; font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--eddm-text-faint); }
 .later-row { display:flex; justify-content:space-between; gap:1rem; padding:.4rem 0; font-size:.92rem; color:var(--eddm-text-muted); }
-.tag { font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--eddm-sand); }
+.tag { font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--eddm-accent); }
 a.post { display:flex; gap:.9rem; align-items:baseline; margin-left:2.1rem; padding:.65rem 0;
   border-top:1px solid var(--eddm-line); color:inherit; text-decoration:none; line-height:1.6; }
 a.post b { flex:0 0 auto; font-weight:500; font-size:.78rem; color:var(--eddm-text-faint);
   font-variant-numeric:tabular-nums; }
-a.post:hover { color:var(--eddm-sand); }
+a.post:hover { color:var(--eddm-accent); }
 a.post:hover b { color:var(--eddm-accent-dim); }
 .wait { color:var(--eddm-text-dim); }
 article img, article video { max-width:100%; height:auto; border-radius:.6rem; display:block; margin:1.75rem 0; }
@@ -150,9 +150,9 @@ article h3 + img, article h3 + video, article h3 + .pending { margin-top:.7rem; 
 article p { margin:1.25rem 0; line-height:1.85; color:var(--eddm-text); }
 /* 사례 라벨과 바로 아래 시각물을 한 묶음으로 보이게 한다. 위 본문과는 벌리고 이미지는 붙인다. */
 article p.lb { display:flex; align-items:center; gap:.6rem; margin:2.4rem 0 .55rem; padding:.55rem .75rem;
-  border-left:2px solid var(--eddm-sand); border-radius:0 .45rem .45rem 0;
+  border-left:2px solid var(--eddm-accent); border-radius:0 .45rem .45rem 0;
   background:var(--eddm-raise); color:var(--eddm-ivory); }
-article p.lb::before { content:""; flex:0 0 auto; width:5px; height:5px; border-radius:50%; background:var(--eddm-sand); }
+article p.lb::before { content:""; flex:0 0 auto; width:5px; height:5px; border-radius:50%; background:var(--eddm-accent); }
 article p.lb strong { font-weight:500; font-size:.95rem; }
 article p.lb + figure.media, article p.lb + .slider, article p.lb + .yt,
 article p.lb + img, article p.lb + video, article p.lb + .pending { margin-top:0; }
@@ -173,8 +173,8 @@ article tbody tr:last-child td { border-bottom:0; }
 .cell.bad { border-color:var(--eddm-danger-line); }
 .cell-h { display:flex; align-items:center; gap:.5rem; padding:.7rem 1rem;
   border-bottom:1px solid var(--eddm-line-base); background:var(--eddm-accent-bg); }
-.cell-dot { width:6px; height:6px; border-radius:50%; background:var(--eddm-sand); flex:0 0 auto; }
-.cell-k { font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--eddm-sand); }
+.cell-dot { width:6px; height:6px; border-radius:50%; background:var(--eddm-accent); flex:0 0 auto; }
+.cell-k { font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--eddm-accent); }
 .cell-s { margin-left:auto; font-size:.78rem; color:var(--eddm-text-faint); }
 .cell-t { margin:.9rem 1rem .2rem; font-size:.98rem; color:var(--eddm-text); font-weight:500; }
 .cell-d { margin:.2rem 1rem .8rem; font-size:.88rem; line-height:1.7; color:var(--eddm-text-muted); }
@@ -203,14 +203,14 @@ article tbody tr:last-child td { border-bottom:0; }
 .zoom.on { display:flex; }
 .zoom img { max-width:100%; max-height:100%; border-radius:.4rem; }
 .back { color:var(--eddm-text-muted); text-decoration:none; font-size:.9rem; }
-article a { color:var(--eddm-sand); text-decoration:none; border-bottom:1px solid var(--eddm-accent-line); }
-article a:hover { border-bottom-color:var(--eddm-sand); }
+article a { color:var(--eddm-accent); text-decoration:none; border-bottom:1px solid var(--eddm-accent-line); }
+article a:hover { border-bottom-color:var(--eddm-accent); }
 .yt { margin:1.75rem 0; }
 .yt figcaption { margin-top:.6rem; display:flex; gap:.75rem; align-items:baseline;
   justify-content:space-between; font-size:.85rem; color:var(--eddm-text-muted); line-height:1.6; }
 .yt figcaption a { font-size:.8rem; white-space:nowrap; }
 .yt figcaption .at { font-style:normal; margin-left:.5rem; padding:.1rem .45rem; border-radius:.35rem;
-  background:var(--eddm-accent-bg); color:var(--eddm-sand); font-size:.78rem; white-space:nowrap; }
+  background:var(--eddm-accent-bg); color:var(--eddm-accent); font-size:.78rem; white-space:nowrap; }
 .yt .frame { position:relative; width:100%; padding-top:56.25%; border-radius:.6rem;
   overflow:hidden; background:var(--eddm-media); }
 .yt.tall .frame { padding-top:0; aspect-ratio:9/16; max-width:22rem; margin-inline:auto; }
@@ -258,7 +258,7 @@ body.lecture-on { overflow:hidden; }
   padding-left:max(clamp(1rem,2.4vw,2.75rem),env(safe-area-inset-left));
   border-bottom:1px solid var(--eddm-line-base); background:color-mix(in srgb,var(--eddm-carbon) 94%,transparent); }
 .lecture-bar::after { content:""; position:absolute; left:0; bottom:-1px; width:var(--eddm-lecture-progress);
-  height:2px; background:var(--eddm-sand);
+  height:2px; background:var(--eddm-accent);
   transition:width .28s ease-out; }
 .lecture-brand { min-width:0; display:flex; align-items:center; gap:.7rem; color:var(--eddm-text-muted); }
 .lecture-symbol-wrap { flex:0 0 auto; display:grid; place-items:center; width:2rem; height:2rem; }
@@ -268,7 +268,7 @@ body.lecture-on { overflow:hidden; }
   text-transform:uppercase; }
 .lecture-brand-copy i { overflow:hidden; color:var(--eddm-text-muted); font-size:.74rem; font-style:normal;
   white-space:nowrap; text-overflow:ellipsis; }
-.lecture-progress { min-width:8.6rem; color:var(--eddm-sand); font-size:.76rem; font-weight:650;
+.lecture-progress { min-width:8.6rem; color:var(--eddm-accent); font-size:.76rem; font-weight:650;
   letter-spacing:.08em; text-align:center;
   font-variant-numeric:tabular-nums; }
 .lecture-actions { display:flex; justify-content:flex-end; gap:.45rem; }
@@ -278,7 +278,7 @@ body.lecture-on { overflow:hidden; }
   transition:color .15s ease,border-color .15s ease,background .15s ease; }
 .lecture-actions button:hover, .lecture-foot button:hover { color:var(--eddm-ivory); border-color:var(--eddm-accent-line);
   background:var(--eddm-accent-bg); }
-.lecture-actions button[aria-pressed="true"] { color:var(--eddm-sand); border-color:var(--eddm-accent-line);
+.lecture-actions button[aria-pressed="true"] { color:var(--eddm-accent); border-color:var(--eddm-accent-line);
   background:var(--eddm-accent-bg); }
 .lecture-actions button:disabled, .lecture-foot button:disabled { opacity:.3; cursor:not-allowed;
   color:var(--eddm-text-faint); border-color:var(--eddm-line-base); background:transparent; }
@@ -286,7 +286,7 @@ body.lecture-on { overflow:hidden; }
 .lecture-alert { position:absolute; z-index:7; top:5rem; left:50%; width:max-content;
   max-width:min(34rem,calc(100vw - 2rem)); margin:0; padding:.7rem .95rem;
   border:1px solid var(--eddm-accent-line); border-radius:.5rem;
-  background:color-mix(in srgb,var(--eddm-ink) 96%,var(--eddm-sand)); color:var(--eddm-ivory);
+  background:color-mix(in srgb,var(--eddm-ink) 96%,var(--eddm-accent)); color:var(--eddm-ivory);
   font-size:.8rem; line-height:1.5; text-align:center;
   box-shadow:0 1rem 2.5rem color-mix(in srgb,var(--eddm-ink) 48%,transparent);
   transform:translateX(-50%); }
@@ -312,8 +312,8 @@ body.lecture-on { overflow:hidden; }
   border:1px solid var(--eddm-line-base); border-radius:.5rem; background:transparent; color:var(--eddm-text);
   text-align:left; transition:border-color .15s ease,background .15s ease,color .15s ease; }
 .lecture-map-item:hover { border-color:var(--eddm-accent-line); background:var(--eddm-accent-bg); color:var(--eddm-ivory); }
-.lecture-map-item[aria-current="step"] { border-color:var(--eddm-sand); background:var(--eddm-accent-bg); color:var(--eddm-ivory); }
-.lecture-map-item span { display:block; margin-bottom:.65rem; color:var(--eddm-sand); font-size:.68rem;
+.lecture-map-item[aria-current="step"] { border-color:var(--eddm-accent); background:var(--eddm-accent-bg); color:var(--eddm-ivory); }
+.lecture-map-item span { display:block; margin-bottom:.65rem; color:var(--eddm-accent); font-size:.68rem;
   font-weight:650; letter-spacing:.12em; font-variant-numeric:tabular-nums; }
 .lecture-map-item b { display:block; overflow:hidden; font-size:clamp(1rem,1.35vw,1.25rem); line-height:1.35;
   text-overflow:ellipsis; }
@@ -347,12 +347,12 @@ body.lecture-on { overflow:hidden; }
   width:100%; margin:0 auto; }
 .scene-meta { display:grid; justify-items:start; gap:.45rem; width:4.5rem; min-width:4.5rem; padding-top:.42rem; }
 .scene-index { display:flex; align-items:center; gap:.55rem;
-  color:var(--eddm-sand); font-size:.74rem; font-weight:650; letter-spacing:.12em; font-variant-numeric:tabular-nums; }
+  color:var(--eddm-accent); font-size:.74rem; font-weight:650; letter-spacing:.12em; font-variant-numeric:tabular-nums; }
 .scene-index::after { content:""; width:2.4rem; height:1px; background:var(--eddm-accent-line); }
 .scene-cue { width:4.5rem; min-height:.85rem; color:var(--eddm-text-faint); font-size:.65rem; font-weight:650;
   letter-spacing:.08em; white-space:nowrap; opacity:0; transform:translateY(-2px);
   transition:opacity var(--lecture-motion) ease,transform var(--lecture-motion) ease; }
-.scene-cue:not(:empty) { color:var(--eddm-sand); opacity:.82; transform:none; }
+.scene-cue:not(:empty) { color:var(--eddm-accent); opacity:.82; transform:none; }
 .scene-head > div { min-width:0; }
 .scene-head > div:last-child { opacity:1; transition:opacity var(--lecture-motion) ease; }
 .scene-head h2 { margin:0; font-size:clamp(2.15rem,3.5vw,4.1rem); line-height:1.05;
@@ -376,7 +376,7 @@ body.lecture-on { overflow:hidden; }
 .scene-canvas > p:not(.lb), .scene-canvas > ul, .scene-canvas > ol { display:none; }
 .scene-canvas .slider { display:contents; }
 .scene-canvas .lb, .scene-canvas h4 { display:none; grid-column:1/-1; justify-self:start; margin:0;
-  padding:0 0 .45rem; border-bottom:1px solid var(--eddm-accent-line); color:var(--eddm-sand);
+  padding:0 0 .45rem; border-bottom:1px solid var(--eddm-accent-line); color:var(--eddm-accent);
   font-size:clamp(.86rem,1vw,1.05rem); font-weight:650; }
 .scene-canvas [data-scene-label-visible="true"] { display:flex; }
 .scene-canvas [data-visual] { display:none; justify-self:center; max-width:100%; max-height:100%; margin:0; opacity:1;
@@ -432,7 +432,7 @@ html:not([data-theme="dark"]) .scene-canvas figure.media video {
 .scene-canvas figure.media figcaption { width:max-content; max-width:100%; text-align:center; }
 .scene-canvas pre { width:var(--lecture-visual-max); max-width:100%; max-height:var(--lecture-visual-height); overflow:auto; margin:0; padding:clamp(1.15rem,2.2vw,2.25rem);
   border:1px solid var(--eddm-line-strong); border-radius:.5rem;
-  background:color-mix(in srgb,var(--eddm-ink) 94%,var(--eddm-sand)); color:var(--eddm-ivory);
+  background:color-mix(in srgb,var(--eddm-ink) 94%,var(--eddm-accent)); color:var(--eddm-ivory);
   box-shadow:0 1.1rem 3rem color-mix(in srgb,var(--eddm-ink) 38%,transparent);
   font-family:${DESIGN.font.mono}; font-size:clamp(.95rem,1.35vw,1.4rem); line-height:1.6; white-space:pre; }
 html:not([data-theme="dark"]) .scene-canvas pre {
@@ -472,7 +472,7 @@ html:not([data-theme="dark"]) .scene-canvas pre {
   margin:0 auto; padding:.25rem 0 .25rem 1rem;
   border-left:2px solid transparent; color:transparent; font-size:clamp(1rem,1.2vw,1.35rem); line-height:1.5;
   transform:translateY(4px); }
-.scene-callout.on { border-left-color:var(--eddm-sand); color:var(--eddm-ivory);
+.scene-callout.on { border-left-color:var(--eddm-accent); color:var(--eddm-ivory);
   animation:scene-callout var(--lecture-motion) ease-out both; }
 .lecture-notes { grid-column:2; grid-row:1; z-index:3; min-width:0; max-height:100%; overflow:auto;
   height:100%; box-sizing:border-box; padding:clamp(1.25rem,2vw,2rem); border-left:1px solid var(--eddm-line-base);
@@ -483,8 +483,8 @@ html:not([data-theme="dark"]) .scene-canvas pre {
 .lecture-deck[data-presenter-window="true"] [data-lecture-presenter],
 .lecture-deck[data-presenter-window="true"] [data-lecture-fullscreen],
 .lecture-deck[data-presenter-window="true"] [data-lecture-notes-toggle] { display:none; }
-.lecture-deck[data-presenter-window="true"] .lecture-help { color:var(--eddm-sand); }
-.lecture-notes b { display:block; margin-bottom:.45rem; color:var(--eddm-sand); font-size:.72rem;
+.lecture-deck[data-presenter-window="true"] .lecture-help { color:var(--eddm-accent); }
+.lecture-notes b { display:block; margin-bottom:.45rem; color:var(--eddm-accent); font-size:.72rem;
   letter-spacing:.12em; text-transform:uppercase; }
 .lecture-notes-meta { margin:0 0 1.35rem; padding-bottom:1rem; border-bottom:1px solid var(--eddm-line-base);
   color:var(--eddm-text-muted); font-size:.78rem; font-variant-numeric:tabular-nums; }
@@ -500,7 +500,7 @@ html:not([data-theme="dark"]) .scene-canvas pre {
   border-color:var(--eddm-accent-line); background:var(--eddm-accent-bg); }
 .lecture-notes p { margin:0; color:var(--eddm-text); font-size:.92rem; line-height:1.72; white-space:pre-line; }
 .lecture-notes-next { margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--eddm-line-base); }
-.lecture-notes-next span { display:block; margin-bottom:.45rem; color:var(--eddm-sand); font-size:.7rem;
+.lecture-notes-next span { display:block; margin-bottom:.45rem; color:var(--eddm-accent); font-size:.7rem;
   font-weight:650; letter-spacing:.1em; text-transform:uppercase; }
 .lecture-notes-next p { color:var(--eddm-text-muted); }
 .lecture-foot { position:relative; z-index:4; display:flex; align-items:center; justify-content:space-between; gap:1rem;

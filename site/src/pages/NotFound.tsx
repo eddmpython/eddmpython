@@ -16,7 +16,7 @@ export function NotFound() {
         <div className="mt-8 flex flex-wrap gap-3">
           <a
             href="/"
-            className="rounded-lg bg-ivory px-4 py-2.5 text-sm font-medium text-carbon transition-colors hover:bg-white"
+            className="eddm-button-primary rounded-lg px-4 py-2.5 text-sm font-medium transition-colors"
           >
             홈으로
           </a>

@@ -7,7 +7,7 @@
  *
  * 강조색을 바꾸려면 아래 `ACCENT`의 `dark`와 `light`만 고친다. 현재는 색조를
  * 더하지 않고 다크에서는 가장 밝은 값, 라이트에서는 가장 진한 값을 쓴다. 브랜드 마크의
- * 점 색은 강조색이 아니며 `brand.ts`가 이 파일의 `palette.dot`을 읽어 사용한다.
+ * 로고의 점과 워드마크도 같은 값에서 나온다. `brand.ts`가 `palette.brand`를 읽는다.
  */
 
 const PALETTE = {
@@ -15,8 +15,21 @@ const PALETTE = {
   ink: "#0c0f0e",
   ivory: "#f5f3ee",
   paper: "#ffffff",
-  /** 브랜드 마크의 점. 심볼에서 색이 고정된 유일한 부분이고 워드마크의 `.py` 가 같은 값을 쓴다. */
-  dot: "#f56565",
+  /**
+   * 브랜드 강조색. 저장소의 모든 강조가 이 값 하나에서 나온다.
+   *
+   * 로고 심볼의 점, 워드마크의 `.py`, 버튼, 링크, 선택 상태, 강의 진행선이 전부 여기서
+   * 갈라진다. 강조색을 바꾸려면 이 한 줄만 고친다.
+   */
+  brand: "#f56565",
+  /**
+   * 밝은 배경에서 쓰는 진한 판.
+   *
+   * `brand` 는 다크 배경(carbon)에서 6.08:1 로 잘 읽히지만 라이트 배경(ivory)에서는
+   * 2.73:1 이라 글자와 선으로 쓸 수 없다. 같은 색조를 유지하면서 대비를 4.93:1 로 올린
+   * 값이다. 두 값 다 실제로 재서 정했고 라이트 테마에서만 쓴다.
+   */
+  brandDeep: "#c53030",
   alert: "#e0552d",
   dartlab: "#7da2e8",
   codaro: "#dfa14e",
@@ -24,10 +37,17 @@ const PALETTE = {
   pyproc: "#ff5a36",
 } as const;
 
-/** 강조색 교체 지점. 테마별 대비를 위해 두 값만 한 묶음으로 관리한다. */
+/**
+ * 강조색 교체 지점. 테마별 대비를 위해 두 값만 한 묶음으로 관리한다.
+ *
+ * 2026-08-26 에 흑백에서 브랜드 코랄로 바꿨다. 그전에는 다크가 ivory, 라이트가 carbon 이라
+ * 색조가 없었다. 지금은 양쪽 다 `PALETTE.brand` 계열이고 라이트만 대비 때문에 진한 판을 쓴다.
+ * 브랜드 색을 갈면 이 묶음이 따라오고, 이 묶음을 소비하는 `--eddm-accent` 파생 변수가 화면
+ * 전체를 따라온다. 화면별 CSS 에 색을 다시 적지 않는 이유다.
+ */
 const ACCENT = {
-  dark: PALETTE.ivory,
-  light: PALETTE.carbon,
+  dark: PALETTE.brand,
+  light: PALETTE.brandDeep,
 } as const;
 
 export const DESIGN = {
@@ -112,11 +132,9 @@ function sharedDeclarations(): string {
     "--eddm-carbon": "var(--eddm-canvas)",
     "--eddm-ink": "var(--eddm-frame)",
     "--eddm-ivory": "var(--eddm-foreground)",
-    /** 이전 소비자를 위한 별칭. 새 컴포넌트는 --eddm-accent를 쓴다. */
-    "--eddm-sand": "var(--eddm-accent)",
     "--eddm-text": "color-mix(in srgb, var(--eddm-foreground) 75%, transparent)",
-    /** 브랜드 마크의 점. 로고 락업 안에서만 쓴다. 강조색이 아니다. */
-    "--eddm-dot": PALETTE.dot,
+    /** 브랜드 색 원값. 테마와 무관하게 고정이라 로고 락업이 이것을 쓴다. */
+    "--eddm-brand": PALETTE.brand,
     "--eddm-text-muted": "color-mix(in srgb, var(--eddm-foreground) 55%, transparent)",
     "--eddm-text-dim": "color-mix(in srgb, var(--eddm-foreground) 45%, transparent)",
     "--eddm-text-faint": "color-mix(in srgb, var(--eddm-foreground) 35%, transparent)",
