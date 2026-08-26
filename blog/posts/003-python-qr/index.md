@@ -41,7 +41,7 @@ https://eddmpython.com/tool/python-qr
 python -m pip install segno
 ```
 
-여러 줄이 지나가고 마지막에 `Successfully installed segno-1.5.0` 처럼 `Successfully installed` 로 시작하는 줄이 보이면 설치된 것입니다. 뒤의 번호는 받는 시점에 따라 다릅니다. 이미 깔려 있으면 `Requirement already satisfied` 가 나옵니다.
+여러 줄이 지나가고 마지막에 `Successfully installed segno-1.6.6` 처럼 `Successfully installed` 로 시작하는 줄이 보이면 설치된 것입니다. 뒤의 번호는 받는 시점에 따라 다릅니다. 이미 깔려 있으면 `Requirement already satisfied` 가 나옵니다.
 
 설치 줄을 `pip install segno` 로 알고 있다면 앞의 `python -m` 이 눈에 걸릴 겁니다. 컴퓨터에 파이썬이 여러 개 깔려 있으면 그냥 `pip` 는 엉뚱한 파이썬에 설치합니다. `python -m pip` 는 지금 이 터미널이 쓰는 파이썬에 설치합니다.
 
