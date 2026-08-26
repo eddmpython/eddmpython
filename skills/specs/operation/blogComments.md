@@ -122,6 +122,18 @@ node scripts/giscus-probe.mjs https://eddmpython.com  # iframe 안의 실제 색
 `http://localhost` 라, 부모 문서가 http 면 그 iframe 이 안전한 맥락을 잃어 CSS 가 적용되지 않는다.
 같은 CSS 를 최상위로 열면 정상 적용된다. 색 확인은 운영 주소에서 한다.
 
+로컬 HTTPS 로 확정하려던 경로는 pyproc 이 자체 서명 인증서 대상을 열지 못해 막혀 있다
+(`BROWSER_CONTROL_TARGET_UNAVAILABLE`). pyproc 대기열의 `17-localHttpsTargetTrust` 로 접수했다.
+
+### 시각 승인 캡처에서 댓글이 비어 보이는 것은 정상이다
+
+`verify:visual` 의 전체 화면 캡처에는 댓글 자리가 빈 칸으로 남는다. 결함이 아니다. iframe 이
+`loading="lazy"` 라 뷰포트에 닿아야 요청이 나가는데, 전체 화면 캡처는 스크롤하지 않고 한 번에 찍기
+때문이다. 실제로 뜨는지는 스크롤을 하는 `blog:shot` 이 본다.
+
+그 lazy 를 끄면 이 빈 칸은 사라지지만 글을 열 때마다 iframe 안의 수십 KB 짜리 앱을 끝까지 안 읽는
+사람에게도 받게 한다. 빈 칸은 스크롤이 닿는 순간까지만 보이므로 그대로 둔다.
+
 ## 대체 링크
 
 댓글 제목 아래 GitHub Discussions 로 가는 링크를 함께 둔다. giscus.app 은 남의 서비스이고
