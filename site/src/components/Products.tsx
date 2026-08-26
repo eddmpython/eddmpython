@@ -20,7 +20,7 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
         target="_blank"
         rel="noreferrer"
         aria-label={`${product.name} 열기`}
-        className={`max-md:order-first overflow-hidden rounded-xl bg-white/[0.06] p-1.5 ring-1 ring-white/10 transition-colors hover:ring-white/25 sm:p-2 md:order-none md:rounded-2xl md:p-3 ${
+        className={`max-md:order-first overflow-hidden rounded-xl bg-[var(--eddm-hover)] p-1.5 ring-1 ring-[var(--eddm-line-base)] transition-colors hover:ring-[var(--eddm-line-strong)] sm:p-2 md:order-none md:rounded-2xl md:p-3 ${
           flip ? "md:col-start-1" : "md:col-start-2"
         } md:row-start-1`}
       >
@@ -44,7 +44,7 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
           <h3 className="text-xl font-medium tracking-tight md:text-2xl">
             {product.name}
           </h3>
-          <span className="rounded-full border border-white/10 px-2.5 py-0.5 text-xs text-ivory/55">
+          <span className="rounded-full border border-[var(--eddm-line-base)] px-2.5 py-0.5 text-xs text-ivory/55">
             {product.status}
           </span>
         </div>
@@ -69,7 +69,7 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
         </ul>
 
         {product.install && (
-          <code className="mt-6 block overflow-x-auto rounded-lg border border-white/10 bg-carbon px-3.5 py-2.5 font-mono text-[13px] whitespace-pre text-ivory/80">
+          <code className="mt-6 block overflow-x-auto rounded-lg border border-[var(--eddm-line-base)] bg-carbon px-3.5 py-2.5 font-mono text-[13px] whitespace-pre text-ivory/80">
             <span className="select-none text-accent/70">$ </span>
             {product.install}
           </code>

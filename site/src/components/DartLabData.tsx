@@ -56,11 +56,11 @@ export function DartLabData() {
               </div>
             </div>
 
-            <dl className="grid grid-cols-2 border-t border-white/10 md:border-t-0 md:border-l">
+            <dl className="grid grid-cols-2 border-t border-[var(--eddm-line-base)] md:border-t-0 md:border-l">
               {STATS.map((stat) => (
                 <div
                   key={stat.value}
-                  className="border-white/10 p-6 odd:border-r [&:nth-child(-n+2)]:border-b md:p-7"
+                  className="border-[var(--eddm-line-base)] p-6 odd:border-r [&:nth-child(-n+2)]:border-b md:p-7"
                 >
                   <dt className="text-xs leading-relaxed text-ivory/45">
                     {stat.label}

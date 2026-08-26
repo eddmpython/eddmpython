@@ -68,7 +68,7 @@ function PendingMedia({
   caption: string;
 }) {
   return (
-    <span className="my-7 block overflow-hidden rounded-xl border border-dashed border-white/15 bg-white/[0.02]">
+    <span className="my-7 block overflow-hidden rounded-xl border border-dashed border-[var(--eddm-line-strong)] bg-[var(--eddm-raise)]">
       <span className="flex aspect-[3/2] w-full flex-col items-center justify-center gap-2 px-6 text-center">
         <span className="font-mono text-[11px] tracking-[0.14em] text-ivory/38 uppercase">
           시각물 준비 중
@@ -77,7 +77,7 @@ function PendingMedia({
         <span className="font-mono text-[11px] text-ivory/28">{assetKey}</span>
       </span>
       {caption && (
-        <span className="block border-t border-white/8 px-4 py-3 text-left text-sm leading-relaxed text-ivory/48">
+        <span className="block border-t border-[var(--eddm-line)] px-4 py-3 text-left text-sm leading-relaxed text-ivory/48">
           {caption}
         </span>
       )}
@@ -95,18 +95,18 @@ function ArticleVideo({
   caption: string;
 }) {
   return (
-    <figure className="my-7 overflow-hidden rounded-xl border border-white/10 bg-black/20">
+    <figure className="my-7 overflow-hidden rounded-xl border border-[var(--eddm-line-base)] bg-[var(--eddm-media)]">
       <video
         controls
         playsInline
         preload="metadata"
         aria-label={alt}
-        className="block w-full bg-black"
+        className="block w-full bg-[var(--eddm-media)]"
       >
         <source src={src} type="video/mp4" />
       </video>
       {caption && (
-        <figcaption className="border-t border-white/8 bg-white/[0.02] px-4 py-3 text-left text-sm leading-relaxed text-ivory/48">
+        <figcaption className="border-t border-[var(--eddm-line)] bg-[var(--eddm-raise)] px-4 py-3 text-left text-sm leading-relaxed text-ivory/48">
           {caption}
         </figcaption>
       )}
@@ -151,7 +151,7 @@ function YouTube({
   return (
     <span
       data-youtube-player={id}
-      className={`my-7 block overflow-hidden rounded-xl border border-white/10 ${
+      className={`my-7 block overflow-hidden rounded-xl border border-[var(--eddm-line-base)] ${
         vertical ? "mx-auto max-w-sm" : ""
       }`}
     >
@@ -170,7 +170,7 @@ function YouTube({
             type="button"
             aria-label="YouTube 영상 재생"
             onClick={() => setPlaying(true)}
-            className="group relative flex h-full w-full items-center justify-center overflow-hidden bg-black"
+            className="group relative flex h-full w-full items-center justify-center overflow-hidden bg-[var(--eddm-media)]"
           >
             <img
               src={thumb}
@@ -180,13 +180,13 @@ function YouTube({
               onError={() => setThumb(`https://i.ytimg.com/vi/${id}/hqdefault.jpg`)}
               className="absolute inset-0 h-full w-full object-cover"
             />
-            <span className="relative flex size-16 items-center justify-center rounded-full border border-white/25 bg-black/75 shadow-xl transition-transform group-hover:scale-105">
-              <span className="ml-1 block h-0 w-0 border-y-[10px] border-y-transparent border-l-[16px] border-l-white" />
+            <span className="relative flex size-16 items-center justify-center rounded-full border border-[var(--eddm-line-strong)] bg-[var(--eddm-overlay)] shadow-xl transition-transform group-hover:scale-105">
+              <span className="ml-1 block h-0 w-0 border-y-[10px] border-y-transparent border-l-[16px] border-l-[var(--eddm-foreground)]" />
             </span>
           </button>
         )}
       </span>
-      <span className="flex items-center justify-between gap-4 border-t border-white/8 bg-white/[0.02] px-4 py-3 text-sm text-ivory/52">
+      <span className="flex items-center justify-between gap-4 border-t border-[var(--eddm-line)] bg-[var(--eddm-raise)] px-4 py-3 text-sm text-ivory/52">
         <span className="text-left leading-relaxed">{caption}</span>
         <a
           href={watchUrl}
@@ -275,7 +275,7 @@ function ArticleToc({ headings }: { headings: ArticleHeading[] }) {
       <p className="font-mono text-[11px] tracking-[0.14em] text-ivory/38 uppercase">
         이 글의 순서
       </p>
-      <ol className="mt-4 space-y-3 border-l border-white/10 pl-4">
+      <ol className="mt-4 space-y-3 border-l border-[var(--eddm-line-base)] pl-4">
         {headings.map((heading) => (
           <li key={heading.id}>
             <a
@@ -327,7 +327,7 @@ function Threads({ url }: { url: string }) {
     <span className="my-7 block">
       <blockquote
         ref={ref as never}
-        className="text-post-media block rounded-xl border border-white/10 bg-white/[0.03] p-5"
+        className="text-post-media block rounded-xl border border-[var(--eddm-line-base)] bg-[var(--eddm-raise)] p-5"
         data-text-post-permalink={url}
         data-text-post-version="0"
       >
@@ -376,7 +376,7 @@ export function Markdown({ children }: { children: string }) {
               );
             }
             return (
-              <figure className="my-7 overflow-hidden rounded-xl border border-white/10 bg-black/20">
+              <figure className="my-7 overflow-hidden rounded-xl border border-[var(--eddm-line-base)] bg-[var(--eddm-media)]">
                 <img
                   src={picture.src}
                   alt={picture.alt}
@@ -385,7 +385,7 @@ export function Markdown({ children }: { children: string }) {
                   className="aspect-[3/2] w-full object-cover saturate-[0.72]"
                 />
                 {picture.title && (
-                  <figcaption className="border-t border-white/8 bg-white/[0.02] px-4 py-3 text-left text-sm leading-relaxed text-ivory/48">
+                  <figcaption className="border-t border-[var(--eddm-line)] bg-[var(--eddm-raise)] px-4 py-3 text-left text-sm leading-relaxed text-ivory/48">
                     {picture.title}
                   </figcaption>
                 )}
@@ -414,7 +414,7 @@ export function Markdown({ children }: { children: string }) {
               if (THREADS.test(url)) return <Threads url={url} />;
               if (IMAGE.test(url)) {
                 return (
-                  <span className="my-7 block overflow-hidden rounded-xl border border-white/10">
+                  <span className="my-7 block overflow-hidden rounded-xl border border-[var(--eddm-line-base)]">
                     <img src={url} alt="" loading="lazy" className="block w-full" />
                   </span>
                 );
@@ -432,7 +432,7 @@ export function Markdown({ children }: { children: string }) {
           return (
             <h2
               id={heading?.id}
-              className="eddm-section-title mt-20 mb-3 flex scroll-mt-28 items-baseline gap-4 border-t border-white/15 pt-9 text-ivory md:mt-24 md:gap-5 md:pt-10"
+              className="eddm-section-title mt-20 mb-3 flex scroll-mt-28 items-baseline gap-4 border-t border-[var(--eddm-line-strong)] pt-9 text-ivory md:mt-24 md:gap-5 md:pt-10"
             >
               <span
                 aria-hidden="true"
@@ -467,7 +467,7 @@ export function Markdown({ children }: { children: string }) {
           </a>
         ),
         blockquote: ({ children: k }) => (
-          <blockquote className="my-6 border-l-2 border-white/15 pl-5 text-ivory/60">
+          <blockquote className="my-6 border-l-2 border-[var(--eddm-line-strong)] pl-5 text-ivory/60">
             {k}
           </blockquote>
         ),
@@ -475,12 +475,12 @@ export function Markdown({ children }: { children: string }) {
           className ? (
             <code className="font-mono text-[13px]">{k}</code>
           ) : (
-            <code className="rounded border border-white/10 bg-white/[0.06] px-1.5 py-0.5 font-mono text-[0.9em]">
+            <code className="rounded border border-[var(--eddm-line-base)] bg-[var(--eddm-hover)] px-1.5 py-0.5 font-mono text-[0.9em]">
               {k}
             </code>
           ),
         pre: ({ children: k }) => (
-          <pre className="my-6 overflow-x-auto rounded-xl border border-white/10 bg-carbon px-5 py-4 leading-6 text-ivory/85">
+          <pre className="my-6 overflow-x-auto rounded-xl border border-[var(--eddm-line-base)] bg-carbon px-5 py-4 leading-6 text-ivory/85">
             {k}
           </pre>
         ),
@@ -498,22 +498,22 @@ export function Markdown({ children }: { children: string }) {
               src={typeof src === "string" ? src : undefined}
               alt={alt ?? ""}
               loading="lazy"
-              className="my-7 block w-full rounded-xl border border-white/10"
+              className="my-7 block w-full rounded-xl border border-[var(--eddm-line-base)]"
             />
           ),
-        hr: () => <hr className="my-10 border-white/10" />,
+        hr: () => <hr className="my-10 border-[var(--eddm-line-base)]" />,
         table: ({ children: k }) => (
           <div className="my-6 overflow-x-auto">
             <table className="w-full border-collapse text-sm">{k}</table>
           </div>
         ),
         th: ({ children: k }) => (
-          <th className="border-b border-white/15 px-3 py-2 text-left font-medium">
+          <th className="border-b border-[var(--eddm-line-strong)] px-3 py-2 text-left font-medium">
             {k}
           </th>
         ),
         td: ({ children: k }) => (
-          <td className="border-b border-white/8 px-3 py-2 text-ivory/70">{k}</td>
+          <td className="border-b border-[var(--eddm-line)] px-3 py-2 text-ivory/70">{k}</td>
         ),
       }}
       >

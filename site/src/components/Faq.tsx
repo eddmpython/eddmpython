@@ -38,7 +38,7 @@ function Item({ q, a, index }: { q: string; a: string; index: number }) {
   return (
     <details
       ref={ref}
-      className="reveal group border-b border-white/10"
+      className="reveal group border-b border-[var(--eddm-line-base)]"
       style={{ transitionDelay: `${Math.min(index, 5) * 0.05}s` }}
     >
       <summary className="flex cursor-pointer list-none items-start gap-3 py-5 text-[15px] font-medium transition-colors hover:text-ivory md:text-base [&::-webkit-details-marker]:hidden">
@@ -63,7 +63,7 @@ export function Faq() {
           title="자주 묻는 것"
           description="쓰기 전에 확인하게 되는 것들을 모았습니다."
         />
-        <div className="mt-10 border-t border-white/10">
+        <div className="mt-10 border-t border-[var(--eddm-line-base)]">
           {ITEMS.map((it, i) => (
             <Item key={it.q} q={it.q} a={it.a} index={i} />
           ))}

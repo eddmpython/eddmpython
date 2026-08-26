@@ -31,7 +31,7 @@ export function ProductCell({ product }: { product: Product }) {
               className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
                 i === tab
                   ? "border-[var(--eddm-accent-line)] bg-[var(--eddm-accent-bg)] text-[var(--eddm-accent)]"
-                  : "border-white/10 text-ivory/55 hover:border-white/20 hover:text-ivory"
+                  : "border-[var(--eddm-line-base)] text-ivory/55 hover:border-[var(--eddm-line-strong)] hover:text-ivory"
               }`}
             >
               {c.label}

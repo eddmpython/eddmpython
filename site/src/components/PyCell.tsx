@@ -155,8 +155,8 @@ export function PyCell({
         : "실행을 누르면 결과가 여기에 나옵니다. 코드를 고쳐서 다시 실행해 보세요";
 
   return (
-    <div className="overflow-hidden rounded-xl border border-white/10 bg-carbon">
-      <div className="flex items-center gap-2 border-b border-white/10 bg-white/[0.03] px-4 py-2.5">
+    <div className="overflow-hidden rounded-xl border border-[var(--eddm-line-base)] bg-carbon">
+      <div className="flex items-center gap-2 border-b border-[var(--eddm-line-base)] bg-[var(--eddm-raise)] px-4 py-2.5">
         <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-pyproc" />
         <span className="truncate font-mono text-xs text-ivory/55">
           pyproc 머신 · 브라우저 안
@@ -176,10 +176,10 @@ export function PyCell({
         wrap="off"
         aria-label="Python 코드"
         rows={Math.max(minRows, code.split("\n").length + 1)}
-        className="block w-full resize-y overflow-x-auto bg-transparent px-4 py-4 font-mono text-[13px] leading-6 text-ivory/90 outline-none focus-visible:bg-white/[0.03]"
+        className="block w-full resize-y overflow-x-auto bg-transparent px-4 py-4 font-mono text-[13px] leading-6 text-ivory/90 outline-none focus-visible:bg-[var(--eddm-raise)]"
       />
 
-      <div className="flex flex-wrap items-center gap-2 border-t border-white/10 px-4 py-3">
+      <div className="flex flex-wrap items-center gap-2 border-t border-[var(--eddm-line-base)] px-4 py-3">
         <button
           type="button"
           onClick={run}
@@ -192,7 +192,7 @@ export function PyCell({
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="rounded-lg border border-white/25 px-3.5 py-1.5 text-sm text-ivory transition-colors hover:bg-white/5"
+            className="rounded-lg border border-[var(--eddm-line-strong)] px-3.5 py-1.5 text-sm text-ivory transition-colors hover:bg-[var(--eddm-hover)]"
           >
             멈추고 새로고침
           </button>
@@ -203,7 +203,7 @@ export function PyCell({
       </div>
 
       <output
-        className={`block max-h-72 overflow-auto border-t border-white/10 px-4 py-4 font-mono text-[12px] leading-5 break-words whitespace-pre-wrap ${
+        className={`block max-h-72 overflow-auto border-t border-[var(--eddm-line-base)] px-4 py-4 font-mono text-[12px] leading-5 break-words whitespace-pre-wrap ${
           state === "error" || state === "unsupported"
             ? "text-[var(--eddm-danger)]"
             : "text-ivory/70"

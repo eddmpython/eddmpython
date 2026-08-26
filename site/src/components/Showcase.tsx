@@ -38,7 +38,7 @@ export function Showcase({ active, onActiveChange, onRotate }: Props) {
         rel="noreferrer"
         aria-label={`${current.product} ${current.label} 페이지 열기`}
         data-hero-product-link
-        className="group block cursor-pointer overflow-hidden rounded-2xl bg-ink p-4 ring-1 ring-white/[0.08] transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:ring-white/20 sm:p-5"
+        className="group block cursor-pointer overflow-hidden rounded-2xl bg-ink p-4 ring-1 ring-[var(--eddm-line)] transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:ring-[var(--eddm-line-strong)] sm:p-5"
       >
         <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-carbon">
           {SLIDES.map((s, i) => (
@@ -55,7 +55,7 @@ export function Showcase({ active, onActiveChange, onRotate }: Props) {
               }`}
             />
           ))}
-          <span className="absolute right-3 bottom-3 flex items-center gap-1.5 rounded-full border border-white/15 bg-carbon/85 px-3 py-1.5 text-xs font-medium text-ivory shadow-lg backdrop-blur-sm transition-colors group-hover:bg-ivory group-hover:text-carbon sm:right-4 sm:bottom-4 sm:text-sm">
+          <span className="absolute right-3 bottom-3 flex items-center gap-1.5 rounded-full border border-[var(--eddm-line-strong)] bg-carbon/85 px-3 py-1.5 text-xs font-medium text-ivory shadow-lg backdrop-blur-sm transition-colors group-hover:bg-ivory group-hover:text-carbon sm:right-4 sm:bottom-4 sm:text-sm">
             {current.product} 열기
             <span aria-hidden="true">↗</span>
           </span>
@@ -84,7 +84,7 @@ export function Showcase({ active, onActiveChange, onRotate }: Props) {
             className={`cursor-pointer rounded-full border px-3 py-1 text-[13px] transition-colors ${
               i === active
                 ? "border-[var(--eddm-accent-line)] bg-[var(--eddm-accent-bg)] text-[var(--eddm-accent)]"
-                : "border-white/10 text-ivory/50 hover:border-white/20 hover:text-ivory"
+                : "border-[var(--eddm-line-base)] text-ivory/50 hover:border-[var(--eddm-line-strong)] hover:text-ivory"
             }`}
           >
             {s.label}
@@ -94,7 +94,7 @@ export function Showcase({ active, onActiveChange, onRotate }: Props) {
           type="button"
           onClick={() => setStopped((v) => !v)}
           aria-pressed={stopped}
-          className="cursor-pointer rounded-full border border-white/10 px-3 py-1 text-[13px] text-ivory/55 transition-colors hover:border-white/20 hover:text-ivory"
+          className="cursor-pointer rounded-full border border-[var(--eddm-line-base)] px-3 py-1 text-[13px] text-ivory/55 transition-colors hover:border-[var(--eddm-line-strong)] hover:text-ivory"
         >
           {stopped ? "자동 넘김 켜기" : "자동 넘김 멈춤"}
         </button>

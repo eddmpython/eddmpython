@@ -22,7 +22,7 @@ export function NotFound() {
           </a>
           <a
             href="/blog"
-            className="rounded-lg border border-white/15 px-4 py-2.5 text-sm text-ivory transition-colors hover:bg-white/5"
+            className="rounded-lg border border-[var(--eddm-line-strong)] px-4 py-2.5 text-sm text-ivory transition-colors hover:bg-[var(--eddm-hover)]"
           >
             블로그
           </a>

@@ -36,7 +36,7 @@ function PoseCard({ pose, index }: { pose: (typeof POSES)[number]; index: number
       target="_blank"
       rel="noreferrer"
       aria-label={`${pose.channel}에서 으뜸이 만나기`}
-      className="reveal group cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-ink transition-colors hover:border-white/25"
+      className="reveal group cursor-pointer overflow-hidden rounded-2xl border border-[var(--eddm-line-base)] bg-ink transition-colors hover:border-[var(--eddm-line-strong)]"
       style={{ transitionDelay: `${index * 0.08}s` }}
     >
       <div className="aspect-square overflow-hidden bg-ink">
@@ -49,7 +49,7 @@ function PoseCard({ pose, index }: { pose: (typeof POSES)[number]; index: number
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.025]"
         />
       </div>
-      <div className="flex items-end justify-between gap-4 border-t border-white/10 px-5 py-4">
+      <div className="flex items-end justify-between gap-4 border-t border-[var(--eddm-line-base)] px-5 py-4">
         <div>
           <div className="text-[15px] font-medium text-ivory">{pose.title}</div>
           <div className="mt-1 text-xs text-ivory/45">{pose.channel}</div>
@@ -67,14 +67,14 @@ function PoseCard({ pose, index }: { pose: (typeof POSES)[number]; index: number
 
 export function Euddeum() {
   return (
-    <section id="euddeum" className="scroll-mt-16 border-y border-white/5 bg-white/[0.015]">
+    <section id="euddeum" className="scroll-mt-16 border-y border-[var(--eddm-line)] bg-[var(--eddm-raise)]">
       <div className="mx-auto w-full max-w-5xl px-6 py-16 md:py-24">
         <div className="flex flex-col gap-7 md:flex-row md:items-end md:justify-between">
           <SectionHead
             title="SNS에서 먼저 인사하는 으뜸이"
             description="으뜸이를 캐릭터화한 분홍 뱀입니다. 낯선 데이터와 도구를 조금 더 가깝게 설명하려고 GitHub, Threads, YouTube에서 다양한 표정과 포즈로 등장합니다."
           />
-          <div className="flex w-fit items-center gap-3 rounded-2xl border border-white/10 bg-ink p-2.5 pr-5">
+          <div className="flex w-fit items-center gap-3 rounded-2xl border border-[var(--eddm-line-base)] bg-ink p-2.5 pr-5">
             <img
               src="/brand/euddeum-avatar.webp"
               alt="EDDM Python 이름표를 든 으뜸이 SNS 아바타"

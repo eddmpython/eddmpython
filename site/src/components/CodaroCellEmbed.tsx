@@ -45,7 +45,7 @@ export function CodaroCellEmbed({ exampleId }: { exampleId: string }) {
    */
   if (!example) {
     return (
-      <aside className="my-8 rounded-2xl border border-[var(--eddm-danger-line)] bg-white/[0.025] px-4 py-4 text-sm text-[var(--eddm-danger)]">
+      <aside className="my-8 rounded-2xl border border-[var(--eddm-danger-line)] bg-[var(--eddm-raise)] px-4 py-4 text-sm text-[var(--eddm-danger)]">
         실행 칸을 찾지 못했습니다
         <span className="mt-1 block font-mono text-xs text-ivory/45">{exampleId}</span>
       </aside>
@@ -55,9 +55,9 @@ export function CodaroCellEmbed({ exampleId }: { exampleId: string }) {
   return (
     <aside
       aria-label={`실습 셀: ${example.title}`}
-      className="my-8 overflow-hidden rounded-2xl border border-white/11 bg-white/[0.025]"
+      className="my-8 overflow-hidden rounded-2xl border border-[var(--eddm-line-base)] bg-[var(--eddm-raise)]"
     >
-      <header className="border-b border-white/10 px-4 py-4 md:px-5">
+      <header className="border-b border-[var(--eddm-line-base)] px-4 py-4 md:px-5">
         <p className="font-mono text-[11px] tracking-[0.14em] text-ivory/38 uppercase">
           실습 셀
         </p>
@@ -77,7 +77,7 @@ export function CodaroCellEmbed({ exampleId }: { exampleId: string }) {
           minRows={10}
         />
       </div>
-      <footer className="flex flex-col gap-2 border-t border-white/10 px-4 py-3 text-xs leading-relaxed text-ivory/48 sm:flex-row sm:items-center sm:justify-between md:px-5">
+      <footer className="flex flex-col gap-2 border-t border-[var(--eddm-line-base)] px-4 py-3 text-xs leading-relaxed text-ivory/48 sm:flex-row sm:items-center sm:justify-between md:px-5">
         <span>이 셀은 입문 예제 실행용이며 강검증과 진도 저장은 전체 Web Run에서 이어집니다</span>
         <a
           href={example.fullUrl}

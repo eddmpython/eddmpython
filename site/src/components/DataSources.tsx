@@ -23,7 +23,7 @@ function SourceCard({ source, index }: { source: Source; index: number }) {
   return (
     <div
       ref={ref}
-      className="reveal rounded-xl border border-white/10 bg-white/[0.03] px-5 py-4 transition-colors hover:border-white/20"
+      className="reveal rounded-xl border border-[var(--eddm-line-base)] bg-[var(--eddm-raise)] px-5 py-4 transition-colors hover:border-[var(--eddm-line-strong)]"
       style={{ transitionDelay: `${Math.min(index, 6) * 0.05}s` }}
     >
       <div className="text-[15px] font-medium">{source.name}</div>

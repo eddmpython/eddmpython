@@ -18,7 +18,7 @@ const REGISTRIES = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-white/10">
+    <footer className="border-t border-[var(--eddm-line-base)]">
       <div className="mx-auto grid w-full max-w-5xl gap-10 px-6 py-12 md:grid-cols-[1.4fr_1fr_1fr] md:py-14">
         <div>
           <Logo />
@@ -93,7 +93,7 @@ export function Footer() {
         </nav>
       </div>
 
-      <div className="border-t border-white/5">
+      <div className="border-t border-[var(--eddm-line)]">
         <div className="mx-auto w-full max-w-5xl px-6 py-6 text-xs text-ivory/55">
           © 2026 eddmpython
         </div>

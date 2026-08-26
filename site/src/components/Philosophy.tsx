@@ -7,7 +7,7 @@ export function Philosophy() {
       <div className="mx-auto w-full max-w-5xl px-6 py-16 md:py-24">
         <figure
           ref={ref}
-          className="reveal rounded-2xl border border-white/10 bg-white/[0.03] px-8 py-14 text-center md:py-16"
+          className="reveal rounded-2xl border border-[var(--eddm-line-base)] bg-[var(--eddm-raise)] px-8 py-14 text-center md:py-16"
         >
           <blockquote className="mx-auto max-w-2xl text-2xl leading-snug font-semibold tracking-tight md:text-3xl">
             AI는 판단하고,

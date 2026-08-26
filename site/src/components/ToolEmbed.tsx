@@ -12,7 +12,7 @@ export function ToolEmbed({ toolId }: { toolId: string }) {
   const Tool = TOOLS[toolId];
   if (!Tool) {
     return (
-      <aside className="my-8 rounded-2xl border border-[var(--eddm-danger-line)] bg-white/[0.025] px-4 py-4 text-sm text-[var(--eddm-danger)]">
+      <aside className="my-8 rounded-2xl border border-[var(--eddm-danger-line)] bg-[var(--eddm-raise)] px-4 py-4 text-sm text-[var(--eddm-danger)]">
         도구를 찾지 못했습니다
         <span className="mt-1 block font-mono text-xs text-ivory/45">{toolId}</span>
       </aside>
@@ -23,7 +23,7 @@ export function ToolEmbed({ toolId }: { toolId: string }) {
       fallback={
         <div
           aria-label="도구 불러오는 중"
-          className="my-8 flex h-48 items-center justify-center rounded-2xl border border-white/11 bg-white/[0.02] font-mono text-[11px] tracking-[0.14em] text-ivory/38 uppercase"
+          className="my-8 flex h-48 items-center justify-center rounded-2xl border border-[var(--eddm-line-base)] bg-[var(--eddm-raise)] font-mono text-[11px] tracking-[0.14em] text-ivory/38 uppercase"
         >
           도구 불러오는 중
         </div>

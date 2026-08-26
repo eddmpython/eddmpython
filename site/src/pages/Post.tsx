@@ -53,7 +53,7 @@ export function Post() {
         <div className="mt-10 text-[16px]">
           <Markdown>{post.body}</Markdown>
         </div>
-        <div className="mt-16 border-t border-white/10 pt-7">
+        <div className="mt-16 border-t border-[var(--eddm-line-base)] pt-7">
           <a
             href="/blog"
             className="text-sm text-ivory/60 transition-colors hover:text-ivory"

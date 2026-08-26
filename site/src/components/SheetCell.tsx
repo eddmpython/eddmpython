@@ -63,8 +63,8 @@ export function SheetCell() {
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-white/10 bg-carbon">
-      <div className="flex items-center gap-2 border-b border-white/10 bg-white/[0.03] px-4 py-2.5">
+    <div className="overflow-hidden rounded-xl border border-[var(--eddm-line-base)] bg-carbon">
+      <div className="flex items-center gap-2 border-b border-[var(--eddm-line-base)] bg-[var(--eddm-raise)] px-4 py-2.5">
         <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-xlpod" />
         <span className="truncate font-mono text-xs text-ivory/55">
           시트 · 눌러서 값과 수식을 바꿔 보세요
@@ -72,8 +72,8 @@ export function SheetCell() {
       </div>
 
       {/* 수식 입력줄 */}
-      <div className="flex items-stretch border-b border-white/10">
-        <span className="flex w-14 shrink-0 items-center justify-center border-r border-white/10 font-mono text-xs text-ivory/55">
+      <div className="flex items-stretch border-b border-[var(--eddm-line-base)]">
+        <span className="flex w-14 shrink-0 items-center justify-center border-r border-[var(--eddm-line-base)] font-mono text-xs text-ivory/55">
           {active}
         </span>
         <input
@@ -109,11 +109,11 @@ export function SheetCell() {
         <table className="w-full min-w-[26rem] border-collapse font-mono text-[13px]">
           <thead>
             <tr>
-              <th className="w-9 border-r border-b border-white/10 bg-white/[0.02] p-0 font-normal" />
+              <th className="w-9 border-r border-b border-[var(--eddm-line-base)] bg-[var(--eddm-raise)] p-0 font-normal" />
               {HEAD.map((h, c) => (
                 <th
                   key={c}
-                  className="border-r border-b border-white/10 bg-white/[0.02] px-2 py-1 text-left font-normal text-ivory/45"
+                  className="border-r border-b border-[var(--eddm-line-base)] bg-[var(--eddm-raise)] px-2 py-1 text-left font-normal text-ivory/45"
                 >
                   <span className="text-ivory/70">{colLetter(c)}</span>
                   <span className="ml-2 text-[11px]">{h}</span>
@@ -124,7 +124,7 @@ export function SheetCell() {
           <tbody>
             {Array.from({ length: ROWS }, (_, r) => (
               <tr key={r}>
-                <td className="border-r border-b border-white/10 bg-white/[0.02] px-2 py-1 text-center text-ivory/45">
+                <td className="border-r border-b border-[var(--eddm-line-base)] bg-[var(--eddm-raise)] px-2 py-1 text-center text-ivory/45">
                   {r + 1}
                 </td>
                 {Array.from({ length: COLS }, (_, c) => {
@@ -140,7 +140,7 @@ export function SheetCell() {
                       className={`border-r border-b p-0 ${
                         isActive
                           ? "border-xlpod/60 bg-xlpod/10 outline outline-1 outline-xlpod/60"
-                          : "border-white/10"
+                          : "border-[var(--eddm-line-base)]"
                       }`}
                     >
                       {isEditing ? (
@@ -206,7 +206,7 @@ export function SheetCell() {
         </table>
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-white/10 px-4 py-3 text-xs text-ivory/55">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[var(--eddm-line-base)] px-4 py-3 text-xs text-ivory/55">
         <button
           type="button"
           onClick={() => {
@@ -214,7 +214,7 @@ export function SheetCell() {
             setActive("D1");
             setEditing(null);
           }}
-          className="rounded-lg border border-white/15 px-3 py-1 text-sm text-ivory transition-colors hover:bg-white/5"
+          className="rounded-lg border border-[var(--eddm-line-strong)] px-3 py-1 text-sm text-ivory transition-colors hover:bg-[var(--eddm-hover)]"
         >
           되돌리기
         </button>

@@ -27,7 +27,7 @@ export function ProductRail({ active, onSelect }: Props) {
                   className={`relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--eddm-carbon)_55%,black)] ring-2 transition-[box-shadow,opacity] duration-500 sm:h-10 sm:w-10 ${
                     on
                       ? `${mark.ringClass} product-mark-live opacity-100`
-                      : "ring-white/10 opacity-55 hover:opacity-85 hover:ring-white/25"
+                      : "ring-[var(--eddm-line-base)] opacity-55 hover:opacity-85 hover:ring-[var(--eddm-line-strong)]"
                   }`}
                   style={on ? { boxShadow: `0 0 0 4px ${mark.glow}` } : undefined}
                 >

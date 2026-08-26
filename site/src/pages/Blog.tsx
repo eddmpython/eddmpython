@@ -24,15 +24,15 @@ export function Blog() {
         <h1 className="text-3xl font-medium tracking-tight md:text-4xl">블로그</h1>
 
         {posts.length > 0 && (
-          <ol data-blog-list className="mt-12 border-t border-white/10">
+          <ol data-blog-list className="mt-12 border-t border-[var(--eddm-line-base)]">
             {posts.map((p) => (
-              <li key={p.slug} className="border-b border-white/10">
+              <li key={p.slug} className="border-b border-[var(--eddm-line-base)]">
                 <a
                   href={`/blog/${p.slug}`}
                   className="group grid grid-cols-[1fr_5rem] items-start gap-4 py-7 transition-colors md:grid-cols-[1fr_8.5rem] md:gap-6"
                 >
                   <span>
-                    <span className="block text-lg font-medium tracking-tight transition-colors group-hover:text-white md:text-xl">
+                    <span className="block text-lg font-medium tracking-tight transition-colors group-hover:text-[var(--eddm-foreground)] md:text-xl">
                       {p.title}
                     </span>
                     {p.summary && (
@@ -43,7 +43,7 @@ export function Blog() {
                   </span>
                   <span
                     data-blog-thumb
-                    className="block overflow-hidden rounded-lg border border-white/10 bg-white/5"
+                    className="block overflow-hidden rounded-lg border border-[var(--eddm-line-base)] bg-[var(--eddm-hover)]"
                   >
                     <span className="block aspect-[4/3]">
                       {p.ogImage && (
