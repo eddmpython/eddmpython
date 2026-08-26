@@ -32,6 +32,7 @@
     "classroom:shot": "node scripts/classroom-shot.mjs",
     "classroom:audit": "node scripts/classroom-audit.mjs",
     "admin:shot": "node scripts/admin-shot.mjs",
+    "blog:shot": "node scripts/blog-shot.mjs",
     "check:design": "node --experimental-strip-types scripts/check-brand.mjs",
     "check:brand": "npm run check:design",
     "check:secrets": "node scripts/check-secrets.mjs"

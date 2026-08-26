@@ -74,7 +74,11 @@ const ADSENSE_CSP = [
   "form-action 'self'",
   "img-src 'self' data: https:",
   "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com",
-  "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com",
+  // giscus 는 자기 스타일시트 link 를 이 페이지의 head 에 직접 꽂는다. iframe 안이 아니라
+  // 바깥이라 이 목록에 없으면 막힌다. 아바타 이미지와 GitHub API 호출은 iframe 안에서
+  // 일어나므로 img-src 와 connect-src 에는 넣지 않는다.
+  "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://giscus.app",
+  // 아래 script-src 와 frame-src 의 https: 가 giscus 의 client.js 와 iframe 을 이미 덮는다.
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https:",
   "connect-src 'self' https:",
   "media-src 'self' https:",
@@ -151,6 +155,7 @@ function redirect(to: string, requestUrl: URL): Response {
 
 import { handleRoom } from "./classroom";
 import { handleAdmin } from "./admin";
+import { giscusThemeCss } from "./src/design";
 import type { Env as SiteEnv } from "./env";
 
 // Durable Object 는 저장소 모듈이 든다. 운영장과 강의방이 같은 것을 본다.
@@ -163,6 +168,29 @@ export default {
 
     const legacy = LEGACY_BLOG[pathname] ?? LEGACY_BLOG[url.pathname];
     if (legacy) return redirect(legacy, url);
+
+    /*
+     * 댓글 위젯의 테마. giscus.app 의 iframe 이 이 파일을 받아 자기 head 에 넣는다.
+     *
+     * 정적 파일로 두지 않는 이유는 색의 정본이 design.ts 하나이기 때문이다. public 에 CSS 를
+     * 두면 브랜드 색을 그 파일에 다시 적게 되고, 강조색을 갈 때 한 곳만 고치면 되는 약속이
+     * 깨진다. 받아 가는 쪽이 다른 출처라 CORS 헤더가 필요하다.
+     */
+    if (pathname === "/giscus.css") {
+      return new Response(giscusThemeCss(), {
+        headers: {
+          "content-type": "text/css; charset=utf-8",
+          "access-control-allow-origin": "https://giscus.app",
+          /*
+           * 파일 이름에 내용 해시를 붙일 수 없다. 주소를 giscus 에 넘기는 쪽은 브라우저이고
+           * 그 주소는 고정이라, 오래 캐시하면 브랜드 색을 갈아도 이미 방문한 사람은 옛 색을
+           * 계속 본다. 600 바이트짜리라 매번 재검증해도 비용이 없다.
+           */
+          "cache-control": "no-cache",
+          "x-content-type-options": "nosniff",
+        },
+      });
+    }
 
     /**
      * 운영장. 모든 강의를 여기서 배선한다.

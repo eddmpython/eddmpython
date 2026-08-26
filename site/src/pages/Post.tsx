@@ -4,6 +4,7 @@ import { findPost } from "../posts";
 import { Markdown } from "../components/Markdown";
 import { Nav } from "../components/Nav";
 import { Footer } from "../components/Footer";
+import { Comments } from "../components/Comments";
 
 export function Post() {
   const { slug } = useParams();
@@ -53,6 +54,7 @@ export function Post() {
         <div className="mt-10 text-[16px]">
           <Markdown>{post.body}</Markdown>
         </div>
+        <Comments postId={post.id} />
         <div className="mt-16 border-t border-[var(--eddm-line-base)] pt-7">
           <a
             href="/blog"

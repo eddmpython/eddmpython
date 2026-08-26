@@ -182,3 +182,55 @@ export function designCssVars(mode: "dark" | "adaptive" = "dark"): string {
 export function themeColor(theme: DesignTheme): string {
   return DESIGN.theme[theme].canvas;
 }
+
+/**
+ * 댓글 위젯(giscus)의 테마.
+ *
+ * 댓글은 giscus.app 이 iframe 으로 그리므로 이 사이트의 CSS 가 닿지 않는다. giscus 는
+ * `data-theme` 에 CSS 파일 URL 을 주면 그것을 자기 iframe 의 head 에 넣어 준다. 그 파일이
+ * 브랜드를 입힐 유일한 통로다.
+ *
+ * 이 함수를 두지 않으면 로그인 버튼이 GitHub 기본 초록(#238636)으로 나온다. 이 저장소는
+ * 모든 강조가 `PALETTE.brand` 하나에서 갈라지기로 되어 있어서 그 초록은 남의 색이다.
+ *
+ * **테마 전체를 베끼지 않고 얹는다.** giscus 의 `transparent_dark` 를 `@import` 로 그대로
+ * 끌어오고 브랜드가 걸리는 변수만 덮어쓴다. 4KB 짜리 CSS 를 복사해 두면 giscus 가 자기 테마를
+ * 고칠 때 우리 복사본만 낡는다. 배경이 투명한 판을 고른 이유는 이 사이트의 canvas 가 그대로
+ * 비쳐서 댓글이 페이지에 얹힌 남의 상자로 보이지 않기 때문이다.
+ *
+ * 이 CSS 를 받아 가는 것은 giscus 서버가 아니라 방문자의 브라우저다. 그래서 로컬에서도 돌고,
+ * 대신 응답에 giscus.app 을 허용하는 CORS 헤더가 필요하다. 서빙은 worker.ts 가 한다.
+ */
+export function giscusThemeCss(): string {
+  const brand = DESIGN.accent.dark;
+  const onBrand = DESIGN.theme.dark.accentContrast;
+  const vars: Record<string, string> = {
+    // 로그인과 댓글 쓰기 버튼.
+    "--color-btn-primary-bg": brand,
+    "--color-btn-primary-text": onBrand,
+    "--color-btn-primary-hover-bg": `color-mix(in srgb, ${brand} 88%, ${DESIGN.palette.ivory})`,
+    "--color-btn-primary-selected-bg": `color-mix(in srgb, ${brand} 88%, ${DESIGN.palette.carbon})`,
+    "--color-btn-primary-disabled-bg": `color-mix(in srgb, ${brand} 55%, transparent)`,
+    "--color-btn-primary-disabled-text": `color-mix(in srgb, ${onBrand} 60%, transparent)`,
+    // 댓글 본문 안의 링크와 선택 상태. giscus 기본은 GitHub 파랑이다.
+    "--color-accent-fg": brand,
+    "--color-accent-emphasis": brand,
+    "--color-accent-muted": `color-mix(in srgb, ${brand} 40%, transparent)`,
+    "--color-accent-subtle": `color-mix(in srgb, ${brand} 12%, transparent)`,
+  };
+  const body = Object.entries(vars)
+    .map(([key, value]) => `${key}:${value}`)
+    .join(";");
+  /*
+   * 셀렉터가 `:root` 가 아니라 `main` 인 것이 이 함수의 핵심이다.
+   *
+   * giscus 의 테마 파일은 변수를 `:root` 가 아니라 `main` 에 정의한다. CSS 변수는 상속이라
+   * 버튼에 더 가까운 조상의 값이 이긴다. `:root` 에 적으면 `getComputedStyle(html)` 로는
+   * 우리 값이 보이는데 정작 버튼은 `main` 의 값을 쓰기 때문에, 변수가 먹은 것처럼 보이면서
+   * 화면은 그대로인 상태가 된다. 2026-08-26 에 그 상태를 실제로 만들었고 iframe 안에 붙어
+   * 계산값을 읽고서야 알았다 (scripts/giscus-probe.mjs).
+   *
+   * `@import` 가 먼저 오므로 같은 셀렉터에서는 아래 선언이 이긴다.
+   */
+  return `@import url("https://giscus.app/themes/transparent_dark.css");\nmain{${body}}\n`;
+}

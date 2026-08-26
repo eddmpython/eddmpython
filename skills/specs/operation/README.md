@@ -26,6 +26,7 @@ status: curated
 | [`operation.blogCopy`](blogCopy.md) | 블로그 제목과 카피 | 제목·summary가 약할 때 |
 | [`operation.contentStrategy`](contentStrategy.md) | 글 주제 전략 | 다음 글을 고를 때 |
 | [`operation.blogTracking`](blogTracking.md) | 글 낡음 감시 | 글에 추적을 걸 때 |
+| [`operation.blogComments`](blogComments.md) | 블로그 댓글 | 댓글 배선을 다룰 때 |
 | [`operation.visualVerification`](visualVerification.md) | 시각 검증과 승인 | 화면을 바꾸고 배포하기 전에 |
 | [`operation.workspace`](workspace.md) | 산출물과 임시 파일 | 작업을 끝낼 때 |
 | [`operation.secrets`](secrets.md) | 비밀정보와 공개 경계 | 커밋과 공개 전에 |
