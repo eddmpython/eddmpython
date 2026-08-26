@@ -2,7 +2,7 @@
   "version": 1,
   "watch": {
     "segno": {
-      "anchor": "여러 줄이 지나가고 마지막에 `Successfully installed segno-1.5.0` 처럼",
+      "anchor": "여러 줄이 지나가고 마지막에 `Successfully installed segno-1.6.6` 처럼",
       "kind": "pypi",
       "notify": [
         "issue",
@@ -10,7 +10,7 @@
       ],
       "package": "segno",
       "update": {
-        "find": "segno-1.5.0",
+        "find": "segno-1.6.6",
         "mode": "pr",
         "replace": "segno-{version}"
       },
