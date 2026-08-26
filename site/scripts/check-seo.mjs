@@ -171,7 +171,25 @@ for (const post of postFiles) {
   if (!slug) fail(post.file, "slug frontmatter가 없습니다");
   postRoutes.push({ file: post.file, abs: post.abs, slug, path: `/blog/${slug}` });
 }
-const pages = ["/", "/blog", ...postRoutes.map((post) => post.path)];
+/*
+ * 공통 메타를 검사할 페이지 목록.
+ *
+ * 손으로 적지 않는다. 아래 sitemap 대조와 같은 이유다. 2026-08-26 에 `/brand` 가 생겼을 때
+ * sitemap 쪽은 막혔지만 이 목록은 조용히 지나갔다. 새 페이지가 og:title 도 JSON-LD 도
+ * 검사받지 않은 채로 배포될 수 있었다는 뜻이다. 막히지 않는 게이트가 더 나쁘다.
+ *
+ * 페이지 목록의 정본은 `src/seo.ts` 이고 그 결과가 프리렌더된 `index.html` 이다. 그 파일을
+ * 세면 정본이 바뀔 때 이 검사가 저절로 따라온다.
+ */
+const pages = (await readdir(distRoot, { recursive: true, withFileTypes: true }))
+  .filter((entry) => entry.isFile() && entry.name === "index.html")
+  .map((entry) => {
+    const dir = entry.parentPath ?? entry.path;
+    const rel = resolve(dir).slice(resolve(distRoot).length).split("\\").join("/");
+    return rel === "" ? "/" : rel;
+  })
+  .sort();
+if (!pages.includes("/")) fail("dist", "홈이 프리렌더되지 않았습니다");
 for (const path of pages) checkShared(await pageHtml(path), path);
 
 const defaultImage = await readFile(resolve(distRoot, "og.png"));
