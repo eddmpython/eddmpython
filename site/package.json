@@ -24,6 +24,7 @@
     "test": "npm run test:blog-media && npm run test:blog-env && npm run test:hash-navigation && npm run test:visual-plan && npm run test:classroom-render && npm run test:qr && npm run check:blog && npm run check:design && npm run check:secrets && npm run check:skills && tsc --noEmit",
     "deploy": "npm run build && npm run check:leak && npm run check:visual && wrangler deploy",
     "check:post": "node scripts/check-blog.mjs",
+    "track": "node scripts/track.mjs",
     "check:leak": "node scripts/check-leak.mjs",
     "classroom:dev": "wrangler dev --port 8787 --persist-to ../../eddmpython.out/wrangler-state",
     "postclassroom:dev": "node scripts/clean-wrangler.mjs",

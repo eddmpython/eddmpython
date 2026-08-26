@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "watch": {
+    "segno": {
+      "anchor": "여러 줄이 지나가고 마지막에 `Successfully installed segno-1.6.6` 처럼",
+      "kind": "pypi",
+      "package": "segno",
+      "why": "글 전체가 segno.make_qr 와 qr.save 두 줄 위에 서 있다. 메이저가 바뀌면 그 두 줄과 scale 과 border 인자가 그대로인지 확인해야 한다."
+    }
+  }
+}

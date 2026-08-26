@@ -7,6 +7,8 @@ import {
   lintImagePolicy,
   parseSectionParts,
 } from "./blog-media-package.mjs";
+/* 감시 종류의 정본은 추적기다. 여기에 목록을 다시 적으면 둘이 조용히 갈라진다. */
+import { KINDS as trackKinds } from "./track.mjs";
 
 /*
  * 글 하나가 폴더 하나다.
@@ -66,6 +68,7 @@ const mediaName = "media.json";
 const toolEntry = "tool/index.tsx";
 /** 이 글의 실습 칸. 없어도 된다. */
 const cellsName = "cells.json";
+const trackName = "track.json";
 const publicSlug = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const mediaSuffixes = new Set([
   ".svg",
@@ -201,6 +204,7 @@ for (const entry of await readdir(postsDir, { withFileTypes: true })) {
     toolId: entry.name.replace(/^\d{3}-/, ""),
     hasTool: existsSync(join(dir, "tool", "index.tsx")),
     hasCells: names.includes(cellsName),
+    hasTrack: names.includes(trackName),
   });
 }
 postDirs.sort((a, b) => a.sequence - b.sequence);
@@ -623,6 +627,51 @@ for (const post of targetPosts) {
     if (!anchor) fail(file, `${id} 의 hero 계획에 contentAnchor 가 비었습니다`);
     if (!body.includes(anchor)) {
       fail(file, `${id} 의 hero 계획 contentAnchor 가 본문에 없습니다: ${anchor.slice(0, 40)}`);
+    }
+  }
+
+  /*
+   * 이 글이 밖에서 무엇을 지켜보는지.
+   *
+   * `track.json` 을 둔 글만 추적한다. 파일이 없으면 그 글은 지켜볼 것이 없다는 뜻이고 그것도
+   * 정상이다. 002 처럼 밖에 매인 사실이 없는 글에 감시를 붙이면 알림이 소음이 된다.
+   *
+   * `why` 를 필수로 둔 이유가 이 계약의 전부다. 알림이 "polars 1.45.0 이 나왔다" 로 끝나면
+   * 읽는 사람이 매번 글을 다시 열어 무엇이 걸리는지 찾아야 한다. 그러면 몇 번 만에 안 읽게
+   * 된다. 무엇이 흔들리는지를 계획에 미리 적어 두면 알림 한 줄로 판단할 수 있다.
+   *
+   * `anchor` 는 선택이다. 적어 두면 본문의 그 문장이 살아 있는지 여기서 함께 본다. 수치를
+   * 다시 재서 본문을 고치면 감시도 같이 보게 만드는 장치다. 글이 아직 흔들리는 동안에는
+   * 비워 두고 발행할 때 박는다.
+   */
+  if (post.hasTrack) {
+    const trackLabel = `blog/${postsDirName}/${postId}/${trackName}`;
+    const plan = await loadJson(join(post.dir, trackName), trackLabel);
+    if (plan.version !== 1 || !plan.watch || typeof plan.watch !== "object") {
+      fail(trackLabel, "version 또는 watch 계약이 잘못됐습니다");
+    }
+    if (!Object.keys(plan.watch).length) {
+      fail(trackLabel, "감시가 하나도 없습니다. 지켜볼 것이 없으면 파일을 두지 않습니다");
+    }
+    for (const [id, watch] of Object.entries(plan.watch)) {
+      if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id) || !watch || typeof watch !== "object") {
+        fail(trackLabel, `올바르지 않은 감시 id: ${id}`);
+      }
+      const kind = trackKinds[watch.kind];
+      if (!kind) {
+        fail(trackLabel, `${id} 의 kind 를 모릅니다: ${watch.kind}. 아는 것: ${Object.keys(trackKinds).join(", ")}`);
+      }
+      if (!String(watch.why ?? "").trim()) {
+        fail(trackLabel, `${id} 에 why 가 없습니다. 이 변화가 이 글의 무엇을 흔드는지 적습니다`);
+      }
+      const missing = kind.required.filter((key) => !String(watch[key] ?? "").trim());
+      if (missing.length) {
+        fail(trackLabel, `${id} 의 ${watch.kind} 필드가 비었습니다: ${missing.join(", ")}`);
+      }
+      const anchor = String(watch.anchor ?? "").trim();
+      if (anchor && !body.includes(anchor)) {
+        fail(trackLabel, `${id} 의 anchor 가 본문에 없습니다: ${anchor.slice(0, 40)}`);
+      }
     }
   }
 

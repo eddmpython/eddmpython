@@ -1,0 +1,91 @@
+# 글이 지목한 외부 사실이 아직 그대로인지 주기적으로 본다.
+#
+# 무엇을 하는지와 왜 본문을 고치지 않는지는 site/scripts/track.mjs 의 머리주석이 정본이다.
+# 감시 계획은 각 글 폴더의 track.json 이 소유한다. 파일이 없는 글은 추적하지 않는다.
+#
+# 이 워크플로가 바꾸는 파일은 blog/track-state.json 하나뿐이다. 본문과 사이트는 건드리지
+# 않는다. 이 저장소는 git push 가 아니라 npm run deploy 로 배포되므로 봇 커밋이 공개
+# 화면을 바꿀 경로 자체가 없다.
+name: track
+
+on:
+  # 주 1회. 한국 시간 월요일 아침을 노리지만 정시성은 약속하지 않는다.
+  # GitHub 문서가 예약 실행의 지연과 드롭을 명시하고 실제로 몇 시간씩 밀린다.
+  # 정각은 큐가 가장 붐비는 시각이라 피한다.
+  schedule:
+    - cron: "17 21 * * 0"
+  workflow_dispatch:
+
+# 예약 워크플로는 저장소가 60일 동안 조용하면 자동으로 멈춘다. 그때는 위의
+# workflow_dispatch 로 한 번 손으로 돌리면 다시 산다.
+concurrency:
+  group: track
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # 추적기는 의존성이 없다. node 내장 fetch 만 쓴다. 그래서 npm ci 를 돌리지 않는다.
+      - name: 감시 확인
+        id: probe
+        working-directory: site
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set +e
+          node scripts/track.mjs --write --report > "$RUNNER_TEMP/report.md"
+          code=$?
+          set -e
+          cat "$RUNNER_TEMP/report.md"
+          # 2 는 추적기 자체가 깨진 것이다. 조용히 넘어가면 다음 변화도 영영 못 잡는다.
+          if [ "$code" -eq 2 ]; then
+            echo "추적기가 실행 중에 죽었습니다"
+            exit 2
+          fi
+          # 1 은 변화나 확인 실패가 있다는 뜻이다. 소스가 죽는 것도 소식이라 함께 알린다.
+          if [ "$code" -eq 1 ]; then
+            echo "found=1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: 이슈 열기
+        if: steps.probe.outputs.found == '1'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --title "글이 지켜보던 것이 움직였습니다 ($(date -u +%Y-%m-%d))" \
+            --body-file "$RUNNER_TEMP/report.md"
+
+      # 본 값을 저장소에 적는다. actions/cache 는 7 일 안 쓰면 지워지고, 지워진 다음 실행이
+      # 모든 감시를 처음 보는 것으로 착각해 기준선을 다시 잡는다. 그러면 그 사이에 일어난
+      # 변화를 통째로 놓친다. 만료가 없는 곳은 저장소뿐이다.
+      #
+      # 변화가 없을 때도 돌려야 한다. 새 글에 감시를 달면 첫 실행은 기준선만 잡고 아무것도
+      # 알리지 않는데, 그때 커밋하지 않으면 그 기준선이 러너와 함께 사라진다. 그러면 다음
+      # 실행이 또 기준선을 잡고, 영원히 아무것도 못 잡는 감시가 된다.
+      #
+      # 이슈를 먼저 열고 여기서 커밋하는 순서다. 커밋이 실패하면 다음 실행이 같은 이슈를 한 번
+      # 더 열지만, 반대 순서로 두면 커밋만 성공하고 알림을 놓쳐 그 변화를 영영 모르게 된다.
+      - name: 본 값 기록
+        if: always() && steps.probe.outcome == 'success'
+        run: |
+          if git diff --quiet -- blog/track-state.json; then
+            echo "상태 파일에 바뀐 것이 없습니다"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add blog/track-state.json
+          git commit -m "감시가 본 값을 적는다"
+          git push
