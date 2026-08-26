@@ -69,12 +69,21 @@ export function Footer() {
         <nav aria-label="채널">
           <h3 className="text-sm font-medium text-ivory/55">채널</h3>
           <ul className="mt-4 space-y-2.5 text-sm">
+            {/* 저장소 안 링크는 새 탭으로 열지 않는다. 레지스트리만 바깥이다 */}
             <li>
               <a
                 href="/blog"
                 className="text-ivory/70 transition-colors hover:text-ivory"
               >
                 블로그
+              </a>
+            </li>
+            <li>
+              <a
+                href="/brand"
+                className="text-ivory/70 transition-colors hover:text-ivory"
+              >
+                브랜드
               </a>
             </li>
             {REGISTRIES.map((c) => (
