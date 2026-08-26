@@ -108,6 +108,40 @@ const ROUTE_RULES = [
     ],
   },
   {
+    // 브랜드 자산 화면. 여기 보이는 마크는 그림이 아니라 src/brand.ts 가 그 자리에서
+    // 계산해 낸 실물이다. 심볼을 고쳐 경로가 깨지면 이 화면이 먼저 무너지므로
+    // 락업·마감·크기·팔레트가 전부 살아 있는지 세어서 확인한다.
+    match: (path) => path === "/brand",
+    id: "brand",
+    checks: [
+      VISIBLE("main#content"),
+      TEXT("main#content h1", "한 획으로 그린 나선"),
+      COUNT("main#content h1", { exact: 1 }),
+      // 심볼이 그려지려면 path 가 있어야 한다. 화면 전체에서 넉넉히 잡는다.
+      COUNT("main#content svg path", { min: 12 }),
+      VISIBLE("#origin"),
+      VISIBLE("#lockup"),
+      VISIBLE("#icon"),
+      VISIBLE("#size"),
+      VISIBLE("#color"),
+      VISIBLE("#files"),
+      // 마감 네 가지가 다 있어야 한다. 하나라도 빠지면 자산 목록이 거짓이 된다.
+      COUNT("#icon svg", { exact: 4 }),
+      // 16px 부터 64px 까지 다섯 단계.
+      COUNT("#size svg", { exact: 5 }),
+      TEXT("#color", "#f56565"),
+      // 내려받는 파일은 빌드가 만든 실제 주소여야 한다.
+      VISIBLE('#files a[href="/brand/mark-dark.svg"]'),
+      VISIBLE('#files a[href="/brand/mark-light.svg"]'),
+      VISIBLE('#files a[href="/brand/icon-dark.svg"]'),
+      VISIBLE('#files a[href="/favicon.svg"]'),
+    ],
+    captures: [
+      { id: "lockup", selector: "#lockup" },
+      { id: "icon-finishes", selector: "#icon" },
+    ],
+  },
+  {
     match: (path) => path.startsWith("/blog/"),
     checks: [
       VISIBLE("article#content"),

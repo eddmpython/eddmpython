@@ -1,10 +1,10 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { build, defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import { faviconSvg } from "./src/brand";
+import { BRAND, appIconSvg, faviconSvg, symbolSvg } from "./src/brand";
 
 // 빌드 산출물은 저장소 밖에 둔다 (CLAUDE.md 작업 산출물 규칙).
 // site/ 기준 두 단계 위는 sideProject/ 이므로 저장소 형제 폴더에 떨어진다.
@@ -38,11 +38,27 @@ type PageMeta = {
 };
 
 /**
- * favicon.svg 를 src/brand.ts 에서 만든다.
+ * 내려받을 수 있는 브랜드 자산을 src/brand.ts 에서 만든다.
  *
- * public/ 에 사본을 두면 랜딩 마크를 고칠 때 파비콘만 옛 형태로 남는다.
- * 소스를 하나로 두고 dev 는 미들웨어로, build 는 dist 파일로 같은 문자열을 낸다.
+ * public/ 에 사본을 두면 심볼을 고칠 때 파비콘과 자산만 옛 형태로 남는다. 실제로
+ * 그것을 막으려고 파일을 안 두는 것이지 게을러서가 아니다. 소스를 하나로 두고
+ * dev 는 미들웨어로, build 는 dist 파일로 같은 문자열을 낸다.
+ *
+ * 목록의 왼쪽이 곧 공개 URL 이다. README 와 `/brand` 페이지가 이 주소를 가리킨다.
+ * 여기에 없는 브랜드 파일은 존재하지 않는다.
  */
+const BRAND_FILES: Record<string, () => string> = {
+  "favicon.svg": faviconSvg,
+  // 심볼 단독. 놓일 바탕이 다르므로 두 벌을 낸다. 쓰는 쪽에서 색을 칠하지 않는다.
+  "brand/mark-dark.svg": () => symbolSvg({ ink: BRAND.ivory }),
+  "brand/mark-light.svg": () => symbolSvg({ ink: BRAND.carbon }),
+  // 정사각 칩 네 마감. 다른 앱 아이콘 사이에 놓이는 자리용이다.
+  "brand/icon-light.svg": () => appIconSvg("light", 512),
+  "brand/icon-dark.svg": () => appIconSvg("dark", 512),
+  "brand/icon-brand.svg": () => appIconSvg("brand", 512),
+  "brand/icon-outline.svg": () => appIconSvg("outline", 512),
+};
+
 function brandAssets(): Plugin {
   let root = "";
   let outDir = "";
@@ -54,17 +70,20 @@ function brandAssets(): Plugin {
     },
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
-        if (req.url?.split("?")[0] !== "/favicon.svg") return next();
+        const path = req.url?.split("?")[0]?.replace(/^\//, "") ?? "";
+        const make = BRAND_FILES[path];
+        if (!make) return next();
         res.setHeader("Content-Type", "image/svg+xml");
-        res.end(faviconSvg());
+        res.end(make());
       });
     },
     closeBundle() {
-      writeFileSync(
-        join(resolve(root, outDir), "favicon.svg"),
-        faviconSvg(),
-        "utf8",
-      );
+      const dist = resolve(root, outDir);
+      for (const [name, make] of Object.entries(BRAND_FILES)) {
+        const target = join(dist, name);
+        mkdirSync(dirname(target), { recursive: true });
+        writeFileSync(target, make(), "utf8");
+      }
     },
   };
 }

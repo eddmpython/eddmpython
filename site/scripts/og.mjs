@@ -18,7 +18,7 @@ import { tmpdir } from "node:os";
 import { join, resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { SYMBOL, BRAND } from "../src/brand.ts";
+import { SYMBOL, BRAND, symbolMarkup } from "../src/brand.ts";
 import { PRODUCTS } from "../src/products.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -52,12 +52,9 @@ function findBrowser() {
   );
 }
 
-/** 심볼 단독. components/Logo.tsx 의 LogoSymbol 과 같은 구성이다. */
+/** 심볼 단독. 도형은 brand.ts 가 낸다. 여기서 좌표를 다시 적지 않는다. */
 const symbolSvg = (width) => `
-<svg viewBox="${SYMBOL.viewBox}" width="${width}" style="display:block">
-  <path d="${SYMBOL.shape}" fill="${BRAND.ivory}" fill-rule="evenodd"/>
-  <rect x="${SYMBOL.dot.x}" y="${SYMBOL.dot.y}" width="${SYMBOL.dot.width}" height="${SYMBOL.dot.height}" rx="${SYMBOL.dot.rx}" fill="${BRAND.dot}"/>
-</svg>`;
+<svg viewBox="${SYMBOL.viewBox}" width="${width}" style="display:block">${symbolMarkup({ ink: BRAND.ivory })}</svg>`;
 
 const html = `<!doctype html>
 <html lang="ko"><head><meta charset="utf-8">

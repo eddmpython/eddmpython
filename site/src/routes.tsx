@@ -1,6 +1,7 @@
 import { Route, Routes as RouterRoutes } from "react-router-dom";
 import { Home } from "./pages/Home";
 import { Blog } from "./pages/Blog";
+import { Brand } from "./pages/Brand";
 import { Post } from "./pages/Post";
 import { NotFound } from "./pages/NotFound";
 
@@ -17,6 +18,7 @@ export function Routes() {
       <RouterRoutes>
         <Route path="/" element={<Home />} />
         <Route path="/blog" element={<Blog />} />
+        <Route path="/brand" element={<Brand />} />
         <Route path="/blog/:slug" element={<Post />} />
         <Route path="*" element={<NotFound />} />
       </RouterRoutes>

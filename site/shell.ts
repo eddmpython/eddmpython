@@ -10,7 +10,7 @@
  * 옮기면 이상했다. 색 값은 여기서도 적지 않는다. `src/design.ts` 의 DESIGN이 정본이고
  * `scripts/check-brand.mjs` 가 이 파일에 hex 가 나타나면 배포를 막는다.
  */
-import { SYMBOL, BRAND } from "./src/brand";
+import { SYMBOL, symbolMarkup } from "./src/brand";
 import { DESIGN, designCssVars, themeColor } from "./src/design";
 import { SOCIAL } from "./src/social";
 import { esc } from "./classroom-render";
@@ -243,11 +243,7 @@ export function header(): string {
   ).join("");
   return `<nav class="hd">
   <a class="hd-logo" href="${esc(SITE)}" target="_blank" rel="noreferrer" aria-label="eddmpython 홈">
-    <svg class="hd-symbol" viewBox="${esc(SYMBOL.viewBox)}" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="${esc(
-      SYMBOL.shape,
-    )}"/><rect x="${SYMBOL.dot.x}" y="${SYMBOL.dot.y}" width="${SYMBOL.dot.width}" height="${
-    SYMBOL.dot.height
-  }" rx="${SYMBOL.dot.rx}" fill="${esc(BRAND.dot)}"/></svg>
+    <svg class="hd-symbol" viewBox="${esc(SYMBOL.viewBox)}" aria-hidden="true">${symbolMarkup()}</svg>
     <span class="hd-word"><b>eddm</b><i>.py</i></span>
   </a>
   <div class="hd-right">${links}<span class="hd-icons">${icons}

@@ -272,6 +272,52 @@ export function postMeta(post: Post): PageMeta {
   };
 }
 
+/**
+ * 브랜드 자산 페이지.
+ *
+ * 로고를 쓰려는 사람이 검색으로 바로 닿아야 하는 화면이라 sitemap 에 넣는다.
+ * 공유 카드는 기본 og 이미지를 그대로 쓴다. 그 이미지 자체가 로고 락업이다.
+ */
+export function brandMeta(): PageMeta {
+  const path = "/brand";
+  const url = `${ORIGIN}${path}`;
+  const description =
+    "eddmpython 심볼과 로고 락업, 앱 아이콘 마감, 강조색과 내려받을 파일. 심볼은 좌표가 아니라 작도 규칙으로 정의되어 있고 이 화면의 마크도 그 규칙이 계산해 낸 것입니다.";
+  const breadcrumbId = `${url}#breadcrumb`;
+  return {
+    path,
+    title: "브랜드 · eddmpython",
+    socialTitle: "eddmpython 브랜드 자산",
+    description,
+    type: "website",
+    image: DEFAULT_IMAGE,
+    imageAlt: "eddmpython 심볼과 eddm.py 워드마크",
+    imageType: "image/png",
+    imageWidth: 1200,
+    imageHeight: 630,
+    jsonLd: [
+      graph(
+        ORG,
+        SITE,
+        {
+          "@type": "WebPage",
+          "@id": url,
+          url,
+          name: "eddmpython 브랜드 자산",
+          description,
+          inLanguage: "ko-KR",
+          isPartOf: { "@id": SITE_ID },
+          breadcrumb: { "@id": breadcrumbId },
+        },
+        breadcrumbs(breadcrumbId, [
+          { name: "eddmpython", url: ORIGIN },
+          { name: "브랜드", url },
+        ]),
+      ),
+    ],
+  };
+}
+
 export function allPages(): PageMeta[] {
-  return [homeMeta(), blogMeta(), ...POSTS.map(postMeta)];
+  return [homeMeta(), blogMeta(), brandMeta(), ...POSTS.map(postMeta)];
 }

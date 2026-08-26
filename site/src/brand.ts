@@ -1,27 +1,50 @@
 /**
  * 브랜드 심볼 정본.
  *
- * 여기 있는 것은 심볼 하나뿐이다. 심볼에 워드마크를 붙인 로고 락업은
- * components/Logo.tsx 가 조립한다. 이 파일에 글자를 넣지 않는다.
+ * 심볼의 형태는 좌표가 아니라 **작도 규칙**으로 적혀 있다. 아래 `GEOMETRY` 의 숫자
+ * 열몇 개가 정본이고 경로 문자열은 그 숫자에서 계산해서 나온다. 손으로 딴 path 를
+ * 박아 두면 획 두께 하나를 고치려 해도 좌표 수백 개를 다시 따야 하고, 그때 접선이
+ * 어긋난 것을 아무도 못 본다.
  *
- * 심볼 형태는 여기에서만 정의한다. 랜딩(React)과 favicon.svg(정적 파일)가
- * 같은 좌표를 읽으므로 둘이 어긋날 수 없다. favicon 은 vite.config.ts 의
- * brandAssets 플러그인이 이 모듈에서 생성한다. public/ 에 사본을 두지 않는다.
+ * 랜딩(React), favicon(정적 파일), 강의장 머리띠(Worker HTML), og 이미지(Node)가
+ * 전부 이 모듈을 읽는다. 사본이 없으므로 어긋날 수 없다.
  *
- * 형태
- * - 소문자 e 다. 원에서 오른쪽 위를 가로획으로 끊고 아래를 오른쪽으로 뻗었다.
- * - 획은 하나의 채움 경로다. 안쪽 구멍은 evenodd 로 뚫린다.
- * - 오른쪽 아래의 점만 별도 요소다. 심볼에서 유일하게 색이 고정된 부분이다.
+ * ## 형태
  *
- * 좌표 규칙
- * - transform 없이 좌표에 스케일을 구워 넣었다. 중첩 변환이 없다.
- * - 잉크 경계가 viewBox 에 꼭 맞는다. 여백은 쓰는 쪽이 정한다.
- * - 가로세로 1.18 이다. 점이 오른쪽으로 나오는 만큼 e 자체는 정사각에 가깝다.
+ * 한 획으로 그린 나선이다. 안쪽 끝에서 시작해 가로획으로 오른쪽으로 가고, 위로 감아
+ * 바깥 바퀴를 한 바퀴 돌고, 오른쪽 아래로 빠져나와 위로 치솟으며 가늘어진다.
+ * 치솟은 끝 바로 위에 점이 하나 뜬다.
  *
- * 작은 크기에서
- * - 16px 에서 가로획의 통로가 좁아지지만 e 로 읽힌다. 점은 2~3px 로 남아
- *   색 점 하나로 보인다. 획을 얇게 깎아 통로를 넓히지 않는다.
- * - 24px 부터 가로획과 점의 간격이 뚜렷해진다.
+ * - 소문자 `e` 로 읽힌다. 가로획과 바깥 바퀴가 e 의 눈과 배다.
+ * - 한글 `으` 로 읽힌다. 둥근 바깥 바퀴가 `ㅇ`, 가로획이 `ㅡ` 다.
+ * - 감긴 몸통과 빠져나오는 꼬리가 뱀(Python)이다.
+ * - 가늘어지는 꼬리와 그 위의 점이 성장 곡선의 정점이다.
+ *
+ * 나선이라 안쪽에 갇힌 구멍이 없다. 가운데 여백은 바깥까지 이어지는 한 줄기 골이다.
+ * `fill-rule` 이 필요 없고 16px 에서도 골이 막히지 않는 이유가 이것이다.
+ *
+ * ## 작도
+ *
+ * 모든 마디가 앞 마디와 접선을 공유한다. 이음매가 보이지 않는 이유는 그렇게 맞춰서가
+ * 아니라 반지름을 접점 조건에서 **풀어서** 쓰기 때문이다.
+ *
+ * - 가로획은 수평 직선이다.
+ * - 감아 올리는 호는 가로획에 접한다. 그래서 호의 중심은 가로획 바로 위에 있다.
+ * - 같은 호가 바깥 바퀴에도 안쪽에서 접한다. 두 접점 조건이 호의 반지름을 결정한다.
+ *   `ARM_RADIUS` 를 손으로 정하지 않고 푸는 이유다.
+ * - 꼬리는 바깥 바퀴에서 접선 방향으로 뻗는 3차 베지에다.
+ * - 획 두께는 꼬리에 들어서기 전까지 일정하고 꼬리에서만 선형으로 가늘어진다.
+ *
+ * ## 좌표계
+ *
+ * 작도는 바깥 바퀴의 중심을 원점으로 하고 y 는 화면과 같이 아래로 늘어난다.
+ * 바깥 바퀴의 중심선 반지름이 100 이다. 다른 숫자는 전부 그 100 에 대한 비율로 읽는다.
+ * 내보낼 때만 잉크 경계가 viewBox 에 꼭 맞도록 평행이동한다.
+ *
+ * ## 작은 크기에서
+ *
+ * 16px 에서도 가운데 골이 막히지 않는다. 획을 깎아 골을 넓히지 않는다.
+ * 점은 2~3px 의 색 점 하나로 남고 꼬리 끝과 붙지 않는다.
  *
  * 이 파일은 React 를 import 하지 않는다. vite.config.ts(Node)에서도 읽는다.
  */
@@ -30,41 +53,287 @@
 // 모듈을 못 찾는다. vite 와 tsc 는 확장자가 있어도 그대로 푼다.
 import { DESIGN } from "./design.ts";
 
+/**
+ * 심볼의 정본 수치. 이 열몇 줄이 형태를 전부 결정한다.
+ *
+ * 바깥 바퀴 중심이 원점, 중심선 반지름이 100 이다. 값을 고치면 접선 조건이 다시 풀리므로
+ * 이음매는 저절로 맞는다. 다만 고친 뒤에는 16px 렌더를 눈으로 본다.
+ */
+const GEOMETRY = {
+  /** 바깥 바퀴 중심선 반지름. 다른 모든 수치의 기준이다 */
+  turnRadius: 100,
+  /** 획 두께. 꼬리에 들어서기 전까지 일정하다 */
+  stroke: 48,
+  /** 가로획의 중심선 y. 원점보다 아주 조금 아래다 */
+  barY: 2.5,
+  /** 감아 올리는 호의 중심 x. 중심 y 는 접선 조건이 정한다 */
+  armCenterX: 41.5,
+  /** 가로획 안쪽 끝(둥근 마구리)의 중심 x */
+  barCapX: -25,
+  /** 꼬리가 바깥 바퀴에서 갈라지는 각도(도). 화면 아래쪽이 +90 이다 */
+  tailAngle: 77,
+  /** 꼬리 베지에의 시작 손잡이 길이. 바퀴에서 얼마나 길게 접선을 끌고 나가는지 */
+  tailOutHandle: 110,
+  /** 꼬리 베지에의 끝 손잡이 길이. 끝에서 얼마나 곧게 위로 서는지 */
+  tailInHandle: 38,
+  /** 꼬리 끝(둥근 마구리)의 중심 x. 점의 중심과 같다. 꼬리가 점을 겨눈다 */
+  tipX: 165.5,
+  /** 꼬리 끝의 중심 y */
+  tipY: -34.5,
+  /** 꼬리 끝의 획 두께. 0 으로 보내지 않는다. 작은 크기에서 끝이 사라진다 */
+  tipStroke: 15.5,
+  /** 점의 중심 y. x 는 `tipX` 와 같다 */
+  dotY: -80.5,
+  /** 점의 반지름. 획 반두께보다 조금 크다. 같게 하면 점이 작아 보인다 */
+  dotRadius: 25.5,
+} as const;
+
+const HALF = GEOMETRY.stroke / 2;
+
+/**
+ * 감아 올리는 호의 반지름. 두 접점 조건을 연립해 푼다.
+ *
+ * 가로획에 접하므로 중심은 `(armCenterX, barY - r)` 이고, 바깥 바퀴에 안쪽에서
+ * 접하므로 중심 사이 거리가 `turnRadius - r` 이다. 두 식을 정리하면 r 이 하나로 떨어진다.
+ * 이 값을 손으로 적어 두면 다른 수치를 고칠 때 접선이 조용히 어긋난다.
+ */
+const ARM_RADIUS =
+  (GEOMETRY.armCenterX ** 2 + GEOMETRY.barY ** 2 - GEOMETRY.turnRadius ** 2) /
+  (2 * (GEOMETRY.barY - GEOMETRY.turnRadius));
+const ARM_CENTER_Y = GEOMETRY.barY - ARM_RADIUS;
+/** 호와 바깥 바퀴가 만나는 각도. 두 중심을 잇는 방향이 곧 접점 방향이다 */
+const JOIN_ANGLE = Math.atan2(ARM_CENTER_Y, GEOMETRY.armCenterX);
+const TAIL_ANGLE = (GEOMETRY.tailAngle * Math.PI) / 180;
+
+type Pt = readonly [number, number];
+
+const onTurn = (angle: number, radius: number): Pt => [
+  radius * Math.cos(angle),
+  radius * Math.sin(angle),
+];
+
+/** 꼬리 중심선 3차 베지에의 제어점 네 개 */
+const TAIL: readonly Pt[] = (() => {
+  const p0 = onTurn(TAIL_ANGLE, GEOMETRY.turnRadius);
+  // 바퀴를 각도가 줄어드는 쪽으로 돌아 왔으므로 진행 방향은 (sin, -cos) 이다.
+  const tangent: Pt = [Math.sin(TAIL_ANGLE), -Math.cos(TAIL_ANGLE)];
+  return [
+    p0,
+    [
+      p0[0] + tangent[0] * GEOMETRY.tailOutHandle,
+      p0[1] + tangent[1] * GEOMETRY.tailOutHandle,
+    ],
+    [GEOMETRY.tipX, GEOMETRY.tipY + GEOMETRY.tailInHandle],
+    [GEOMETRY.tipX, GEOMETRY.tipY],
+  ];
+})();
+
+const bezierAt = (t: number): Pt => {
+  const u = 1 - t;
+  return [
+    u ** 3 * TAIL[0][0] +
+      3 * u * u * t * TAIL[1][0] +
+      3 * u * t * t * TAIL[2][0] +
+      t ** 3 * TAIL[3][0],
+    u ** 3 * TAIL[0][1] +
+      3 * u * u * t * TAIL[1][1] +
+      3 * u * t * t * TAIL[2][1] +
+      t ** 3 * TAIL[3][1],
+  ];
+};
+
+const bezierDirectionAt = (t: number): Pt => {
+  const u = 1 - t;
+  const x =
+    3 * u * u * (TAIL[1][0] - TAIL[0][0]) +
+    6 * u * t * (TAIL[2][0] - TAIL[1][0]) +
+    3 * t * t * (TAIL[3][0] - TAIL[2][0]);
+  const y =
+    3 * u * u * (TAIL[1][1] - TAIL[0][1]) +
+    6 * u * t * (TAIL[2][1] - TAIL[1][1]) +
+    3 * t * t * (TAIL[3][1] - TAIL[2][1]);
+  const len = Math.hypot(x, y) || 1;
+  return [x / len, y / len];
+};
+
+/** 꼬리의 반두께. 바퀴에서 나온 두께에서 끝 두께까지 선형으로 준다 */
+const tailHalf = (t: number) => HALF + (GEOMETRY.tipStroke / 2 - HALF) * t;
+
+/**
+ * 꼬리 한쪽 가장자리의 표본점. `side` 가 +1 이면 진행 방향 왼쪽(바깥쪽)이다.
+ *
+ * 두께가 변하므로 가장자리는 원호가 아니다. 균일하게 표본을 뜨고 Catmull-Rom 으로
+ * 3차 베지에를 만든다. 양 끝의 접선을 얻으려고 구간 밖을 한 점씩 더 뜬다. 끝을 특별히
+ * 다루지 않아도 바퀴 쪽 이음매가 접선을 그대로 잇는다.
+ */
+const tailEdge = (side: 1 | -1, segments = 12): Pt[] => {
+  const at = (t: number): Pt => {
+    const [x, y] = bezierAt(t);
+    const [dx, dy] = bezierDirectionAt(t);
+    const h = tailHalf(t) * side;
+    return [x - dy * h, y + dx * h];
+  };
+  const out: Pt[] = [];
+  for (let i = -1; i <= segments + 1; i += 1) out.push(at(i / segments));
+  return out;
+};
+
+const round = (n: number) => {
+  const v = Math.round(n * 1000) / 1000;
+  return Object.is(v, -0) ? 0 : v;
+};
+
+/**
+ * 표본점을 3차 베지에 마디로 잇는다. 앞뒤 한 점씩은 접선 계산에만 쓰고 그리지 않는다.
+ *
+ * Catmull-Rom 의 제어점 공식이라 마디 사이가 C1 이다. 표본 열두 개면 이 곡률에서
+ * 참 곡선과의 차이가 좌표 단위 0.05 아래다. viewBox 가 315 이므로 눈으로도
+ * 계측으로도 구분되지 않는다.
+ */
+const edgeToCubics = (pts: readonly Pt[]): string => {
+  const parts: string[] = [];
+  for (let i = 1; i < pts.length - 2; i += 1) {
+    const p0 = pts[i - 1];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2];
+    const c1: Pt = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2: Pt = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    parts.push(
+      `C${round(c1[0])} ${round(c1[1])} ${round(c2[0])} ${round(c2[1])} ${round(p2[0])} ${round(p2[1])}`,
+    );
+  }
+  return parts.join("");
+};
+
+/** 잉크 경계. 바깥 바퀴가 왼쪽·위·아래를 정하고 점이 오른쪽을 정한다 */
+const BOUNDS = {
+  left: -(GEOMETRY.turnRadius + HALF),
+  top: -(GEOMETRY.turnRadius + HALF),
+  bottom: GEOMETRY.turnRadius + HALF,
+  right: GEOMETRY.tipX + GEOMETRY.dotRadius,
+};
+const OFFSET_X = -BOUNDS.left;
+const OFFSET_Y = -BOUNDS.top;
+
+const shift = (p: Pt): Pt => [p[0] + OFFSET_X, p[1] + OFFSET_Y];
+const fmt = (p: Pt) => `${round(p[0])} ${round(p[1])}`;
+
+/**
+ * 획 하나의 바깥 윤곽. 겉을 따라 나갔다가 속을 따라 돌아온다.
+ *
+ * 두께가 일정한 구간은 원호의 평행곡선이 다시 원호라서 `A` 명령 하나로 정확히 적힌다.
+ * 근사가 들어가는 곳은 두께가 변하는 꼬리뿐이다.
+ */
+const buildShape = (): string => {
+  const outerTurn = GEOMETRY.turnRadius + HALF;
+  const innerTurn = GEOMETRY.turnRadius - HALF;
+  const outerEdge = tailEdge(1).map(shift);
+  const innerEdge = tailEdge(-1).map(shift);
+  const tipInner = innerEdge[innerEdge.length - 2];
+  const tipRadius = GEOMETRY.tipStroke / 2;
+
+  const barStart = shift([GEOMETRY.barCapX, GEOMETRY.barY + HALF]);
+  const barEnd = shift([GEOMETRY.armCenterX, GEOMETRY.barY + HALF]);
+  const barBackEnd = shift([GEOMETRY.armCenterX, GEOMETRY.barY - HALF]);
+  const barBackStart = shift([GEOMETRY.barCapX, GEOMETRY.barY - HALF]);
+
+  return [
+    `M${fmt(barStart)}`,
+    `L${fmt(barEnd)}`,
+    // 감아 올리는 호의 바깥 가장자리. 끝점은 바깥 바퀴의 바깥 가장자리와 같은 점이다.
+    `A${round(ARM_RADIUS + HALF)} ${round(ARM_RADIUS + HALF)} 0 0 0 ${fmt(shift(onTurn(JOIN_ANGLE, outerTurn)))}`,
+    // 바깥 바퀴 겉면. 240도를 돌므로 large-arc 를 켠다.
+    `A${outerTurn} ${outerTurn} 0 1 0 ${fmt(shift(onTurn(TAIL_ANGLE, outerTurn)))}`,
+    edgeToCubics(outerEdge),
+    // 꼬리 끝 둥근 마구리.
+    `A${round(tipRadius)} ${round(tipRadius)} 0 0 0 ${fmt(tipInner)}`,
+    edgeToCubics([...innerEdge].reverse()),
+    `A${innerTurn} ${innerTurn} 0 1 1 ${fmt(shift(onTurn(JOIN_ANGLE, innerTurn)))}`,
+    `A${round(ARM_RADIUS - HALF)} ${round(ARM_RADIUS - HALF)} 0 0 1 ${fmt(barBackEnd)}`,
+    `L${fmt(barBackStart)}`,
+    // 가로획 안쪽 둥근 마구리.
+    `A${HALF} ${HALF} 0 0 0 ${fmt(barStart)}`,
+    "Z",
+  ].join("");
+};
+
 export const SYMBOL = {
-  viewBox: "0 0 302 255",
-  width: 302,
-  height: 255,
-  /** e 획 하나. 안쪽 구멍은 evenodd 로 뚫는다. */
-  shape:
-    "M 103.5 1.93 C 89.97 4.86, 83.94 6.93, 72.17 12.68 C 8.96 43.57, -18.26 123.64, 13.14 186.33 C 27.31 214.61, 52.16 236.4, 82.75 247.36 C 101.11 253.94, 114.33 255.22, 159.33 254.82 L 194.17 254.5 197.08 251.23 L 200 247.97 199.98 226.73 C 199.96 208.13, 199.74 205.24, 198.23 203.37 C 194.81 199.15, 193.45 199, 158.32 198.97 C 134.55 198.94, 122.27 198.53, 117 197.59 C 84.54 191.78, 60 162.47, 60 129.5 C 60 93.95, 88.31 63.71, 123.75 61.41 C 134.1 60.74, 144.53 63.02, 155 68.25 C 166.72 74.11, 181.91 91.6, 184.54 102.25 L 185.22 105 138.06 105 C 88.38 105, 86.3 105.18, 84.62 109.55 C 84.28 110.44, 84 119.47, 84 129.63 C 84 147.9, 84.03 148.12, 86.45 150.54 L 88.91 153 164.21 153 C 237.19 152.99, 239.6 152.93, 242.71 151.03 C 244.47 149.96, 246.88 147.19, 248.05 144.89 C 250 141.08, 250.15 139.55, 249.72 127.6 C 249.46 120.4, 248.73 111.35, 248.11 107.5 C 239.12 52.13, 202.04 12.59, 148.76 1.59 C 138.25 -0.58, 114.3 -0.4, 103.5 1.93 M 0.39 130.5 C 0.39 137.65, 0.55 140.44, 0.74 136.71 C 0.94 132.97, 0.93 127.12, 0.74 123.71 C 0.55 120.29, 0.39 123.35, 0.39 130.5",
-  /** 오른쪽 아래의 점. 모서리를 둥글린 정사각에 가깝다. */
-  dot: { x: 250, y: 199, width: 52, height: 56, rx: 8 },
+  width: round(BOUNDS.right - BOUNDS.left),
+  height: round(BOUNDS.bottom - BOUNDS.top),
+  viewBox: `0 0 ${round(BOUNDS.right - BOUNDS.left)} ${round(BOUNDS.bottom - BOUNDS.top)}`,
+  /** 획 하나. 나선이라 갇힌 구멍이 없고 fill-rule 이 필요 없다 */
+  shape: buildShape(),
+  /** 꼬리 끝 위의 점. 심볼에서 유일하게 색이 고정된 부분이다 */
+  dot: {
+    cx: round(GEOMETRY.tipX + OFFSET_X),
+    cy: round(GEOMETRY.dotY + OFFSET_Y),
+    r: GEOMETRY.dotRadius,
+  },
 } as const;
 
 /** 정적 SVG는 CSS 변수를 못 읽으므로 디자인 정본의 원색을 읽어 쓴다. */
 export const BRAND = {
   carbon: DESIGN.palette.carbon,
   ivory: DESIGN.palette.ivory,
+  paper: DESIGN.palette.paper,
   /**
-   * 심볼의 점. 저장소 강행규칙이 핑크 계열을 금지하고 브랜드 마크의 포인트 하나만
-   * 예외로 둔다. 이 값이 그 예외이며 마크 밖으로 넓히지 않는다. 워드마크의 `.py` 가
-   * 같은 값을 쓰는 것은 로고 락업 안이라 예외 범위에 든다.
+   * 심볼의 점. 저장소 강행규칙이 강조색을 `DESIGN.palette.brand` 하나로 묶는다.
+   * 워드마크의 `.py` 도 같은 값에서 나온다.
    */
   dot: DESIGN.palette.brand,
 } as const;
 
 /**
- * 브라우저 탭 아이콘 본문. 파비콘에는 로고가 아니라 심볼만 넣는다.
- * 16px 짜리 정사각에 글자를 넣으면 읽히지 않는다.
+ * 심볼의 알맹이. `<svg>` 껍데기 없이 도형만 낸다.
  *
- * currentColor 를 쓸 수 없다. 파비콘은 문서 문맥 밖에서 렌더되어 상속받을 색이
- * 없고, 브라우저는 이를 검정으로 처리한다. 어두운 탭 배경에서 심볼이 사라진다.
- * 그래서 칩 배경과 심볼 색을 명시한다.
+ * 머리띠, 파비콘, og 이미지, 내려받는 자산이 전부 이 한 줄을 쓴다. 각자 조립하게 두면
+ * 점의 색이나 좌표가 한 곳에서만 어긋난다.
  *
- * 심볼이 가로 1.18:1 이라 정사각 칩 안에서 세로 여백이 조금 더 남는다. 12% 여백을
- * 두면 iOS 스퀘어클과 Android 원형 마스크 양쪽에서 잘리지 않는다.
+ * `ink` 를 비우면 획이 `currentColor` 를 따른다. 문서 문맥 밖에서 렌더되는 정적
+ * 파일은 상속받을 색이 없으므로 반드시 값을 넘긴다.
  */
-export function faviconSvg(): string {
+export function symbolMarkup({
+  ink = "currentColor",
+  dot = BRAND.dot,
+}: { ink?: string; dot?: string } = {}): string {
+  return `<path fill="${ink}" d="${SYMBOL.shape}"/><circle cx="${SYMBOL.dot.cx}" cy="${SYMBOL.dot.cy}" r="${SYMBOL.dot.r}" fill="${dot}"/>`;
+}
+
+/** 심볼 한 장짜리 SVG 파일. 배경을 깔지 않는다 */
+export function symbolSvg(options: { ink?: string; dot?: string } = {}): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${SYMBOL.viewBox}" role="img" aria-label="eddmpython">${symbolMarkup(options)}</svg>\n`;
+}
+
+/**
+ * 앱 아이콘 마감 네 가지. 정사각 칩 안에 심볼만 넣는다.
+ *
+ * 어디에 놓이는지에 따라 바탕이 달라야 한다. 밝은 독에서는 어두운 획이, 어두운
+ * 독에서는 밝은 획이 살아남는다. 강조색 칩은 다른 아이콘 사이에서 눈에 띄어야 할 때만,
+ * 테두리 칩은 어두운 바탕 위에 칩 경계를 보여야 할 때만 쓴다. 네 가지 다 같은 심볼이고
+ * 색만 바뀐다.
+ *
+ * 강조색 칩에서는 점도 획과 같은 흰색이다. 칩이 이미 강조색이라 점을 강조색으로 두면
+ * 바탕에 묻혀 사라진다. 강조를 지고 있는 것이 점에서 칩으로 옮겨 간 것이지 점을
+ * 빼는 것이 아니다.
+ */
+export const ICON_FINISHES = {
+  light: { tile: BRAND.paper, ink: BRAND.carbon, dot: BRAND.dot, outlined: false },
+  dark: { tile: BRAND.carbon, ink: BRAND.ivory, dot: BRAND.dot, outlined: false },
+  brand: { tile: BRAND.dot, ink: BRAND.paper, dot: BRAND.paper, outlined: false },
+  outline: { tile: BRAND.carbon, ink: BRAND.ivory, dot: BRAND.dot, outlined: true },
+} as const;
+
+export type IconFinish = keyof typeof ICON_FINISHES;
+
+/**
+ * 정사각 앱 아이콘.
+ *
+ * 심볼이 가로로 1.27:1 이라 정사각 칩 안에서 세로 여백이 더 남는다. 12% 여백을 두면
+ * iOS 스퀘어클과 Android 원형 마스크 양쪽에서 꼬리 끝과 점이 잘리지 않는다.
+ */
+export function appIconSvg(finish: IconFinish = "dark", size = 100): string {
+  const f = ICON_FINISHES[finish];
   const pad = 12;
   const box = 100 - pad * 2;
   const scale = Math.min(box / SYMBOL.width, box / SYMBOL.height);
@@ -72,13 +341,24 @@ export function faviconSvg(): string {
   const h = SYMBOL.height * scale;
   const x = (100 - w) / 2;
   const y = (100 - h) / 2;
-
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect width="100" height="100" rx="22" fill="${BRAND.carbon}"/>
-  <g transform="translate(${x.toFixed(2)} ${y.toFixed(2)}) scale(${scale.toFixed(4)})">
-    <path d="${SYMBOL.shape}" fill="${BRAND.ivory}" fill-rule="evenodd"/>
-    <rect x="${SYMBOL.dot.x}" y="${SYMBOL.dot.y}" width="${SYMBOL.dot.width}" height="${SYMBOL.dot.height}" rx="${SYMBOL.dot.rx}" fill="${BRAND.dot}"/>
-  </g>
+  const edge = f.outlined
+    ? `<rect x="1.5" y="1.5" width="97" height="97" rx="20.5" fill="none" stroke="${f.ink}" stroke-opacity=".22" stroke-width="3"/>`
+    : "";
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 100 100" role="img" aria-label="eddmpython">
+  <rect width="100" height="100" rx="22" fill="${f.tile}"/>${edge}
+  <g transform="translate(${round(x)} ${round(y)}) scale(${Math.round(scale * 10000) / 10000})">${symbolMarkup({ ink: f.ink, dot: f.dot })}</g>
 </svg>
 `;
+}
+
+/**
+ * 브라우저 탭 아이콘. 파비콘에는 로고가 아니라 심볼만 넣는다.
+ * 16px 정사각에 글자를 넣으면 읽히지 않는다.
+ *
+ * `currentColor` 를 쓸 수 없다. 파비콘은 문서 문맥 밖에서 렌더되어 상속받을 색이
+ * 없고, 브라우저는 이를 검정으로 처리한다. 어두운 탭 배경에서 심볼이 사라진다.
+ * 그래서 칩 배경과 심볼 색을 명시하는 `dark` 마감을 쓴다.
+ */
+export function faviconSvg(): string {
+  return appIconSvg("dark");
 }
