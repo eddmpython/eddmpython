@@ -130,10 +130,16 @@ const ROUTE_RULES = [
       // 16px 부터 64px 까지 다섯 단계.
       COUNT("#size svg", { exact: 5 }),
       TEXT("#color", "#f56565"),
-      // 내려받는 파일은 빌드가 만든 실제 주소여야 한다.
+      // 내려받는 파일은 빌드가 만든 실제 주소여야 한다. 화면은 `BRAND_ASSETS` 를 그대로
+      // 훑으므로 목록과 어긋날 수 없고, 여기서 확인하는 것은 그 목록 자체가 일곱 개를
+      // 그대로 들고 있는지다. 한때 빌드는 일곱 개를 내는데 화면은 네 개만 보여 줬다.
+      COUNT("#files a", { exact: 7 }),
       VISIBLE('#files a[href="/brand/mark-dark.svg"]'),
       VISIBLE('#files a[href="/brand/mark-light.svg"]'),
+      VISIBLE('#files a[href="/brand/icon-light.svg"]'),
       VISIBLE('#files a[href="/brand/icon-dark.svg"]'),
+      VISIBLE('#files a[href="/brand/icon-brand.svg"]'),
+      VISIBLE('#files a[href="/brand/icon-outline.svg"]'),
       VISIBLE('#files a[href="/favicon.svg"]'),
     ],
     captures: [

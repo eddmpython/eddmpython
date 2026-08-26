@@ -4,7 +4,7 @@ import { pathToFileURL } from "node:url";
 import { build, defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import { BRAND, appIconSvg, faviconSvg, symbolSvg } from "./src/brand";
+import { BRAND_ASSETS } from "./src/brand";
 
 // 빌드 산출물은 저장소 밖에 둔다 (CLAUDE.md 작업 산출물 규칙).
 // site/ 기준 두 단계 위는 sideProject/ 이므로 저장소 형제 폴더에 떨어진다.
@@ -44,21 +44,10 @@ type PageMeta = {
  * 그것을 막으려고 파일을 안 두는 것이지 게을러서가 아니다. 소스를 하나로 두고
  * dev 는 미들웨어로, build 는 dist 파일로 같은 문자열을 낸다.
  *
- * 목록의 왼쪽이 곧 공개 URL 이다. README 와 `/brand` 페이지가 이 주소를 가리킨다.
- * 여기에 없는 브랜드 파일은 존재하지 않는다.
+ * **목록은 `src/brand.ts` 의 `BRAND_ASSETS` 가 정본이다.** 여기에 다시 적지 않는다.
+ * 한때 빌드가 내는 파일과 `/brand` 화면이 보여 주는 파일이 달랐고, 목록이 두 곳에
+ * 있었기 때문이다.
  */
-const BRAND_FILES: Record<string, () => string> = {
-  "favicon.svg": faviconSvg,
-  // 심볼 단독. 놓일 바탕이 다르므로 두 벌을 낸다. 쓰는 쪽에서 색을 칠하지 않는다.
-  "brand/mark-dark.svg": () => symbolSvg({ ink: BRAND.ivory }),
-  "brand/mark-light.svg": () => symbolSvg({ ink: BRAND.carbon }),
-  // 정사각 칩 네 마감. 다른 앱 아이콘 사이에 놓이는 자리용이다.
-  "brand/icon-light.svg": () => appIconSvg("light", 512),
-  "brand/icon-dark.svg": () => appIconSvg("dark", 512),
-  "brand/icon-brand.svg": () => appIconSvg("brand", 512),
-  "brand/icon-outline.svg": () => appIconSvg("outline", 512),
-};
-
 function brandAssets(): Plugin {
   let root = "";
   let outDir = "";
@@ -71,18 +60,18 @@ function brandAssets(): Plugin {
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
         const path = req.url?.split("?")[0]?.replace(/^\//, "") ?? "";
-        const make = BRAND_FILES[path];
-        if (!make) return next();
+        const asset = BRAND_ASSETS.find((a) => a.file === path);
+        if (!asset) return next();
         res.setHeader("Content-Type", "image/svg+xml");
-        res.end(make());
+        res.end(asset.svg());
       });
     },
     closeBundle() {
       const dist = resolve(root, outDir);
-      for (const [name, make] of Object.entries(BRAND_FILES)) {
-        const target = join(dist, name);
+      for (const asset of BRAND_ASSETS) {
+        const target = join(dist, asset.file);
         mkdirSync(dirname(target), { recursive: true });
-        writeFileSync(target, make(), "utf8");
+        writeFileSync(target, asset.svg(), "utf8");
       }
     },
   };

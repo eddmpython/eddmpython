@@ -1,7 +1,7 @@
 import { Nav } from "../components/Nav";
 import { Footer } from "../components/Footer";
 import { AppIcon, Logo, LogoStacked, LogoSymbol, Wordmark } from "../components/Logo";
-import { SYMBOL, BRAND, ICON_FINISHES, type IconFinish } from "../brand";
+import { SYMBOL, BRAND, BRAND_ASSETS, ICON_FINISHES, type IconFinish } from "../brand";
 import { DESIGN } from "../design";
 
 /**
@@ -11,8 +11,10 @@ import { DESIGN } from "../design";
  * 전부 `src/brand.ts` 가 그 자리에서 계산해 낸 것이라 사이트의 다른 화면과 다를 수 없다.
  * 브랜드 시트를 이미지로 떠서 올리면 심볼을 고친 다음 날부터 시트만 옛날 것이 된다.
  *
- * 내려받는 파일은 `vite.config.ts` 의 `BRAND_FILES` 가 빌드 때 만든다. 아래 주소는
- * 그 목록과 같아야 한다.
+ * 내려받는 파일 목록은 `src/brand.ts` 의 `BRAND_ASSETS` 가 정본이고 빌드가 그 목록을
+ * 그대로 dist 에 쓴다. 이 화면은 같은 목록을 읽어서 보여 주므로 빌드가 내는 파일과
+ * 화면이 안내하는 파일이 어긋날 수 없다. 한때 목록이 두 곳에 있어서 빌드는 일곱 개를
+ * 내는데 화면은 네 개만 보여 줬다.
  */
 
 const PANEL =
@@ -86,19 +88,12 @@ const ORIGINS: Array<{ glyph: React.ReactNode; label: string; note: string }> = 
   },
 ];
 
-const FINISH_NOTE: Record<IconFinish, { label: string; note: string; file: string }> = {
-  light: { label: "밝은 칩", note: "밝은 독과 밝은 문서 위", file: "icon-light.svg" },
-  dark: { label: "어두운 칩", note: "기본값. 파비콘이 쓰는 마감", file: "icon-dark.svg" },
-  brand: { label: "강조 칩", note: "다른 아이콘 사이에서 튀어야 할 때", file: "icon-brand.svg" },
-  outline: { label: "테두리 칩", note: "어두운 바탕에 칩 경계를 보여야 할 때", file: "icon-outline.svg" },
+const FINISH_NOTE: Record<IconFinish, { label: string; note: string }> = {
+  light: { label: "밝은 칩", note: "밝은 독과 밝은 문서 위" },
+  dark: { label: "어두운 칩", note: "기본값. 파비콘이 쓰는 마감" },
+  brand: { label: "강조 칩", note: "다른 아이콘 사이에서 튀어야 할 때" },
+  outline: { label: "테두리 칩", note: "어두운 바탕에 칩 경계를 보여야 할 때" },
 };
-
-const DOWNLOADS = [
-  { file: "/brand/mark-dark.svg", label: "심볼 (밝은 획)", note: "어두운 바탕용" },
-  { file: "/brand/mark-light.svg", label: "심볼 (어두운 획)", note: "밝은 바탕용" },
-  { file: "/brand/icon-dark.svg", label: "앱 아이콘", note: "512px 정사각 SVG" },
-  { file: "/favicon.svg", label: "파비콘", note: "탭 아이콘" },
-];
 
 /** 팔레트. 값은 design.ts 가 정본이고 여기서는 읽기만 한다 */
 const SWATCHES = [
@@ -256,20 +251,24 @@ export function Brand() {
           description="빌드가 심볼 정본에서 직접 만들어 냅니다. 저장소에 사본이 없어서 마크를 고치면 이 파일들이 같이 바뀝니다."
         >
           <div className="grid gap-3 sm:grid-cols-2">
-            {DOWNLOADS.map((d) => (
+            {BRAND_ASSETS.map((a) => (
               <a
-                key={d.file}
-                href={d.file}
+                key={a.file}
+                href={`/${a.file}`}
                 className={`${PANEL} flex items-center gap-4 px-5 py-4 transition-colors hover:border-[var(--eddm-line-strong)]`}
               >
                 <span className="flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-carbon">
                   <LogoSymbol className="h-4 w-auto text-ivory" />
                 </span>
                 <span className="min-w-0">
-                  <span className="block text-[15px] font-medium">{d.label}</span>
-                  <span className="block font-mono text-xs text-ivory/45">{d.file}</span>
+                  <span className="block text-[15px] font-medium">{a.label}</span>
+                  <span className="block font-mono text-xs break-all text-ivory/45">
+                    /{a.file}
+                  </span>
                 </span>
-                <span className="ml-auto text-sm text-ivory/45">{d.note}</span>
+                <span className="ml-auto flex-none pl-3 text-sm text-ivory/45">
+                  {a.note}
+                </span>
               </a>
             ))}
           </div>

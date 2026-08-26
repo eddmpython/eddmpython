@@ -1,4 +1,4 @@
-import { SYMBOL, BRAND, ICON_FINISHES, type IconFinish } from "../brand";
+import { SYMBOL, BRAND, ICON_FINISHES, ICON_TILE, type IconFinish } from "../brand";
 
 /**
  * 브랜드 표기 4종. 넷을 섞어 쓰지 않는다.
@@ -83,7 +83,9 @@ export function LogoStacked({ size = "display" }: { size?: LockupSize } = {}) {
 /**
  * 정사각 앱 아이콘 칩.
  *
- * 마감 네 가지는 brand.ts 의 `ICON_FINISHES` 가 정본이다. 여기서 색을 다시 적지 않는다.
+ * 마감 네 가지는 `ICON_FINISHES`, 칩의 여백과 모서리는 `ICON_TILE` 이 정본이다. 여기서
+ * 색도 여백도 다시 적지 않는다. 한때 이 컴포넌트가 여백과 모서리를 자기 숫자로 들고 있었고,
+ * 그래서 화면의 칩과 내려받는 `icon-*.svg` 가 서로 다른 변환행렬을 냈다.
  */
 export function AppIcon({
   finish = "dark",
@@ -93,28 +95,25 @@ export function AppIcon({
   className?: string;
 }) {
   const f = ICON_FINISHES[finish];
-  const pad = 12;
-  const box = 100 - pad * 2;
-  const scale = Math.min(box / SYMBOL.width, box / SYMBOL.height);
-  const x = (100 - SYMBOL.width * scale) / 2;
-  const y = (100 - SYMBOL.height * scale) / 2;
+  const t = ICON_TILE;
+  const inner = t.size - t.edge.inset * 2;
   return (
-    <svg viewBox="0 0 100 100" className={className} aria-hidden="true">
-      <rect width="100" height="100" rx="22" fill={f.tile} />
+    <svg viewBox={`0 0 ${t.size} ${t.size}`} className={className} aria-hidden="true">
+      <rect width={t.size} height={t.size} rx={t.radius} fill={f.tile} />
       {f.outlined ? (
         <rect
-          x="1.5"
-          y="1.5"
-          width="97"
-          height="97"
-          rx="20.5"
+          x={t.edge.inset}
+          y={t.edge.inset}
+          width={inner}
+          height={inner}
+          rx={t.edge.radius}
           fill="none"
           stroke={f.ink}
-          strokeOpacity=".22"
-          strokeWidth="3"
+          strokeOpacity={t.edge.opacity}
+          strokeWidth={t.edge.width}
         />
       ) : null}
-      <g transform={`translate(${x} ${y}) scale(${scale})`}>
+      <g transform={`translate(${t.x} ${t.y}) scale(${t.scale})`}>
         <path d={SYMBOL.shape} fill={f.ink} />
         <circle cx={SYMBOL.dot.cx} cy={SYMBOL.dot.cy} r={SYMBOL.dot.r} fill={f.dot} />
       </g>

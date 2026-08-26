@@ -103,6 +103,27 @@ const ARM_RADIUS =
 const ARM_CENTER_Y = GEOMETRY.barY - ARM_RADIUS;
 /** 호와 바깥 바퀴가 만나는 각도. 두 중심을 잇는 방향이 곧 접점 방향이다 */
 const JOIN_ANGLE = Math.atan2(ARM_CENTER_Y, GEOMETRY.armCenterX);
+
+/**
+ * 작도가 성립하는 범위.
+ *
+ * "값을 고치면 접선 조건이 다시 풀리므로 이음매가 저절로 맞는다" 는 무조건이 아니다. 획이
+ * 감아 올리는 호의 지름보다 두꺼워지면 호의 안쪽 가장자리가 뒤집혀 반지름이 음수인 `A` 가
+ * 나온다. 브라우저는 그것을 조용히 무시하거나 이상하게 그린다. 형태가 깨졌는데 아무 데서도
+ * 안 걸리는 것이 가장 나쁘므로 여기서 세운다.
+ *
+ * 지금 값에서 여유는 획 두께 84.8 까지다. 실제로 쓰는 48 과는 멀다.
+ */
+if (!(GEOMETRY.stroke > 0 && GEOMETRY.stroke < 2 * ARM_RADIUS)) {
+  throw new Error(
+    `심볼 작도가 성립하지 않습니다. 획 두께는 0 보다 크고 ${(2 * ARM_RADIUS).toFixed(2)} 보다 작아야 하는데 ${GEOMETRY.stroke} 입니다`,
+  );
+}
+if (!(GEOMETRY.stroke < 2 * GEOMETRY.turnRadius)) {
+  throw new Error(
+    `심볼 작도가 성립하지 않습니다. 획 두께가 바깥 바퀴의 지름 ${2 * GEOMETRY.turnRadius} 을 넘습니다`,
+  );
+}
 const TAIL_ANGLE = (GEOMETRY.tailAngle * Math.PI) / 180;
 
 type Pt = readonly [number, number];
@@ -327,26 +348,61 @@ export const ICON_FINISHES = {
 export type IconFinish = keyof typeof ICON_FINISHES;
 
 /**
- * 정사각 앱 아이콘.
+ * 정사각 칩의 작도.
  *
- * 심볼이 가로로 1.27:1 이라 정사각 칩 안에서 세로 여백이 더 남는다. 12% 여백을 두면
- * iOS 스퀘어클과 Android 원형 마스크 양쪽에서 꼬리 끝과 점이 잘리지 않는다.
+ * 문자열 판(`appIconSvg`)과 React 판(`components/Logo.tsx` 의 `AppIcon`)이 같은 값을 읽는다.
+ * 양쪽에 여백과 모서리를 따로 적어 두면 한쪽만 고쳐도 아무도 모른다. 실제로 두 판의
+ * 변환행렬이 어긋난 적이 있다.
+ *
+ * 심볼을 칩 한 변의 12% 만큼 들여 놓는다. iOS 스퀘어클과 Android 원형 마스크 양쪽에서
+ * 꼬리 끝과 점이 잘리지 않는 값으로 실제 렌더해서 정했다. **심볼이 가로로 1.27:1 이라
+ * 들여쓰기는 가로에 걸리고 세로 여백은 그보다 더 남는다.** 남는 여백을 재는 것은 `padX`,
+ * `padY` 이고 두 값은 다르다. 위아래까지 12% 로 맞추려 들면 심볼이 칩 밖으로 나간다.
  */
-export function appIconSvg(finish: IconFinish = "dark", size = 100): string {
+export const ICON_TILE = (() => {
+  const size = 100;
+  const inset = 12;
+  const box = size - inset * 2;
+  // 여기서 한 번만 자른다. 쓰는 쪽에서 각자 자르면 문자열 판과 React 판이 서로 다른
+  // 자릿수를 내고, 같은 값을 읽는데도 결과가 갈린다. 실제로 그렇게 갈린 적이 있다.
+  // 여섯 자리면 512px 칩에서 오차가 0.001px 아래다.
+  const trim = (n: number) => Math.round(n * 1e6) / 1e6;
+  // 자리는 자르지 않은 배율로 잡고 배율만 자른다. 잘린 배율로 자리를 잡으면 12% 들여쓰기가
+  // 11.999975% 가 되어 문서가 말하는 값과 미묘하게 달라진다. 그 차이는 눈에 안 보이지만
+  // 숫자를 확인하러 온 사람에게는 보인다.
+  const exact = Math.min(box / SYMBOL.width, box / SYMBOL.height);
+  const scale = trim(exact);
+  const w = SYMBOL.width * exact;
+  const h = SYMBOL.height * exact;
+  return {
+    size,
+    /** 칩 모서리 */
+    radius: 22,
+    /** 테두리 마감의 안쪽 선 */
+    edge: { inset: 1.5, radius: 20.5, width: 3, opacity: 0.22 },
+    scale,
+    x: trim((size - w) / 2),
+    y: trim((size - h) / 2),
+    /** 실제로 남는 여백(%). 가로가 들여쓰기와 같고 세로가 더 크다 */
+    padX: trim(((size - w) / 2 / size) * 100),
+    padY: trim(((size - h) / 2 / size) * 100),
+  };
+})();
+
+/** 정사각 앱 아이콘 한 장짜리 SVG 파일 */
+export function appIconSvg(
+  finish: IconFinish = "dark",
+  size = ICON_TILE.size,
+): string {
   const f = ICON_FINISHES[finish];
-  const pad = 12;
-  const box = 100 - pad * 2;
-  const scale = Math.min(box / SYMBOL.width, box / SYMBOL.height);
-  const w = SYMBOL.width * scale;
-  const h = SYMBOL.height * scale;
-  const x = (100 - w) / 2;
-  const y = (100 - h) / 2;
+  const t = ICON_TILE;
+  const inner = t.size - t.edge.inset * 2;
   const edge = f.outlined
-    ? `<rect x="1.5" y="1.5" width="97" height="97" rx="20.5" fill="none" stroke="${f.ink}" stroke-opacity=".22" stroke-width="3"/>`
+    ? `<rect x="${t.edge.inset}" y="${t.edge.inset}" width="${inner}" height="${inner}" rx="${t.edge.radius}" fill="none" stroke="${f.ink}" stroke-opacity="${t.edge.opacity}" stroke-width="${t.edge.width}"/>`
     : "";
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 100 100" role="img" aria-label="eddmpython">
-  <rect width="100" height="100" rx="22" fill="${f.tile}"/>${edge}
-  <g transform="translate(${round(x)} ${round(y)}) scale(${Math.round(scale * 10000) / 10000})">${symbolMarkup({ ink: f.ink, dot: f.dot })}</g>
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${t.size} ${t.size}" role="img" aria-label="eddmpython">
+  <rect width="${t.size}" height="${t.size}" rx="${t.radius}" fill="${f.tile}"/>${edge}
+  <g transform="translate(${t.x} ${t.y}) scale(${t.scale})">${symbolMarkup({ ink: f.ink, dot: f.dot })}</g>
 </svg>
 `;
 }
@@ -362,3 +418,58 @@ export function appIconSvg(finish: IconFinish = "dark", size = 100): string {
 export function faviconSvg(): string {
   return appIconSvg("dark");
 }
+
+/**
+ * 내려받을 수 있는 브랜드 파일의 정본 목록.
+ *
+ * 빌드(`vite.config.ts`)가 이 목록을 그대로 dist 에 쓰고, `/brand` 화면(`pages/Brand.tsx`)이
+ * 같은 목록을 그대로 보여 준다. 한때 빌드는 일곱 개를 내는데 화면은 네 개만 보여 줬다.
+ * 목록이 두 곳에 있었기 때문이고, 그래서 목록을 여기 하나로 옮겼다.
+ *
+ * `file` 이 dist 안의 경로이자 공개 URL(`/` + file)이다. 목록에 없는 브랜드 파일은
+ * 존재하지 않는다.
+ */
+export const BRAND_ASSETS = [
+  {
+    file: "brand/mark-dark.svg",
+    label: "심볼 (밝은 획)",
+    note: "어두운 바탕용",
+    svg: () => symbolSvg({ ink: BRAND.ivory }),
+  },
+  {
+    file: "brand/mark-light.svg",
+    label: "심볼 (어두운 획)",
+    note: "밝은 바탕용",
+    svg: () => symbolSvg({ ink: BRAND.carbon }),
+  },
+  {
+    file: "brand/icon-light.svg",
+    label: "앱 아이콘 (밝은 칩)",
+    note: "512px 정사각",
+    svg: () => appIconSvg("light", 512),
+  },
+  {
+    file: "brand/icon-dark.svg",
+    label: "앱 아이콘 (어두운 칩)",
+    note: "512px 정사각",
+    svg: () => appIconSvg("dark", 512),
+  },
+  {
+    file: "brand/icon-brand.svg",
+    label: "앱 아이콘 (강조 칩)",
+    note: "512px 정사각",
+    svg: () => appIconSvg("brand", 512),
+  },
+  {
+    file: "brand/icon-outline.svg",
+    label: "앱 아이콘 (테두리 칩)",
+    note: "512px 정사각",
+    svg: () => appIconSvg("outline", 512),
+  },
+  {
+    file: "favicon.svg",
+    label: "파비콘",
+    note: "탭 아이콘",
+    svg: faviconSvg,
+  },
+] as const;
