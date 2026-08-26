@@ -1,16 +1,14 @@
 {
-  "version": 1,
-  "promptContract": "section-grounded-v2",
   "assets": {
     "half-caught": {
       "alt": "잘라 낸 종이 조각 옆에 아직 손대지 않은 종이가 남아 있는 모습",
-      "contentAnchor": "AI가 자주 쓰는 표현은 목록에서 개수를 세지 않고 문맥을 보고 판단합니다.",
+      "contentAnchor": "이 표현이 하나도 없어도 목적어가 흐리거나 결론을 되풀이하면 그 문장은 고칩니다.",
       "narrativeUse": "눈에 띄는 표현을 지우는 일만으로는 글의 질문과 판단을 고칠 수 없다는 점을 보여 준다.",
       "palettePolicy": "eddmpython-carbon-ivory-sand-v1",
       "placement": "H3 부제 바로 뒤",
       "prompt": "Create a wide 3:2 minimal studio still life on a matte charcoal surface. A single long ivory paper strip runs left to right across the frame. In the left half, several small rectangular pieces have been cut out of the strip and lie neatly separated on a shallow tray beside it, leaving clean empty gaps in the strip. In the right half, the same strip continues completely whole and untouched, with no cuts and no gaps. One simple rigid cutting guide sits at the midpoint where the cutting stops. Soft restrained studio lighting, shallow depth, clear physical materials. Muted charcoal and warm ivory tones only, no saturated accent colors. Absolutely no text, letters, numbers, glyphs, screens, logos, brands, people, robots, watermarks, decorative scenery, or unrelated objects.",
       "role": "section",
-      "sectionHeading": "4. AI가 자주 쓰는 표현 걷어 내기",
+      "sectionHeading": "6. AI가 자주 쓰는 표현 걷어 내기",
       "sectionSubtitle": "금지어를 지워도 남는 어색함",
       "sourceKind": "imagegen",
       "sourcePolicy": "auto",
@@ -18,5 +16,7 @@
       "visualRelationship": "잘라 낸 조각은 지운 AI 표현이고 손대지 않은 종이는 아직 읽어야 할 질문과 판단이다",
       "visualSubject": "잘라 낸 종이 조각을 담은 접시와 아직 손대지 않은 종이 한 장"
     }
-  }
+  },
+  "promptContract": "section-grounded-v2",
+  "version": 1
 }

@@ -17,6 +17,8 @@ ogImageHeight: 832
 ogImageType: image/webp
 ---
 
+https://eddmpython.com/tool/python-qr
+
 파이썬으로 QR코드를 만드는 핵심은 `import`, `make_qr`, `save` 세 줄입니다. 이 글을 따라가면 웹 주소가 담긴 PNG 파일이 손에 남습니다. 안내문이나 명함에 그대로 넣을 수 있고, 휴대폰으로 찍었을 때 실제로 열리는지까지 확인한 파일입니다.
 
 세 줄에서 끝내지 않습니다. 저장은 됐는데 파일이 어디 있는지 못 찾거나, 찾아서 휴대폰을 댔는데 아무 반응이 없거나, 화면에서 읽히던 것이 종이에서 안 읽히는 일이 남아 있기 때문입니다.
@@ -24,10 +26,6 @@ ogImageType: image/webp
 파이썬을 설치한 윈도우 컴퓨터에서 터미널로 진행합니다. 깔려 있는지 확인하는 방법과 없을 때 받는 곳도 아래에서 같이 다룹니다. 코드는 `segno` 를 씁니다. 검색해서 나오는 예제는 대부분 `qrcode` 라이브러리를 쓰는데, 안내대로 `pip install qrcode` 만 하고 실행하면 `ModuleNotFoundError: No module named 'PIL'` 이 뜹니다. PNG로 저장하는 일을 `qrcode` 가 아니라 `PIL` 이라는 그림 라이브러리가 맡기 때문입니다. `segno` 는 설치 한 줄이면 다른 패키지 없이 PNG와 SVG를 바로 저장합니다.
 
 ![어두운 책상 위에서 휴대폰이 작은 타일 격자 카드를 비추자 카드에서 가는 리본 하나가 흘러나와 화면으로 이어지는 장면](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/17/17e97599ef2ac51854f63acd7d52026fa0af03556885fdb76e1cdc597a99ce3d.webp "링크 하나가 휴대폰이 읽는 타일 패턴으로 바뀝니다")
-
-아직 설치하지 않았거나 결과부터 보고 싶다면 아래 입력칸에 주소를 넣어 봅니다. QR코드가 바로 만들어지고 `PNG 저장` 버튼으로 내려받을 수 있습니다.
-
-https://eddmpython.com/tool/python-qr
 
 ## segno 설치하고 QR코드 파일 만들기
 
@@ -64,6 +62,8 @@ print(os.path.abspath("link.png"))
 
 `segno.make` 가 아니라 `segno.make_qr` 인 것도 중요합니다. `make` 는 내용이 짧으면 마이크로 QR코드라는 더 작은 규격을 고르는데, 마이크로 QR코드를 읽지 못하는 카메라 앱이 있습니다. `make_qr` 은 내용이 짧아도 일반 QR코드만 만듭니다.
 
+https://eddmpython.com/codaro/run/?example=qr-micro
+
 아까 열어 둔 터미널에 아래를 칩니다.
 
 ```powershell
@@ -77,6 +77,10 @@ C:\Users\사용자이름\Desktop\qr\link.png
 ```
 
 가운데 경로는 컴퓨터마다 다릅니다. 바탕화면이 OneDrive에 백업돼 있으면 `Desktop` 앞에 `OneDrive` 가 한 칸 더 붙습니다. 이 줄이 나왔으면 성공입니다.
+
+파이썬을 아직 설치하지 않았다면 아래 칸에서 같은 코드를 브라우저로 돌려 볼 수 있습니다.
+
+https://eddmpython.com/codaro/run/?example=qr-first
 
 `can't open file` 이 들어간 긴 메시지가 나오는 경우는 둘입니다. 파일 이름이 실제로는 `make_qr.py.txt` 이거나, 터미널이 다른 폴더를 보고 있는 것입니다. 터미널에 `dir` 을 치면 그 폴더의 진짜 파일 이름이 나옵니다. `make_qr.py.txt` 로 보이면 메모장에서 파일 형식을 `모든 파일` 로 두고 다시 저장합니다.
 
@@ -129,6 +133,8 @@ post.png 저장했습니다
 
 `for name, url in links.items():` 는 목록을 위에서부터 한 줄씩 꺼내 왼쪽을 `name` 에, 오른쪽을 `url` 에 담습니다. 세 줄을 적었으니 세 번 돌면서 세 장을 저장합니다.
 
+https://eddmpython.com/codaro/run/?example=qr-many
+
 파일 이름을 왼쪽에 따로 적는 까닭은 주소를 그대로 쓸 수 없기 때문입니다. 주소 안의 `/` 와 `:` 는 파일 이름에 쓸 수 없는 기호라서 저장이 실패합니다.
 
 세 장을 차례로 열어 각각 다른 주소로 열리는지 휴대폰으로 확인합니다. 지금까지 만든 파일은 전부 화면에서만 확인한 것입니다. 종이에 올리면 크기를 다시 잡아야 합니다.
@@ -155,7 +161,6 @@ print(qr.symbol_size(scale=20, border=4))
 (660, 660)
 ```
 
-
 `symbol_size` 는 파일이 가로세로 몇 픽셀로 저장되는지 알려 줍니다. 위가 앞에서 만든 `link.png` 의 크기이고 아래가 방금 저장한 `print.png` 의 크기입니다. 660픽셀은 화면용 264픽셀의 두 배 반이라, 안내문이나 명함에 앉혀도 칸의 가장자리가 뭉개지지 않습니다.
 
 `border=4` 는 그대로 둡니다. QR코드를 만든 덴소웨이브도 [공식 설명](https://www.qrcode.com/en/howto/code.html)에서 네 변 모두에 네 칸 너비의 여백이 필요하다고 밝힙니다. 어두운 배경의 포스터에서는 이 흰 테두리가 눈에 띄어 잘라 내고 싶어집니다. 잘라 내면 화면에서 읽히던 QR코드가 인쇄물에서 안 읽힙니다.
@@ -172,6 +177,6 @@ print(qr.symbol_size(scale=20, border=4))
 - 브랜드 색은 저장할 때 `dark` 와 `light` 로 정합니다. `qr.save("navy.png", scale=8, border=4, dark="#1b3a5c", light="white")` 처럼 적습니다.
 - `make` 와 `make_qr` 의 차이는 `is_micro` 로 찍어 볼 수 있습니다. `print(segno.make("naver.com").is_micro, segno.make_qr("naver.com").is_micro)` 를 실행하면 `True False` 가 나옵니다.
 - QR코드에는 여분의 데이터가 함께 들어갑니다. 일부가 가려져도 그 데이터로 내용을 되살려 읽습니다. Segno가 그 양을 어떻게 정하는지는 [공식 문서](https://segno.readthedocs.io/en/stable/boost-error-correction-level.html)에 있습니다.
-- 도안을 코드 없이 먼저 잡아 보려면 이 글 위의 입력칸에서 `모듈 크기` 와 `테두리 여백` 슬라이더를 움직여 봅니다. 두 슬라이더가 각각 `scale` 과 `border` 입니다.
+- 도안을 코드 없이 잡아 보려면 이 글 맨 위의 입력칸에서 `모듈 크기` 와 `테두리 여백` 슬라이더를 움직여 봅니다. 두 슬라이더가 각각 `scale` 과 `border` 입니다.
 
 무엇을 하든 마지막은 같습니다. 저장한 파일을 쓸 자리에 올려 놓고 휴대폰으로 한 번 찍어 봅니다.

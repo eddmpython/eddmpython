@@ -106,6 +106,10 @@ function phrasesFrom(text, isJson = false) {
     if (/^[A-Za-z][A-Za-z0-9]*:\s/.test(line)) continue;
     for (const sentence of line.split(/(?<=[.!?])\s+/)) {
       const phrase = sentence.trim();
+      // 주소만 있는 줄은 교안 고유 문장이 아니라 공개 표면의 주소다. 실행 칸의 `fullUrl` 처럼
+      // 교안과 블로그가 같은 공개 주소를 가리키는 것은 정상이고 누출이 아니다. 2026-08-26 에
+      // 블로그 003 이 교안과 같은 Codaro Web Run 주소를 쓴다는 이유로 배포가 막혔다.
+      if (/^https?:\/\/\S+$/.test(phrase)) continue;
       if (phrase.length >= MIN_PHRASE && /[가-힣A-Za-z]/.test(phrase)) found.push(phrase);
     }
   }

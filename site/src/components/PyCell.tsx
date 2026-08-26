@@ -91,12 +91,45 @@ export function PyCell({
 
       readyRef.current = true;
       setState("running");
-      const result = await machine.runAsync(code);
-      setOut(
-        result === undefined || result === null
-          ? "(반환값 없음)"
-          : String(result),
+
+      /*
+       * print 출력을 파이썬 쪽에서 받아 둔다.
+       *
+       * `boot()` 이 돌려주는 머신에는 stdout 훅이 없다. 프로토타입에 run, runAsync, fs, term,
+       * loadPackages, proc, jobs, containers, dispose 뿐이다. 그래서 `runAsync` 의 반환값만
+       * 화면에 남고 `print` 로 결과를 보여 주는 예제는 전부 빈 출력으로 끝났다. 2026-08-26 에
+       * 실제로 그 상태였고 실행 칸을 쓴 글 전부가 해당됐다.
+       *
+       * `sys.stdout` 을 StringIO 로 바꿔 두고 실행한 뒤 되돌려 받는다. 파이썬 표준 동작이라
+       * 런타임 구현이 바뀌어도 그대로 성립한다.
+       */
+      await machine.runAsync(
+        "import sys as _sys, io as _io\n_cell_cap = _io.StringIO()\n_cell_prev = _sys.stdout\n_sys.stdout = _cell_cap",
       );
+
+      let result: unknown;
+      let failed: unknown;
+      try {
+        result = await machine.runAsync(code);
+      } catch (e) {
+        failed = e;
+      }
+
+      const printed = String(
+        (await machine.runAsync(
+          "import sys as _sys\n_sys.stdout = _cell_prev\n_cell_cap.getvalue()",
+        )) ?? "",
+      );
+
+      if (failed) throw failed;
+
+      const tail =
+        result === undefined || result === null ? "" : String(result);
+      const shown = [printed, tail]
+        .filter((part) => part.length)
+        .join("\n")
+        .replace(/\s+$/, "");
+      setOut(shown.length ? shown : "(출력 없음)");
       setState("done");
     } catch (e) {
       setOut(e instanceof Error ? e.message : String(e));

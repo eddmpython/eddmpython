@@ -54,7 +54,7 @@ status: observed
 블로그 글은 `primaryKeyword`와 `searchIntent`를 frontmatter에 함께 둔다. 제목, summary, 도입 두
 문단은 같은 문제나 결과에 답한다. explanation 제목은 이유나 질문, how-to 제목은 방법이나 순서,
 troubleshooting 제목은 문제나 해결, comparison 제목은 차이나 선택이 보이게 쓴다. 이 판단은 전역
-`$blog-writing`의 세 명 이상 독립 평가로 확인한다. `check:blog`는 frontmatter 필드와 빌드 계약만
+`$blog-writing`의 독립 평가로 확인한다. `check:blog`는 frontmatter 필드와 빌드 계약만
 확인하며 문장 품질이나 핵심어 횟수를 점수로 매기지 않는다.
 
 ## 구조화 데이터

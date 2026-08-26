@@ -18,6 +18,13 @@ type CodaroExample = {
   code: string;
   hint: string;
   fullUrl: string;
+  /**
+   * 이 셀이 micropip 으로 받아야 하는 PyPI 패키지.
+   *
+   * 없으면 파이썬 표준 라이브러리만 쓰는 셀이다. 한때 이 필드가 없어서 외부 패키지를 쓰는 글은
+   * 실행 칸을 붙일 수 없었고, 코드 블록만 보여 주고 독자는 직접 설치해야 했다.
+   */
+  packages?: string[];
 };
 
 const examples: Record<string, CodaroExample> = Object.assign(
@@ -65,6 +72,7 @@ export function CodaroCellEmbed({ exampleId }: { exampleId: string }) {
         <PyCell
           code={code}
           onCodeChange={setCode}
+          packages={example.packages ?? []}
           hint={example.hint}
           minRows={10}
         />
