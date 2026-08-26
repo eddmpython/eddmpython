@@ -4,6 +4,22 @@
     "003-python-qr/segno": {
       "value": "1.6.6",
       "at": "2026-08-26"
+    },
+    "004-dataframe-libraries/duckdb": {
+      "value": "1.5.5",
+      "at": "2026-08-26"
+    },
+    "004-dataframe-libraries/pandas": {
+      "value": "3.0.5",
+      "at": "2026-08-26"
+    },
+    "004-dataframe-libraries/polars": {
+      "value": "1.44.1",
+      "at": "2026-08-26"
+    },
+    "004-dataframe-libraries/pyarrow": {
+      "value": "25.0.1",
+      "at": "2026-08-26"
     }
   }
 }

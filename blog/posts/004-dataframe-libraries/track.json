@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "watch": {
+    "duckdb": {
+      "anchor": "0.13초에 47MB입니다.",
+      "kind": "pypi",
+      "package": "duckdb",
+      "why": "글이 가장 빠른 답으로 내세우는 0.13초 47MB 와 `import duckdb` 만 했을 때의 38MB 가 DuckDB 1.5.5 로 잰 값이다. 메이저가 바뀌면 파일 이름을 SQL 에 그대로 적는 문법과 그 수치를 다시 봐야 한다."
+    },
+    "pandas": {
+      "anchor": "`object` 가 아니라 `str` 이 나오고 그 속이 `ArrowStringArray` 입니다.",
+      "kind": "pypi",
+      "package": "pandas",
+      "why": "이 글의 출발점인 4.1초 560MB 와 표의 첫 두 행이 pandas 3.0.5 로 잰 값이다. 문자열이 Arrow 규격으로 바뀐 것도 3.0 의 변화라 메이저가 바뀌면 그 절의 출력과 수치를 다시 재야 한다."
+    },
+    "polars": {
+      "anchor": "`PROJECT 2/5 COLUMNS` 가 다섯 열 중 두 열만 표에 올리겠다는 뜻입니다.",
+      "kind": "pypi",
+      "package": "polars",
+      "why": "지연 실행 두 행이 Polars 1.44.1 로 잰 값이고 본문에 `explain()` 출력을 여섯 줄 그대로 실었다. 메이저가 바뀌면 그 출력 모양과 `scan_csv` 와 `collect` 의 계약을 다시 확인해야 한다."
+    },
+    "pyarrow": {
+      "anchor": "숫자는 Arrow가 정한 모양 그대로 이미 놓여 있어서 가리키기만 하면 됩니다.",
+      "kind": "pypi",
+      "package": "pyarrow",
+      "why": "표를 넘길 때 숫자 열은 0MB, 문자열 열은 53MB 가 든다고 재서 적었다. 그 차이는 Polars 의 문자열 표현과 Arrow 규격이 다르기 때문에 생기므로, PyArrow 메이저가 바뀌면 두 값을 다시 재야 한다."
+    }
+  }
+}
