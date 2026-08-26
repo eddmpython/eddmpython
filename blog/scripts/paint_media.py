@@ -43,6 +43,7 @@ import argparse
 import json
 import subprocess
 import sys
+import urllib.request
 from pathlib import Path
 
 import numpy as np
@@ -50,6 +51,7 @@ from PIL import Image, ImageFilter
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 POSTS_ROOT = REPO_ROOT / "blog" / "posts"
+CATALOG_PATH = REPO_ROOT / "blog" / "media" / "catalog.json"
 STAGING_ROOT = REPO_ROOT.parent / "eddmpython.out" / "blog-media"
 DESIGN_TS = REPO_ROOT / "site" / "src" / "design.ts"
 
@@ -89,6 +91,44 @@ CLIP_HIGH = 0.999
 
 PALETTE_POLICY = "eddmpython-gray-master-v1"
 MASTER_SUFFIX = ".master.png"
+
+
+def fetchMasters(post: str, stage: Path) -> list[str]:
+    """catalog 에 적힌 원본을 내려받는다. 이미 있는 것은 건드리지 않는다.
+
+    원본은 발행할 때 허깅페이스로 올라가고 로컬에서는 지워진다. 그래서 강조색을 바꿔 다시
+    칠하려는 기계에는 원본이 없는 것이 정상이다. 여기서 받아 오지 않으면 다시 칠하기가
+    이미지를 만든 그 기계에서만 되는 일이 된다.
+    """
+    if not CATALOG_PATH.is_file():
+        return []
+    catalog = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
+    repo = str(catalog.get("repo") or "")
+    assets = catalog.get("assets") or {}
+    wanted = {
+        str(record["assetKey"]): str(record["masterPath"])
+        for record in assets.values()
+        if isinstance(record, dict)
+        and record.get("post") == post
+        and record.get("masterSha256")
+        and record.get("masterPath")
+    }
+    if not wanted or not repo:
+        return []
+
+    got = []
+    for key, remote in sorted(wanted.items()):
+        target = stage / f"{key}{MASTER_SUFFIX}"
+        if target.is_file():
+            continue
+        url = f"https://huggingface.co/datasets/{repo}/resolve/main/{remote}"
+        request = urllib.request.Request(url, headers={"User-Agent": "eddmpython-paint"})
+        with urllib.request.urlopen(request, timeout=180) as response:
+            data = response.read()
+        stage.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(data)
+        got.append(f"{key} ({len(data) // 1024}KB)")
+    return got
 
 
 def loadPalette() -> dict[str, str]:
@@ -221,6 +261,9 @@ def main() -> None:
     args = ap.parse_args()
 
     stage = STAGING_ROOT / args.post
+    pulled = fetchMasters(args.post, stage)
+    if pulled:
+        print(f"원본을 원격에서 받았다: {', '.join(pulled)}")
     if not stage.is_dir():
         sys.exit(f"작업본 폴더가 없다: {stage}")
 
@@ -228,7 +271,7 @@ def main() -> None:
     masters = sorted(p for p in stage.iterdir() if p.name.endswith(MASTER_SUFFIX))
     if not masters:
         sys.exit(
-            f"{stage} 에 원본이 없다. 원본 이름은 <assetKey>{MASTER_SUFFIX} 다."
+            f"{stage} 에 원본이 없고 catalog 에도 없다. 원본 이름은 <assetKey>{MASTER_SUFFIX} 다."
         )
 
     palette = loadPalette()

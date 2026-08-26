@@ -41,6 +41,8 @@ ASSET_ID_RE = re.compile(
     r"(?P<key>[a-z0-9]+(?:-[a-z0-9]+)*)"
 )
 SHA256_RE = re.compile(r"[0-9a-f]{64}")
+# 회색 원본의 이름. paint_media.py 와 generate_flux.py 가 같은 값을 쓴다.
+MASTER_SUFFIX = ".master.png"
 IMAGEGEN_V2 = "eddmpython-dark-v2"
 IMAGEGEN_PALETTE = "eddmpython-gray-master-v1"
 # 옛 값. 새로 발행하지 않는다. 이미 올라간 자산의 계획을 읽기 위해서만 받는다.
@@ -353,6 +355,16 @@ def staging_path(post: str, key: str, explicit: str | None) -> Path:
     return existing[0]
 
 
+def master_staging_path(post: str, key: str) -> Path | None:
+    """회색 원본의 작업본 경로. 없으면 None.
+
+    원본 이름은 `<assetKey>.master.png` 라 `staging_path` 가 찾는 `<assetKey>.png` 와 겹치지
+    않는다. 파일 stem 이 `<assetKey>.master` 이기 때문이다.
+    """
+    path = (STAGING_ROOT / post / f"{key}{MASTER_SUFFIX}").resolve()
+    return path if path.is_file() else None
+
+
 def object_path(sha256: str, suffix: str) -> str:
     if not SHA256_RE.fullmatch(sha256):
         raise ValueError(f"올바르지 않은 SHA-256: {sha256}")
@@ -483,8 +495,11 @@ def publish(
     raw = post_path.read_text(encoding="utf-8")
     next_raw = updated_post(raw, key, next_url, old_url, str(entry["alt"]), metadata)
 
+    master_local = master_staging_path(post, key)
     if dry_run:
         print(f"{asset_id}: {local_path} -> {next_url}")
+        if master_local:
+            print(f"{asset_id}: 원본도 함께 올린다 {master_local.name}")
         return next_url
 
     token = resolve_token()
@@ -515,6 +530,30 @@ def publish(
     if not api.file_exists(repo_id=repo, filename=remote_path, repo_type="dataset"):
         raise RuntimeError(f"HF 업로드 뒤 원격 객체를 확인할 수 없음: {remote_path}")
 
+    # 회색 원본도 같은 콘텐츠 주소 공간에 올린다.
+    #
+    # 발행본은 원본에 정본 강조색을 입힌 결과다. 강조색이 바뀌면 원본을 다시 칠하기만 하면
+    # 되는데, 그 원본이 로컬 staging 에만 있으면 기계가 죽는 순간 사라진다. 2026-08-27 에
+    # 실제로 일곱 장이 그 상태였다. 발행본에서 휘도를 되뽑아 다시 칠해 봤더니 픽셀의 68% 가
+    # 8/255 넘게 어긋났다. 발행본에는 강조색과 밝기 보정이 이미 섞여 있어서 재료로 못 쓴다.
+    # 그래서 원본은 발행본과 같은 무게로 다뤄야 한다.
+    master_sha = None
+    master_remote = None
+    if master_local:
+        master_meta = image_metadata(master_local)
+        master_sha = hashlib.sha256(master_local.read_bytes()).hexdigest()
+        master_remote = object_path(master_sha, canonical_suffix(master_local))
+        if not api.file_exists(repo_id=repo, filename=master_remote, repo_type="dataset"):
+            api.upload_file(
+                path_or_fileobj=str(master_local),
+                path_in_repo=master_remote,
+                repo_id=repo,
+                repo_type="dataset",
+                commit_message=f"블로그 미디어 원본: {asset_id}",
+            )
+        if not api.file_exists(repo_id=repo, filename=master_remote, repo_type="dataset"):
+            raise RuntimeError(f"HF 업로드 뒤 원본을 확인할 수 없음: {master_remote}")
+
     next_catalog = deepcopy(catalog)
     next_objects = next_catalog["objects"]
     next_assets = next_catalog["assets"]
@@ -531,21 +570,46 @@ def publish(
         "visualSubject": entry.get("visualSubject", ""),
         "width": metadata["width"],
     }
-    next_assets[asset_id] = {
+    asset_record = {
         "post": post,
         "assetKey": key,
         "sha256": sha256,
         "path": remote_path,
     }
+    if master_sha and master_remote:
+        # 원본도 자기 설명을 갖는다. role 로 발행본과 구분해서 --find 가 둘을 헷갈리지 않는다.
+        next_objects[master_sha] = {
+            "alt": entry.get("alt", ""),
+            "bytes": master_local.stat().st_size,
+            "height": master_meta["height"],
+            "mime": master_meta["mime"],
+            "path": master_remote,
+            "role": "master",
+            "sourcePost": post,
+            "visualSubject": entry.get("visualSubject", ""),
+            "width": master_meta["width"],
+        }
+        asset_record["masterSha256"] = master_sha
+        asset_record["masterPath"] = master_remote
+    else:
+        # 옛 정책 자산은 원본이 없다. 있던 것이 사라지는 일은 없어야 하므로 앞 값을 잇는다.
+        prev = catalog.get("assets", {}).get(asset_id)
+        if isinstance(prev, dict) and prev.get("masterSha256"):
+            asset_record["masterSha256"] = prev["masterSha256"]
+            asset_record["masterPath"] = prev.get("masterPath", "")
+    next_assets[asset_id] = asset_record
     # 참조가 끊긴 객체를 여기서 지우지 않는다. 글을 갈아엎어도 이미지는 남겨 두고 다시 쓴다.
     # 정리는 --prune-objects 로 명시해서 한다.
 
     save_json(CATALOG_PATH, next_catalog)
     post_path.write_text(next_raw, encoding="utf-8")
     local_path.unlink()
+    if master_local:
+        master_local.unlink()
     if local_path.parent == (STAGING_ROOT / post).resolve() and not any(local_path.parent.iterdir()):
         local_path.parent.rmdir()
-    print(f"{asset_id}: HF 업로드, catalog와 본문 반영, staging 정리 완료")
+    what = "발행본과 원본" if master_sha else "발행본"
+    print(f"{asset_id}: {what} HF 업로드, catalog와 본문 반영, staging 정리 완료")
     return next_url
 
 
@@ -624,6 +688,13 @@ def unreferenced_objects(catalog: dict) -> list[str]:
         str(record.get("sha256"))
         for record in assets.values()
         if isinstance(record, dict) and record.get("sha256")
+    }
+    # 회색 원본도 자산이 가리키는 것이다. 이것을 안 세면 원본이 전부 참조 없음으로 잡혀
+    # --prune-objects 가 강조색을 다시 칠할 유일한 재료를 지운다.
+    referenced |= {
+        str(record.get("masterSha256"))
+        for record in assets.values()
+        if isinstance(record, dict) and record.get("masterSha256")
     }
     referenced |= course_referenced_sha()
     return sorted(sha for sha in objects if sha not in referenced)

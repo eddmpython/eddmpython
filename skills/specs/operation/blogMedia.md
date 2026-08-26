@@ -157,16 +157,55 @@ DartLab 카드뉴스에서 가져온 핵심은 이미지에 문장을 구워 넣
 
 | 무엇 | 누가 만드나 | 어디에 |
 |---|---|---|
-| 원본 `<assetKey>.master.png` | `generate_flux.py` 가 모델을 불러 만든다. 무손실 PNG | 저장소 밖 staging |
-| 발행본 `<assetKey>.webp` | `paint_media.py` 가 원본에 강조색을 입힌다 | 저장소 밖 staging, 검수 후 HF |
+| 원본 `<assetKey>.master.png` | `generate_flux.py` 가 모델을 불러 만든다. 무손실 PNG | **발행본과 같이 HF** |
+| 발행본 `<assetKey>.webp` | `paint_media.py` 가 원본에 강조색을 입힌다 | 검수 후 HF |
 
 ```bash
 python -X utf8 blog/scripts/generate_flux.py <post-id>     # 원본
 python -X utf8 blog/scripts/paint_media.py <post-id>       # 발행본
+python -X utf8 blog/scripts/publish_media.py --asset <id> --reviewed   # 둘 다 올라간다
 ```
 
 **강조색이 바뀌면 원본은 그대로 두고 `paint_media.py` 만 다시 돌린다.** 모델을 다시 부르지
-않으므로 비용이 들지 않고, 결정적이라 같은 원본에서 언제나 같은 그림이 나온다.
+않으므로 비용이 들지 않고, 결정적이라 같은 원본에서 언제나 같은 그림이 나온다. 실측으로
+확인했다. 같은 원본을 같은 강조색으로 다시 칠하면 sha256 까지 같은 바이트가 나온다.
+
+### 원본도 허깅페이스에 올린다
+
+**원본은 발행본과 같은 무게로 다룬다.** 같은 `objects/sha256/` 공간에 올라가고 자산 레코드가
+그것을 가리킨다.
+
+```json
+"005-python-history/hero": {
+  "post": "005-python-history",
+  "assetKey": "hero",
+  "sha256": "2d262b...",
+  "path": "objects/sha256/2d/2d262b....webp",
+  "masterSha256": "7fb240...",
+  "masterPath": "objects/sha256/7f/7fb240....png"
+}
+```
+
+객체 쪽에는 `"role": "master"` 가 붙어 발행본과 구분된다.
+
+2026-08-27 까지는 원본이 로컬 staging 에만 있었다. 발행 스크립트가 발행본만 올리고 원본은
+올리지도 지우지도 않았기 때문이다. 그래서 **다시 칠할 유일한 재료가 한 기계에만** 있었고
+어느 게이트도 그것을 몰랐다.
+
+발행본에서 휘도를 되뽑아 대신 쓰는 길도 재 봤다. 원본에서 새 색으로 칠한 것과 견주니 픽셀의
+68% 가 8/255 넘게 어긋났고 최대 차이가 82/255 였다. 발행본에는 강조색과 밝기 보정이 이미
+섞여 있어 재료가 못 된다. 그래서 원본을 보관하는 것 말고 다른 방법이 없다.
+
+**다시 칠하는 기계에 원본이 없는 것이 정상이다.** `paint_media.py` 가 catalog 의
+`masterPath` 를 보고 알아서 내려받는다. 그래서 어느 기계에서든 아래 두 줄이면 끝난다.
+
+```bash
+python -X utf8 blog/scripts/paint_media.py <post-id>
+python -X utf8 blog/scripts/publish_media.py --asset <id> --reviewed
+```
+
+`check:blog` 가 `palettePolicy: eddmpython-gray-master-v1` 인 자산에 `masterSha256` 이 없으면
+막는다. `--prune-objects` 도 `masterSha256` 을 참조로 세므로 원본을 지우지 않는다.
 
 ### 어디에 무슨 색이 앉나
 
@@ -263,8 +302,10 @@ python -X utf8 blog/scripts/publish_media.py --asset 20260808-example/hero --rev
 2. 파일 바이트의 SHA-256 을 계산한다
 3. `objects/sha256/<앞 두 글자>/<전체 해시>.<확장자>` 에 올린다
 4. 원격 객체가 실제로 존재하는지 다시 확인한다
-5. catalog 에 바이트 수, MIME, 너비, 높이를 기록하고 본문의 `media://` 를 Hugging Face URL 로 바꾼다
-6. 성공한 로컬 작업본과 빈 staging 폴더를 삭제한다
+5. **회색 원본이 옆에 있으면 같은 방식으로 올리고 다시 확인한다**
+6. catalog 에 바이트 수, MIME, 너비, 높이를 기록하고, 원본이 있으면 `masterSha256` 과
+   `masterPath` 를 자산에 적는다. 본문의 `media://` 를 Hugging Face URL 로 바꾼다
+7. 성공한 로컬 작업본과 원본과 빈 staging 폴더를 삭제한다
 
 **참조가 끊긴 객체를 자동으로 지우지 않는다.** 글을 갈아엎어도 이미지는 남는다.
 

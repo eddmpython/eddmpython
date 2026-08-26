@@ -3,6 +3,7 @@ import { readdir, readFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 import {
   h2Sections,
+  IMAGEGEN_PALETTE,
   lintImageBrief,
   lintImagePolicy,
   parseSectionParts,
@@ -439,6 +440,23 @@ for (const [id, record] of Object.entries(catalog.assets)) {
 
 for (const id of Object.keys(plan.assets)) {
   if (!catalog.assets[id]) fail(planLabel(id), `${id}가 아직 Hugging Face에 발행되지 않았습니다`);
+  /*
+   * 회색 원본을 쓰는 자산은 그 원본도 발행돼 있어야 한다.
+   *
+   * 발행본은 원본에 정본 강조색을 입힌 결과다. 강조색이 바뀌면 원본을 다시 칠하면 되는데,
+   * 그 원본이 어딘가 로컬에만 있으면 그 기계가 죽는 순간 다시 칠할 방법이 사라진다.
+   * 2026-08-27 에 실제로 일곱 장이 그 상태였고 아무 게이트도 그것을 몰랐다. 발행본에서
+   * 휘도를 되뽑아 대신 쓰는 것은 재 봤더니 픽셀의 68% 가 어긋나서 못 쓴다.
+   *
+   * 옛 정책 자산은 원본 없이 만들어졌으므로 이 검사에서 뺀다.
+   */
+  const policy = (plan.assets[id] ?? coursePlans[id])?.palettePolicy;
+  if (policy === IMAGEGEN_PALETTE && !catalog.assets[id]?.masterSha256) {
+    fail(
+      planLabel(id),
+      `${id}는 ${IMAGEGEN_PALETTE} 인데 회색 원본이 발행되지 않았습니다. paint 한 뒤 publish 하면 원본도 함께 올라갑니다`,
+    );
+  }
 }
 
 /*

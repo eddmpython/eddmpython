@@ -50,42 +50,56 @@
     },
     "003-python-qr/hero": {
       "assetKey": "hero",
+      "masterPath": "objects/sha256/43/43940dcf0d18aad56ad02c0a917f279d9c550275ec2ef0fd4e8eec73625a7dd9.png",
+      "masterSha256": "43940dcf0d18aad56ad02c0a917f279d9c550275ec2ef0fd4e8eec73625a7dd9",
       "path": "objects/sha256/52/529e7d7cb675862be6442f9ecbbb691da4a5ff7dc7c387f1837c9f44533eaf45.webp",
       "post": "003-python-qr",
       "sha256": "529e7d7cb675862be6442f9ecbbb691da4a5ff7dc7c387f1837c9f44533eaf45"
     },
     "004-dataframe-libraries/hero": {
       "assetKey": "hero",
+      "masterPath": "objects/sha256/9b/9b84e25f4299a1910f989edb23ea13361ea65f7b5b2f20f95a93a9509b7b4fb9.png",
+      "masterSha256": "9b84e25f4299a1910f989edb23ea13361ea65f7b5b2f20f95a93a9509b7b4fb9",
       "path": "objects/sha256/ef/ef0ebfa270d6567d90fdd3f14576e1e77a58d17226e7739bed8043f20def0469.webp",
       "post": "004-dataframe-libraries",
       "sha256": "ef0ebfa270d6567d90fdd3f14576e1e77a58d17226e7739bed8043f20def0469"
     },
     "004-dataframe-libraries/one-table-three-tools": {
       "assetKey": "one-table-three-tools",
+      "masterPath": "objects/sha256/8e/8ef469c6313f3dfc38d69f5f5292841742bdd9364c45053e1522f71902bbb71d.png",
+      "masterSha256": "8ef469c6313f3dfc38d69f5f5292841742bdd9364c45053e1522f71902bbb71d",
       "path": "objects/sha256/69/69f86a5f36d0171f7a1c4cff45560283c7afb9133269c10e30abac524ab8c905.webp",
       "post": "004-dataframe-libraries",
       "sha256": "69f86a5f36d0171f7a1c4cff45560283c7afb9133269c10e30abac524ab8c905"
     },
     "004-dataframe-libraries/two-of-five-columns": {
       "assetKey": "two-of-five-columns",
+      "masterPath": "objects/sha256/f4/f435d8082df6d6f3845e2065facab417eb377b0a6c9fb8e3266a269959d498fd.png",
+      "masterSha256": "f435d8082df6d6f3845e2065facab417eb377b0a6c9fb8e3266a269959d498fd",
       "path": "objects/sha256/15/159e3259346a2f8fed48fd874fe2a479214a12f3a3d40ea6645308d505f199ad.webp",
       "post": "004-dataframe-libraries",
       "sha256": "159e3259346a2f8fed48fd874fe2a479214a12f3a3d40ea6645308d505f199ad"
     },
     "005-python-history/gil": {
       "assetKey": "gil",
+      "masterPath": "objects/sha256/92/9243de3c7e37eeabdeb67ecaf67c291591feba8353f4cf03aa411b924468d5b5.png",
+      "masterSha256": "9243de3c7e37eeabdeb67ecaf67c291591feba8353f4cf03aa411b924468d5b5",
       "path": "objects/sha256/bc/bc6d287b4a9a6edb25e2a55975d68a281ff08dfe12ce146fc7adb898d6e3c39b.webp",
       "post": "005-python-history",
       "sha256": "bc6d287b4a9a6edb25e2a55975d68a281ff08dfe12ce146fc7adb898d6e3c39b"
     },
     "005-python-history/hero": {
       "assetKey": "hero",
+      "masterPath": "objects/sha256/7f/7fb240edb5dd0ca5033424402804f37522a3232166d06244bfd82ab24ddf5b80.png",
+      "masterSha256": "7fb240edb5dd0ca5033424402804f37522a3232166d06244bfd82ab24ddf5b80",
       "path": "objects/sha256/2d/2d262b3f368695458f52a10d478faf6064f6cdfaf03308fa0fe079173b18429c.webp",
       "post": "005-python-history",
       "sha256": "2d262b3f368695458f52a10d478faf6064f6cdfaf03308fa0fe079173b18429c"
     },
     "005-python-history/the-break": {
       "assetKey": "the-break",
+      "masterPath": "objects/sha256/19/1965ca5395b274122d176e7e365d6ecf59e21e8b7755fe530474369d225499d6.png",
+      "masterSha256": "1965ca5395b274122d176e7e365d6ecf59e21e8b7755fe530474369d225499d6",
       "path": "objects/sha256/dd/dd263228b071495adb445023a0ceb12bbabdb1c6f58eb5479d2adf5e8475af91.webp",
       "post": "005-python-history",
       "sha256": "dd263228b071495adb445023a0ceb12bbabdb1c6f58eb5479d2adf5e8475af91"
@@ -482,6 +496,17 @@
       "sourcePost": "004-python-basic-syntax",
       "visualSubject": "부서와 금액과 기준값 카드와 세 변수 이름표 및 출력 문장 결과 카드",
       "width": 1536
+    },
+    "1965ca5395b274122d176e7e365d6ecf59e21e8b7755fe530474369d225499d6": {
+      "alt": "어두운 바닥에 놓인 넓은 판 하나가 가운데에서 갈라져 두 조각으로 벌어져 있고 그 틈을 가로질러 가는 다리 하나가 밝게 놓인 장면",
+      "bytes": 1600842,
+      "height": 832,
+      "mime": "image/png",
+      "path": "objects/sha256/19/1965ca5395b274122d176e7e365d6ecf59e21e8b7755fe530474369d225499d6.png",
+      "role": "master",
+      "sourcePost": "005-python-history",
+      "visualSubject": "가운데가 갈라져 벌어진 넓은 판과 그 틈을 가로지르는 좁은 다리",
+      "width": 1216
     },
     "19c1506dd227553f6d2b400569a4d2eee5c41e3635722b87af5c053be76fbaa0": {
       "alt": "Windows 패키지 설치가 uv 실행 파일을 준비하고 새 PowerShell에서 버전과 프로젝트 실행을 통과하는 모습",
@@ -962,6 +987,17 @@
       "sourcePost": "003-what-is-terminal",
       "visualSubject": "세 탭이 있는 Windows Terminal 화면과 PowerShell 해석 화면, 내부 명령과 외부 실행 파일 및 실행 중 프로세스 카드",
       "width": 1536
+    },
+    "43940dcf0d18aad56ad02c0a917f279d9c550275ec2ef0fd4e8eec73625a7dd9": {
+      "alt": "어두운 바닥에 놓인 휴대폰 화면이 작은 사각 타일 격자로 덮여 있고 그 위에서 가는 리본 한 줄이 들려 올라오는 장면",
+      "bytes": 1079139,
+      "height": 832,
+      "mime": "image/png",
+      "path": "objects/sha256/43/43940dcf0d18aad56ad02c0a917f279d9c550275ec2ef0fd4e8eec73625a7dd9.png",
+      "role": "master",
+      "sourcePost": "003-python-qr",
+      "visualSubject": "사각 타일 격자로 덮인 휴대폰 화면과 그 위로 들려 올라오는 가는 리본 한 줄",
+      "width": 1216
     },
     "45a2d0545791403e5c48fd1115880a14c8da715d3e3b31cc440c4a486d8b7d1e": {
       "alt": "엑셀 파일을 올리자 계정별 막대 그래프 대시보드가 생기는 화면",
@@ -1683,6 +1719,17 @@
       "visualSubject": "여러 호출 화면과 공유 기본 리스트 하나 및 호출마다 생성된 독립 결과 리스트 여러 개와 빈 값 판정 게이트",
       "width": 1536
     },
+    "7fb240edb5dd0ca5033424402804f37522a3232166d06244bfd82ab24ddf5b80": {
+      "alt": "어두운 책상 위에 금속 덩이 하나가 놓여 있고 왼쪽 면은 심하게 삭아 얽어 있으며 오른쪽 면은 매끈한데 가운데를 가로지르는 홈 하나가 양쪽으로 끊김 없이 이어진 장면",
+      "bytes": 1384733,
+      "height": 832,
+      "mime": "image/png",
+      "path": "objects/sha256/7f/7fb240edb5dd0ca5033424402804f37522a3232166d06244bfd82ab24ddf5b80.png",
+      "role": "master",
+      "sourcePost": "005-python-history",
+      "visualSubject": "한쪽은 삭고 한쪽은 매끈한 금속 덩이와 그 위를 끊김 없이 가로지르는 홈",
+      "width": 1216
+    },
     "813bf48e3146e990e4ad935132cf21e891459aadaf1272ff6ec404a9d05080b4": {
       "alt": "한 파일 스크립트와 설치되는 소스 패키지가 서로 다른 테스트와 실행 요구에 연결된 모습",
       "bytes": 1149355,
@@ -1833,6 +1880,17 @@
       "visualSubject": "종이 출력 전신 단말기, CRT 화면 단말기, 현대 노트북의 터미널 앱",
       "width": 1536
     },
+    "8ef469c6313f3dfc38d69f5f5292841742bdd9364c45053e1522f71902bbb71d": {
+      "alt": "매끈한 판 하나를 가운데 두고 생김새가 서로 다른 공구 세 개가 각각 다른 방향에서 그 판의 같은 면에 닿아 있는 장면",
+      "bytes": 2080512,
+      "height": 832,
+      "mime": "image/png",
+      "path": "objects/sha256/8e/8ef469c6313f3dfc38d69f5f5292841742bdd9364c45053e1522f71902bbb71d.png",
+      "role": "master",
+      "sourcePost": "004-dataframe-libraries",
+      "visualSubject": "가운데 놓인 판 하나와 서로 다른 방향에서 그 판에 닿아 있는 공구 세 개",
+      "width": 1216
+    },
     "8f0cb0bb269ef4b26d9ff5e89a8eaae3ef99a66cfb426ec143980c6b49a48aa7": {
       "alt": "작은 브라우저 책상이 파일 서랍과 예약 장치가 있는 큰 작업실로 연결된 모습",
       "bytes": 1178484,
@@ -1872,6 +1930,17 @@
       "sourcePost": "013-uv-python-environment",
       "visualSubject": "의존성 설정 파일, 패키지 트리가 있는 잠금 파일, 추가된 패키지 카드, 제거된 빈 자리, 한 가지만 바뀐 패키지 가지와 고정된 나머지 목록",
       "width": 1536
+    },
+    "9243de3c7e37eeabdeb67ecaf67c291591feba8353f4cf03aa411b924468d5b5": {
+      "alt": "어두운 바닥이 넓은 판으로 갈라져 있고 그 사이를 지나는 아주 좁은 통로 하나만 멀리까지 이어지며 그 안에 작은 불빛이 켜진 장면",
+      "bytes": 1466440,
+      "height": 832,
+      "mime": "image/png",
+      "path": "objects/sha256/92/9243de3c7e37eeabdeb67ecaf67c291591feba8353f4cf03aa411b924468d5b5.png",
+      "role": "master",
+      "sourcePost": "005-python-history",
+      "visualSubject": "넓은 판으로 갈라진 바닥과 그 사이를 멀리까지 지나는 좁은 통로 하나",
+      "width": 1216
     },
     "9350676bec68e5034004743b273718ab9a8dc8620a35704298eac1bb278b92b0": {
       "alt": "어두운 바탕에 놓인 접시 안에 잘라 낸 작은 종이 조각 아홉 개가 모여 있고 그 옆에는 아무것도 잘리지 않은 종이 한 장이 그대로 놓여 있는 화면",
@@ -1982,6 +2051,17 @@
       "sourcePost": "023-excel-dataframe-map",
       "visualSubject": "DataFrame 표 화면의 데이터 행 다섯 개와 열 네 개 및 머리글과 인덱스 띠와 크기 결과 카드",
       "width": 1536
+    },
+    "9b84e25f4299a1910f989edb23ea13361ea65f7b5b2f20f95a93a9509b7b4fb9": {
+      "alt": "어두운 책상 위에 두꺼운 종이 뭉치가 쌓여 있고 그 옆면에서 얇은 종이 띠 두 장만 뽑혀 나와 밝게 놓인 장면",
+      "bytes": 804266,
+      "height": 832,
+      "mime": "image/png",
+      "path": "objects/sha256/9b/9b84e25f4299a1910f989edb23ea13361ea65f7b5b2f20f95a93a9509b7b4fb9.png",
+      "role": "master",
+      "sourcePost": "004-dataframe-libraries",
+      "visualSubject": "층층이 쌓인 두꺼운 종이 뭉치와 그 옆면에서 뽑혀 나온 얇은 종이 띠 두 장",
+      "width": 1216
     },
     "9cc5597e6b318dfc0b590d90b5ed3815c766df6513c9dde465bc5d2772c9bf2f": {
       "alt": "한 거래 목록을 두 이름이 함께 가리키고 얕은 복사에서도 안쪽 거래가 공유되는 모습",
@@ -2882,6 +2962,17 @@
       "sourcePost": "004-ai-needs-an-environment",
       "visualSubject": "작은 진입 문서와 큰 정본 문서가 한 방향으로 연결된 두 가지 저장소 지침 배치",
       "width": 1536
+    },
+    "f435d8082df6d6f3845e2065facab417eb377b0a6c9fb8e3266a269959d498fd": {
+      "alt": "세로로 빽빽하게 꽂힌 얇은 판 다섯 줄 가운데 두 줄만 위로 뽑혀 나와 있고 나머지 세 줄은 꽂힌 자리에 그대로 있는 장면",
+      "bytes": 778885,
+      "height": 832,
+      "mime": "image/png",
+      "path": "objects/sha256/f4/f435d8082df6d6f3845e2065facab417eb377b0a6c9fb8e3266a269959d498fd.png",
+      "role": "master",
+      "sourcePost": "004-dataframe-libraries",
+      "visualSubject": "나란히 꽂힌 얇은 세로 판 다섯 개와 그중 위로 뽑혀 올라온 두 개",
+      "width": 1216
     },
     "f612566f6fd7450d78a1f0d15f268ddfc2c14b5adf16ea0b2e097cb3bec23caa": {
       "alt": "한 오류 행은 옆으로 빠지고 다음 행이 계속되며 중지 조건에서는 전체 줄이 끝나는 모습",

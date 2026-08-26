@@ -2,7 +2,7 @@ const SUBTITLE_LEAD = /^###[ \t]+([^\r\n]+)\r?\n\r?\n/u;
 const IMAGE_LEAD =
   /^!\[([^\]]+)\]\(\s*<?([^\s)>]+)>?\s+["']([^"']+)["']\s*\)\s*(?:\r?\n|$)/u;
 const IMAGEGEN_V2 = "eddmpython-dark-v2";
-const IMAGEGEN_PALETTE = "eddmpython-gray-master-v1";
+export const IMAGEGEN_PALETTE = "eddmpython-gray-master-v1";
 /**
  * 옛 값. 이미지 모델에게 강조색을 직접 그리게 하던 시절의 자산이 이 값을 들고 있다.
  * 그 이미지의 픽셀에는 지금 금지된 색이 굳어 있어서 새 정책 이름을 붙이면 데이터가
