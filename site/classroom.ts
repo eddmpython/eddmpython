@@ -1854,9 +1854,9 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
              <span class="lecture-brand">
                <span class="lecture-symbol-wrap"><svg class="lecture-symbol" viewBox="${esc(SYMBOL.viewBox)}" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="${esc(
                  SYMBOL.shape,
-               )}"/><ellipse cx="${SYMBOL.eye.cx}" cy="${SYMBOL.eye.cy}" rx="${SYMBOL.eye.rx}" ry="${
-                 SYMBOL.eye.ry
-               }" fill="${esc(BRAND.eye)}"/></svg></span>
+               )}"/><rect x="${SYMBOL.dot.x}" y="${SYMBOL.dot.y}" width="${SYMBOL.dot.width}" height="${
+                 SYMBOL.dot.height
+               }" rx="${SYMBOL.dot.rx}" fill="${esc(BRAND.dot)}"/></svg></span>
                <span class="lecture-brand-copy"><b>eddmpython course</b><i>${esc(category.title)} · ${esc(post.title)}</i></span>
              </span>
              <span class="lecture-progress" data-lecture-progress role="progressbar" aria-label="강의 진행률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">01 / ${String(post.scenes?.length ?? 0).padStart(2, "0")} · 0 / 0</span>

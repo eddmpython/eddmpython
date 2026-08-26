@@ -7,7 +7,7 @@
  *
  * 강조색을 바꾸려면 아래 `ACCENT`의 `dark`와 `light`만 고친다. 현재는 색조를
  * 더하지 않고 다크에서는 가장 밝은 값, 라이트에서는 가장 진한 값을 쓴다. 브랜드 마크의
- * 눈 색은 강조색이 아니며 `brand.ts`가 이 파일의 `palette.eye`를 읽어 사용한다.
+ * 점 색은 강조색이 아니며 `brand.ts`가 이 파일의 `palette.dot`을 읽어 사용한다.
  */
 
 const PALETTE = {
@@ -15,7 +15,8 @@ const PALETTE = {
   ink: "#0c0f0e",
   ivory: "#f5f3ee",
   paper: "#ffffff",
-  eye: "#d8be91",
+  /** 브랜드 마크의 점. 심볼에서 색이 고정된 유일한 부분이고 워드마크의 `.py` 가 같은 값을 쓴다. */
+  dot: "#f56565",
   alert: "#e0552d",
   dartlab: "#7da2e8",
   codaro: "#dfa14e",
@@ -114,6 +115,8 @@ function sharedDeclarations(): string {
     /** 이전 소비자를 위한 별칭. 새 컴포넌트는 --eddm-accent를 쓴다. */
     "--eddm-sand": "var(--eddm-accent)",
     "--eddm-text": "color-mix(in srgb, var(--eddm-foreground) 75%, transparent)",
+    /** 브랜드 마크의 점. 로고 락업 안에서만 쓴다. 강조색이 아니다. */
+    "--eddm-dot": PALETTE.dot,
     "--eddm-text-muted": "color-mix(in srgb, var(--eddm-foreground) 55%, transparent)",
     "--eddm-text-dim": "color-mix(in srgb, var(--eddm-foreground) 45%, transparent)",
     "--eddm-text-faint": "color-mix(in srgb, var(--eddm-foreground) 35%, transparent)",

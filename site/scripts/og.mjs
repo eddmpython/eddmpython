@@ -55,10 +55,8 @@ function findBrowser() {
 /** 심볼 단독. components/Logo.tsx 의 LogoSymbol 과 같은 구성이다. */
 const symbolSvg = (width) => `
 <svg viewBox="${SYMBOL.viewBox}" width="${width}" style="display:block">
-  <path d="${SYMBOL.body}" fill="none" stroke="${BRAND.ivory}" stroke-width="${SYMBOL.strokeWidth}"
-        stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="${SYMBOL.head}" fill="${BRAND.ivory}"/>
-  <path d="${SYMBOL.eye}" fill="${BRAND.eye}"/>
+  <path d="${SYMBOL.shape}" fill="${BRAND.ivory}" fill-rule="evenodd"/>
+  <rect x="${SYMBOL.dot.x}" y="${SYMBOL.dot.y}" width="${SYMBOL.dot.width}" height="${SYMBOL.dot.height}" rx="${SYMBOL.dot.rx}" fill="${BRAND.dot}"/>
 </svg>`;
 
 const html = `<!doctype html>
@@ -77,7 +75,7 @@ const html = `<!doctype html>
   }
   .brand{font-size:31px;letter-spacing:-.02em;margin-bottom:30px}
   .brand b{font-weight:700}
-  .brand span{font-weight:400;color:${BRAND.ivory}b3}
+  .brand span{font-weight:700;color:${BRAND.dot}}
   h1{font-size:63px;line-height:1.28;font-weight:700;letter-spacing:-.03em;word-break:keep-all}
   ul{display:flex;gap:30px;margin-top:38px;list-style:none;font-size:25px;color:${BRAND.ivory}cc}
   li{display:flex;align-items:center;gap:10px}
@@ -87,7 +85,7 @@ const html = `<!doctype html>
   <!-- 심볼과 워드마크가 떨어져 있어도 한 덩어리로 읽히는 로고 락업이다. -->
   <div style="flex:none">${symbolSvg(258)}</div>
   <div>
-    <div class="brand"><b>eddm</b><span>python</span></div>
+    <div class="brand"><b>eddm</b><span>.py</span></div>
     <h1>복잡한 업무를,<br>실제로 작동하는 자동화로.</h1>
     <ul>${PRODUCTS.map(
       (p) => `<li><i style="background:${DOT[p.dotClass]}"></i>${p.name}</li>`,

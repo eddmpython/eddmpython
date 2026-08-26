@@ -152,12 +152,16 @@ for (const line of classroom.split(/\r?\n/)) {
 }
 
 /**
- * 골드는 브랜드 마크의 눈에만 남는다.
+ * 마크의 점 색은 로고 락업 안에만 남는다.
  *
- * 강조색과 별개인 로고 눈 색을 위의 BRAND_HEX 검사가 보지 않으므로 따로 확인한다.
- * 강조를 다시 골드로 칠하는 것을 막으려면 값 자체를 따로 걸어야 한다.
+ * 강조색과 별개인 이 색을 위의 BRAND_HEX 검사가 보지 않으므로 따로 확인한다.
+ * 저장소 강행규칙이 붉은 계열을 주요 색상에서 막고 브랜드 마크의 포인트 하나만 예외로
+ * 두었다. 그 예외가 화면 강조로 번지는 것을 막으려면 값 자체를 걸어야 한다.
+ *
+ * 2026-08-26 에 심볼을 뱀 매듭에서 e 와 점으로 바꾸면서 이 검사도 눈 색에서 점 색으로
+ * 옮겼다. 값만 갈면 이름이 남아 다음 사람이 무엇을 막는 검사인지 오해한다.
  */
-const GOLD = DESIGN.palette.eye;
+const DOT = DESIGN.palette.dot;
 for (const rel of SCAN) {
   let text;
   try {
@@ -165,8 +169,8 @@ for (const rel of SCAN) {
   } catch {
     continue;
   }
-  const hits = text.match(new RegExp(GOLD + "([0-9a-f]{2})?", "gi"));
-  if (hits) add(rel, `골드 ${GOLD} 를 썼습니다 (${hits.length}곳). 골드는 브랜드 마크의 눈에만 남습니다`);
+  const hits = text.match(new RegExp(DOT + "([0-9a-f]{2})?", "gi"));
+  if (hits) add(rel, `마크 점 색 ${DOT} 를 썼습니다 (${hits.length}곳). 이 색은 로고 락업 안에만 남습니다`);
 }
 
 /** 로그인과 조종 화면이 `강의 관리`라는 같은 제품 이름을 쓴다. */

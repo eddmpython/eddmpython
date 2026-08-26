@@ -52,7 +52,7 @@ body { min-height:100vh; min-height:100dvh; margin:0; background:var(--eddm-carb
 .hd-symbol { height:21px; width:auto; color:var(--eddm-ivory); display:block; }
 .hd-word { font-size:15px; letter-spacing:-.025em; line-height:1.5; color:var(--eddm-ivory); }
 .hd-word b { font-weight:700; }
-.hd-word i { font-style:normal; font-weight:400; color:var(--eddm-text); }
+.hd-word i { font-style:normal; font-weight:700; color:var(--eddm-dot); }
 .hd-right { display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
   column-gap:20px; row-gap:10px; font-size:14px; line-height:1.4285714; color:var(--eddm-text); }
 .hd .nav-link { color:inherit; text-decoration:none; border:0; transition:color .15s cubic-bezier(.4,0,.2,1); }
@@ -245,10 +245,10 @@ export function header(): string {
   <a class="hd-logo" href="${esc(SITE)}" target="_blank" rel="noreferrer" aria-label="eddmpython 홈">
     <svg class="hd-symbol" viewBox="${esc(SYMBOL.viewBox)}" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="${esc(
       SYMBOL.shape,
-    )}"/><ellipse cx="${SYMBOL.eye.cx}" cy="${SYMBOL.eye.cy}" rx="${SYMBOL.eye.rx}" ry="${
-    SYMBOL.eye.ry
-  }" fill="${esc(BRAND.eye)}"/></svg>
-    <span class="hd-word"><b>eddm</b><i>python</i></span>
+    )}"/><rect x="${SYMBOL.dot.x}" y="${SYMBOL.dot.y}" width="${SYMBOL.dot.width}" height="${
+    SYMBOL.dot.height
+  }" rx="${SYMBOL.dot.rx}" fill="${esc(BRAND.dot)}"/></svg>
+    <span class="hd-word"><b>eddm</b><i>.py</i></span>
   </a>
   <div class="hd-right">${links}<span class="hd-icons">${icons}
     ${themeToggle()}
