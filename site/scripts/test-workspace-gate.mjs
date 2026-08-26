@@ -1,7 +1,8 @@
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { join, resolve, sep } from "node:path";
 import { createHash } from "node:crypto";
 import { inspect } from "./check-workspace.mjs";
 
@@ -192,6 +193,41 @@ for (const [label, body] of [
     "OUTPUT_ROOT 이 파이썬 정본의 이름으로 끝난다",
     outputDir !== null && contract.OUTPUT_ROOT.endsWith(outputDir[1]),
     `${contract.OUTPUT_ROOT}`,
+  );
+}
+
+/* 12. 산출물을 쓰는 곳들이 전부 게이트가 보는 폴더 안에 있다.
+ *
+ * 이것이 갈라지면 게이트는 실패하지 않는다. 아무도 안 쓰는 폴더를 보며
+ * "산출물 폴더가 아직 없습니다" 를 찍고 exit 0 으로 통과한다. 검사기가 눈을 감은 채
+ * 초록불을 띄우는 것이라 가장 알아채기 어렵다. */
+{
+  const { OUTPUT_ROOT } = await import("./workspace-contract.mjs");
+  const SITE = fileURLToPath(new URL("..", import.meta.url));
+  const REPO = resolve(SITE, "..");
+  const writers = [
+    ["vite 클라이언트", "vite.config.ts", /const OUT_DIR = "([^"]+)"/, SITE],
+    ["vite SSR", "vite.config.ts", /const SSR_DIR = "([^"]+)"/, SITE],
+    ["wrangler 자산", "wrangler.jsonc", /"directory": "([^"]+)"/, SITE],
+    ["시각 검증", "scripts/visual-api.mjs", /OUTPUT_ROOT = resolve\(SITE_ROOT, "([^"]+)"\)/, SITE],
+  ];
+  for (const [label, file, pattern, base] of writers) {
+    const source = readFileSync(join(SITE, file), "utf-8");
+    const found = source.match(pattern);
+    const target = found ? resolve(base, found[1]) : "";
+    check(
+      `${label} 이 게이트가 보는 폴더 안이다`,
+      found !== null && (target === OUTPUT_ROOT || target.startsWith(OUTPUT_ROOT + sep)),
+      `${found ? found[1] : "(패턴 못 찾음)"} -> ${target}`,
+    );
+  }
+  const leak = readFileSync(join(SITE, "scripts/check-leak.mjs"), "utf-8");
+  const leakPath = leak.match(/resolve\(REPO, "\.\.", "([^"]+)", "([^"]+)"\)/);
+  const leakTarget = leakPath ? resolve(REPO, "..", leakPath[1], leakPath[2]) : "";
+  check(
+    "누출 검사가 게이트가 보는 폴더 안이다",
+    leakPath !== null && leakTarget.startsWith(OUTPUT_ROOT + sep),
+    leakTarget,
   );
 }
 
