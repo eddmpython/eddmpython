@@ -644,7 +644,7 @@ def verify_remote() -> None:
     print(f"블로그 미디어 원격 검증: 객체 {len(paths)}개")
 
 
-def course_referenced_sha() -> set[str]:
+def course_referenced_sha(strict: bool = False) -> set[str]:
     """교안이 쓰는 객체 sha 를 모은다.
 
     교안 plan 은 course 아래에 있고 공개 catalog 의 assets 에 등록되지 않는다. 그래서
@@ -657,6 +657,15 @@ def course_referenced_sha() -> set[str]:
     # 보여 지우자고 나온다. 이 함수가 막으려고 만들어진 바로 그 사고다.
     course_root = REPO_ROOT.parent / "eddmpython-course" / "curriculum"
     if not course_root.is_dir():
+        # 못 셌다는 사실을 조용히 빈 집합으로 바꾸면 위 주석의 사고가 그대로 재현된다.
+        # 지우는 쪽은 세지 못한 채로 진행할 수 없다. 보여 주기만 하는 쪽은 알리고 계속한다.
+        if strict:
+            raise RuntimeError(
+                "교안 저장소가 없어 교안이 쓰는 객체를 셀 수 없다: "
+                f"{course_root} . 이대로 정리하면 교안 객체가 전부 참조 없음으로 보인다. "
+                "2026-08-19 에 279개가 그렇게 잡혔다. 형제 저장소를 클론한 뒤 다시 실행한다"
+            )
+        print(f"경고: 교안 저장소가 없다 ({course_root}). 교안 참조를 세지 못했다")
         return referenced
     for plan_path in course_root.rglob("plan.json"):
         try:
@@ -680,8 +689,12 @@ def course_referenced_sha() -> set[str]:
     return referenced
 
 
-def unreferenced_objects(catalog: dict) -> list[str]:
-    """어디서도 가리키지 않는 객체 sha 목록을 돌려준다. 교안 참조를 함께 센다."""
+def unreferenced_objects(catalog: dict, strict: bool = False) -> list[str]:
+    """어디서도 가리키지 않는 객체 sha 목록을 돌려준다. 교안 참조를 함께 센다.
+
+    `strict` 면 교안 참조를 못 셀 때 빈 목록 대신 예외로 죽는다. 지우는 명령은 반드시
+    이것을 켠다. 못 센 것과 참조가 없는 것은 다르다.
+    """
     objects = catalog.get("objects") or {}
     assets = catalog.get("assets") or {}
     referenced = {
@@ -696,7 +709,7 @@ def unreferenced_objects(catalog: dict) -> list[str]:
         for record in assets.values()
         if isinstance(record, dict) and record.get("masterSha256")
     }
-    referenced |= course_referenced_sha()
+    referenced |= course_referenced_sha(strict=strict)
     return sorted(sha for sha in objects if sha not in referenced)
 
 
@@ -735,7 +748,7 @@ def find_objects(query: str) -> None:
 def prune_objects(apply: bool) -> None:
     """참조가 끊긴 객체 레코드를 지운다. HF 의 실제 바이트는 건드리지 않는다."""
     catalog = load_json(CATALOG_PATH)
-    orphans = unreferenced_objects(catalog)
+    orphans = unreferenced_objects(catalog, strict=True)
     if not orphans:
         print("참조 없는 객체가 없다")
         return

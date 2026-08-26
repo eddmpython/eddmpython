@@ -40,6 +40,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import subprocess
 import sys
@@ -106,7 +107,7 @@ def fetchMasters(post: str, stage: Path) -> list[str]:
     repo = str(catalog.get("repo") or "")
     assets = catalog.get("assets") or {}
     wanted = {
-        str(record["assetKey"]): str(record["masterPath"])
+        str(record["assetKey"]): (str(record["masterPath"]), str(record["masterSha256"]))
         for record in assets.values()
         if isinstance(record, dict)
         and record.get("post") == post
@@ -117,14 +118,25 @@ def fetchMasters(post: str, stage: Path) -> list[str]:
         return []
 
     got = []
-    for key, remote in sorted(wanted.items()):
+    for key, (remote, expect) in sorted(wanted.items()):
         target = stage / f"{key}{MASTER_SUFFIX}"
+        # 이미 있는 파일도 해시를 잰다. 잘렸거나 다른 이미지가 그 이름으로 놓여 있으면
+        # 그것이 영원히 이긴다. 원본은 그 자리가 유일본이라 조용히 틀리면 알 길이 없다.
         if target.is_file():
-            continue
+            if hashlib.sha256(target.read_bytes()).hexdigest() == expect:
+                continue
+            print(f"  로컬 원본이 catalog 와 다르다. 다시 받는다: {key}")
         url = f"https://huggingface.co/datasets/{repo}/resolve/main/{remote}"
         request = urllib.request.Request(url, headers={"User-Agent": "eddmpython-paint"})
         with urllib.request.urlopen(request, timeout=180) as response:
             data = response.read()
+        # 콘텐츠 주소를 도입하고 이 대조를 안 하면 주소가 이름값을 못 한다. 여기가 가장 싸다.
+        actual = hashlib.sha256(data).hexdigest()
+        if actual != expect:
+            raise RuntimeError(
+                f"받은 원본이 catalog 와 다르다: {key} . "
+                f"기대 {expect} , 실제 {actual} . {remote} 를 확인한다"
+            )
         stage.mkdir(parents=True, exist_ok=True)
         target.write_bytes(data)
         got.append(f"{key} ({len(data) // 1024}KB)")
