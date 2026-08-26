@@ -26,15 +26,13 @@ import requests
 sys.dont_write_bytecode = True
 from project_env import load_project_env
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+from media_paths import MASTER_SUFFIX, REPO_ROOT, STAGING_ROOT  # noqa: E402
 POSTS_ROOT = REPO_ROOT / "blog" / "posts"
-STAGING_ROOT = REPO_ROOT.parent / "eddmpython.out" / "blog-media"
 API = "https://api.replicate.com/v1/predictions"
 MODEL = "black-forest-labs/flux-1.1-pro"
 GEN_INTERVAL_SEC = 12
 COLOR_PROFILE = "eddmpython-dark-v2"
 PALETTE_POLICY = "eddmpython-gray-master-v1"
-MASTER_SUFFIX = ".master.png"
 
 
 def composePrompt(asset: dict[str, object]) -> str:

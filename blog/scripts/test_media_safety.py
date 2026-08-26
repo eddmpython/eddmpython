@@ -66,12 +66,15 @@ def pruneRefusesWhenCourseUnreadable() -> None:
         # 형제 교안 저장소가 없는 기계를 흉내낸다
         publish_media.REPO_ROOT = Path(temp) / "repo"
         try:
+            # 죽는 것만으로는 부족하다. 왜 못 셌는지가 대응을 가른다.
+            # 저장소가 없는 것과 있는데 비어 있는 것은 할 일이 다르다.
             raised = False
             try:
                 publish_media.course_referenced_sha(strict=True)
             except RuntimeError as error:
                 raised = True
                 assert "279" in str(error), "무엇이 위험한지 안 알려 준다"
+                assert "저장소가 없다" in str(error), f"이유가 다르다: {error}"
             assert raised, "교안을 못 세는데 strict 가 통과했다"
 
             with contextlib.redirect_stdout(io.StringIO()) as out:
@@ -86,6 +89,36 @@ def pruneRefusesWhenCourseUnreadable() -> None:
             except RuntimeError:
                 raised = True
             assert raised, "unreferenced_objects 가 strict 를 안 넘긴다"
+
+            # 폴더가 있다는 것은 셀 수 있다는 증거가 아니다. sparse checkout, 부분 클론,
+            # 클론 진행 중, 깨진 plan.json 은 전부 폴더가 있으면서 아무것도 못 세는 상태다.
+            course = Path(temp) / "eddmpython-course" / "curriculum"
+            course.mkdir(parents=True)
+            raised = False
+            try:
+                publish_media.course_referenced_sha(strict=True)
+            except RuntimeError as error:
+                raised = True
+                assert "plan.json 도 본문도 없다" in str(error), f"이유가 다르다: {error}"
+            assert raised, "비어 있는 curriculum 을 셀 수 있다고 봤다"
+
+            (course / "unit").mkdir()
+            (course / "unit" / "plan.json").write_text("{깨짐", encoding="utf-8")
+            raised = False
+            try:
+                publish_media.course_referenced_sha(strict=True)
+            except RuntimeError as error:
+                raised = True
+                assert "못 읽었다" in str(error), f"이유가 다르다: {error}"
+            assert raised, "깨진 plan.json 을 조용히 건너뛰었다"
+
+            # 제대로 된 것은 통과하고 실제로 센다. 안 그러면 위 방어가 그냥 막기만 하는 것이다
+            wanted = "b" * 64
+            (course / "unit" / "plan.json").write_text(
+                json.dumps({"assets": {"x": {"sha256": wanted}}}), encoding="utf-8"
+            )
+            counted = publish_media.course_referenced_sha(strict=True)
+            assert wanted in counted, f"정상 plan 을 못 셌다: {counted}"
         finally:
             publish_media.REPO_ROOT = original
     print("  정리: 교안 참조를 못 세면 지우지 않는다")

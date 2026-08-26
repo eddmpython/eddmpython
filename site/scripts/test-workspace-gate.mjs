@@ -1,0 +1,206 @@
+import { execFileSync } from "node:child_process";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { createHash } from "node:crypto";
+import { inspect } from "./check-workspace.mjs";
+
+/*
+ * 산출물 폴더 검사기의 우회로를 잡는다.
+ *
+ * 아래 넷은 첫 판이 전부 통과시켰던 것이고 fresh context 검증이 찾아냈다. 특히 세 번째는
+ * 검사기가 정확히 반대로 작동한 경우다. 유일본 원본이 든 폴더를 보고 "지울 것이면 지우고"
+ * 라고 안내했다. 게이트가 지키려던 바로 그것을 지우라고 시켰다.
+ */
+
+let failures = 0;
+const cases = [];
+
+function check(label, condition, detail = "") {
+  cases.push({ label, ok: Boolean(condition), detail });
+  if (!condition) failures += 1;
+}
+
+const sha = (data) => createHash("sha256").update(data).digest("hex");
+
+/** 임시 산출물 폴더 하나를 만들어 검사한다 */
+async function run(build, { objects = {} } = {}) {
+  const base = mkdtempSync(join(tmpdir(), "eddm-ws-"));
+  const root = join(base, "out");
+  const catalogPath = join(base, "catalog.json");
+  mkdirSync(root, { recursive: true });
+  writeFileSync(catalogPath, JSON.stringify({ objects }), "utf-8");
+  build(root);
+  try {
+    return await inspect({ root, catalogPath, budgetMb: 2048 });
+  } finally {
+    rmSync(base, { recursive: true, force: true, maxRetries: 5 });
+  }
+}
+
+const text = (result) => result.problems.map((p) => `${p.where} ${p.message}`).join("\n");
+
+/* 1. 선언 안 된 폴더에 파일이 있으면 잡는다 */
+{
+  const r = await run((root) => {
+    mkdirSync(join(root, "junk"));
+    writeFileSync(join(root, "junk", "a.bin"), "x");
+  });
+  check("선언 안 된 폴더", r.problems.length === 1, text(r));
+}
+
+/* 2. 파일 없이 하위 폴더만 있는 트리도 잡는다. 첫 판은 files === 0 이라 통과시켰다 */
+{
+  const r = await run((root) => {
+    mkdirSync(join(root, "junk", "deep", "deeper"), { recursive: true });
+  });
+  check("파일 없는 중첩 폴더", r.problems.length === 1, text(r));
+}
+
+/* 3. 진짜로 아무 항목도 없는 폴더는 봐준다. 핸들이 물고 있으면 이 모양이 된다 */
+{
+  const r = await run((root) => mkdirSync(join(root, "ghost")));
+  check("항목이 0개인 폴더는 통과", r.problems.length === 0, text(r));
+}
+
+/* 4. blog-media 밖에 떨어진 원본을 찾아내고, 지우라고 말하지 않는다 */
+{
+  const r = await run((root) => {
+    mkdirSync(join(root, "blog-media-003", "004-post"), { recursive: true });
+    writeFileSync(join(root, "blog-media-003", "004-post", "hero.master.png"), "유일본");
+  });
+  const said = text(r);
+  check("blog-media 밖 원본을 찾는다", said.includes("회색 원본이 여기에만"), said);
+  check("그 폴더를 지우라고 하지 않는다", !said.includes("지울 것이면 지우고"), said);
+  check("지우지 말라고 말한다", said.includes("지우지 마세요"), said);
+}
+
+/* 5. 발행된 원본은 통과시킨다 */
+{
+  const bytes = "발행된 원본";
+  const r = await run(
+    (root) => {
+      mkdirSync(join(root, "blog-media", "003-post"), { recursive: true });
+      writeFileSync(join(root, "blog-media", "003-post", "hero.master.png"), bytes);
+    },
+    { objects: { [sha(Buffer.from(bytes, "utf-8"))]: {} } },
+  );
+  check("발행된 원본은 통과", r.problems.length === 0, text(r));
+}
+
+/* 6. 선언된 폴더 안의 원본도 본다 */
+{
+  const r = await run((root) => {
+    mkdirSync(join(root, "site-dist", "nested"), { recursive: true });
+    writeFileSync(join(root, "site-dist", "nested", "x.master.png"), "숨은 유일본");
+  });
+  check("선언된 폴더 안의 원본도 본다", text(r).includes("회색 원본"), text(r));
+}
+
+/* 7. catalog 가 깨졌으면 통과시키지 않는다 */
+for (const [label, body] of [
+  ["깨진 JSON", "{"],
+  ["objects 없음", "{}"],
+  ["objects 가 배열", '{"objects":[]}'],
+]) {
+  const base = mkdtempSync(join(tmpdir(), "eddm-ws-"));
+  const root = join(base, "out");
+  mkdirSync(root, { recursive: true });
+  const catalogPath = join(base, "catalog.json");
+  writeFileSync(catalogPath, body, "utf-8");
+  let threw = false;
+  try {
+    await inspect({ root, catalogPath, budgetMb: 2048 });
+  } catch {
+    threw = true;
+  }
+  rmSync(base, { recursive: true, force: true, maxRetries: 5 });
+  check(`catalog ${label} 이면 죽는다`, threw);
+}
+
+/* 8. 예산을 넘으면 잡는다 */
+{
+  const base = mkdtempSync(join(tmpdir(), "eddm-ws-"));
+  const root = join(base, "out");
+  mkdirSync(join(root, "site-dist"), { recursive: true });
+  writeFileSync(join(base, "catalog.json"), '{"objects":{}}', "utf-8");
+  writeFileSync(join(root, "site-dist", "big.bin"), Buffer.alloc(2 * 1048576));
+  const r = await inspect({ root, catalogPath: join(base, "catalog.json"), budgetMb: 1 });
+  rmSync(base, { recursive: true, force: true, maxRetries: 5 });
+  check("예산 초과를 잡는다", text(r).includes("예산은 1MB"), text(r));
+}
+
+/* 9. 폴더가 없으면 통과한다 */
+{
+  const r = await inspect({
+    root: join(tmpdir(), "eddm-ws-absent-" + process.pid),
+    catalogPath: join(tmpdir(), "nope.json"),
+    budgetMb: 2048,
+  });
+  check("폴더가 없으면 통과", r.missing === true && r.problems.length === 0);
+}
+
+/* 10. 링크는 잡는다. 만들 권한이 없는 기계에서는 건너뛴다 */
+{
+  const base = mkdtempSync(join(tmpdir(), "eddm-ws-"));
+  const root = join(base, "out");
+  const target = join(base, "target");
+  mkdirSync(join(root, "site-dist"), { recursive: true });
+  mkdirSync(target, { recursive: true });
+  writeFileSync(join(target, "hidden.master.png"), "링크 뒤에 숨은 유일본");
+  writeFileSync(join(base, "catalog.json"), '{"objects":{}}', "utf-8");
+  let made = true;
+  try {
+    execFileSync("cmd", ["/c", "mklink", "/J", join(root, "site-dist", "link"), target], {
+      stdio: "pipe",
+    });
+  } catch {
+    made = false;
+  }
+  if (made) {
+    const r = await inspect({ root, catalogPath: join(base, "catalog.json"), budgetMb: 2048 });
+    check("링크를 잡는다", text(r).includes("링크입니다"), text(r));
+  } else {
+    cases.push({ label: "링크를 잡는다 (건너뜀: 링크를 못 만드는 기계)", ok: true, detail: "" });
+  }
+  rmSync(base, { recursive: true, force: true, maxRetries: 5 });
+}
+
+/* 11. 경로와 이름이 파이썬 정본과 갈라지지 않는다.
+ *
+ * 값만 상수와 비교하면 JS 쪽에 손으로 박아 둔 것을 못 잡는다. 정본 파일을 직접 읽어 견준다.
+ * 한쪽이 바뀌면 검사기는 실패하지 않고 조용히 아무것도 안 보게 되므로 이 시험이 그 자리를 막는다. */
+{
+  const contract = await import("./workspace-contract.mjs");
+  const source = readFileSync(
+    new URL("../../blog/scripts/media_paths.py", import.meta.url),
+    "utf-8",
+  );
+  for (const [name, actual] of [
+    ["MASTER_SUFFIX", contract.MASTER_SUFFIX],
+    ["STAGING_DIR", contract.STAGING_DIR],
+  ]) {
+    const found = source.match(new RegExp(`^${name} = "([^"]*)"$`, "m"));
+    check(
+      `${name} 이 파이썬 정본과 같다`,
+      found !== null && found[1] === actual,
+      `정본 ${found ? found[1] : "(못 읽음)"} / 계약 ${actual}`,
+    );
+  }
+  const outputDir = source.match(/^OUTPUT_DIR = "([^"]*)"$/m);
+  check(
+    "OUTPUT_ROOT 이 파이썬 정본의 이름으로 끝난다",
+    outputDir !== null && contract.OUTPUT_ROOT.endsWith(outputDir[1]),
+    `${contract.OUTPUT_ROOT}`,
+  );
+}
+
+for (const { label, ok, detail } of cases) {
+  console.log(`  ${ok ? "통과" : "실패"}  ${label}`);
+  if (!ok && detail) console.log(`        ${detail.split("\n").join("\n        ")}`);
+}
+if (failures > 0) {
+  console.error(`산출물 폴더 게이트 시험 ${failures}건 실패`);
+  process.exit(1);
+}
+console.log("산출물 폴더 게이트 계약 통과");

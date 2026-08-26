@@ -17,11 +17,10 @@ sys.dont_write_bytecode = True
 from project_env import load_project_env
 
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+from media_paths import MASTER_SUFFIX, REPO_ROOT, STAGING_ROOT  # noqa: E402
 BLOG_ROOT = REPO_ROOT / "blog"
 POSTS_ROOT = BLOG_ROOT / "posts"
 CATALOG_PATH = BLOG_ROOT / "media" / "catalog.json"
-STAGING_ROOT = REPO_ROOT.parent / "eddmpython.out" / "blog-media"
 DEFAULT_HF_REPO = "eddmpython/eddmpython-media"
 OBJECT_PREFIX = "objects/sha256"
 IMAGE_SUFFIXES = (".webp", ".png", ".jpg", ".jpeg", ".gif")
@@ -43,7 +42,6 @@ ASSET_ID_RE = re.compile(
 )
 SHA256_RE = re.compile(r"[0-9a-f]{64}")
 # 회색 원본의 이름. paint_media.py 와 generate_flux.py 가 같은 값을 쓴다.
-MASTER_SUFFIX = ".master.png"
 IMAGEGEN_V2 = "eddmpython-dark-v2"
 IMAGEGEN_PALETTE = "eddmpython-gray-master-v1"
 # 옛 값. 새로 발행하지 않는다. 이미 올라간 자산의 계획을 읽기 위해서만 받는다.
@@ -711,27 +709,44 @@ def course_referenced_sha(strict: bool = False) -> set[str]:
     교안 plan 은 course 아래에 있고 공개 catalog 의 assets 에 등록되지 않는다. 그래서
     catalog 만 보면 교안이 쓰는 객체가 전부 참조 없음으로 보인다. 2026-08-19 에 실제로
     279개 전부가 삭제 대상으로 잡혔다. 교안 plan 과 교안 본문을 함께 세어 그것을 막는다.
+
+    `strict` 면 **세었다는 것을 증명하지 못할 때 예외로 죽는다.** 지우는 명령은 반드시
+    켠다. 폴더가 있다는 것은 셀 수 있다는 증거가 아니다. sparse checkout, 부분 클론,
+    클론 진행 중, 깨진 plan.json 은 전부 폴더가 있으면서 아무것도 못 세는 상태다.
+    그 상태에서 빈 집합을 돌려주면 위 사고가 그대로 재현된다.
     """
     referenced: set[str] = set()
     # 교안은 이 저장소 안 course/ 에서 형제 비공개 저장소로 나갔다. 경로를 같이 옮기지
     # 않아 이 함수가 늘 빈 집합을 돌려주고 있었다. 그러면 교안이 쓰는 객체가 전부 참조 없음으로
     # 보여 지우자고 나온다. 이 함수가 막으려고 만들어진 바로 그 사고다.
     course_root = REPO_ROOT.parent / "eddmpython-course" / "curriculum"
-    if not course_root.is_dir():
-        # 못 셌다는 사실을 조용히 빈 집합으로 바꾸면 위 주석의 사고가 그대로 재현된다.
-        # 지우는 쪽은 세지 못한 채로 진행할 수 없다. 보여 주기만 하는 쪽은 알리고 계속한다.
+
+    def refuse(why: str) -> None:
         if strict:
             raise RuntimeError(
-                "교안 저장소가 없어 교안이 쓰는 객체를 셀 수 없다: "
-                f"{course_root} . 이대로 정리하면 교안 객체가 전부 참조 없음으로 보인다. "
-                "2026-08-19 에 279개가 그렇게 잡혔다. 형제 저장소를 클론한 뒤 다시 실행한다"
+                f"교안이 쓰는 객체를 셀 수 없다: {why} ({course_root}) . 이대로 정리하면 "
+                "교안 객체가 전부 참조 없음으로 보인다. 2026-08-19 에 279개가 그렇게 잡혔다. "
+                "형제 저장소를 온전히 받은 뒤 다시 실행한다"
             )
-        print(f"경고: 교안 저장소가 없다 ({course_root}). 교안 참조를 세지 못했다")
+        print(f"경고: 교안 참조를 세지 못했다 ({why}). 지우는 명령은 이 상태에서 돌리지 않는다")
+
+    if not course_root.is_dir():
+        refuse("저장소가 없다")
         return referenced
-    for plan_path in course_root.rglob("plan.json"):
+
+    plans = sorted(course_root.rglob("plan.json"))
+    docs = sorted(course_root.rglob("*.md"))
+    if not plans and not docs:
+        # 폴더는 있는데 안이 비었다. 클론이 덜 됐거나 sparse checkout 이다.
+        refuse("저장소는 있는데 plan.json 도 본문도 없다")
+        return referenced
+
+    for plan_path in plans:
         try:
             plan = json.loads(plan_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
+        except (OSError, json.JSONDecodeError) as error:
+            # 못 읽은 plan 을 건너뛰면 그 안의 참조를 통째로 놓친다. 조용히 넘기지 않는다.
+            refuse(f"plan.json 을 못 읽었다: {plan_path.name} ({type(error).__name__})")
             continue
         for bucket in ("inventory", "assets"):
             entries = plan.get(bucket)
@@ -741,13 +756,15 @@ def course_referenced_sha(strict: bool = False) -> set[str]:
                 if isinstance(record, dict) and record.get("sha256"):
                     referenced.add(str(record["sha256"]))
     # 본문이 URL 로 직접 참조하는 것도 센다. plan 에 없을 수 있다.
-    for md in course_root.rglob("*.md"):
+    for md in docs:
         try:
             text = md.read_text(encoding="utf-8")
-        except OSError:
+        except OSError as error:
+            refuse(f"본문을 못 읽었다: {md.name} ({type(error).__name__})")
             continue
         referenced.update(SHA256_RE.findall(text))
     return referenced
+
 
 
 def unreferenced_objects(catalog: dict, strict: bool = False) -> list[str]:

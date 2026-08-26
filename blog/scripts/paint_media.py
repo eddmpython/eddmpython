@@ -50,10 +50,9 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageFilter
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+from media_paths import MASTER_SUFFIX, REPO_ROOT, STAGING_ROOT  # noqa: E402
 POSTS_ROOT = REPO_ROOT / "blog" / "posts"
 CATALOG_PATH = REPO_ROOT / "blog" / "media" / "catalog.json"
-STAGING_ROOT = REPO_ROOT.parent / "eddmpython.out" / "blog-media"
 DESIGN_TS = REPO_ROOT / "site" / "src" / "design.ts"
 
 # 강조가 덮는 화면 면적. 고정한 휘도가 아니라 이 비율이 기준이다.
@@ -91,7 +90,6 @@ CLIP_LOW = 0.02
 CLIP_HIGH = 0.999
 
 PALETTE_POLICY = "eddmpython-gray-master-v1"
-MASTER_SUFFIX = ".master.png"
 
 
 def fetchMasters(post: str, stage: Path) -> list[str]:

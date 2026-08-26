@@ -235,6 +235,10 @@ python -X utf8 blog/scripts/publish_media.py --verify
 
 **원본이 섞여 있으면 그 이미지는 다시 만들 수 없다.** 그래서 보고가 원본과 발행본을 나눠 센다.
 
+경로와 파일 이름 규칙의 정본은 `blog/scripts/media_paths.py` 다. `generate_flux.py`,
+`paint_media.py`, `publish_media.py` 와 `site/scripts/workspace-contract.mjs` 가 전부 거기서
+읽는다. 한때 `MASTER_SUFFIX` 가 네 곳에, 스테이징 경로가 다섯 곳에 각각 적혀 있었다.
+
 원본을 받아 오는 쪽도 대조한다. `paint_media.py` 는 내려받은 바이트와 이미 있는 로컬 파일 모두
 `masterSha256` 과 견주고, 다르면 다시 받거나 죽는다. 잘린 파일이 유일본 자리를 조용히 차지하는
 것을 막는다. 부정 대조는 `blog/scripts/test_media_safety.py` 에 있다.

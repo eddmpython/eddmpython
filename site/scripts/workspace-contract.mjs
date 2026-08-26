@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -17,18 +18,38 @@ import { fileURLToPath } from "node:url";
  */
 
 const HERE = resolve(fileURLToPath(new URL(".", import.meta.url)));
+const REPO = resolve(HERE, "../..");
+
+/*
+ * 경로와 이름은 `blog/scripts/media_paths.py` 가 소유한다. 여기에 값을 복사하지 않고 읽는다.
+ *
+ * 복사하면 한쪽이 바뀔 때 이 검사기가 실패하지 않고 **조용히 아무것도 안 보게 된다.**
+ * 원본 접미사가 갈라지면 원본을 하나도 못 찾은 채 초록불을 띄운다. 그것이 가장 나쁜 실패다.
+ * 읽어서 못 찾으면 여기서 죽는다.
+ */
+function fromPython(name) {
+  const source = readFileSync(resolve(REPO, "blog/scripts/media_paths.py"), "utf-8");
+  const found = source.match(new RegExp(`^${name} = "([^"]*)"$`, "m"));
+  if (!found) {
+    throw new Error(
+      `blog/scripts/media_paths.py 에서 ${name} 을 못 읽었습니다. ` +
+        "그 파일이 경로와 이름의 정본입니다. 값을 여기에 복사하지 말고 그쪽 모양을 지키세요",
+    );
+  }
+  return found[1];
+}
+
+/** 발행 전 회색 원본의 접미사 */
+export const MASTER_SUFFIX = fromPython("MASTER_SUFFIX");
+
+/** 이미지 스테이징 폴더 이름 */
+export const STAGING_DIR = fromPython("STAGING_DIR");
 
 /** 저장소 밖 산출물 폴더. `site/vite.config.ts` 와 `site/wrangler.jsonc` 가 같은 곳을 가리킨다 */
-export const OUTPUT_ROOT = resolve(HERE, "../../../eddmpython.out");
+export const OUTPUT_ROOT = resolve(REPO, "..", fromPython("OUTPUT_DIR"));
 
 /** 이 폴더 전체가 이보다 커지면 아무도 안 보는 사이에 쌓인 것이다 */
 export const TOTAL_BUDGET_MB = 2048;
-
-/** 발행 전 회색 원본의 접미사. `blog/scripts/paint_media.py` 의 MASTER_SUFFIX 와 같다 */
-export const MASTER_SUFFIX = ".master.png";
-
-/** 이미지 스테이징 폴더 이름. `publish_media.py` 의 STAGING_ROOT 마지막 조각이다 */
-export const STAGING_DIR = "blog-media";
 
 /**
  * 허용되는 최상위 항목.
