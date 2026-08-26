@@ -70,14 +70,24 @@ export function QrTool() {
   }
 
   return (
-    <section
-      aria-label="QR 생성기"
-      className="my-8 overflow-hidden rounded-2xl border border-white/11 bg-white/[0.025]"
-    >
+    /*
+     * 앱이라는 것이 첫눈에 보여야 한다.
+     *
+     * 라벨을 카드 안에 두면 본문 소제목과 섞여 읽힌다. 테두리에 걸쳐 놓으면 이 덩어리가
+     * 글이 아니라 직접 쓰는 것이라는 신호가 먼저 온다. 바깥 래퍼를 따로 두는 까닭은
+     * 카드가 `overflow-hidden` 이라 걸친 라벨이 잘리기 때문이다.
+     */
+    <div className="relative my-8">
+      <span className="absolute -top-[9px] left-6 z-10 rounded bg-[var(--eddm-canvas)] px-2 font-mono text-[11px] tracking-[0.14em] text-[var(--eddm-accent)] uppercase">
+        QR 생성 앱
+      </span>
+      <section
+        aria-label="QR 생성 앱"
+        className="overflow-hidden rounded-2xl border border-[var(--eddm-line-base)] bg-[var(--eddm-raise)]"
+      >
       <div className="grid grid-cols-1 md:grid-cols-[1fr_280px]">
-        <div className="border-b border-white/8 p-5 md:border-r md:border-b-0 md:p-6">
-          <p className="font-mono text-[11px] tracking-[0.14em] text-ivory/38 uppercase">도구 · QR</p>
-          <label className="mt-4 block">
+        <div className="border-b border-[var(--eddm-line)] p-5 md:border-r md:border-b-0 md:p-6">
+          <label className="mt-1 block">
             <span className="mb-2 block font-mono text-[11px] tracking-[0.12em] text-ivory/45 uppercase">
               주소 또는 문구
             </span>
@@ -85,7 +95,7 @@ export function QrTool() {
               value={text}
               spellCheck={false}
               onChange={(e) => setText(e.target.value)}
-              className="min-h-[5rem] w-full resize-y rounded-lg border border-white/11 bg-carbon px-3 py-2.5 font-mono text-sm leading-relaxed text-ivory outline-none focus:border-white/25"
+              className="min-h-[5rem] w-full resize-y rounded-lg border border-[var(--eddm-line-base)] bg-[var(--eddm-canvas)] px-3 py-2.5 font-mono text-sm leading-relaxed text-ivory outline-none focus:border-[var(--eddm-line-strong)]"
             />
           </label>
           <div className="mt-5 grid grid-cols-2 gap-4">
@@ -122,7 +132,8 @@ export function QrTool() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center gap-4 bg-white/[0.02] p-5 md:p-6">
+        <div className="flex flex-col items-center justify-center gap-4 bg-[var(--eddm-raise)] p-5 md:p-6">
+          {/* 이 흰색만 테마를 따르지 않는다. QR 은 흰 바탕에 검은 모듈이어야 카메라가 읽는다. */}
           <div className="rounded-lg bg-white p-3.5 leading-none shadow-[0_14px_40px_-18px_rgba(0,0,0,.9)]">
             <canvas
               ref={canvasRef}
@@ -145,7 +156,7 @@ export function QrTool() {
               type="button"
               onClick={download}
               disabled={!ok}
-              className="flex-1 rounded-lg border border-white/11 bg-white/[0.08] px-2 py-2 text-[13px] font-medium text-ivory/75 transition-colors hover:border-white/20 hover:bg-white/[0.12] hover:text-ivory disabled:opacity-40"
+              className="flex-1 rounded-lg border border-[var(--eddm-line-base)] bg-[var(--eddm-hover)] px-2 py-2 text-[13px] font-medium text-ivory/75 transition-colors hover:border-[var(--eddm-line-strong)] hover:bg-[var(--eddm-hover)] hover:text-ivory disabled:opacity-40"
             >
               PNG 저장
             </button>
@@ -153,7 +164,7 @@ export function QrTool() {
               type="button"
               onClick={copy}
               disabled={!ok}
-              className="flex-1 rounded-lg border border-white/11 bg-white/[0.08] px-2 py-2 text-[13px] font-medium text-ivory/75 transition-colors hover:border-white/20 hover:bg-white/[0.12] hover:text-ivory disabled:opacity-40"
+              className="flex-1 rounded-lg border border-[var(--eddm-line-base)] bg-[var(--eddm-hover)] px-2 py-2 text-[13px] font-medium text-ivory/75 transition-colors hover:border-[var(--eddm-line-strong)] hover:bg-[var(--eddm-hover)] hover:text-ivory disabled:opacity-40"
             >
               이미지 복사
             </button>
@@ -163,6 +174,7 @@ export function QrTool() {
           </p>
         </div>
       </div>
-    </section>
+      </section>
+    </div>
   );
 }
