@@ -34,11 +34,19 @@ const mb = (bytes) => (bytes / 1048576).toFixed(1);
 /** 한 항목을 훑어 파일 수, 바이트, 원본 후보, 링크를 모은다. 링크는 따라 들어가지 않는다 */
 async function survey(root) {
   const found = { files: 0, bytes: 0, entries: 0, masters: [], links: [] };
+  /*
+   * 원본 판별을 정확한 이름 대조로 하면 `hero.Master.png` 와 `hero.master.png.bak` 이
+   * 원본이 아닌 것이 된다. 그러면 검사기는 그 항목을 그냥 선언 안 된 폴더로 보고
+   * "지울 것이면 지우고" 를 찍는다. 유일본을 지우라고 안내하는 그 모양으로 되돌아간다.
+   * 소문자로 낮추고 포함으로 본다. 원본 아닌 것을 원본이라 부르는 쪽으로 틀리는 것이
+   * 반대로 틀리는 것보다 낫다.
+   */
+  const looksMaster = (name) => name.toLowerCase().includes(MASTER_SUFFIX.toLowerCase());
   const one = await stat(root).catch(() => null);
   if (one && !one.isDirectory()) {
     found.files = 1;
     found.bytes = one.size;
-    if (root.endsWith(MASTER_SUFFIX)) found.masters.push(root);
+    if (looksMaster(root)) found.masters.push(root);
     return found;
   }
   const walk = async (dir) => {
@@ -57,7 +65,7 @@ async function survey(root) {
       }
       found.files += 1;
       found.bytes += (await stat(full)).size;
-      if (item.name.endsWith(MASTER_SUFFIX)) found.masters.push(full);
+      if (looksMaster(item.name)) found.masters.push(full);
     }
   };
   await walk(root);

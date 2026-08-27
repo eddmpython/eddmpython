@@ -792,15 +792,26 @@ def unreferenced_objects(catalog: dict, strict: bool = False) -> list[str]:
 
 
 def find_objects(query: str) -> None:
-    """설명으로 재사용할 이미지를 찾는다. 지금 글이 안 쓰는 것도 함께 보여 준다."""
+    """설명으로 재사용할 이미지를 찾는다. 지금 글이 안 쓰는 것도 함께 보여 준다.
+
+    **원본을 안 쓰는 중으로 찍으면 안 된다.** `used` 가 자산의 `sha256` 만 모으던 때는
+    회색 원본이 전부 `[안 쓰는 중]` 으로 나왔다. 원본 레코드는 발행본과 `alt` 가 같아서
+    같은 설명 두 줄이 나란히 서고 한 줄만 쓰는 중이었다. 이 명령은 사람이 객체를 눈으로
+    훑는 유일한 자리이고, `--prune-objects` 는 마지막 줄에서 HF 수동 삭제로 안내한다.
+    거기서 "안 쓰는 중" 을 보고 지우면 그것이 유일본이다.
+    """
     catalog = load_json(CATALOG_PATH)
     objects = catalog.get("objects") or {}
     assets = catalog.get("assets") or {}
-    used = {
-        str(record.get("sha256")): asset_id
-        for asset_id, record in assets.items()
-        if isinstance(record, dict) and record.get("sha256")
-    }
+    used: dict[str, str] = {}
+    for asset_id, record in assets.items():
+        if not isinstance(record, dict):
+            continue
+        if record.get("sha256"):
+            used[str(record["sha256"])] = asset_id
+        # 원본도 자산이 가리키는 것이다. 이것을 안 세면 유일본이 안 쓰는 중으로 나온다.
+        if record.get("masterSha256"):
+            used[str(record["masterSha256"])] = f"{asset_id} 원본"
     needle = query.strip().lower()
     hits = []
     for sha, record in objects.items():
@@ -815,12 +826,20 @@ def find_objects(query: str) -> None:
     if not hits:
         print(f"'{query}' 로 찾은 이미지가 없다. 객체 {len(objects)}개를 뒤졌다")
         return
+    masters = 0
     for sha, record in sorted(hits, key=lambda item: str(item[1].get("sourcePost", ""))):
+        is_master = record.get("role") == "master"
+        masters += 1 if is_master else 0
         mark = f"쓰는 중 {used[sha]}" if sha in used else "안 쓰는 중"
-        print(f"[{mark}] {record.get('sourcePost', '?')}")
+        # 원본은 본문에 박을 것이 아니다. 재사용 후보로 착각하지 않게 이름표를 붙인다.
+        label = "  <- 회색 원본. 다시 칠할 유일한 재료다" if is_master else ""
+        print(f"[{mark}] {record.get('sourcePost', '?')}{label}")
         print(f"  {record.get('alt') or record.get('visualSubject') or '(설명 없음)'}")
         print(f"  {catalog['repo']} / {record.get('path')}")
     print(f"{len(hits)}개 찾았다. 객체 {len(objects)}개 중")
+    if masters:
+        print(f"이 중 {masters}개는 회색 원본이다. 본문에 쓰지 말고 지우지도 않는다")
+
 
 
 def prune_objects(apply: bool) -> None:

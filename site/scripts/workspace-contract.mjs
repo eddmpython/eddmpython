@@ -27,16 +27,39 @@ const REPO = resolve(HERE, "../..");
  * 원본 접미사가 갈라지면 원본을 하나도 못 찾은 채 초록불을 띄운다. 그것이 가장 나쁜 실패다.
  * 읽어서 못 찾으면 여기서 죽는다.
  */
-function fromPython(name) {
-  const source = readFileSync(resolve(REPO, "blog/scripts/media_paths.py"), "utf-8");
-  const found = source.match(new RegExp(`^${name} = "([^"]*)"$`, "m"));
-  if (!found) {
+/**
+ * 파이썬 정본에서 `이름 = "값"` 한 줄을 읽는다. 시험이 실제 파일을 안 고치고 부를 수 있게
+ * 소스 문자열을 받는다. 파일을 읽는 쪽은 아래 `fromPython` 이다.
+ */
+export function readAssignment(source, name) {
+  const found = [...source.matchAll(new RegExp(`^${name} = "([^"]*)"$`, "gm"))];
+  if (found.length === 0) {
     throw new Error(
       `blog/scripts/media_paths.py 에서 ${name} 을 못 읽었습니다. ` +
         "그 파일이 경로와 이름의 정본입니다. 값을 여기에 복사하지 말고 그쪽 모양을 지키세요",
     );
   }
-  return found[1];
+  /*
+   * 첫 일치를 읽으면 안 된다. 파이썬은 **마지막** 대입을 쓰므로 줄 하나만 덧붙이면
+   * 두 언어가 다른 값을 보게 되고, 그때 검사기는 실패하지 않고 조용히 아무것도 안 본다.
+   * 병합 충돌을 양쪽 다 남기고 풀거나 값을 바꾸려고 아래에 새 줄을 덧붙이면 그 모양이 된다.
+   * 애매하면 고르지 않고 죽는다.
+   */
+  if (found.length > 1) {
+    throw new Error(
+      `blog/scripts/media_paths.py 에 ${name} 대입이 ${found.length}개 있습니다 ` +
+        `(${found.map((m) => JSON.stringify(m[1])).join(", ")}). ` +
+        "파이썬은 마지막 것을 쓰고 여기는 어느 것인지 정할 수 없습니다. 한 줄만 남기세요",
+    );
+  }
+  return found[0][1];
+}
+
+function fromPython(name) {
+  return readAssignment(
+    readFileSync(resolve(REPO, "blog/scripts/media_paths.py"), "utf-8"),
+    name,
+  );
 }
 
 /** 발행 전 회색 원본의 접미사 */

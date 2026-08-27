@@ -196,7 +196,66 @@ for (const [label, body] of [
   );
 }
 
-/* 12. 산출물을 쓰는 곳들이 전부 게이트가 보는 폴더 안에 있다.
+/* 12. 이름이 조금 어긋난 원본도 원본으로 본다.
+ *
+ * 정확한 이름 대조만 하면 hero.Master.png 와 hero.master.png.bak 이 원본이 아닌 것이 되고,
+ * 검사기는 그 항목을 그냥 선언 안 된 폴더로 보고 "지울 것이면 지우고" 를 찍는다.
+ * 유일본을 지우라고 안내하는 그 모양으로 되돌아간다. */
+for (const name of ["hero.Master.png", "hero.MASTER.PNG", "hero.master.png.bak"]) {
+  const r = await run((root) => {
+    mkdirSync(join(root, "blog-media-backup", "003-post"), { recursive: true });
+    writeFileSync(join(root, "blog-media-backup", "003-post", name), "유일본");
+  });
+  const said = text(r);
+  check(`${name} 도 원본으로 본다`, said.includes("회색 원본이 여기에만"), said);
+  check(`${name} 이 든 폴더를 지우라고 하지 않는다`, !said.includes("지울 것이면 지우고"), said);
+}
+
+/* 13. 선언된 폴더 안의 대문자 원본도 본다. 이것을 놓치면 문제 0건으로 완전한 초록불이 뜬다 */
+{
+  const r = await run((root) => {
+    mkdirSync(join(root, "blog-media", "003-post"), { recursive: true });
+    writeFileSync(join(root, "blog-media", "003-post", "hero.Master.png"), "유일본");
+  });
+  check("선언된 폴더 안의 대문자 원본", text(r).includes("회색 원본"), text(r));
+}
+
+/* 14. 정본에 같은 대입이 둘이면 값을 고르지 않고 죽는다.
+ *
+ * 파이썬은 마지막 대입을 쓰고 정규식은 첫 일치를 읽는다. 둘이 갈라지면 검사기는
+ * 실패하지 않고 조용히 아무것도 안 보게 된다. 애매하면 죽는 것이 맞다. */
+{
+  const { readAssignment } = await import("./workspace-contract.mjs");
+  const one = 'MASTER_SUFFIX = ".master.png"';
+  const two = 'MASTER_SUFFIX = ".master.tiff"';
+  check("하나면 그 값을 읽는다", readAssignment(one, "MASTER_SUFFIX") === ".master.png");
+  for (const [label, source] of [
+    ["아래에 덧붙임", `${one}
+${two}`],
+    ["위에 덧붙임", `${two}
+${one}`],
+    ["사이에 다른 줄", `${one}
+STAGING_DIR = "x"
+${two}`],
+  ]) {
+    let threw = false;
+    try {
+      readAssignment(source, "MASTER_SUFFIX");
+    } catch {
+      threw = true;
+    }
+    check(`정본에 대입이 둘이면 죽는다 (${label})`, threw, source.split(String.fromCharCode(10)).join(" / "));
+  }
+  let missing = false;
+  try {
+    readAssignment("NOTHING = \"x\"", "MASTER_SUFFIX");
+  } catch {
+    missing = true;
+  }
+  check("정본에 없으면 죽는다", missing);
+}
+
+/* 15. 산출물을 쓰는 곳들이 전부 게이트가 보는 폴더 안에 있다.
  *
  * 이것이 갈라지면 게이트는 실패하지 않는다. 아무도 안 쓰는 폴더를 보며
  * "산출물 폴더가 아직 없습니다" 를 찍고 exit 0 으로 통과한다. 검사기가 눈을 감은 채

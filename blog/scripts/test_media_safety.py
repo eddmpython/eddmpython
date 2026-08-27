@@ -273,10 +273,60 @@ def verifyCatchesRemoteDrift() -> None:
     print("  원격 검증: 사라짐, 내용 바뀜, 해시 없음, 크기 불일치를 모두 잡는다")
 
 
+def findNeverCallsMasterUnused() -> None:
+    """--find 는 사람이 객체를 눈으로 훑는 유일한 자리다. 거기서 원본을 안 쓰는 중이라 하면 안 된다."""
+    pub, mas = sha(b"published"), sha(b"gray master")
+    original = publish_media.CATALOG_PATH
+    try:
+        with tempfile.TemporaryDirectory(prefix="eddm-find-") as temp:
+            path = Path(temp) / "catalog.json"
+            path.write_text(
+                json.dumps(
+                    {
+                        "version": 1,
+                        "objectPrefix": publish_media.OBJECT_PREFIX,
+                        "repo": "example/none",
+                        "objects": {
+                            pub: {"alt": "복도 사진", "sourcePost": "999-test",
+                                  "path": f"objects/sha256/{pub[:2]}/{pub}.webp"},
+                            mas: {"alt": "복도 사진", "sourcePost": "999-test", "role": "master",
+                                  "path": f"objects/sha256/{mas[:2]}/{mas}.png"},
+                        },
+                        "assets": {
+                            "999-test/hero": {
+                                "post": "999-test", "assetKey": "hero",
+                                "sha256": pub, "masterSha256": mas,
+                                "masterPath": f"objects/sha256/{mas[:2]}/{mas}.png",
+                            }
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            publish_media.CATALOG_PATH = path
+            with contextlib.redirect_stdout(io.StringIO()) as out:
+                publish_media.find_objects("복도")
+            shown = out.getvalue()
+            assert "안 쓰는 중" not in shown, f"원본을 안 쓰는 중이라 불렀다: {shown}"
+            assert "지우지도 않는다" in shown, f"지우지 말라는 말이 없다: {shown}"
+            # 꼬리 요약이 아니라 원본 줄 자체에 표시가 붙어야 한다. 사람은 줄을 보고 지운다.
+            marked = [
+                line
+                for line in shown.split(chr(10))
+                if line.startswith("[") and "유일한 재료" in line
+            ]
+            assert len(marked) == 1, f"원본 줄에 표시가 없다: {shown}"
+            assert "원본" in marked[0], f"어느 자산의 원본인지 안 알려 준다: {marked[0]}"
+    finally:
+        publish_media.CATALOG_PATH = original
+    print("  찾기: 원본을 안 쓰는 중이라 부르지 않는다")
+
+
 def main() -> None:
     pruneRefusesWhenCourseUnreadable()
     fetchRejectsWrongBytes()
     verifyCatchesRemoteDrift()
+    findNeverCallsMasterUnused()
     print("이미지 원본 안전 계약 통과")
 
 
