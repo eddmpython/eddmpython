@@ -8,7 +8,7 @@
       "placement": "H3 부제 바로 뒤",
       "prompt": "Wide 3:2 editorial still life on a dark matte floor, shot from a low angle looking along the floor. Six wide parallel channels are carved into the floor and all of them taper inward and converge toward the exact center of the frame, where they meet at one single very narrow slot. The narrow slot is much smaller than any one of the incoming channels and it is the only lit thing in the frame. The funnel shape is unmistakable: many wide ways in, one thin way through. Shallow depth of field, honest cut concrete and metal. The frame is filled edge to edge with the floor and there are no black bars or borders. No readable text, letters, numbers, glyphs, screens, logos, brands, people, hands, or decorative scenery.",
       "role": "section",
-      "sectionHeading": "지금 파이썬이 빨라지는 중",
+      "sectionHeading": "지금 빨라지는 세 갈래, 그중 하나가 GIL",
       "sectionSubtitle": "한꺼번에 손보는 세 군데",
       "sourceKind": "imagegen",
       "sourcePolicy": "auto",

@@ -11,16 +11,6 @@
         "segno"
       ]
     },
-    "qr-micro": {
-      "title": "make 와 make_qr 의 차이 찍어 보기",
-      "description": "짧은 주소를 두 함수에 각각 넣어 결과를 비교합니다. 주소를 더 짧게 바꾸거나 https:// 를 붙여 보면 경계가 어디인지 보입니다.",
-      "code": "import segno\n\na = segno.make(\"naver.com\")\nb = segno.make_qr(\"naver.com\")\n\nprint(\"make    가로\", a.symbol_size(border=0)[0], \"칸  마이크로 QR:\", a.is_micro)\nprint(\"make_qr 가로\", b.symbol_size(border=0)[0], \"칸  마이크로 QR:\", b.is_micro)\n",
-      "hint": "마이크로 QR 이 True 로 나오면 그 규격을 읽지 못하는 카메라 앱이 있습니다",
-      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor",
-      "packages": [
-        "segno"
-      ]
-    },
     "qr-many": {
       "title": "여러 주소의 크기를 한 번에 보기",
       "description": "목록에 주소를 추가하거나 고쳐서 실행합니다. 이름과 주소가 짝지어 처리되는 것과 주소마다 크기가 달라지는 것을 확인할 수 있습니다.",
