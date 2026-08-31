@@ -28,7 +28,12 @@ export type CourseCategory = {
 type CourseBundle = {
   schema: number;
   sceneContract?: number;
-  /** 용어와 한 줄 정의. schema 5 부터 온다. 본문의 term:// 마커가 여기서 정의를 찾는다 */
+  /**
+   * 용어와 한 줄 정의. 2026-08-31 부터 실리는 **추가 필드**이고 schema 와 무관하다.
+   * schema 를 올리지 않은 이유가 이 기능의 핵심이다. 추가 필드는 옛 배포본이 조용히
+   * 무시하므로 교안 발행이 강의장 배포를 기다리지 않는다. 운영자가 교안 발행과 사이트
+   * 배포를 연관짓지 말라고 못박았다.
+   */
   glossary?: Record<string, string>;
   categories: CourseCategory[];
 };
@@ -38,9 +43,10 @@ type CourseBundle = {
  *
  * **두 판을 같이 받는다.** 하나만 받으면 발행과 배포 사이에 강의장이 빈 목록을 낸다.
  * 어느 쪽을 먼저 하든 그 틈이 생기고, 하필 강의 직전이면 그것이 사고다.
- * 5 는 용어집(glossary)이 붙은 판이고 4 는 그 전 판이다.
+ * 숫자는 옛 배포본이 그대로 그리면 깨지는 변경에만 올린다. 조용히 무시되는 추가
+ * 필드(glossary)는 숫자를 올리지 않는다.
  */
-const COURSE_SCHEMA = new Set([1, 2, 3, 4, 5]);
+const COURSE_SCHEMA = new Set([1, 2, 3, 4]);
 const COURSE_SCENE_CONTRACTS = new Set([1, 2]);
 
 export type CourseState = { ok: boolean; categories: CourseCategory[]; glossary: Record<string, string> };
@@ -123,7 +129,7 @@ export async function course(env: Env): Promise<CourseState> {
   if (!bundle || !COURSE_SCHEMA.has(bundle.schema) || !Array.isArray(bundle.categories)) {
     return { ok: false, categories: [], glossary: {} };
   }
-  if (bundle.schema >= 4 && !COURSE_SCENE_CONTRACTS.has(bundle.sceneContract ?? 0)) {
+  if (bundle.schema === 4 && !COURSE_SCENE_CONTRACTS.has(bundle.sceneContract ?? 0)) {
     return { ok: false, categories: [], glossary: {} };
   }
   // 문자열 쌍만 받는다. 묶음의 다른 부분이 멀쩡한데 용어집만 깨졌으면 툴팁 없이 그린다.

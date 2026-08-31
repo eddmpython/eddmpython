@@ -470,11 +470,58 @@ check("본문 시각물 수와 계약이 다르면 강의 모드를 만들지 �
 /*
  * 용어 툴팁.
  *
- * 발행이 본문에 [용어](term://용어) 마커를 심는다 (schema 5). 렌더러는 그 마커만 툴팁으로
- * 바꾸고 문장을 다시 매칭하지 않는다. 여기서 지키는 것은 둘이다. 마커가 정의를 단 툴팁이
- * 될 것, 정의를 못 찾은 마커가 눌리면 깨지는 term:// 링크로 남지 않을 것.
+ * 묶음은 glossary 데이터만 싣고, 본문의 어느 자리를 감싸는지는 렌더러의
+ * markGlossaryTerms 가 정한다. 발행 시점에 마커를 심으면 그 마커를 모르는 배포본이
+ * 깨진 링크를 그리고 교안 발행이 강의장 배포 순서에 묶이기 때문이다. 여기서 지키는
+ * 것은 셋이다. 산문의 용어만 감쌀 것, 감싼 자리가 정의를 단 툴팁이 될 것, 정의를 못
+ * 찾은 마커가 눌리면 깨지는 term:// 링크로 남지 않을 것.
  */
 const GLOSSARY = { 변수: "값에 이름을 붙여 담아 두는 자리입니다." };
+
+check("산문의 용어가 자동으로 툴팁이 된다. 조사는 밖에 남는다", () => {
+  const { html } = renderPost("여기서 변수를 만듭니다.", {}, GLOSSARY);
+  assert.ok(html.includes('<span class="term"'));
+  assert.ok(html.includes("변수<span class=\"term-pop\""));
+  assert.ok(html.includes("</span>를 만듭니다."));
+  assert.ok(!html.includes("term://"));
+});
+
+check("앞에 글자가 붙은 합성어는 감싸지 않는다", () => {
+  const { html } = renderPost("종속변수라는 말이 있습니다.", {}, GLOSSARY);
+  assert.ok(!html.includes('class="term"'));
+});
+
+check("H2 섹션마다 용어당 한 번만 감싼다", () => {
+  const { html } = renderPost(
+    "## 첫 절\n\n변수가 있습니다. 변수를 또 씁니다.\n\n## 둘째 절\n\n변수가 다시 나옵니다.",
+    {},
+    GLOSSARY,
+  );
+  assert.equal(html.match(/class="term"/g)?.length, 2);
+});
+
+check("코드와 제목과 인라인 코드의 용어는 감싸지 않는다", () => {
+  const { html } = renderPost(
+    "## 변수 소개\n\n```python\n변수 = 1\n```\n\n`변수`는 코드입니다.",
+    {},
+    GLOSSARY,
+  );
+  assert.ok(!html.includes('class="term"'));
+});
+
+check("긴 용어가 먼저 잡힌다", () => {
+  const { html } = renderPost("가상 환경을 만듭니다.", {}, {
+    "가상 환경": "설치 자리를 나눈 것입니다.",
+    환경: "코드가 실행되는 자리입니다.",
+  });
+  assert.ok(html.includes('term-pop" id="term-r-1" role="tooltip">설치 자리를 나눈 것입니다.'));
+  assert.equal(html.match(/class="term"/g)?.length, 1);
+});
+
+check("용어집이 비면 본문은 그대로다", () => {
+  const plain = renderPost("여기서 변수를 만듭니다.");
+  assert.ok(plain.html.includes("<p>여기서 변수를 만듭니다.</p>"));
+});
 
 check("용어 마커가 정의를 단 툴팁이 된다", () => {
   const { html } = renderPost("[변수](term://변수)를 만듭니다.", {}, GLOSSARY);

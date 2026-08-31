@@ -183,16 +183,93 @@ export type CourseCell = {
 };
 export type Cells = Record<string, CourseCell>;
 
-/** 용어와 한 줄 정의. 묶음 최상위 glossary 가 그대로 온다. */
+/** 용어와 한 줄 정의. 묶음 최상위 glossary 추가 필드가 그대로 온다. */
 export type Glossary = Record<string, string>;
 
 /**
- * 발행이 심은 `[용어](term://용어)` 마커를 툴팁으로 바꾼다.
+ * 본문의 용어 자리를 `[용어](term://용어)` 마커로 감싼다. **감싸는 자리의 정본은 여기다.**
  *
- * 어느 자리를 감싸는지는 발행 쪽 `scripts/glossary.mjs` 가 정본이다. 여기서는 그 마커가
- * inline() 을 거쳐 만들어 낸 `<a href="term://...">` 앵커만 찾아 바꾼다. 문장을 다시
- * 매칭하지 않으므로 발행 검사와 강의 화면이 다른 자리를 감싸는 어긋남이 생길 수 없다.
+ * 발행 시점이 아니라 렌더 시점에 감싸는 이유는 배포 독립성이다. 발행이 마커를 심으면
+ * 그 마커를 모르는 배포본이 깨진 링크를 그리고, 교안 발행이 강의장 배포 순서에 묶인다.
+ * 운영자가 2026-08-31 에 그 연관을 끊으라고 못박았다. 묶음은 데이터(glossary)만 싣고,
+ * 옛 배포본은 그 필드를 조용히 무시한다.
  *
+ * 매칭 규칙은 넷이고, 교안 저장소의 죽은 용어 검사
+ * (`eddmpython-course/scripts/glossary.mjs`) 와 **같아야 한다.** 한쪽을 고치면 다른 쪽도
+ * 같은 날 고친다.
+ *   1. 산문 문단과 목록 줄에서만 감싼다. 코드, 제목, 표, 이미지, 링크 문단은 건드리지 않는다
+ *   2. 용어 앞이 한글, 영문, 숫자면 감싸지 않는다. 종속변수 안의 변수를 잡지 않는다.
+ *      뒤는 제한하지 않는다. 한국어 조사는 뒤에 붙는다 (변수를, 변수가)
+ *   3. 긴 용어가 먼저다. "가상 환경" 이 "환경" 보다 먼저 잡힌다
+ *   4. H2 섹션마다 용어당 한 번만 감싼다. 문장마다 밑줄이 깔리면 본문이 시끄러워진다
+ */
+const TERM_SKIP_LINE = [
+  /^#{1,6}\s/, // 제목은 목차와 장면 머리다
+  /^!\[/, // 이미지 블록
+  /^\|/, // 표. 좁은 칸에 툴팁을 겹치지 않는다
+  /^https?:\/\/\S+$/, // 실행 칸과 영상 주소
+  /^\[[^\]]+\]\([^)]+\)$/, // 링크 하나짜리 문단은 영상 캡션이다
+  /^\*\*[^*\n]+\*\*$/, // 사례 라벨
+];
+/** 인라인 코드와 기존 링크를 보호 구간으로 갈라 낸다. 홀수 인덱스가 보호 구간이다. */
+const TERM_PROTECTED = /(`[^`]*`|\[[^\]]*\]\([^)]*\))/;
+
+function markTermFree(text: string, sortedTerms: string[], marked: Set<string>): string {
+  let out = "";
+  let i = 0;
+  while (i < text.length) {
+    let hit: string | null = null;
+    for (const term of sortedTerms) {
+      if (!text.startsWith(term, i)) continue;
+      const before = i > 0 ? text[i - 1] : "";
+      if (before && /[A-Za-z0-9가-힣]/.test(before)) continue;
+      hit = term;
+      break;
+    }
+    if (hit) {
+      if (marked.has(hit)) {
+        out += hit;
+      } else {
+        marked.add(hit);
+        out += `[${hit}](term://${hit})`;
+      }
+      i += hit.length;
+    } else {
+      out += text[i];
+      i += 1;
+    }
+  }
+  return out;
+}
+
+export function markGlossaryTerms(body: string, glossary: Glossary): string {
+  const sortedTerms = Object.keys(glossary).sort((a, b) => b.length - a.length);
+  if (!sortedTerms.length) return body;
+  const lines = body.replace(/\r\n/g, "\n").split("\n");
+  let fenced = false;
+  let marked = new Set<string>();
+  return lines
+    .map((line) => {
+      if (/^```/.test(line)) {
+        fenced = !fenced;
+        return line;
+      }
+      if (fenced) return line;
+      const trimmed = line.trim();
+      if (/^##\s/.test(trimmed)) marked = new Set(); // 새 섹션에서는 다시 한 번 감싼다
+      if (!trimmed || TERM_SKIP_LINE.some((rule) => rule.test(trimmed))) return line;
+      return line
+        .split(TERM_PROTECTED)
+        .map((part, index) => (index % 2 === 1 ? part : markTermFree(part, sortedTerms, marked)))
+        .join("");
+    })
+    .join("\n");
+}
+
+/**
+ * markGlossaryTerms 가 심은 마커를 툴팁으로 바꾼다.
+ *
+ * 마커가 inline() 을 거쳐 만들어 낸 `<a href="term://...">` 앵커만 찾아 바꾼다.
  * 정의가 묶음에 없으면 앵커를 벗겨 맨글자로 되돌린다. term:// 는 브라우저가 열 수 있는
  * 주소가 아니라서 링크로 남기면 누르는 순간 깨진다.
  */
@@ -464,7 +541,8 @@ export function renderPost(
 ): { html: string; headings: string[]; hasCells: boolean; visuals: number } {
   const headings: string[] = [];
   const state = { visual: 0 };
-  const html = applyGlossary(renderMarkdown(body, headings, cells, state), glossary, "term-r");
+  const marked = markGlossaryTerms(body, glossary);
+  const html = applyGlossary(renderMarkdown(marked, headings, cells, state), glossary, "term-r");
   // 실행 칸이 없는 글에는 파이썬 런타임 스크립트를 붙이지 않는다.
   return { html, headings, hasCells: html.includes('data-cell="'), visuals: state.visual };
 }
@@ -512,7 +590,7 @@ export function renderLecture(
   cells: Cells = {},
   glossary: Glossary = {},
 ): { html: string; hasCells: boolean; ok: boolean } {
-  const sections = splitCourseSections(body);
+  const sections = splitCourseSections(markGlossaryTerms(body, glossary));
   if (!scenes.length || sections.length !== scenes.length) return { html: "", hasCells: false, ok: false };
   let hasCells = false;
   const rendered: string[] = [];
