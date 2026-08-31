@@ -128,6 +128,11 @@ export const ALLOWED = [
     rebuild: "cd site && node scripts/classroom-audit.mjs",
   },
   {
+    name: "course",
+    what: "교안 발행 묶음. 비공개 저장소가 KV 로 올리기 전에 여기 굽는다",
+    rebuild: "cd ../eddmpython-course && npm run publish:dry",
+  },
+  {
     /*
      * 갈아엎기 전 이력이다. 블로그 이전 시대의 다른 앱이고 커밋 251개이며
      * `refs/tags/v1.0-full` 과 `refs/codex/root-rewrite-candidate` 를 담는다.

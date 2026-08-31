@@ -183,6 +183,35 @@ export type CourseCell = {
 };
 export type Cells = Record<string, CourseCell>;
 
+/** 용어와 한 줄 정의. 묶음 최상위 glossary 가 그대로 온다. */
+export type Glossary = Record<string, string>;
+
+/**
+ * 발행이 심은 `[용어](term://용어)` 마커를 툴팁으로 바꾼다.
+ *
+ * 어느 자리를 감싸는지는 발행 쪽 `scripts/glossary.mjs` 가 정본이다. 여기서는 그 마커가
+ * inline() 을 거쳐 만들어 낸 `<a href="term://...">` 앵커만 찾아 바꾼다. 문장을 다시
+ * 매칭하지 않으므로 발행 검사와 강의 화면이 다른 자리를 감싸는 어긋남이 생길 수 없다.
+ *
+ * 정의가 묶음에 없으면 앵커를 벗겨 맨글자로 되돌린다. term:// 는 브라우저가 열 수 있는
+ * 주소가 아니라서 링크로 남기면 누르는 순간 깨진다.
+ */
+export function applyGlossary(html: string, glossary: Glossary, prefix: string): string {
+  let n = 0;
+  return html.replace(/<a href="term:\/\/([^"]*)">([^<]*)<\/a>/g, (_, rawTerm: string, label: string) => {
+    // href 는 esc() 를 거쳐 왔다. &amp; 같은 escape 를 되돌려야 묶음의 키와 맞는다.
+    const term = rawTerm
+      .replace(/&amp;/g, "&")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'");
+    const def = glossary[term];
+    if (!def) return label;
+    n += 1;
+    const id = `${prefix}-${n}`;
+    return `<span class="term" tabindex="0" aria-describedby="${id}">${label}<span class="term-pop" id="${id}" role="tooltip">${esc(def)}</span></span>`;
+  });
+}
+
 /**
  * 실행 칸을 그린다.
  *
@@ -431,10 +460,11 @@ export function renderMarkdown(
 export function renderPost(
   body: string,
   cells: Cells = {},
+  glossary: Glossary = {},
 ): { html: string; headings: string[]; hasCells: boolean; visuals: number } {
   const headings: string[] = [];
   const state = { visual: 0 };
-  const html = renderMarkdown(body, headings, cells, state);
+  const html = applyGlossary(renderMarkdown(body, headings, cells, state), glossary, "term-r");
   // 실행 칸이 없는 글에는 파이썬 런타임 스크립트를 붙이지 않는다.
   return { html, headings, hasCells: html.includes('data-cell="'), visuals: state.visual };
 }
@@ -480,6 +510,7 @@ export function renderLecture(
   body: string,
   scenes: CourseScene[],
   cells: Cells = {},
+  glossary: Glossary = {},
 ): { html: string; hasCells: boolean; ok: boolean } {
   const sections = splitCourseSections(body);
   if (!scenes.length || sections.length !== scenes.length) return { html: "", hasCells: false, ok: false };
@@ -504,5 +535,6 @@ export function renderLecture(
   <p class="scene-callout" data-scene-callout aria-live="polite"></p>
 </section>`);
   }
-  return { html: rendered.join("\n"), hasCells, ok: true };
+  // 읽기 화면(term-r)과 id 가 겹치지 않게 접두어를 다르게 둔다. 같은 페이지에 둘 다 있다.
+  return { html: applyGlossary(rendered.join("\n"), glossary, "term-l"), hasCells, ok: true };
 }

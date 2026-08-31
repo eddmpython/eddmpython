@@ -25,19 +25,25 @@ export type CourseCategory = {
   cells?: Cells;
   posts: CoursePost[];
 };
-type CourseBundle = { schema: number; sceneContract?: number; categories: CourseCategory[] };
+type CourseBundle = {
+  schema: number;
+  sceneContract?: number;
+  /** 용어와 한 줄 정의. schema 5 부터 온다. 본문의 term:// 마커가 여기서 정의를 찾는다 */
+  glossary?: Record<string, string>;
+  categories: CourseCategory[];
+};
 
 /**
  * 묶음의 모양은 eddmpython-course 와의 계약이다. 바꾸면 양쪽을 같은 날 같이 고친다.
  *
  * **두 판을 같이 받는다.** 하나만 받으면 발행과 배포 사이에 강의장이 빈 목록을 낸다.
  * 어느 쪽을 먼저 하든 그 틈이 생기고, 하필 강의 직전이면 그것이 사고다.
- * 2 는 카테고리 성과(goal)가 붙은 판이고 1 은 그 전 판이다.
+ * 5 는 용어집(glossary)이 붙은 판이고 4 는 그 전 판이다.
  */
-const COURSE_SCHEMA = new Set([1, 2, 3, 4]);
+const COURSE_SCHEMA = new Set([1, 2, 3, 4, 5]);
 const COURSE_SCENE_CONTRACTS = new Set([1, 2]);
 
-export type CourseState = { ok: boolean; categories: CourseCategory[] };
+export type CourseState = { ok: boolean; categories: CourseCategory[]; glossary: Record<string, string> };
 
 const isPost = (p: unknown): p is CoursePost =>
   !!p &&
@@ -107,18 +113,25 @@ export async function course(env: Env): Promise<CourseState> {
   let bundle: CourseBundle | null = null;
   try {
     const raw = await env.COURSE.get("bundle", { cacheTtl: 60 });
-    if (raw === null) return { ok: true, categories: [] };
+    if (raw === null) return { ok: true, categories: [], glossary: {} };
     bundle = JSON.parse(raw) as CourseBundle;
   } catch {
     // 묶음이 깨졌으면 교안이 없는 것으로 본다. 여기서 던지면 강의장만이 아니라 운영 화면도
     // 같이 죽는다. 강의 중에 운영자가 방 목록조차 못 보게 되는 것이 제일 나쁜 결과다.
-    return { ok: false, categories: [] };
+    return { ok: false, categories: [], glossary: {} };
   }
   if (!bundle || !COURSE_SCHEMA.has(bundle.schema) || !Array.isArray(bundle.categories)) {
-    return { ok: false, categories: [] };
+    return { ok: false, categories: [], glossary: {} };
   }
-  if (bundle.schema === 4 && !COURSE_SCENE_CONTRACTS.has(bundle.sceneContract ?? 0)) {
-    return { ok: false, categories: [] };
+  if (bundle.schema >= 4 && !COURSE_SCENE_CONTRACTS.has(bundle.sceneContract ?? 0)) {
+    return { ok: false, categories: [], glossary: {} };
+  }
+  // 문자열 쌍만 받는다. 묶음의 다른 부분이 멀쩡한데 용어집만 깨졌으면 툴팁 없이 그린다.
+  const glossary: Record<string, string> = {};
+  if (bundle.glossary && typeof bundle.glossary === "object" && !Array.isArray(bundle.glossary)) {
+    for (const [term, def] of Object.entries(bundle.glossary)) {
+      if (typeof def === "string" && term && def) glossary[term] = def;
+    }
   }
   const categories = bundle.categories
     .filter((c) => c && typeof c.slug === "string" && Array.isArray(c.posts))
@@ -131,7 +144,7 @@ export async function course(env: Env): Promise<CourseState> {
       })),
     }))
     .sort((a, b) => a.order - b.order);
-  return { ok: true, categories };
+  return { ok: true, categories, glossary };
 }
 
 /**

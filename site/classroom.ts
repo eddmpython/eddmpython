@@ -205,6 +205,17 @@ article tbody tr:last-child td { border-bottom:0; }
 .back { color:var(--eddm-text-muted); text-decoration:none; font-size:.9rem; }
 article a { color:var(--eddm-accent); text-decoration:none; border-bottom:1px solid var(--eddm-accent-line); }
 article a:hover { border-bottom-color:var(--eddm-accent); }
+
+/* 용어 툴팁. 발행이 심은 term:// 마커가 이 모양으로 나온다. 호버, 키보드 포커스, 탭으로 연다. */
+.term { position:relative; cursor:help; border-bottom:1px dashed var(--eddm-accent-dim); }
+.term:focus { outline:none; border-bottom-style:solid; border-bottom-color:var(--eddm-accent); }
+.term-pop { position:absolute; left:50%; bottom:calc(100% + .6rem); transform:translateX(-50%);
+  width:max-content; max-width:min(19rem,calc(100vw - 2.5rem)); padding:.55rem .8rem;
+  border:1px solid var(--eddm-line-strong); border-radius:.55rem; background:var(--eddm-code-surface);
+  color:var(--eddm-text); font-size:.8rem; font-weight:400; font-style:normal; line-height:1.65;
+  white-space:normal; text-align:left; letter-spacing:0;
+  box-shadow:0 .75rem 2rem color-mix(in srgb,var(--eddm-ink) 45%,transparent); z-index:30; display:none; }
+.term:hover .term-pop, .term:focus .term-pop, .term.on .term-pop { display:block; }
 .yt { margin:1.75rem 0; }
 .yt figcaption { margin-top:.6rem; display:flex; gap:.75rem; align-items:baseline;
   justify-content:space-between; font-size:.85rem; color:var(--eddm-text-muted); line-height:1.6; }
@@ -753,6 +764,21 @@ document.addEventListener("click", (e) => {
   }
 });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") z.classList.remove("on"); });
+`;
+
+/**
+ * 용어 툴팁의 탭 토글. 호버가 없는 화면(태블릿, 휴대전화)에서는 탭이 유일한 길이다.
+ * 다른 용어를 탭하거나 빈 곳을 탭하면 열려 있던 것을 닫는다. 툴팁이 두 개 겹치면 못 읽는다.
+ */
+const TERM_SCRIPT = `
+document.addEventListener("click", (e) => {
+  const t = e.target.closest ? e.target.closest(".term") : null;
+  document.querySelectorAll(".term.on").forEach((el) => { if (el !== t) el.classList.remove("on"); });
+  if (t) t.classList.toggle("on");
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") document.querySelectorAll(".term.on").forEach((el) => el.classList.remove("on"));
+});
 `;
 
 /**
@@ -1744,7 +1770,8 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     );
   }
 
-  const all = (await course(env)).categories;
+  const courseState = await course(env);
+  const all = courseState.categories;
   const open = visible(all, room.unlocked);
 
   if (parts.length === 1) {
@@ -1803,8 +1830,8 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     const at = category.posts.findIndex((p) => p.id === parts[2]);
     const post = category.posts[at];
     if (!post) return new Response("없는 글입니다.", { status: 404 });
-    const { html, headings, hasCells } = renderPost(post.body, category.cells ?? {});
-    const lecture = renderLecture(post.body, post.scenes ?? [], category.cells ?? {});
+    const { html, headings, hasCells } = renderPost(post.body, category.cells ?? {}, courseState.glossary);
+    const lecture = renderLecture(post.body, post.scenes ?? [], category.cells ?? {}, courseState.glossary);
 
     // 왼쪽. 같은 과정의 글을 오간다. 강의 중에 앞 편으로 되돌아가는 일이 잦다.
     const nav = category.posts
@@ -1917,7 +1944,11 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
          </main>
          ${toc}
        </div>${lectureUi}`,
-      stamp + TOC_SCRIPT + (hasCells || lecture.hasCells ? CELL_SCRIPT : "") + (lecture.ok ? LECTURE_SCRIPT : ""),
+      stamp
+        + TOC_SCRIPT
+        + (hasCells || lecture.hasCells ? CELL_SCRIPT : "")
+        + (lecture.ok ? LECTURE_SCRIPT : "")
+        + (html.includes('class="term"') || lecture.html.includes('class="term"') ? TERM_SCRIPT : ""),
       true,
       hasCells || lecture.hasCells,
     );

@@ -7,6 +7,7 @@
 import assert from "node:assert/strict";
 import {
   COURSE_SCENE_RUNTIME,
+  applyGlossary,
   compileSceneTimeline,
   renderLecture,
   renderMarkdown,
@@ -464,6 +465,80 @@ check("본문 시각물 수와 계약이 다르면 강의 모드를 만들지 �
   );
   assert.equal(lecture.ok, false);
   assert.equal(lecture.html, "");
+});
+
+/*
+ * 용어 툴팁.
+ *
+ * 발행이 본문에 [용어](term://용어) 마커를 심는다 (schema 5). 렌더러는 그 마커만 툴팁으로
+ * 바꾸고 문장을 다시 매칭하지 않는다. 여기서 지키는 것은 둘이다. 마커가 정의를 단 툴팁이
+ * 될 것, 정의를 못 찾은 마커가 눌리면 깨지는 term:// 링크로 남지 않을 것.
+ */
+const GLOSSARY = { 변수: "값에 이름을 붙여 담아 두는 자리입니다." };
+
+check("용어 마커가 정의를 단 툴팁이 된다", () => {
+  const { html } = renderPost("[변수](term://변수)를 만듭니다.", {}, GLOSSARY);
+  assert.ok(html.includes('<span class="term" tabindex="0" aria-describedby="term-r-1">변수'));
+  assert.ok(html.includes('<span class="term-pop" id="term-r-1" role="tooltip">값에 이름을 붙여 담아 두는 자리입니다.</span>'));
+  assert.ok(!html.includes("term://"));
+  // 조사는 툴팁 밖에 남는다
+  assert.ok(html.includes("</span>를 만듭니다."));
+});
+
+check("정의가 없는 마커는 맨글자로 되돌린다", () => {
+  // term:// 는 브라우저가 못 여는 주소다. 링크로 남기면 누르는 순간 깨진다
+  const { html } = renderPost("[변수](term://변수)를 만듭니다.", {}, {});
+  assert.ok(!html.includes("<a"));
+  assert.ok(!html.includes("term://"));
+  assert.ok(html.includes("<p>변수를 만듭니다.</p>"));
+});
+
+check("정의의 꺾쇠는 escape 되어 나간다", () => {
+  const html = applyGlossary(
+    inline("[변수](term://변수)"),
+    { 변수: '<b>진하게</b> "따옴표"' },
+    "term-r",
+  );
+  assert.ok(!html.includes("<b>"));
+  assert.ok(html.includes("&lt;b&gt;"));
+  assert.ok(html.includes("&quot;따옴표&quot;"));
+});
+
+check("굵게 안의 용어 마커도 툴팁이 된다", () => {
+  const { html } = renderPost("**[변수](term://변수)**가 핵심입니다.", {}, GLOSSARY);
+  assert.ok(html.includes('<strong><span class="term"'));
+});
+
+check("강의 장면의 용어는 읽기 화면과 다른 id 를 받는다", () => {
+  // 같은 페이지에 읽기 본문과 강의 장면이 함께 있다. id 가 겹치면 aria 연결이 깨진다
+  const body = [
+    "## 첫 장면",
+    "",
+    "### 부제입니다",
+    "",
+    "[변수](term://변수)를 만듭니다.",
+    "",
+    "![그림](https://example.com/a.png)",
+  ].join("\n");
+  const scenes: CourseScene[] = [
+    { id: "s1", role: "open", layout: "stage", visualCount: 1, beats: [{ effect: "enter", targets: [1] }] },
+  ];
+  const read = renderPost(body, {}, GLOSSARY);
+  const lecture = renderLecture(body, scenes, {}, GLOSSARY);
+  assert.equal(lecture.ok, true);
+  assert.ok(read.html.includes('id="term-r-1"'));
+  assert.ok(lecture.html.includes('id="term-l-1"'));
+  assert.ok(!lecture.html.includes('id="term-r-1"'));
+});
+
+check("용어가 여럿이면 id 가 이어 붙는다", () => {
+  const { html } = renderPost(
+    "[변수](term://변수)와 [함수](term://함수)를 봅니다.",
+    {},
+    { ...GLOSSARY, 함수: "코드 여러 줄에 붙인 이름입니다." },
+  );
+  assert.ok(html.includes('id="term-r-1"'));
+  assert.ok(html.includes('id="term-r-2"'));
 });
 
 console.log(`classroom render: 코드 분할과 escape 등 ${count} cases`);
