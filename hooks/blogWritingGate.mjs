@@ -205,18 +205,16 @@ async function main(mode) {
   if (mode === "pre") {
     const target = slash(toolInput.file_path || toolInput.notebook_path);
 
-    // 승인은 사람이 붙어 있는 터미널에서만 만들어진다. 그 결과를 손으로 적으면 문이 아니다.
+    // 승인 기록은 approve-blog.mjs 만 쓴다. 그 결과를 손으로 적으면 승인이라는 것이 없어진다.
     if (APPROVAL.test(target)) {
       process.stderr.write(
         "BLOCK: 운영자 승인 파일을 직접 쓰려 한다\n\n" +
           `  ${target}\n\n` +
-          "이 파일은 운영자가 글을 읽고 통과시킨 판본의 정본이다.\n" +
-          "site/scripts/approve-blog.mjs 만 이 파일을 쓰고, 그 스크립트는\n" +
-          "process.stdin.isTTY 가 참일 때만 승인을 받는다. 여기서 값을 적는 것은\n" +
-          "그 문을 우회하는 것이고, 우회하면 이 저장소에 승인이라는 것이 없어진다.\n\n" +
-          "운영자에게 이렇게 알린다.\n" +
-          "  cd site\n" +
-          "  npm run approve:blog\n",
+          "이 파일은 운영자가 통과시킨 판본의 정본이고 site/scripts/approve-blog.mjs 만 쓴다.\n" +
+          "운영자가 터미널에서 직접 승인하거나 (cd site && npm run approve:blog),\n" +
+          "운영자가 이번 대화에서 명시적으로 승인했다면 그 문구를 그대로 실어 기록한다.\n" +
+          '  npm run approve:blog -- --from-chat "운영자 승인 문구 원문"\n\n' +
+          "여기서 값을 직접 적는 것은 어느 길도 아니다.\n",
       );
       process.exit(2);
     }

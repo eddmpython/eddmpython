@@ -1,16 +1,17 @@
 /*
- * 운영자가 글을 읽고 통과시킨다. 사람이 붙어 있는 터미널에서만 돈다.
+ * 운영자가 글을 통과시킨다. 승인의 길은 둘이고 결과는 같은 blog/approved.json 이다.
  *
- * 쓰는 법
- *   cd site
- *   npm run approve:blog
+ * 1. 대화형 (기본): 사람이 붙어 있는 터미널에서 글을 하나씩 보고 y 를 받는다.
+ *      cd site && npm run approve:blog
+ * 2. 대화 승인 기록: 운영자가 AI 와의 대화에서 명시적으로 승인했을 때, AI 가 그 문구를
+ *    그대로 실어 기록을 남긴다. 2026-08-31 운영자 결정이다 ("내가 승인하면 그냥 하는걸로").
+ *      npm run approve:blog -- --from-chat "운영자 승인 문구 원문"
  *
- * 통과시킬 글을 하나씩 보여 주고 y 를 받는다. 그 자리에서 통과한 판본의 해시가
- * blog/approved.json 에 남고, 배포는 그 판본만 내보낸다. 통과 뒤에 본문이 한 글자라도
- * 바뀌면 다시 물어본다.
+ * --from-chat 은 운영자가 이번 대화에서 실제로 승인을 말한 경우에만 쓴다. AI 가 승인을
+ * 추정하거나 앞선 세션의 승인을 재사용하는 것은 금지다. 문구가 기록에 그대로 남으므로
+ * 무엇을 근거로 통과시켰는지 blog/approved.json 에서 항상 되짚을 수 있다.
  *
- * 왜 AI 가 이것을 대신 못 하는가. 아래 isTTY 검사 하나 때문이다. AI 의 셸 도구는 stdin 이
- * null device 라 TTY 가 없다. 이 스크립트는 그 자리에서 멈추고 승인을 만들지 않는다.
+ * 통과 뒤 본문이 한 글자라도 바뀌면 그 글은 다시 pending 이 된다.
  */
 import { writeFileSync } from "node:fs";
 import { createInterface } from "node:readline/promises";
@@ -23,21 +24,49 @@ import {
   readApprovals,
 } from "./blog-approval.mjs";
 
-if (!process.stdin.isTTY || !process.stdout.isTTY) {
-  console.error("승인은 사람이 붙어 있는 터미널에서만 받습니다.");
+const fromChatAt = process.argv.indexOf("--from-chat");
+const fromChat = fromChatAt >= 0 ? (process.argv[fromChatAt + 1] ?? "").trim() : null;
+if (fromChatAt >= 0 && !fromChat) {
+  console.error("--from-chat 에는 운영자의 승인 문구 원문이 필요합니다.");
+  console.error('  npm run approve:blog -- --from-chat "승인한다"');
+  process.exit(1);
+}
+
+if (fromChat === null && (!process.stdin.isTTY || !process.stdout.isTTY)) {
+  console.error("대화형 승인은 사람이 붙어 있는 터미널에서만 받습니다.");
   console.error("");
-  console.error("지금 stdin 이나 stdout 에 TTY 가 없습니다. 스크립트나 CI 나 에이전트의 셸에서는");
-  console.error("승인이 만들어지지 않습니다. 그것이 이 문의 목적입니다.");
-  console.error("");
-  console.error("운영자가 직접 터미널을 열고 아래를 실행합니다.");
+  console.error("운영자가 직접 터미널에서 실행하거나,");
   console.error("  cd site");
   console.error("  npm run approve:blog");
+  console.error("");
+  console.error("운영자가 대화에서 승인을 말했다면 그 문구를 그대로 실어 기록합니다.");
+  console.error('  npm run approve:blog -- --from-chat "운영자 승인 문구 원문"');
   process.exit(1);
 }
 
 const pending = pendingPosts();
 if (!pending.length) {
   console.log("통과시킬 글이 없습니다. 지금 있는 글은 전부 승인된 판본입니다.");
+  process.exit(0);
+}
+
+if (fromChat !== null) {
+  const approvals = readApprovals();
+  const at = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
+  for (const item of pending) {
+    approvals.posts[item.post] = {
+      sha256: item.now,
+      at,
+      title: articleTitle(item.post),
+      via: "chat",
+      quote: fromChat,
+    };
+    console.log(`  통과  ${item.post}  ${articleTitle(item.post)}`);
+  }
+  const ordered = Object.fromEntries(Object.entries(approvals.posts).sort(([a], [b]) => a.localeCompare(b)));
+  writeFileSync(approvalPath, `${JSON.stringify({ version: 1, posts: ordered }, null, 2)}\n`, "utf8");
+  console.log("");
+  console.log(`${pending.length} 편을 대화 승인으로 통과시켰습니다. ${approvalLabel} 에 승인 문구까지 적었습니다.`);
   process.exit(0);
 }
 

@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "posts": {
+    "001-ai-needs-an-environment": {
+      "sha256": "f15ba8f16a8ff013716c8f2232dc70d90859aa2688fd501a65596dccf0b0b194",
+      "at": "2026-08-31T14:42:13Z",
+      "title": "AI 코딩 처음 시작하기, AGENTS.md와 CLAUDE.md 만드는 방법",
+      "via": "chat",
+      "quote": "승인한다"
+    },
+    "002-ai-writing-tells": {
+      "sha256": "76fee06f0258dda28ab2c25a17e0fb995a34fc19ffa9bf71190c7300ee189f89",
+      "at": "2026-08-31T14:42:13Z",
+      "title": "AI 글을 자연스럽게 고치는 여덟 단계, 사실 지키기부터 다섯 명 검토까지",
+      "via": "chat",
+      "quote": "승인한다"
+    },
+    "003-python-qr": {
+      "sha256": "3c6d1022e711131cd7fddc7eb1bdf5e208126ab6f94e9dbf8c818a3b34e286c0",
+      "at": "2026-08-31T14:42:13Z",
+      "title": "파이썬으로 QR코드 만들기, 휴대폰이 읽는 PNG 파일까지",
+      "via": "chat",
+      "quote": "승인한다"
+    },
+    "004-dataframe-libraries": {
+      "sha256": "64ba59b041a169ead479d31ff1e3748ea1737607bead1bb09d308b290f91e69a",
+      "at": "2026-08-31T14:42:13Z",
+      "title": "파이썬 데이터프레임 라이브러리 여섯 가지, 엑셀이 못 여는 표부터",
+      "via": "chat",
+      "quote": "승인한다"
+    },
+    "005-python-history": {
+      "sha256": "1072d5d48cf7b44af0edb6320667b00ccc779d57ac81731dddcca14f6f0bc366",
+      "at": "2026-08-31T14:42:13Z",
+      "title": "파이썬 역사, 1991년 코드를 오늘 돌려 보면 무엇이 남아 있나",
+      "via": "chat",
+      "quote": "승인한다"
+    }
+  }
+}
