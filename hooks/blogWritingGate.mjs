@@ -10,7 +10,13 @@
 //
 // 무엇을 막는가.
 //   pre   전역 SKILL.md 를 열지 않은 세션이 blog/posts/*/index.md 를 쓰는 것
-//   stop  본문을 고쳐 놓고 그 글의 review.json 을 안 만진 채 턴을 끝내는 것
+//   stop  이 세션이 본문을 고쳐 놓고 그 글의 review.json 을 안 만진 채 턴을 끝내는 것
+//
+// stop 은 세션 시작 때 떠 둔 내용 해시 스냅샷과 지금을 비교한다. 처음에는 세션 시작
+// 커밋 기준 diff 를 썼는데, 이전 세션이 커밋 없이 남긴 잔여까지 이 세션의 변경으로
+// 오인해서 글쓰기와 무관한 세션이 남의 잔여에 막혔다 (2026-08-27 실측). 물려받은
+// 잔여는 이 세션이 막을 일이 아니다. 스냅샷이 없으면 예전처럼 남은 변경 전체를 보되
+// 이 세션의 변경인지 가리지 못했다는 사실을 차단 메시지에 밝힌다.
 //
 // 무엇을 못 막는가. 스킬을 열고도 안 지키는 것과 기록을 형식적으로 채우는 것이다.
 // 기록의 내용은 site/scripts/check-blog.mjs 가 구조로 본다. 거기서 앞선 라운드가 집은
@@ -92,7 +98,41 @@ function git(args) {
   }
 }
 
-/** 세션 시작 지점부터 지금 작업 트리까지 바뀐 파일. 커밋을 했든 안 했든 지금 남은 것만 본다. */
+/** 세션 시작 때 뜬 본문과 기록의 내용 해시. stop 이 이것과 지금을 비교한다. */
+const SNAPSHOT = "claude-blogwriting-session-files";
+
+/** 지금 작업 트리에 실제로 있는 본문과 평가 기록 경로. 추적 여부는 가리지 않는다. */
+function articleAndReviewFiles() {
+  return git(
+    'ls-files --cached --others --exclude-standard -- "blog/posts/*/index.md" "blog/posts/*/review.json"',
+  )
+    .split("\n")
+    .map((line) => slash(line.trim().replace(/^"|"$/g, "")))
+    .filter(Boolean)
+    .filter((file) => existsSync(file));
+}
+
+/** 파일들의 git 내용 해시. 목록이 비면 빈 객체다. */
+function contentHashes(files) {
+  if (!files.length) return {};
+  const lines = git(`hash-object -- ${files.map((file) => `"${file}"`).join(" ")}`)
+    .split("\n")
+    .filter(Boolean);
+  const hashes = {};
+  files.forEach((file, index) => {
+    if (lines[index]) hashes[file] = lines[index];
+  });
+  return hashes;
+}
+
+/** 스냅샷과 견주어 이 세션 동안 내용이 실제로 바뀐 파일. 스냅샷에 없던 새 파일도 바뀐 것이다. */
+export function changedByHashes(base = {}, current = {}) {
+  return Object.keys(current)
+    .filter((file) => base[file] !== current[file])
+    .sort();
+}
+
+/** 세션 시작 지점부터 지금 작업 트리까지 바뀐 파일. 스냅샷이 없을 때만 쓰는 예전 방식이다. */
 function changedSinceSessionStart(gitDir) {
   const baseFile = `${gitDir}/claude-session-base`;
   const base = existsSync(baseFile) ? readFileSync(baseFile, "utf8").trim() : "";
@@ -133,6 +173,17 @@ async function main(mode) {
       rmSync(marker, { force: true });
     } catch {
       /* 없으면 지울 것도 없다 */
+    }
+    // 이 시점의 본문과 기록 내용을 떠 둔다. 이전 세션이 남긴 잔여와 이 세션의
+    // 변경을 stop 에서 가르는 기준이다.
+    try {
+      writeFileSync(
+        `${gitDir}/${SNAPSHOT}`,
+        JSON.stringify(contentHashes(articleAndReviewFiles())),
+        "utf8",
+      );
+    } catch {
+      /* 스냅샷을 못 뜨면 stop 이 남은 변경 전체를 본다. 그쪽이 안전한 쪽이다. */
     }
     process.exit(0);
   }
@@ -189,12 +240,28 @@ async function main(mode) {
   if (mode === "stop") {
     // 한 번 막았으면 통과시킨다. 같은 이유로 무한히 붙잡지 않는다.
     if (payload.stop_hook_active) process.exit(0);
-    const missing = missingReviews(changedSinceSessionStart(gitDir));
+    const snapshotFile = `${gitDir}/${SNAPSHOT}`;
+    let base = null;
+    if (existsSync(snapshotFile)) {
+      try {
+        base = JSON.parse(readFileSync(snapshotFile, "utf8"));
+      } catch {
+        base = null;
+      }
+    }
+    const changed = base
+      ? changedByHashes(base, contentHashes(articleAndReviewFiles()))
+      : changedSinceSessionStart(gitDir);
+    const missing = missingReviews(changed);
     if (!missing.length) process.exit(0);
+    const head = base
+      ? "BLOCK: 이 세션에서 본문을 고쳐 놓고 평가 기록을 안 남기고 끝내려 한다\n\n"
+      : "BLOCK: 작업 트리에 평가 기록 없는 본문 변경이 남아 있다\n" +
+        "(세션 시작 스냅샷이 없어 이 세션의 변경인지 가리지 못했다. 이전 세션이 남긴 잔여일 수 있다)\n\n";
     process.stderr.write(
-      "BLOCK: 본문을 고쳐 놓고 평가 기록을 안 남기고 끝내려 한다\n\n" +
+      head +
         missing
-          .map((post) => `  blog/posts/${post}/index.md 를 고쳤는데 review.json 이 그대로다`)
+          .map((post) => `  blog/posts/${post}/index.md 가 바뀌었는데 review.json 이 그대로다`)
           .join("\n") +
         "\n\n" +
         "전역 $blog-writing 의 `여러 명이 따로 읽고 다시 고치기` 를 돌리고\n" +

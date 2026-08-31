@@ -12,7 +12,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { articleOf, missingReviews, skillOpenedBy } from "../blogWritingGate.mjs";
+import { articleOf, changedByHashes, missingReviews, skillOpenedBy } from "../blogWritingGate.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const GATE = resolve(HERE, "..", "blogWritingGate.mjs");
@@ -70,6 +70,14 @@ check(
 check("다른 글의 기록", missingReviews(["blog/posts/004-x/index.md", "blog/posts/003-a/review.json"]), ["004-x"]);
 check("블로그 밖 변경", missingReviews(["site/src/x.ts", "CLAUDE.md"]), []);
 check("변경 없음", missingReviews([]), []);
+
+/* 3.5 세션 스냅샷과 지금의 내용 해시 비교 */
+
+check("해시 같음", changedByHashes({ a: "1" }, { a: "1" }), []);
+check("해시 다름", changedByHashes({ a: "1" }, { a: "2" }), ["a"]);
+check("스냅샷에 없던 새 파일", changedByHashes({}, { a: "1" }), ["a"]);
+check("지워진 파일은 세지 않음", changedByHashes({ a: "1" }, {}), []);
+check("빈 양쪽", changedByHashes({}, {}), []);
 
 /* 4. 네 모드를 임시 저장소에서 실제로 실행한다 */
 
@@ -149,6 +157,26 @@ try {
   check("추적 안 된 새 글도 잡힘", run("stop", {}), 2);
   writeFileSync(join(SANDBOX, "blog/posts/006-new-post/review.json"), '{"version":1}\n', "utf8");
   check("새 글도 기록이 있으면 통과", run("stop", {}), 0);
+
+  // 이전 세션이 커밋 없이 남긴 잔여는 다음 세션을 막지 않는다.
+  // 2026-08-27 에 글쓰기와 무관한 세션이 남의 잔여에 막혔던 그 자리다.
+  sh("git add -A && git commit -q -m clean");
+  writeFileSync(join(SANDBOX, article), "이전 세션이 남긴 본문\n", "utf8");
+  check("잔여가 있어도 새 세션은 시작", run("start"), 0);
+  check("물려받은 잔여로는 막지 않음", run("stop", {}), 0);
+
+  // 물려받은 글이라도 이 세션이 더 고치면 막는다.
+  writeFileSync(join(SANDBOX, article), "이 세션이 또 고친 본문\n", "utf8");
+  check("물려받은 글을 이 세션이 고치면 막힘", run("stop", {}), 2);
+  writeFileSync(join(SANDBOX, review), '{"version":1,"rounds":[]}\n', "utf8");
+  check("기록을 남기면 다시 통과", run("stop", {}), 0);
+
+  // 스냅샷이 없으면 남은 변경 전체를 본다. 예전 방식 폴백이다.
+  sh("git add -A && git commit -q -m clean2");
+  writeFileSync(join(gitDir, "claude-session-base"), sh("git rev-parse HEAD").toString().trim(), "utf8");
+  rmSync(join(gitDir, "claude-blogwriting-session-files"), { force: true });
+  writeFileSync(join(SANDBOX, article), "스냅샷 없이 남은 본문\n", "utf8");
+  check("스냅샷이 없으면 잔여도 막음", run("stop", {}), 2);
 } finally {
   rmSync(SANDBOX, { recursive: true, force: true });
 }
