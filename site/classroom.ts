@@ -527,9 +527,14 @@ html:not([data-theme="dark"]) .scene-canvas pre {
   .lecture-map-item span { margin-bottom:.35rem; }
   .lecture-map-foot { align-items:stretch; flex-direction:column; gap:.75rem; }
   .lecture-map-blank { justify-content:center; }
-  /* scene-meta 3.4rem + 머리 열 간격 .7rem. 기준선 변수를 같이 좁힌다. */
+  /* 좁은 화면은 기준선을 접는다. 들여쓰기가 화면 폭을 먹어 시각물이 작아지기 때문이다
+     (운영 실측: 66px 들여쓰기에 390px 화면의 개막 영상이 297px). 대신 장면 번호를 제목
+     위 한 열로 쌓아 번호, 제목, 시각물, 판단 문장이 전부 거터 한 선에서 시작한다. */
   .lecture-deck { --lecture-gutter-block:1rem; --lecture-gutter-inline:.85rem; --lecture-visual-height:48vh;
-    --lecture-head-indent:4.1rem; }
+    --lecture-head-indent:0rem; }
+  .scene-head { grid-template-columns:minmax(0,1fr); gap:.45rem; }
+  .scene-head .scene-meta { display:flex; align-items:center; width:auto; min-width:0; padding-top:0; gap:.55rem; }
+  .scene-head .scene-cue { width:auto; }
   .lecture-bar { grid-template-columns:minmax(0,1fr) auto; gap:.65rem; min-height:4rem;
     padding-top:max(.45rem,env(safe-area-inset-top));
     padding-right:max(.75rem,env(safe-area-inset-right));

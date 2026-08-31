@@ -95,7 +95,7 @@ const VIEWPORTS = [
     sectionTitle: "24px", centerGap: 24, headIndent: 88, titleMin: 30, visualMin: 620,
     compareColumns: 2, wideComposition: false, runPython: false },
   { id: "mobile", width: 390, height: 844, dpr: 1, isMobile: true, hasTouch: true,
-    sectionTitle: "22px", centerGap: 14, headIndent: 66, titleMin: 22, visualMin: 320,
+    sectionTitle: "22px", centerGap: 14, headIndent: 0, titleMin: 22, visualMin: 320,
     compareColumns: 1, wideComposition: false, runPython: false },
 ];
 const requestedViewports = new Set(
