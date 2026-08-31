@@ -397,7 +397,7 @@ check("읽기 본문 하나를 장면과 비트 계약으로 투영한다", () =
     "",
     "### 그림을 먼저 보여 줍니다",
     "",
-    "설명은 발표자 노트 재료입니다.",
+    "설명은 읽기 모드 본문입니다. 강의 화면에는 나오지 않습니다.",
     "",
     "![첫 그림](https://example.com/a.svg)",
     "",
@@ -418,7 +418,8 @@ check("읽기 본문 하나를 장면과 비트 계약으로 투영한다", () =
   ];
   const lecture = renderLecture(body, scenes);
   assert.equal(lecture.ok, true);
-  assert.equal(COURSE_SCENE_RUNTIME, 3);
+  // 4 는 발표자 노트를 걷어낸 PPT 구도 판이다. 첫 beat 가 자동으로 실행된 채 열린다.
+  assert.equal(COURSE_SCENE_RUNTIME, 4);
   assert.equal(lecture.html.match(/class="lecture-scene"/g)?.length, 2);
   assert.ok(lecture.html.includes('data-layout="stage"'));
   assert.ok(lecture.html.includes(`data-scene-runtime="${COURSE_SCENE_RUNTIME}"`));
@@ -428,8 +429,35 @@ check("읽기 본문 하나를 장면과 비트 계약으로 투영한다", () =
   assert.equal(lecture.html.match(/aria-hidden="true" inert/g)?.length, 2);
   assert.ok(lecture.html.includes('aria-labelledby="lecture-s1-title"'));
   assert.ok(lecture.html.includes('id="lecture-s1-title" tabindex="-1"'));
-  assert.ok(lecture.html.includes("설명은 발표자 노트 재료입니다."));
+  assert.ok(lecture.html.includes("설명은 읽기 모드 본문입니다."));
   assert.ok(lecture.html.includes("결과를 확인합니다"));
+});
+
+check("계약 3 의 다중 대상 enter 와 compare 개막을 프레임으로 계산한다", () => {
+  const frames = compileSceneTimeline({
+    id: "s1",
+    role: "open",
+    layout: "stage",
+    visualCount: 3,
+    beats: [
+      { effect: "enter", targets: [1, 2] },
+      { effect: "annotate", targets: [2], note: "짝지어 올린 화면입니다" },
+      { effect: "replace", targets: [3] },
+    ],
+  });
+  assert.deepEqual(frames[0].visible, [1, 2]);
+  assert.equal(frames[1].annotation, "짝지어 올린 화면입니다");
+  assert.deepEqual(frames[2].visible, [3]);
+
+  const opened = compileSceneTimeline({
+    id: "s2",
+    role: "explain",
+    layout: "compare",
+    visualCount: 2,
+    beats: [{ effect: "compare", targets: [1, 2] }],
+  });
+  assert.deepEqual(opened[0].visible, [1, 2]);
+  assert.deepEqual(opened[0].compare, [1, 2]);
 });
 
 check("효과를 클릭별 완성 프레임으로 한 번만 계산한다", () => {

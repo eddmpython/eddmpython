@@ -47,7 +47,11 @@ type CourseBundle = {
  * 필드(glossary)는 숫자를 올리지 않는다.
  */
 const COURSE_SCHEMA = new Set([1, 2, 3, 4]);
-const COURSE_SCENE_CONTRACTS = new Set([1, 2]);
+/**
+ * 3 은 첫 beat 자동 재생, enter/replace 다중 대상(셋까지), compare 개막을 더한 판이다.
+ * 1 과 2 의 장면은 3 이 받는 모양의 부분집합이라 아래 검증 하나로 세 판을 다 받는다.
+ */
+const COURSE_SCENE_CONTRACTS = new Set([1, 2, 3]);
 
 export type CourseState = { ok: boolean; categories: CourseCategory[]; glossary: Record<string, string> };
 
@@ -61,13 +65,13 @@ const sceneRoles = new Set(["open", "explain", "invert", "close"]);
 const sceneLayouts = new Set(["stage", "sequence", "compare", "code", "demo"]);
 const sceneEffects = new Set(["enter", "replace", "focus", "compare", "annotate", "run", "simulate"]);
 const sceneEffectRules = {
-  enter: { count: 1, requiresVisible: false, visibility: "append" },
-  replace: { count: 1, requiresVisible: false, visibility: "replace" },
-  focus: { count: 1, requiresVisible: true, visibility: "keep" },
-  compare: { count: 2, requiresVisible: false, visibility: "replace" },
-  annotate: { count: 1, requiresVisible: true, visibility: "keep" },
-  run: { count: 1, requiresVisible: true, visibility: "keep" },
-  simulate: { count: 1, requiresVisible: true, visibility: "keep" },
+  enter: { min: 1, max: 3, requiresVisible: false, visibility: "append" },
+  replace: { min: 1, max: 3, requiresVisible: false, visibility: "replace" },
+  focus: { min: 1, max: 1, requiresVisible: true, visibility: "keep" },
+  compare: { min: 2, max: 2, requiresVisible: false, visibility: "replace" },
+  annotate: { min: 1, max: 1, requiresVisible: true, visibility: "keep" },
+  run: { min: 1, max: 1, requiresVisible: true, visibility: "keep" },
+  simulate: { min: 1, max: 1, requiresVisible: true, visibility: "keep" },
 } as const;
 const isScene = (value: unknown): value is CourseScene => {
   if (!value || typeof value !== "object") return false;
@@ -90,11 +94,13 @@ const isScene = (value: unknown): value is CourseScene => {
         (beat.effect === "annotate" ? Boolean(beat.note?.trim()) : beat.note === undefined),
     )
   );
-  if (!shapeOk || !["enter", "replace"].includes(scene.beats[0]?.effect)) return false;
+  // 첫 beat 는 장면을 여는 화면이다. compare 를 받는 이유는 비교가 목적인 장면이
+  // 의미 없는 enter 클릭 없이 비교 무대로 바로 열리게 하려는 것이다 (계약 3).
+  if (!shapeOk || !["enter", "replace", "compare"].includes(scene.beats[0]?.effect)) return false;
   const visible = new Set<number>();
   for (const beat of scene.beats) {
     const rule = sceneEffectRules[beat.effect];
-    if (beat.targets.length !== rule.count) return false;
+    if (beat.targets.length < rule.min || beat.targets.length > rule.max) return false;
     if (rule.requiresVisible && beat.targets.some((target) => !visible.has(target))) return false;
     if (rule.visibility === "replace") visible.clear();
     if (rule.visibility !== "keep") beat.targets.forEach((target) => visible.add(target));

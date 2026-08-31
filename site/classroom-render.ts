@@ -101,7 +101,11 @@ export type CourseScene = {
   beats: CourseSceneBeat[];
 };
 
-export const COURSE_SCENE_RUNTIME = 3;
+/**
+ * 4 는 발표자 노트를 걷어낸 PPT 구도 판이다. 장면이 첫 beat 를 자동으로 실행한 화면으로
+ * 열리고(빈 제목 화면 없음), 클릭 수는 beat 수보다 하나 적다. 제목은 상단 띠에 남는다.
+ */
+export const COURSE_SCENE_RUNTIME = 4;
 
 export type CourseSceneFrame = {
   effect: CourseSceneBeat["effect"];
