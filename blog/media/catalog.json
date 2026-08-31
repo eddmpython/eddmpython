@@ -103,6 +103,46 @@
       "path": "objects/sha256/dd/dd263228b071495adb445023a0ceb12bbabdb1c6f58eb5479d2adf5e8475af91.webp",
       "post": "005-python-history",
       "sha256": "dd263228b071495adb445023a0ceb12bbabdb1c6f58eb5479d2adf5e8475af91"
+    },
+    "01-instructor-introduction/connected-tools": {
+      "assetKey": "connected-tools",
+      "masterPath": "objects/sha256/4b/4b672233ce730da3c6797dd06f52cc5fbb14c417610824cbc1ace0eb99dea666.png",
+      "masterSha256": "4b672233ce730da3c6797dd06f52cc5fbb14c417610824cbc1ace0eb99dea666",
+      "path": "objects/sha256/e6/e612a79635b1dde35055a76c2530567b1d6bc48df0bde4bc96feac81056e50ef.webp",
+      "post": "01-instructor-introduction",
+      "sha256": "e612a79635b1dde35055a76c2530567b1d6bc48df0bde4bc96feac81056e50ef"
+    },
+    "01-instructor-introduction/instructor-workflow": {
+      "assetKey": "instructor-workflow",
+      "masterPath": "objects/sha256/83/8393c14fe50c18f31d0a56e1f494590ab1aa434b3bf0c697a599f30e001700db.png",
+      "masterSha256": "8393c14fe50c18f31d0a56e1f494590ab1aa434b3bf0c697a599f30e001700db",
+      "path": "objects/sha256/30/3052628399dd87c94701b5c977cfb697945cd639c349e42aae3fc21c15fd3913.webp",
+      "post": "01-instructor-introduction",
+      "sha256": "3052628399dd87c94701b5c977cfb697945cd639c349e42aae3fc21c15fd3913"
+    },
+    "01-instructor-introduction/product-pipeline": {
+      "assetKey": "product-pipeline",
+      "masterPath": "objects/sha256/58/5888221789313a40fc014cdc593222283480d62d7ef8f56e9bca1f55e5a8e34f.png",
+      "masterSha256": "5888221789313a40fc014cdc593222283480d62d7ef8f56e9bca1f55e5a8e34f",
+      "path": "objects/sha256/b1/b1f4f789ffbc18eca76dcff8a422e6f5f8c504ace0eb9b86263a528efa3a5fdc.webp",
+      "post": "01-instructor-introduction",
+      "sha256": "b1f4f789ffbc18eca76dcff8a422e6f5f8c504ace0eb9b86263a528efa3a5fdc"
+    },
+    "01-instructor-introduction/two-experiences": {
+      "assetKey": "two-experiences",
+      "masterPath": "objects/sha256/fe/fe8b28fcd934728d0c3a4957bdfb290edc4648b828bbd8a5256d6e36a7018c6b.png",
+      "masterSha256": "fe8b28fcd934728d0c3a4957bdfb290edc4648b828bbd8a5256d6e36a7018c6b",
+      "path": "objects/sha256/39/39085a60a7b82b42cfe1d4b77cfb611a67402f19a6e3c3108014751b74f607d1.webp",
+      "post": "01-instructor-introduction",
+      "sha256": "39085a60a7b82b42cfe1d4b77cfb611a67402f19a6e3c3108014751b74f607d1"
+    },
+    "01-instructor-introduction/work-domains": {
+      "assetKey": "work-domains",
+      "masterPath": "objects/sha256/8c/8c16837b7c7642e2ca8d1cda1140a497ec78e39d542b31f349bf587a54309c8e.png",
+      "masterSha256": "8c16837b7c7642e2ca8d1cda1140a497ec78e39d542b31f349bf587a54309c8e",
+      "path": "objects/sha256/d4/d4bfad9ef9a4c0bba2d8d49d699f98f7574f58348ba2a6eb1fa3c37aa5e5cb8c.webp",
+      "post": "01-instructor-introduction",
+      "sha256": "d4bfad9ef9a4c0bba2d8d49d699f98f7574f58348ba2a6eb1fa3c37aa5e5cb8c"
     }
   },
   "objectPrefix": "objects/sha256",
@@ -798,6 +838,16 @@
       "visualSubject": "서로 다른 두 모델의 비용 표, 보존 정책 문서, 생각 강도 설정 다이얼",
       "width": 1536
     },
+    "3052628399dd87c94701b5c977cfb697945cd639c349e42aae3fc21c15fd3913": {
+      "alt": "종이 증빙과 키보드가 놓인 책상 왼쪽에서 표와 양식이 떠 있는 모니터 두 대가 있는 오른쪽으로 업무가 이어지는 모습",
+      "bytes": 159606,
+      "height": 832,
+      "mime": "image/webp",
+      "path": "objects/sha256/30/3052628399dd87c94701b5c977cfb697945cd639c349e42aae3fc21c15fd3913.webp",
+      "sourcePost": "01-instructor-introduction",
+      "visualSubject": "종이 증빙 묶음과 키보드에서 시작해 모니터 두 대의 업무 시스템 화면으로 이어지는 하나의 긴 책상",
+      "width": 1216
+    },
     "3075e2d92ae65329b3adab45bb7faf9dac67a3fb7f3ef453bb73e3e8d6ff4104": {
       "alt": "원시 거래 다섯 건이 정리와 분류 및 요약 함수를 지나 최종 보고서로 나오는 전체 처리 모습",
       "bytes": 1178396,
@@ -867,6 +917,16 @@
       "sourcePost": "026-pandas-missing-duplicates",
       "visualSubject": "거래 표와 날짜 및 숫자 변환 검사기와 정상 행 표 및 원본 값과 오류 이유가 있는 확인필요 표",
       "width": 1536
+    },
+    "39085a60a7b82b42cfe1d4b77cfb611a67402f19a6e3c3108014751b74f607d1": {
+      "alt": "왼쪽에 장부와 증빙 서류 묶음이 쌓여 있고 오른쪽에 코드 편집기가 열린 노트북이 놓인 하나의 책상",
+      "bytes": 133922,
+      "height": 832,
+      "mime": "image/webp",
+      "path": "objects/sha256/39/39085a60a7b82b42cfe1d4b77cfb611a67402f19a6e3c3108014751b74f607d1.webp",
+      "sourcePost": "01-instructor-introduction",
+      "visualSubject": "장부 철과 도장, 클립으로 묶인 증빙 서류가 쌓인 쪽과 코드 편집기가 떠 있는 노트북이 마주 놓인 한 작업면",
+      "width": 1216
     },
     "394387c08e52fd27fcc7dca3cad2b2acc77a59d42d4c42e2a0d1391345a327e7": {
       "alt": "프로젝트 설정 파일 세 개가 잠금과 설치 단계를 거쳐 가상환경 폴더를 만드는 장면",
@@ -1089,6 +1149,17 @@
       "visualSubject": "여섯 칸 오류보고와 새 AI 대화 및 동일 오류와 근거 카드와 최소 수정과 테스트",
       "width": 1536
     },
+    "4b672233ce730da3c6797dd06f52cc5fbb14c417610824cbc1ace0eb99dea666": {
+      "alt": "외장 저장장치에서 작은 서버 상자와 노트북을 거쳐 태블릿까지 케이블 하나로 이어진 장면",
+      "bytes": 375183,
+      "height": 832,
+      "mime": "image/png",
+      "path": "objects/sha256/4b/4b672233ce730da3c6797dd06f52cc5fbb14c417610824cbc1ace0eb99dea666.png",
+      "role": "master",
+      "sourcePost": "01-instructor-introduction",
+      "visualSubject": "외장 저장장치, 작은 서버 상자, 노트북, 태블릿이 케이블 하나로 순서대로 이어진 장면",
+      "width": 1216
+    },
     "4be7d4dc0a54f646705020e2110700c496e1409ae56d292598005411e7af6701": {
       "alt": "0과 빈 문자열 및 None이 모두 거짓 칸으로 모이지만 서로 다른 입력 상태표를 가진 모습",
       "bytes": 1173267,
@@ -1208,6 +1279,17 @@
       "sourcePost": "003-first-python-code",
       "visualSubject": "브라우저 코드 입력칸, 바뀐 수량 값, 실행 버튼, 세 개와 여섯 개의 붕어빵 영수증 결과",
       "width": 1536
+    },
+    "5888221789313a40fc014cdc593222283480d62d7ef8f56e9bca1f55e5a8e34f": {
+      "alt": "불빛이 켜진 데이터 저장 랙에서 굵은 케이블 하나가 책상 위 결과 화면 모니터로 이어진 어두운 방",
+      "bytes": 979279,
+      "height": 832,
+      "mime": "image/png",
+      "path": "objects/sha256/58/5888221789313a40fc014cdc593222283480d62d7ef8f56e9bca1f55e5a8e34f.png",
+      "role": "master",
+      "sourcePost": "01-instructor-introduction",
+      "visualSubject": "작은 불빛이 켜진 데이터 저장 랙에서 굵은 케이블 하나가 이어져 결과 표가 뜬 모니터로 연결된 어두운 방",
+      "width": 1216
     },
     "592cf0e492c49e1d5e24247726beecbae6cfcb045df69df1944859690068d2c7": {
       "alt": "현재 폴더와 Python 스크립트 폴더가 다른 상태에서 입력 파일의 계산 경로와 실제 위치를 비교하는 모습",
@@ -1770,6 +1852,17 @@
       "visualSubject": "공백과 쉼표 및 원 표시가 있는 문자열 금액과 정리 코드와 빈칸 검사 및 정수 결과",
       "width": 1536
     },
+    "8393c14fe50c18f31d0a56e1f494590ab1aa434b3bf0c697a599f30e001700db": {
+      "alt": "종이 증빙과 키보드가 놓인 책상 왼쪽에서 표와 양식이 떠 있는 모니터 두 대가 있는 오른쪽으로 업무가 이어지는 모습",
+      "bytes": 802347,
+      "height": 832,
+      "mime": "image/png",
+      "path": "objects/sha256/83/8393c14fe50c18f31d0a56e1f494590ab1aa434b3bf0c697a599f30e001700db.png",
+      "role": "master",
+      "sourcePost": "01-instructor-introduction",
+      "visualSubject": "종이 증빙 묶음과 키보드에서 시작해 모니터 두 대의 업무 시스템 화면으로 이어지는 하나의 긴 책상",
+      "width": 1216
+    },
     "8581132c2780527c8a89a5aa8f297e1e7e334cf43290e46aef8bde08e6d27bb5": {
       "alt": "테스트 전용 임시 폴더의 원본 Excel은 그대로 남고 같은 결과 파일을 두 번 만들어도 행 수가 늘지 않는 모습",
       "bytes": 1265926,
@@ -1829,6 +1922,17 @@
       "sourcePost": "010-python-errors",
       "visualSubject": "Python 실행 결과 화면의 실제 출력과 프로세스 종료 상태 및 기대값 비교와 특정 파일 오류만 통과시키는 예외 처리",
       "width": 1536
+    },
+    "8c16837b7c7642e2ca8d1cda1140a497ec78e39d542b31f349bf587a54309c8e": {
+      "alt": "그래프 대시보드, 막대 지표, 문서 양식 표, 거래 목록 화면을 띄운 모니터 네 대가 두 줄로 걸린 어두운 작업 공간",
+      "bytes": 984071,
+      "height": 832,
+      "mime": "image/png",
+      "path": "objects/sha256/8c/8c16837b7c7642e2ca8d1cda1140a497ec78e39d542b31f349bf587a54309c8e.png",
+      "role": "master",
+      "sourcePost": "01-instructor-introduction",
+      "visualSubject": "어두운 벽에 두 줄로 걸린 모니터 네 대가 각각 그래프 대시보드, 막대 지표, 문서 양식 표, 거래 목록 화면을 띄운 모습",
+      "width": 1216
     },
     "8c719c2661f347c5f39fc9960a9fb175df9594269707a80df422c8d93529a6f9": {
       "alt": "모호한 한 줄 요청과 입력 및 규칙과 결과 및 검증이 채워진 실행 계약이 대비되는 모습",
@@ -2363,6 +2467,16 @@
       "visualSubject": "문자열 금액 객체와 정수 금액 객체 및 type 검사 코드와 변환 결과",
       "width": 1536
     },
+    "b1f4f789ffbc18eca76dcff8a422e6f5f8c504ace0eb9b86263a528efa3a5fdc": {
+      "alt": "불빛이 켜진 데이터 저장 랙에서 굵은 케이블 하나가 책상 위 결과 화면 모니터로 이어진 어두운 방",
+      "bytes": 144656,
+      "height": 832,
+      "mime": "image/webp",
+      "path": "objects/sha256/b1/b1f4f789ffbc18eca76dcff8a422e6f5f8c504ace0eb9b86263a528efa3a5fdc.webp",
+      "sourcePost": "01-instructor-introduction",
+      "visualSubject": "작은 불빛이 켜진 데이터 저장 랙에서 굵은 케이블 하나가 이어져 결과 표가 뜬 모니터로 연결된 어두운 방",
+      "width": 1216
+    },
     "b2767037cd1de4ac1cf10555c55fdc23b40905c3ef2c2edc939e7096af328a2c": {
       "alt": "거래 ID와 금액으로 묶인 세 쌍이 두 반복 변수로 나뉘는 모습",
       "bytes": 1194703,
@@ -2633,6 +2747,16 @@
       "visualSubject": "Python 설치 관리자 화면과 런타임 카드 및 PATH 폴더와 python 및 py 터미널 결과",
       "width": 1536
     },
+    "d4bfad9ef9a4c0bba2d8d49d699f98f7574f58348ba2a6eb1fa3c37aa5e5cb8c": {
+      "alt": "그래프 대시보드, 막대 지표, 문서 양식 표, 거래 목록 화면을 띄운 모니터 네 대가 두 줄로 걸린 어두운 작업 공간",
+      "bytes": 122304,
+      "height": 832,
+      "mime": "image/webp",
+      "path": "objects/sha256/d4/d4bfad9ef9a4c0bba2d8d49d699f98f7574f58348ba2a6eb1fa3c37aa5e5cb8c.webp",
+      "sourcePost": "01-instructor-introduction",
+      "visualSubject": "어두운 벽에 두 줄로 걸린 모니터 네 대가 각각 그래프 대시보드, 막대 지표, 문서 양식 표, 거래 목록 화면을 띄운 모습",
+      "width": 1216
+    },
     "d67afbeb9fd71261b65139c30c4577c957a03b4a5393890f824dd98fe278129c": {
       "alt": "거래 금액 네 개가 0부터 시작하는 위치표와 앞뒤 방향표를 따라 한 줄로 놓인 모습",
       "bytes": 1159786,
@@ -2802,6 +2926,16 @@
       "sourcePost": "016-work-automation-plan",
       "visualSubject": "여러 업무가 얽힌 큰 범위와 반복 시점 및 Excel 입력 세 개 및 검증된 결과 파일 하나로 경계가 잘린 자동화 후보 업무",
       "width": 1536
+    },
+    "e612a79635b1dde35055a76c2530567b1d6bc48df0bde4bc96feac81056e50ef": {
+      "alt": "외장 저장장치에서 작은 서버 상자와 노트북을 거쳐 태블릿까지 케이블 하나로 이어진 장면",
+      "bytes": 27104,
+      "height": 832,
+      "mime": "image/webp",
+      "path": "objects/sha256/e6/e612a79635b1dde35055a76c2530567b1d6bc48df0bde4bc96feac81056e50ef.webp",
+      "sourcePost": "01-instructor-introduction",
+      "visualSubject": "외장 저장장치, 작은 서버 상자, 노트북, 태블릿이 케이블 하나로 순서대로 이어진 장면",
+      "width": 1216
     },
     "e660fe9cc830f4d8af38fbe264aaf304317c394cb9d270fc84aaa22ad7499d0f": {
       "alt": "uv run이 프로젝트 가상환경의 Python과 잠긴 패키지를 선택해 Excel 결과와 검증 결과를 만드는 장면",
@@ -3053,6 +3187,17 @@
       "sourcePost": "005-claude-code-agents",
       "visualSubject": "메인 세션, 서브에이전트, 에이전트 팀, 작업 트리의 네 작업 구조를 나눈 화면",
       "width": 1536
+    },
+    "fe8b28fcd934728d0c3a4957bdfb290edc4648b828bbd8a5256d6e36a7018c6b": {
+      "alt": "왼쪽에 장부와 증빙 서류 묶음이 쌓여 있고 오른쪽에 코드 편집기가 열린 노트북이 놓인 하나의 책상",
+      "bytes": 1120097,
+      "height": 832,
+      "mime": "image/png",
+      "path": "objects/sha256/fe/fe8b28fcd934728d0c3a4957bdfb290edc4648b828bbd8a5256d6e36a7018c6b.png",
+      "role": "master",
+      "sourcePost": "01-instructor-introduction",
+      "visualSubject": "장부 철과 도장, 클립으로 묶인 증빙 서류가 쌓인 쪽과 코드 편집기가 떠 있는 노트북이 마주 놓인 한 작업면",
+      "width": 1216
     },
     "fe9a1e28e8808bdd0519b087da7059185a89eb3fbcc2bbda0f0b465e0dac812c": {
       "alt": "거래 검색이 끝까지 진행된 경로와 중간에 찾고 멈춘 경로가 서로 다르게 끝나는 모습",
