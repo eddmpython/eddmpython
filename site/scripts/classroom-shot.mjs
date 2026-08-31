@@ -83,8 +83,10 @@ const VIEWPORTS = [
     sectionTitle: "24px", centerGap: 24, titleMin: 42, visualMin: 620,
     compareColumns: 2, wideComposition: true, runPython: false },
   // 1366x768 화면을 브라우저 125%로 쓸 때의 유효 CSS viewport다.
+  // visualMin 470: 제목 상단 PPT 구도에서 이 높이의 개막 영상은 flex 축소가 상한이라
+  // 약 479px 로 그려진다 (2026-08-31 운영 실측). 480 은 옛 좌우 분할 시절의 값이다.
   { id: "projector-125", width: 1093, height: 614, dpr: 1.25, isMobile: false, hasTouch: false,
-    sectionTitle: "24px", centerGap: 24, titleMin: 28, visualMin: 480,
+    sectionTitle: "24px", centerGap: 24, titleMin: 28, visualMin: 470,
     compareColumns: 2, wideComposition: true, runPython: false },
   { id: "tablet-landscape", width: 1180, height: 820, dpr: 1, isMobile: true, hasTouch: true,
     sectionTitle: "24px", centerGap: 20, titleMin: 36, visualMin: 540,
