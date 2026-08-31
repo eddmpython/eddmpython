@@ -253,6 +253,9 @@ article a:hover { border-bottom-color:var(--eddm-accent); }
   /* 시각물 높이 캡은 선호값이다. 캔버스가 flex 열이라 라벨과 캡션까지 더해 넘치면
      시각물이 비율을 지키며 줄어든다. 고정 vh 캡만 믿던 판은 제목 위로 겹치거나 잘렸다. */
   --lecture-stage-max:100rem; --lecture-visual-max:82rem; --lecture-visual-height:56vh;
+  /* 한 장면의 왼쪽 기준선. 제목(scene-meta 4.5rem + 머리 열 간격 1rem 뒤), 시각물, 판단
+     문장이 전부 이 선에서 시작한다. scene-meta 폭을 바꾸면 이 값도 같이 바꾼다. */
+  --lecture-head-indent:5.5rem;
   --lecture-gutter-block:clamp(1.35rem,3vw,3rem); --lecture-gutter-inline:clamp(1rem,5vw,5rem);
   --lecture-motion:220ms;
   width:100vw; height:100vh; height:100dvh; max-width:none; max-height:none; margin:0; padding:0;
@@ -385,9 +388,11 @@ body.lecture-on { overflow:hidden; }
  * compare 순간만 아래 override 가 2열 grid 로 바꾼다.
  */
 .scene-canvas { grid-area:canvas; align-self:stretch; display:flex; flex-direction:column;
-  justify-content:center; align-items:center; gap:clamp(.8rem,2vw,1.6rem);
-  width:min(var(--lecture-stage-max),100%); min-height:0; margin:0 auto; contain:layout style;
-  overflow:hidden; }
+  justify-content:center; align-items:flex-start; gap:clamp(.8rem,2vw,1.6rem);
+  width:auto; min-height:0;
+  margin-left:calc(max((100% - var(--lecture-stage-max)) / 2, 0px) + var(--lecture-head-indent));
+  margin-right:max((100% - var(--lecture-stage-max)) / 2, 0px);
+  contain:layout style; overflow:hidden; }
 .scene-canvas > * { min-height:0; }
 .scene-canvas > p:not(.lb), .scene-canvas > ul, .scene-canvas > ol { display:none; }
 .scene-canvas .slider { display:contents; }
@@ -483,9 +488,12 @@ html:not([data-theme="dark"]) .scene-canvas pre {
 .lecture-scene[data-layout="code"] { --lecture-visual-max:92rem; }
 .lecture-scene[data-layout="demo"] { --lecture-visual-max:88rem; }
 .lecture-scene[data-layout="demo"] .scene-canvas [data-visual] { width:var(--lecture-visual-max); max-width:100%; }
-.scene-callout { grid-area:callout; display:flex; align-items:center; width:min(76rem,100%);
+.scene-callout { grid-area:callout; display:flex; align-items:center; width:auto;
   height:clamp(3.4rem,6vh,4.4rem); min-height:0; box-sizing:border-box; overflow:auto;
-  margin:0 auto; padding:.25rem 0 .25rem 1rem;
+  margin-top:0; margin-bottom:0;
+  margin-left:calc(max((100% - var(--lecture-stage-max)) / 2, 0px) + var(--lecture-head-indent));
+  margin-right:max((100% - var(--lecture-stage-max)) / 2, 0px);
+  padding:.25rem 0 .25rem 1rem;
   border-left:2px solid transparent; color:transparent; font-size:clamp(1rem,1.2vw,1.35rem); line-height:1.5;
   transform:translateY(4px); }
 .scene-callout.on { border-left-color:var(--eddm-accent); color:var(--eddm-ivory);
@@ -519,7 +527,9 @@ html:not([data-theme="dark"]) .scene-canvas pre {
   .lecture-map-item span { margin-bottom:.35rem; }
   .lecture-map-foot { align-items:stretch; flex-direction:column; gap:.75rem; }
   .lecture-map-blank { justify-content:center; }
-  .lecture-deck { --lecture-gutter-block:1rem; --lecture-gutter-inline:.85rem; --lecture-visual-height:48vh; }
+  /* scene-meta 3.4rem + 머리 열 간격 .7rem. 기준선 변수를 같이 좁힌다. */
+  .lecture-deck { --lecture-gutter-block:1rem; --lecture-gutter-inline:.85rem; --lecture-visual-height:48vh;
+    --lecture-head-indent:4.1rem; }
   .lecture-bar { grid-template-columns:minmax(0,1fr) auto; gap:.65rem; min-height:4rem;
     padding-top:max(.45rem,env(safe-area-inset-top));
     padding-right:max(.75rem,env(safe-area-inset-right));

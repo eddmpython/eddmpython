@@ -158,8 +158,12 @@ export function compileSceneTimeline(scene: CourseScene): CourseSceneFrame[] {
     if (changesVisibility) beat.targets.forEach((target) => visible.add(target));
     if (beat.effect === "focus") focus = [...beat.targets];
     if (beat.effect === "compare") compare = [...beat.targets];
-    if (beat.effect === "annotate") {
-      annotation = beat.note ?? "";
+    /**
+     * 판단 문장. 계약 4 부터는 아무 beat 의 note 로 실려 그 화면과 함께 나타난다.
+     * annotate 는 계약 3 이하의 형식이고 note 가 필수라 같은 줄 하나로 둘 다 처리된다.
+     */
+    if (beat.note) {
+      annotation = beat.note;
       annotationTargets = [...beat.targets];
     }
     if (beat.effect === "run" || beat.effect === "simulate") interaction = [...beat.targets];

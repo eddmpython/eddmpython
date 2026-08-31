@@ -77,25 +77,25 @@ const first = process.argv[3] ?? null;
  */
 const VIEWPORTS = [
   { id: "desktop", width: 1920, height: 900, dpr: 1, isMobile: false, hasTouch: false,
-    sectionTitle: "24px", centerGap: 24, titleMin: 56, visualMin: 700,
+    sectionTitle: "24px", centerGap: 24, headIndent: 88, titleMin: 56, visualMin: 700,
     compareColumns: 2, wideComposition: true, runPython: true },
   { id: "projector", width: 1366, height: 768, dpr: 1, isMobile: false, hasTouch: false,
-    sectionTitle: "24px", centerGap: 24, titleMin: 42, visualMin: 620,
+    sectionTitle: "24px", centerGap: 24, headIndent: 88, titleMin: 42, visualMin: 620,
     compareColumns: 2, wideComposition: true, runPython: false },
   // 1366x768 화면을 브라우저 125%로 쓸 때의 유효 CSS viewport다.
   // visualMin 470: 제목 상단 PPT 구도에서 이 높이의 개막 영상은 flex 축소가 상한이라
   // 약 479px 로 그려진다 (2026-08-31 운영 실측). 480 은 옛 좌우 분할 시절의 값이다.
   { id: "projector-125", width: 1093, height: 614, dpr: 1.25, isMobile: false, hasTouch: false,
-    sectionTitle: "24px", centerGap: 24, titleMin: 28, visualMin: 470,
+    sectionTitle: "24px", centerGap: 24, headIndent: 88, titleMin: 28, visualMin: 470,
     compareColumns: 2, wideComposition: true, runPython: false },
   { id: "tablet-landscape", width: 1180, height: 820, dpr: 1, isMobile: true, hasTouch: true,
-    sectionTitle: "24px", centerGap: 20, titleMin: 36, visualMin: 540,
+    sectionTitle: "24px", centerGap: 20, headIndent: 88, titleMin: 36, visualMin: 540,
     compareColumns: 2, wideComposition: true, runPython: false },
   { id: "tablet-portrait", width: 820, height: 1180, dpr: 1, isMobile: true, hasTouch: true,
-    sectionTitle: "24px", centerGap: 24, titleMin: 30, visualMin: 620,
+    sectionTitle: "24px", centerGap: 24, headIndent: 88, titleMin: 30, visualMin: 620,
     compareColumns: 2, wideComposition: false, runPython: false },
   { id: "mobile", width: 390, height: 844, dpr: 1, isMobile: true, hasTouch: true,
-    sectionTitle: "22px", centerGap: 14, titleMin: 22, visualMin: 320,
+    sectionTitle: "22px", centerGap: 14, headIndent: 66, titleMin: 22, visualMin: 320,
     compareColumns: 1, wideComposition: false, runPython: false },
 ];
 const requestedViewports = new Set(
@@ -736,44 +736,39 @@ for (const viewport of activeViewports) {
       );
       await save(session, "07-lecture-beat", false);
 
-      const annotationState = value(await evaluate(session, `(async () => {
+      // 계약 4: 판단 문장은 단독 클릭이 아니라 지금 beat(run)에 함께 실려 나온다.
+      const annotationState = value(await evaluate(session, `(() => {
         const deck = document.querySelector('[data-lecture-deck]');
-        const waitFrame = (key) => new Promise((resolve) => {
-          const done = () => resolve(true);
-          deck.addEventListener('lectureframe', done, { once:true });
-          document.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles:true }));
-        });
-        await waitFrame('ArrowRight');
         const scene = deck.querySelector('.lecture-scene.on');
         const callout = scene.querySelector('[data-scene-callout]');
-        const state = {
+        return {
           effect: scene.dataset.sceneEffect,
-          cue: scene.querySelector('[data-scene-cue]')?.textContent.trim(),
           callout: callout?.textContent.trim(),
           calloutVisible: callout?.classList.contains('on'),
           visible: scene.querySelectorAll('[data-scene-visible="true"]').length,
           hash: location.hash,
         };
-        return state;
       })()`));
       await save(session, "07-lecture-annotation", false);
       annotationState.clearedAfterBack = Boolean(value(await evaluate(session, `(async () => {
         const deck = document.querySelector('[data-lecture-deck]');
-        await new Promise((resolve) => {
+        const waitFrame = (key) => new Promise((resolve) => {
           deck.addEventListener('lectureframe', resolve, { once:true });
-          document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowLeft', bubbles:true }));
+          document.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles:true }));
         });
+        await waitFrame('ArrowLeft');
         const callout = document.querySelector('.lecture-scene.on [data-scene-callout]');
-        return !callout.classList.contains('on') && callout.textContent === '';
+        const cleared = !callout.classList.contains('on') && callout.textContent === '';
+        await waitFrame('ArrowRight');
+        return cleared;
       })()`)));
       record(
-        `${viewport.id} annotate 판단 문장`,
-        annotationState?.effect === "annotate" &&
-          annotationState?.cue === "판단 기준" &&
+        `${viewport.id} beat 에 실린 판단 문장`,
+        annotationState?.effect === "run" &&
           annotationState?.calloutVisible === true &&
           annotationState?.callout?.includes("마우스를 잡은 사람이 없어도") &&
           annotationState?.visible === 1 &&
-          annotationState?.hash === "#lecture=s1.3" &&
+          annotationState?.hash === "#lecture=s1.2" &&
           annotationState?.clearedAfterBack === true,
         JSON.stringify(annotationState),
       );
@@ -1114,7 +1109,7 @@ for (const viewport of activeViewports) {
         brandClipped: brand ? brand.scrollWidth > brand.clientWidth : null,
       };
     })()`));
-    // PPT 구도. 제목 띠가 위, 시각물이 그 아래 무대 중앙에 온다. 좌우 분할 구도는 폐기했다.
+    // PPT 구도. 제목 띠가 위이고, 제목·시각물·판단 문장이 같은 왼쪽 기준선에서 시작한다.
     record(
       `${viewport.id} 레이아웃별 강의 무대`,
       balancedStage?.deck?.left === 0 &&
@@ -1125,7 +1120,7 @@ for (const viewport of activeViewports) {
         balancedStage?.stage?.width === balancedStage?.viewport &&
         Math.abs(balancedStage?.footer?.bottom - balancedStage?.viewportHeight) <= 1 &&
         balancedStage?.head?.bottom <= balancedStage?.canvas?.top + 1 &&
-        balancedStage?.centerGap <= viewport.centerGap &&
+        Math.abs(balancedStage?.visual?.left - (balancedStage?.head?.left + viewport.headIndent)) <= 3 &&
         (!viewport.wideComposition ||
           (balancedStage?.brandLeft >= 16 && balancedStage?.brandClipped === false)),
       JSON.stringify(balancedStage),

@@ -49,9 +49,10 @@ type CourseBundle = {
 const COURSE_SCHEMA = new Set([1, 2, 3, 4]);
 /**
  * 3 은 첫 beat 자동 재생, enter/replace 다중 대상(셋까지), compare 개막을 더한 판이다.
- * 1 과 2 의 장면은 3 이 받는 모양의 부분집합이라 아래 검증 하나로 세 판을 다 받는다.
+ * 4 는 단독 annotate 를 없애고 판단 문장을 아무 beat 의 note 로 실은 판이다. 1~3 의
+ * 장면은 4 가 받는 모양의 부분집합(annotate 는 전환기 수용)이라 아래 검증 하나로 다 받는다.
  */
-const COURSE_SCENE_CONTRACTS = new Set([1, 2, 3]);
+const COURSE_SCENE_CONTRACTS = new Set([1, 2, 3, 4]);
 
 export type CourseState = { ok: boolean; categories: CourseCategory[]; glossary: Record<string, string> };
 
@@ -90,8 +91,10 @@ const isScene = (value: unknown): value is CourseScene => {
         Array.isArray(beat.targets) &&
         beat.targets.length > 0 &&
         beat.targets.every((target) => Number.isInteger(target) && target > 0 && target <= scene.visualCount) &&
-        (beat.note === undefined || typeof beat.note === "string") &&
-        (beat.effect === "annotate" ? Boolean(beat.note?.trim()) : beat.note === undefined),
+        // 계약 4: 판단 문장은 아무 beat 에나 note 로 탄다. annotate(계약 3 이하)는 note 필수다.
+        (beat.effect === "annotate"
+          ? Boolean(typeof beat.note === "string" && beat.note.trim())
+          : beat.note === undefined || Boolean(typeof beat.note === "string" && beat.note.trim())),
     )
   );
   // 첫 beat 는 장면을 여는 화면이다. compare 를 받는 이유는 비교가 목적인 장면이

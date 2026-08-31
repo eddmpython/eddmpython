@@ -460,6 +460,24 @@ check("계약 3 의 다중 대상 enter 와 compare 개막을 프레임으로 �
   assert.deepEqual(opened[0].compare, [1, 2]);
 });
 
+check("계약 4 의 판단 문장은 아무 beat 의 note 로 실려 그 화면과 함께 나온다", () => {
+  const frames = compileSceneTimeline({
+    id: "s1",
+    role: "open",
+    layout: "stage",
+    visualCount: 2,
+    beats: [
+      { effect: "enter", targets: [1], note: "개막과 함께 보이는 판단" },
+      { effect: "run", targets: [1], note: "실행과 함께 보이는 판단" },
+      { effect: "replace", targets: [2] },
+    ],
+  });
+  assert.equal(frames[0].annotation, "개막과 함께 보이는 판단");
+  assert.equal(frames[1].annotation, "실행과 함께 보이는 판단");
+  // 화면을 바꾸는 beat 는 이전 판단 문장을 지운다
+  assert.equal(frames[2].annotation, "");
+});
+
 check("효과를 클릭별 완성 프레임으로 한 번만 계산한다", () => {
   const frames = compileSceneTimeline({
     id: "s1",
