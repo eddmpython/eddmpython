@@ -567,7 +567,9 @@ html:not([data-theme="dark"]) .scene-canvas pre {
   .lecture-brand-copy { display:none; }
 }
 @media (max-height:650px) and (min-width:721px) {
-  .lecture-deck { --lecture-gutter-block:.65rem; --lecture-visual-height:44vh; }
+  /* 낮은 화면은 캡을 후하게 둔다. 44vh 는 프로젝터 125% 확대에서 영상 폭을 480px 아래로
+     떨어뜨렸다 (운영 실측 479px). 넘치면 flex 축소가 지키므로 캡이 후해도 안전하다. */
+  .lecture-deck { --lecture-gutter-block:.65rem; --lecture-visual-height:48vh; }
   .lecture-bar { min-height:3.25rem; padding-top:.3rem; padding-bottom:.3rem; }
   .lecture-actions button { height:2.15rem; }
   .lecture-scene { gap:.45rem; }
