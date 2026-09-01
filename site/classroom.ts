@@ -394,6 +394,10 @@ body.lecture-on { overflow:hidden; }
   margin-right:max((100% - var(--lecture-stage-max)) / 2, 0px);
   contain:layout style; overflow:hidden; }
 .scene-canvas > * { min-height:0; }
+/* 표, 코드, 실행 칸은 줄이지 않는다. 줄이면 머리 행만 남는 스크롤 상자가 된다
+   (2026-09-01 실측). 넘칠 때 줄어드는 것은 비율을 지키는 이미지와 영상의 몫이고,
+   이들이 큰 경우는 자신의 최대 높이 캡과 내부 스크롤이 막는다. */
+.scene-canvas .table-wrap, .scene-canvas pre, .scene-canvas .cell { flex:0 0 auto; }
 .scene-canvas > p:not(.lb), .scene-canvas > ul, .scene-canvas > ol { display:none; }
 .scene-canvas .slider { display:contents; }
 .scene-canvas .lb, .scene-canvas h4 { display:none; grid-column:1/-1; justify-self:start;
