@@ -1,11 +1,11 @@
 ---
-title: 파이썬 데이터프레임 라이브러리 6가지
+title: 파이썬 데이터프레임 라이브러리 12가지
 slug: dataframe-libraries
 author: eddmpython
 section: 파이썬 데이터
-summary: 같은 판매 데이터를 pandas, Polars, Dask, Modin, cuDF, PySpark DataFrame으로 만들고 같은 질문을 풉니다. 문법과 실행 위치, 필요한 장비를 나란히 비교해 내 작업에 맞는 데이터프레임을 고릅니다.
+summary: 같은 판매 데이터를 12개 DataFrame으로 만들고 같은 질문을 풉니다. 일반 표부터 공간 데이터, 멀티모달, GPU, 클러스터, 클라우드까지 실행 경계를 비교합니다.
 readerQuestion: 파이썬 데이터프레임 라이브러리가 여러 가지인데 각각 무엇이 다르고 내 작업에는 어느 것을 골라야 하나?
-readerTakeaway: pandas는 기본 분석, Polars는 빠른 로컬 처리, Dask는 분할 작업, Modin은 pandas 코드의 병렬화, cuDF는 NVIDIA GPU, PySpark는 클러스터 작업에 맞는다.
+readerTakeaway: 익숙한 문법보다 데이터가 놓인 자리와 열의 종류를 먼저 보면 로컬, 공간, 분산, GPU, 클라우드 DataFrame 가운데 맞는 것을 고를 수 있다.
 readerLevel: working
 readerStartingPoint: 엑셀은 쓸 줄 알고 pandas로 DataFrame과 groupby를 써 봤지만 다른 데이터프레임은 이름만 들어 봤다.
 primaryKeyword: 파이썬 데이터프레임 라이브러리
@@ -19,9 +19,9 @@ ogImageType: image/webp
 
 엑셀의 행과 열을 파이썬으로 옮기면 대개 pandas의 `DataFrame` 을 처음 만납니다. 그런데 DataFrame이라는 이름을 쓰는 라이브러리는 pandas 하나가 아닙니다. 그렇다면 내 표에는 무엇을 골라야 할까요? 같은 표처럼 보여도 어느 메모리에 놓이는지, 계산을 언제 시작하는지, 한 대에서 도는지 여러 대에서 도는지가 다릅니다.
 
-이 글은 실제로 `DataFrame` 을 중심 자료 구조로 제공하는 여섯 가지를 절마다 하나씩 다룹니다. DuckDB는 데이터베이스이고 PyArrow는 `Table` 과 메모리 규격을 제공하며 Ibis는 계산 표현식을 여러 엔진으로 보냅니다. 셋 다 훌륭한 표 도구지만 데이터프레임 여섯 가지에는 넣지 않았습니다. SQL로 파일을 분석하려는 독자는 [Codaro DuckDB 입문](https://eddmpython.github.io/codaro/learn/lesson/duckdb/00_DuckDB소개/)에서 따로 시작할 수 있습니다.
+이 글은 Python에서 `DataFrame` 또는 `GeoDataFrame` 객체를 제공하는 열두 가지를 절마다 하나씩 다룹니다. DuckDB는 데이터베이스이고 PyArrow는 `Table` 과 메모리 규격을 제공하며 Ibis는 계산 표현식을 여러 엔진으로 보냅니다. 셋 다 훌륭한 표 도구지만 DataFrame 열두 가지에는 넣지 않았습니다. SQL로 파일을 분석하려는 독자는 [Codaro DuckDB 입문](https://eddmpython.github.io/codaro/learn/lesson/duckdb/00_DuckDB소개/)에서 따로 시작할 수 있습니다.
 
-같은 판매 기록 네 줄을 여섯 DataFrame에 넣고, 서울 수량의 합계가 5인지 확인합니다. 작은 표를 쓰는 이유는 모든 코드를 같은 눈금으로 읽기 위해서입니다. 속도는 데이터 크기와 장비에 따라 뒤집히므로 서로 다른 컴퓨터와 클러스터에서 나온 숫자를 한 순위표로 섞지 않았습니다. 아래 버전과 실행 조건은 2026년 9월 1일에 다시 확인했습니다.
+같은 판매 기록 네 줄을 열두 DataFrame에 넣고, 서울 수량의 합계가 5인지 확인합니다. 작은 표를 쓰는 이유는 모든 코드를 같은 눈금으로 읽기 위해서입니다. 속도는 데이터 크기와 장비에 따라 뒤집히므로 서로 다른 컴퓨터와 클러스터에서 나온 숫자를 한 순위표로 섞지 않았습니다. 아래 버전과 실행 조건은 2026년 9월 1일에 다시 확인했습니다.
 
 ![어두운 책상 위에 두꺼운 종이 뭉치가 쌓여 있고 그 옆면에서 얇은 종이 띠 두 장만 뽑혀 나와 밝게 놓인 장면](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/ef/ef0ebfa270d6567d90fdd3f14576e1e77a58d17226e7739bed8043f20def0469.webp "표는 커져도 질문에 쓰는 열은 일부입니다")
 
@@ -29,12 +29,18 @@ ogImageType: image/webp
 |---|---:|---|---|
 | pandas | 3.0.5 | 한 Python 프로세스의 메모리 | 직접 실행 |
 | Polars | 1.44.1 | 한 컴퓨터의 여러 CPU 코어 | 직접 실행 |
+| Vaex | 4.19.0 | 메모리에 올리지 않은 로컬 파일 | 별도 환경에서 직접 실행 |
+| DataFusion | 54.0.0 | 한 프로세스의 Arrow 질의 엔진 | 직접 실행 |
+| GeoPandas | 1.1.4 | 좌표와 도형이 든 pandas 표 | 직접 실행 |
+| Narwhals | 2.25.0 | 선택한 DataFrame 백엔드 | pandas 백엔드로 직접 실행 |
 | Dask | 2026.8.0 | 여러 pandas 조각과 작업자 | 직접 실행 |
 | Modin | 0.37.1 | Ray가 나눈 pandas 호환 조각 | 별도 환경에서 직접 실행 |
+| Daft | 0.7.24 | 로컬 실행기 또는 분산 작업자 | 직접 실행 |
 | cuDF | 26.08 | NVIDIA GPU 메모리 | 공식 환경 조건과 API 확인 |
 | PySpark | 4.2.0 | Spark 실행기와 클러스터 | 공식 환경 조건과 API 확인 |
+| BigFrames | 2.48.0 | Google BigQuery | 패키지와 공식 API 확인 |
 
-처음 고를 때는 계산 경계를 봅니다. 한 프로세스면 pandas, 한 컴퓨터의 빠른 열 계산이면 Polars, pandas 파티션을 여러 작업자로 나누면 Dask, 기존 pandas 코드를 적게 바꿔 병렬 엔진을 시험하면 Modin입니다. NVIDIA GPU에 계산을 오래 머물게 할 수 있을 때 cuDF, 회사에 Spark 클러스터가 있을 때 PySpark가 맞습니다.
+처음에는 데이터가 있는 자리와 열의 종류를 봅니다. 일반 로컬 표는 pandas와 Polars, 메모리보다 큰 로컬 파일은 Vaex, SQL식 지연 계획은 DataFusion이 맡습니다. 좌표는 GeoPandas, 여러 DataFrame을 받는 라이브러리는 Narwhals, pandas 호환 병렬화는 Modin, 여러 작업자는 Dask가 후보입니다. 이미지와 오디오가 섞이면 Daft, NVIDIA GPU는 cuDF, Spark 클러스터는 PySpark, BigQuery에 이미 있는 표는 BigFrames로 좁힙니다.
 
 ## pandas DataFrame, 가장 넓은 출발점
 
@@ -127,6 +133,159 @@ https://eddmpython.com/codaro/run/?example=df-polars-group
 
 표현식과 지연 실행을 더 배우려면 [Codaro Polars 입문](https://eddmpython.github.io/codaro/learn/lesson/polars/00_Polars소개/)으로 이어집니다.
 
+## Vaex DataFrame, 메모리보다 큰 로컬 파일
+
+Vaex DataFrame은 HDF5와 Arrow 파일을 메모리에 전부 복사하지 않고 필요한 열을 늦게 계산하는 로컬 표입니다. 공식 문서는 이를 [lazy Out-of-Core DataFrame](https://vaex.io/docs/index.html)이라고 부릅니다. 파일은 노트북 디스크에 있고 계산은 한 컴퓨터에서 한다는 점이 Dask 같은 분산 표와 다릅니다.
+
+```powershell
+python -m pip install vaex
+```
+
+```python
+import vaex
+
+salesDf = vaex.from_dict(
+    {
+        "region": ["서울", "부산", "서울", "대구"],
+        "qty": [3, 5, 2, 7],
+    }
+)
+
+seoulQty = salesDf[salesDf.region == "서울"].sum("qty")
+
+print(type(salesDf).__name__)
+print(int(seoulQty))
+```
+
+```text
+DataFrameLocal
+5
+```
+
+`from_dict` 로 만든 작은 표의 실제 클래스 이름은 `DataFrameLocal` 입니다. 서울 조건은 선택으로 남고 `sum` 이 수량 열을 읽어 5를 계산합니다. 이 예제는 API를 확인하기 위한 메모리 표이며, Vaex의 이유는 큰 HDF5나 Arrow 파일을 `open` 으로 열 때 드러납니다.
+
+작은 CSV 몇 개를 다룬다면 pandas나 Polars가 단순합니다. 파일을 HDF5나 Arrow로 준비할 수 있고 탐색 집계를 반복하지만 전체를 메모리에 올리기 어려울 때 Vaex를 검토합니다.
+
+## DataFusion DataFrame, 프로그램 안의 질의 엔진
+
+DataFusion DataFrame은 Rust와 Apache Arrow로 질의를 먼저 계획하므로 실제 계산은 마지막 동작에서 시작됩니다. 서버나 데이터베이스 파일을 먼저 띄우지 않고 Python 프로세스 안에서 CSV, Parquet, JSON, Arrow 자료를 읽으며 SQL과 DataFrame API를 함께 씁니다.
+
+```powershell
+python -m pip install datafusion
+```
+
+```python
+from datafusion import SessionContext, col, literal
+from datafusion import functions as dfFunc
+
+queryContext = SessionContext()
+salesDf = queryContext.from_pydict(
+    {
+        "region": ["서울", "부산", "서울", "대구"],
+        "qty": [3, 5, 2, 7],
+    }
+)
+
+resultDf = (
+    salesDf
+    .filter(col("region") == literal("서울"))
+    .aggregate([], [dfFunc.sum(col("qty")).alias("seoulQty")])
+)
+seoulQty = resultDf.to_pydict()["seoulQty"][0]
+
+print(type(salesDf).__name__)
+print(int(seoulQty))
+```
+
+```text
+DataFrame
+5
+```
+
+`filter` 와 `aggregate` 는 논리 계획을 만들고 `to_pydict` 가 실행을 요구합니다. [DataFusion Python 문서](https://datafusion.apache.org/python/user-guide/dataframe/index.html)는 `collect`, `show`, `to_pandas` 같은 마지막 동작 전에는 지연 실행된다고 설명합니다.
+
+DataFusion DataFrame은 셀을 직접 고치는 분석 노트보다 질의 기능을 프로그램 안에 넣을 때 맞습니다. SQL과 DataFrame 표현식을 같은 Arrow 실행기에 태울 수 있습니다. 다른 데이터 시스템에 질의 엔진을 넣으려는 개발자에게 맞습니다.
+
+## GeoPandas GeoDataFrame, 좌표와 도형이 있는 열
+
+GeoPandas의 `GeoDataFrame` 은 pandas DataFrame에 점, 선, 면을 담는 geometry 열을 더하고, 그 도형이 쓰는 좌표계를 함께 기록할 수 있습니다. 아래 네 행에는 서울, 부산, 대구의 경도와 위도를 점으로 넣습니다.
+
+```powershell
+python -m pip install geopandas shapely
+```
+
+```python
+import geopandas as gpd
+from shapely.geometry import Point
+
+salesDf = gpd.GeoDataFrame(
+    {
+        "region": ["서울", "부산", "서울", "대구"],
+        "qty": [3, 5, 2, 7],
+    },
+    geometry=[
+        Point(126.9780, 37.5665),
+        Point(129.0756, 35.1796),
+        Point(126.9780, 37.5665),
+        Point(128.6014, 35.8714),
+    ],
+    crs="EPSG:4326",
+)
+
+seoulQty = salesDf.loc[salesDf["region"] == "서울", "qty"].sum()
+
+print(type(salesDf).__name__)
+print(int(seoulQty))
+```
+
+```text
+GeoDataFrame
+5
+```
+
+서울 두 행의 수량을 더하는 문법은 pandas와 같고 답도 5입니다. `geometry` 열과 `EPSG:4326` 좌표계가 붙었으므로 이 표는 [GeoPandas GeoDataFrame](https://geopandas.org/en/latest/docs/reference/geodataframe.html)입니다.
+
+단순히 지역 이름으로 합계를 낼 때는 GeoPandas가 필요 없습니다. 어느 점이 행정구역 안에 있는지 찾거나 거리, 교차, 공간 조인, 지도 표시가 질문에 들어올 때 GeoDataFrame을 고릅니다.
+
+## Narwhals DataFrame, 여러 표를 받는 한 가지 API
+
+Narwhals DataFrame은 데이터를 직접 실행하는 새 엔진이 아니라 pandas, Polars, Modin, cuDF, PyArrow를 같은 표현식으로 다루는 호환 계층입니다. 아래에서는 pandas를 백엔드로 골라 Narwhals DataFrame 하나를 만듭니다.
+
+```powershell
+python -m pip install narwhals pandas
+```
+
+```python
+import narwhals as nw
+
+salesDf = nw.DataFrame.from_dict(
+    {
+        "region": ["서울", "부산", "서울", "대구"],
+        "qty": [3, 5, 2, 7],
+    },
+    backend="pandas",
+)
+
+seoulQty = (
+    salesDf
+    .filter(nw.col("region") == "서울")
+    .select(nw.col("qty").sum())
+    .item()
+)
+
+print(type(salesDf).__name__)
+print(int(seoulQty))
+```
+
+```text
+DataFrame
+5
+```
+
+`backend="pandas"` 이므로 실제 계산은 pandas가 맡지만 호출부에는 Narwhals 표현식만 남습니다. [Narwhals DataFrame 문서](https://narwhals-dev.github.io/narwhals/api-reference/dataframe/)의 `from_dict` 는 pandas, PyArrow, Polars, Modin, cuDF 백엔드를 고를 수 있습니다.
+
+분석가가 백엔드 하나를 정해서 쓰는 프로젝트라면 Narwhals가 한 층 더 생길 뿐입니다. 반대로 그래프나 머신러닝 라이브러리를 만들어 여러 종류의 DataFrame을 입력으로 받아야 한다면 백엔드마다 분기하는 코드를 줄일 수 있습니다.
+
 ## Dask DataFrame, pandas 표를 여러 조각으로
 
 Dask DataFrame은 여러 pandas DataFrame을 행 방향 파티션으로 나눈 뒤 하나의 큰 표처럼 보이게 합니다. 각 파티션의 열 이름과 자료형을 빈 pandas 표인 메타데이터로 기억하고, 계산 순서는 작업 그래프로 쌓습니다.
@@ -206,6 +365,45 @@ DataFrame
 
 Modin이 pandas API 전체를 독자적으로 병렬 구현한 것은 아닙니다. 지원하지 않는 연산은 pandas 구현으로 돌아갈 수 있으며, 그때는 Modin DataFrame을 pandas로 바꾸는 비용이 붙습니다. [Modin 문제 해결 문서](https://modin.readthedocs.io/en/stable/getting_started/troubleshooting.html)의 `defaulting to pandas` 경고가 바로 그 경계입니다.
 
+## Daft DataFrame, 이미지와 오디오까지 한 행에
+
+이미지와 오디오를 한 행에 묶어야 합니다. 그래서 Daft DataFrame이 그 표를 맡습니다. 문자열과 숫자뿐 아니라 이미지, 오디오, 비디오, 텐서를 열로 다루고, 데이터가 커지면 Ray나 Kubernetes 작업자로 계산을 나눌 수 있습니다.
+
+```powershell
+python -m pip install daft
+```
+
+```python
+import daft
+
+salesDf = daft.from_pydict(
+    {
+        "region": ["서울", "부산", "서울", "대구"],
+        "qty": [3, 5, 2, 7],
+    }
+)
+
+resultDf = (
+    salesDf
+    .where(salesDf["region"] == "서울")
+    .agg(daft.col("qty").sum().alias("seoulQty"))
+    .collect()
+)
+seoulQty = resultDf.to_pydict()["seoulQty"][0]
+
+print(type(salesDf).__name__)
+print(int(seoulQty))
+```
+
+```text
+DataFrame
+5
+```
+
+`where` 와 `agg` 는 계획을 만들고 `collect` 가 로컬 실행기에서 계산해 5를 냅니다. [Daft DataFrame API](https://docs.daft.ai/en/stable/api/dataframe/)도 변환을 내부 질의 계획에 쌓고 실행 동작이 계산한다고 설명합니다.
+
+네 행의 문자열과 숫자만 처리할 때는 Polars나 DataFusion이 더 단순합니다. 상품 이미지, 음성 파일, 임베딩과 구조화 열을 같은 행에 두고 전처리나 AI 추론을 묶어야 할 때 Daft의 멀티모달 자료형이 차이를 만듭니다.
+
 ## cuDF DataFrame, GPU 메모리에서 계산
 
 cuDF는 NVIDIA RAPIDS가 만드는 GPU DataFrame입니다. pandas와 닮은 선택, 그룹화, 조인 API를 CUDA에서 실행하며 데이터는 시스템 메모리가 아니라 GPU 메모리에 놓입니다.
@@ -255,7 +453,7 @@ python -m pip install pyspark
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as sf
 
-spark = SparkSession.builder.master("local[*]").appName("dataframe-six").getOrCreate()
+spark = SparkSession.builder.master("local[*]").appName("dataframe-twelve").getOrCreate()
 
 salesDf = spark.createDataFrame(
     [("서울", 3), ("부산", 5), ("서울", 2), ("대구", 7)],
@@ -274,3 +472,36 @@ spark.stop()
 ```
 
 `filter` 와 `agg` 는 실행할 계획을 만들고 `show()` 가 실제 계산을 요구합니다. 두 서울 행의 수량을 더한 결과는 5가 되어야 합니다. 로컬 모드인 `local[*]` 는 문법 연습용이며, 데이터가 이미 Spark 클러스터와 큰 데이터 레이크에 있을 때 PySpark를 고를 이유가 생깁니다.
+
+## BigFrames DataFrame, BigQuery 안에서 계산
+
+BigQuery DataFrames의 Python 패키지 이름은 `bigframes` 이고, pandas 호환 진입점은 `bigframes.pandas` 입니다. DataFrame의 자료와 계산을 로컬 메모리나 직접 관리하는 작업자 대신 Google BigQuery에 둡니다.
+
+```powershell
+python -m pip install bigframes
+```
+
+아래 코드의 프로젝트 이름은 자신의 Google Cloud 프로젝트로 바꿔야 합니다. BigQuery API, 결제 설정, 인증과 필요한 IAM 역할도 먼저 준비합니다. BigFrames 2.48.0 패키지와 DataFrame 생성 API까지 확인했습니다. 실제 BigQuery 작업은 실행하지 않았으므로 출력은 제시하지 않습니다.
+
+```python
+import bigframes.pandas as bpd
+
+bpd.options.bigquery.project = "my-project-id"
+bpd.options.bigquery.location = "asia-northeast3"
+
+salesDf = bpd.DataFrame(
+    {
+        "region": ["서울", "부산", "서울", "대구"],
+        "qty": [3, 5, 2, 7],
+    }
+)
+
+seoulQty = salesDf.loc[salesDf["region"] == "서울", "qty"].sum()
+
+print(type(salesDf).__name__)
+print(seoulQty)
+```
+
+두 서울 행을 고르는 pandas 문법은 같지만 `sum` 은 BigQuery 작업으로 실행됩니다. 작은 목록은 질의에 직접 들어갈 수 있고 큰 입력은 임시 BigQuery 표로 올라갑니다. [Google Cloud 설치 문서](https://docs.cloud.google.com/bigquery/docs/install-dataframes)는 프로젝트와 위치, 인증, 역할을 먼저 요구합니다.
+
+BigQuery에 이미 큰 표가 있고 그 자리에서 집계와 머신러닝을 이어 갈 때 BigFrames가 맞습니다. 로컬 파일 네 줄을 시험하려고 클라우드 프로젝트와 작업 비용을 더하는 선택은 맞지 않습니다.

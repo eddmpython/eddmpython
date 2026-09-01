@@ -2,8 +2,8 @@
   "assets": {
     "hero": {
       "alt": "어두운 책상 위에 두꺼운 종이 뭉치가 쌓여 있고 그 옆면에서 얇은 종이 띠 두 장만 뽑혀 나와 밝게 놓인 장면",
-      "contentAnchor": "같은 판매 기록 네 줄을 여섯 DataFrame에 넣고, 서울 수량의 합계가 5인지 확인합니다.",
-      "narrativeUse": "같은 표에서도 실제 질문에 쓰는 열은 일부이고 데이터프레임마다 그 열을 다루는 경계가 다르다는 출발점을 보여 준다",
+      "contentAnchor": "같은 판매 기록 네 줄을 열두 DataFrame에 넣고, 서울 수량의 합계가 5인지 확인합니다.",
+      "narrativeUse": "같은 표에서도 실제 질문에 쓰는 열은 일부이고 열두 DataFrame마다 그 열을 다루는 경계가 다르다는 출발점을 보여 준다",
       "palettePolicy": "eddmpython-gray-master-v1",
       "placement": "도입 문단 바로 뒤",
       "prompt": "Wide 3:2 editorial still life on a matte desk. A thick compressed stack of layered paper sheets sits in the frame, its side edge facing the camera so the layers read as many stacked strata. From that side edge, exactly two thin paper strips have been pulled out and lie flat on the desk in front of the stack, clearly separated from it. The pulled strips are small next to the bulk of the stack. Restrained side lighting, shallow depth of field, visible paper fiber and edge shadow. No readable text, letters, numbers, glyphs, printed content, screens, logos, brands, people, hands, or decorative scenery.",

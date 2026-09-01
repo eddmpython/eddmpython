@@ -1,11 +1,23 @@
 {
   "version": 1,
   "watch": {
+    "bigframes": {
+      "anchor": "BigFrames 2.48.0 패키지와 DataFrame 생성 API까지 확인했습니다.",
+      "kind": "pypi",
+      "package": "bigframes",
+      "why": "BigFrames 절은 2.48.0의 DataFrame 생성 API와 BigQuery 프로젝트, 위치, 인증 계약에 기대고 있다. 버전이 바뀌면 생성자와 필수 권한을 다시 확인해야 한다."
+    },
     "cudf": {
       "anchor": "cuDF 26.08은 NVIDIA Volta 이후 GPU와 Linux 환경을 요구하고, Windows 11에서는 WSL2의 Linux 안에 설치합니다.",
       "kind": "pypi",
       "package": "cudf-cu12",
       "why": "cuDF 절의 선택 기준은 26.08 설치 문서의 GPU, 운영체제, CUDA 계약에 기대고 있다. 릴리스가 바뀌면 지원 GPU와 Windows WSL2 경계를 다시 확인해야 한다."
+    },
+    "daft": {
+      "anchor": "그래서 Daft DataFrame이 그 표를 맡습니다.",
+      "kind": "pypi",
+      "package": "daft",
+      "why": "Daft 0.7.24에서 from_pydict, where, agg, collect 예제와 출력 5를 직접 확인했다. 버전이 바뀌면 멀티모달 자료형과 분산 실행 경계를 다시 본다."
     },
     "dask": {
       "anchor": "Dask DataFrame은 여러 pandas DataFrame을 행 방향 파티션으로 나눈 뒤 하나의 큰 표처럼 보이게 합니다.",
@@ -13,11 +25,29 @@
       "package": "dask",
       "why": "Dask 2026.8.0의 DataFrame 설계와 from_dict, compute 예제를 사용한다. 메이저가 바뀌면 파티션과 메타데이터 계약을 다시 실행한다."
     },
+    "datafusion": {
+      "anchor": "DataFusion DataFrame은 Rust와 Apache Arrow로 질의를 먼저 계획하므로 실제 계산은 마지막 동작에서 시작됩니다.",
+      "kind": "pypi",
+      "package": "datafusion",
+      "why": "DataFusion 54.0.0에서 from_pydict, filter, aggregate, to_pydict 예제와 출력 5를 직접 확인했다. 메이저가 바뀌면 표현식과 실행 동작을 다시 본다."
+    },
+    "geopandas": {
+      "anchor": "GeoPandas의 `GeoDataFrame` 은 pandas DataFrame에 점, 선, 면을 담는 geometry 열을 더하고, 그 도형이 쓰는 좌표계를 함께 기록할 수 있습니다.",
+      "kind": "pypi",
+      "package": "geopandas",
+      "why": "GeoPandas 1.1.4에서 GeoDataFrame과 EPSG:4326 좌표를 만들고 출력 5를 직접 확인했다. 버전이 바뀌면 pandas, Shapely 최소 버전과 공간 API를 다시 본다."
+    },
     "modin": {
       "anchor": "현재 Modin 0.37.1은 pandas 3.0과 같은 환경에 섞을 수 없습니다.",
       "kind": "pypi",
       "package": "modin",
       "why": "Modin 0.37.1의 pandas 버전 제약과 Ray 실행 결과를 근거로 별도 환경을 권한다. 새 버전이 pandas 3을 지원하면 설치 안내와 판단을 다시 쓴다."
+    },
+    "narwhals": {
+      "anchor": "Narwhals DataFrame은 데이터를 직접 실행하는 새 엔진이 아니라 pandas, Polars, Modin, cuDF, PyArrow를 같은 표현식으로 다루는 호환 계층입니다.",
+      "kind": "pypi",
+      "package": "narwhals",
+      "why": "Narwhals 2.25.0에서 pandas 백엔드의 from_dict, filter, select 예제와 출력 5를 직접 확인했다. 버전이 바뀌면 지원 백엔드와 eager API를 다시 본다."
     },
     "pandas": {
       "anchor": "pandas의 `DataFrame` 은 행과 열에 이름이 붙은 2차원 표입니다.",
@@ -36,6 +66,12 @@
       "kind": "pypi",
       "package": "pyspark",
       "why": "PySpark 4.2.0의 공식 설치 조건과 Spark DataFrame API를 사용한다. 메이저가 바뀌면 Python과 Java 최소 버전, local 실행 코드를 다시 확인해야 한다."
+    },
+    "vaex": {
+      "anchor": "Vaex DataFrame은 HDF5와 Arrow 파일을 메모리에 전부 복사하지 않고 필요한 열을 늦게 계산하는 로컬 표입니다.",
+      "kind": "pypi",
+      "package": "vaex",
+      "why": "Vaex 4.19.0을 Python 3.12 격리 환경에 설치해 from_dict, 선택, sum 예제와 출력 5를 직접 확인했다. 버전이 바뀌면 지원 Python과 파일 형식을 다시 본다."
     }
   }
 }

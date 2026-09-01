@@ -72,18 +72,90 @@
           "findings": []
         }
       ]
+    },
+    {
+      "reviewers": [
+        {
+          "role": "첫 독자",
+          "findings": [
+            {
+              "quote": "DataFrame의 자료와 계산을 로컬 메모리로 내려받지 않고 Google BigQuery에 두는 것이 다른 열한 가지와 가장 큰 차이입니다.",
+              "why": "다른 열한 가지가 무엇인지 되짚어야 BigFrames의 실행 경계가 보인다.",
+              "fix": "로컬 메모리와 직접 관리하는 작업자를 이름으로 적어 차이를 바로 보인다"
+            }
+          ]
+        },
+        {
+          "role": "구조 편집자",
+          "findings": [
+            {
+              "quote": "GeoPandas의 `GeoDataFrame` 은 pandas DataFrame에 점, 선, 면을 담는 geometry 열과 좌표계를 더합니다.",
+              "why": "GeoDataFrame은 geometry 열이 핵심이고 좌표계는 비어 있을 수도 있는데 둘을 같은 필수 요소처럼 묶었다.",
+              "fix": "geometry 열은 더하고 좌표계는 함께 기록할 수 있다고 나눈다"
+            }
+          ]
+        },
+        {
+          "role": "문체 편집자",
+          "findings": [
+            {
+              "quote": "다른 열한 가지와 가장 큰 차이입니다.",
+              "why": "비교 대상을 숫자로 대신해 독자가 앞 절을 다시 세어야 한다.",
+              "fix": "계산이 머무는 자리를 직접 쓴다"
+            }
+          ]
+        },
+        {
+          "role": "빼기 심사자",
+          "findings": [
+            {
+              "quote": "전체 `vaex` 패키지는 시각화와 머신러닝 구성 요소도 함께 설치합니다.",
+              "why": "설치되는 구성요소 목록은 Vaex를 고를지 판단하거나 같은 합계 예제를 실행하는 데 필요하지 않다.",
+              "fix": "문장을 빼고 데이터 크기와 파일 형식이라는 선택 기준만 남긴다"
+            }
+          ]
+        },
+        {
+          "role": "검색 독자",
+          "findings": []
+        }
+      ]
+    },
+    {
+      "reviewers": [
+        {
+          "role": "첫 독자",
+          "findings": []
+        },
+        {
+          "role": "구조 편집자",
+          "findings": []
+        },
+        {
+          "role": "문체 편집자",
+          "findings": []
+        },
+        {
+          "role": "빼기 심사자",
+          "findings": []
+        },
+        {
+          "role": "검색 독자",
+          "findings": []
+        }
+      ]
     }
   ],
   "kept": [],
   "edits": [
     {
-      "what": "원래 요청대로 제목을 파이썬 데이터프레임 라이브러리 6가지로 고치고 H2 여섯 개를 pandas, Polars, Dask, Modin, cuDF, PySpark DataFrame 하나씩으로 다시 짰다"
+      "what": "앞선 수정에서 제목을 파이썬 데이터프레임 라이브러리 6가지로 고치고 H2 여섯 개를 pandas, Polars, Dask, Modin, cuDF, PySpark DataFrame 하나씩으로 다시 짰다"
     },
     {
       "what": "DuckDB, PyArrow, Ibis를 독립 DataFrame 절에서 빼고 각각 데이터베이스, Table과 메모리 규격, 계산 표현식이라는 경계를 도입에서 밝혔다"
     },
     {
-      "what": "여섯 절에서 같은 판매 기록 네 줄과 서울 수량 합계 5를 사용해 문법과 실행 경계를 나란히 비교했다"
+      "what": "앞선 여섯 절에서 같은 판매 기록 네 줄과 서울 수량 합계 5를 사용해 문법과 실행 경계를 나란히 비교했다"
     },
     {
       "what": "pandas, Polars, Dask는 현재 환경에서 실행했고 Modin은 pandas 3과 분리한 Python 3.12 환경에서 Ray로 실행했다. cuDF와 PySpark는 실행하지 못한 조건을 코드 앞에 밝히고 출력 블록을 싣지 않았다"
@@ -93,6 +165,21 @@
     },
     {
       "what": "본문에 남은 DataFrame만 기준으로 cells.json, media.json, track.json을 함께 맞추고 기존 이미지 세 장의 역할과 앵커를 새 절에 연결했다"
+    },
+    {
+      "what": "Vaex, DataFusion, GeoPandas, Narwhals, Daft, BigFrames를 각각 독립 H2로 추가해 제목과 비교표를 12가지로 넓혔다"
+    },
+    {
+      "what": "Vaex 4.19.0, DataFusion 54.0.0, GeoPandas 1.1.4, Narwhals 2.25.0, Daft 0.7.24를 격리 환경에서 실행해 DataFrame 종류와 서울 수량 합계 5를 확인했다"
+    },
+    {
+      "what": "BigFrames 2.48.0은 패키지 import와 DataFrame 생성자 서명, Google Cloud의 프로젝트와 위치와 권한 문서까지 확인했다. 과금 프로젝트와 인증이 필요한 BigQuery 계산은 실행 출력으로 제시하지 않았다"
+    },
+    {
+      "what": "GeoDataFrame의 좌표계가 선택임을 바로잡고, Narwhals가 실행 엔진이 아닌 호환 계층이라는 경계와 여섯 새 DataFrame의 선택 조건을 각 절에 남겼다"
+    },
+    {
+      "what": "최종 확인에서 hanlint가 DataFusion 도입부의 같은 종결 반복을 notice로 짚어, 질의 계획과 실제 계산 시점을 인과로 잇고 error와 notice를 모두 0으로 만들었다"
     }
   ]
 }
