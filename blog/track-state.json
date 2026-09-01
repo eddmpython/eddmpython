@@ -5,9 +5,17 @@
       "value": "1.6.6",
       "at": "2026-08-26"
     },
+    "004-dataframe-libraries/dask": {
+      "value": "2026.8.0",
+      "at": "2026-09-01"
+    },
     "004-dataframe-libraries/duckdb": {
       "at": "2026-08-26",
       "value": "1.5.5"
+    },
+    "004-dataframe-libraries/ibis": {
+      "value": "12.0.0",
+      "at": "2026-09-01"
     },
     "004-dataframe-libraries/pandas": {
       "at": "2026-08-26",
