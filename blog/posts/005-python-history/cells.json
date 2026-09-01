@@ -8,8 +8,8 @@
       "title": "1991년 코드는 오늘 어디서 멈추나"
     },
     "py-gil-check": {
-      "code": "import sys\nimport sysconfig\n\nprint(\"이 파이썬     \", sys.version.split()[0])\nprint(\"GIL 켜져 있나 \", sys._is_gil_enabled())\nprint(\"GIL 없는 빌드 \", bool(sysconfig.get_config_var(\"Py_GIL_DISABLED\")))\n",
-      "description": "GIL 은 한 번에 한 줄만 실행되도록 잡아 두는 자물쇠입니다. 지금 쓰는 파이썬에 그것이 걸려 있는지 세 줄로 봅니다.",
+      "code": "import sys\nimport sysconfig\n\ngilEnabled = sys._is_gil_enabled() if hasattr(sys, \"_is_gil_enabled\") else True\n\nprint(\"이 파이썬     \", sys.version.split()[0])\nprint(\"GIL 켜져 있나 \", gilEnabled)\nprint(\"GIL 없는 빌드 \", bool(sysconfig.get_config_var(\"Py_GIL_DISABLED\")))\n",
+      "description": "GIL 이 켜진 일반 CPython에서는 CPU 작업을 하는 스레드 하나만 한 시점에 파이썬 바이트코드를 실행합니다. 지금 쓰는 파이썬의 상태와 빌드를 세 줄로 봅니다.",
       "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor",
       "hint": "브라우저 안의 파이썬도 자물쇠가 걸린 보통 빌드입니다. 내 컴퓨터에서 돌리면 거기 깔린 판의 값이 나옵니다",
       "title": "내 파이썬에 GIL 이 걸려 있나"

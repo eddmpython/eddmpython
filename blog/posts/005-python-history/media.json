@@ -2,7 +2,7 @@
   "assets": {
     "gil": {
       "alt": "어두운 바닥이 넓은 판으로 갈라져 있고 그 사이를 지나는 아주 좁은 통로 하나만 멀리까지 이어지며 그 안에 작은 불빛이 켜진 장면",
-      "contentAnchor": "그래서 스레드를 열여섯 개로 쪼개도 코어 하나만 씁니다.",
+      "contentAnchor": "그래도 CPU 계산만 하는 순수 파이썬 코드는 스레드를 늘려도 여러 코어를 동시에 쓰기 어렵습니다.",
       "narrativeUse": "코어가 여럿이어도 한 번에 하나만 지나간다는 것을 통로의 모양으로 보여 준다",
       "palettePolicy": "eddmpython-gray-master-v1",
       "placement": "H3 부제 바로 뒤",
@@ -24,7 +24,7 @@
       "placement": "도입 문단 바로 뒤",
       "prompt": "Wide 3:2 editorial still life on a dark matte desk, shot from directly above. Two cast metal blocks of exactly the same size and shape sit pushed together edge to edge in the center. The left block is heavily corroded and pitted with rounded worn-down edges. The right block is freshly machined, bright and clean with sharp square edges. A single deep engraved groove pattern runs across both blocks and lines up perfectly where they meet, so the pattern reads as one continuous line crossing from the old block into the new one. Raking side light along the groove, shallow depth of field, honest metal. The frame is filled edge to edge with the desk surface and there are no black bars or borders. No readable text, letters, numbers, glyphs, screens, logos, brands, people, hands, or decorative scenery.",
       "role": "hero",
-      "sectionHeading": "파이썬 역사의 시작, 1989년 크리스마스",
+      "sectionHeading": "파이썬 역사의 시작, 1989년 크리스마스와 1991년 코드",
       "sectionSubtitle": "깨지는 곳은 넷이고 나머지는 그대로입니다",
       "sourceKind": "imagegen",
       "sourcePolicy": "auto",
@@ -40,7 +40,7 @@
       "placement": "H3 부제 바로 뒤",
       "prompt": "Wide 3:2 editorial still life on a dark matte floor. One wide slab lies flat and is split clean through the middle, the two halves pulled apart to leave a visible gap between them. A single narrow plank spans that gap, resting on both halves, and it catches a bright pool of light while the slab stays dark. The split edges are sharp and deliberate rather than shattered. Shallow depth of field, honest stone and timber. No readable text, letters, numbers, glyphs, screens, logos, brands, people, hands, or decorative scenery.",
       "role": "section",
-      "sectionHeading": "2에서 3으로 건너가는 데 걸린 11년",
+      "sectionHeading": "파이썬 2에서 3으로, 2008년부터 2020년까지",
       "sectionSubtitle": "잘 돌던 코드를 일부러 깨뜨린 판",
       "sourceKind": "imagegen",
       "sourcePolicy": "auto",
