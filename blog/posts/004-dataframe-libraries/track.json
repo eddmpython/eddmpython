@@ -1,41 +1,41 @@
 {
   "version": 1,
   "watch": {
+    "cudf": {
+      "anchor": "cuDF 26.08은 NVIDIA Volta 이후 GPU와 Linux 환경을 요구하고, Windows 11에서는 WSL2의 Linux 안에 설치합니다.",
+      "kind": "pypi",
+      "package": "cudf-cu12",
+      "why": "cuDF 절의 선택 기준은 26.08 설치 문서의 GPU, 운영체제, CUDA 계약에 기대고 있다. 릴리스가 바뀌면 지원 GPU와 Windows WSL2 경계를 다시 확인해야 한다."
+    },
     "dask": {
-      "anchor": "같은 답이 나왔습니다. 그런데 2.12초에 729MB를 썼습니다.",
+      "anchor": "Dask DataFrame은 여러 pandas DataFrame을 행 방향 파티션으로 나눈 뒤 하나의 큰 표처럼 보이게 합니다.",
       "kind": "pypi",
       "package": "dask",
-      "why": "이 절의 결론은 160MB 파일에서 Dask 가 오히려 손해라는 것이고 그 근거가 CSV 2.12초 729MB 다. Parquet 으로 좁힌 0.26초 315MB 는 `더 해 볼 것` 에 있다. Dask 2026.8.0 으로 쟀고, 레거시 dask.dataframe 구현이 deprecated 로 표시되어 있어 그것이 제거되면 blocksize 와 compute 의 계약부터 다시 확인해야 한다."
+      "why": "Dask 2026.8.0의 DataFrame 설계와 from_dict, compute 예제를 사용한다. 메이저가 바뀌면 파티션과 메타데이터 계약을 다시 실행한다."
     },
-    "duckdb": {
-      "anchor": "0.013초에 48MB입니다.",
+    "modin": {
+      "anchor": "현재 Modin 0.37.1은 pandas 3.0과 같은 환경에 섞을 수 없습니다.",
       "kind": "pypi",
-      "package": "duckdb",
-      "why": "글이 가장 빠른 답으로 내세우는 0.013초 48MB 와 `import duckdb` 만 했을 때의 38MB 가 DuckDB 1.5.5 로 잰 값이다. 엑셀 절의 `INSTALL excel` 과 `read_xlsx` 도 같은 버전에서 확인했다. 메이저가 바뀌면 파일 이름을 SQL 에 그대로 적는 문법과 그 수치를 다시 봐야 한다."
-    },
-    "ibis": {
-      "anchor": "0.88초에 141MB입니다.",
-      "kind": "pypi",
-      "package": "ibis-framework",
-      "why": "0.88초 141MB 와 백엔드 22개 목록이 ibis-framework 12.0.0 에서 나온 값이다. 본문에 `t.date.month()` 가 DuckDB 에서 EXTRACT 로, SQLite 에서 STRFTIME 으로 번역되는 출력을 그대로 실었으므로 메이저가 바뀌면 두 SQL 과 백엔드 개수를 다시 찍어야 한다."
+      "package": "modin",
+      "why": "Modin 0.37.1의 pandas 버전 제약과 Ray 실행 결과를 근거로 별도 환경을 권한다. 새 버전이 pandas 3을 지원하면 설치 안내와 판단을 다시 쓴다."
     },
     "pandas": {
-      "anchor": "이 코드에 시간과 메모리를 함께 재면 3.72초에 최대 533MB가 나옵니다.",
+      "anchor": "pandas의 `DataFrame` 은 행과 열에 이름이 붙은 2차원 표입니다.",
       "kind": "pypi",
       "package": "pandas",
-      "why": "이 글의 출발점인 3.72초 533MB 와 usecols 의 1.86초 270MB, Parquet 두 열의 0.18초 359MB 가 pandas 3.0.5 로 잰 값이다. 도입의 엑셀 행 한계 오류도 이 버전과 openpyxl 3.1.5 에서 받았고, `더 해 볼 것` 의 ArrowStringArray 와 NumpyExtensionArray 도 3.0 의 상태다. 메이저가 바뀌면 그 수치와 출력을 다시 재야 한다."
+      "why": "pandas 3.0.5에서 DataFrame 예제와 출력 5를 직접 확인했다. 메이저가 바뀌면 인덱스 정렬과 문자열 자료형 설명을 다시 본다."
     },
     "polars": {
-      "anchor": "`PROJECT 2/5 COLUMNS` 가 다섯 열 중 두 열만 표에 올리겠다는 뜻입니다.",
+      "anchor": "Polars DataFrame에는 pandas처럼 행 라벨을 맞추는 인덱스가 없습니다.",
       "kind": "pypi",
       "package": "polars",
-      "why": "지연 실행의 0.18초 334MB 와 Parquet 의 0.016초 68MB 가 Polars 1.44.1 로 잰 값이고 본문에 `explain()` 출력을 여섯 줄 그대로 실었다. 메이저가 바뀌면 그 출력 모양과 `scan_csv` 와 `collect` 의 계약을 다시 확인해야 한다."
+      "why": "Polars 1.44.1에서 DataFrame 예제와 출력 5를 직접 확인했다. 메이저가 바뀌면 표현식과 DataFrame, LazyFrame 경계를 다시 본다."
     },
-    "pyarrow": {
-      "anchor": "그 표를 DuckDB에 넘기고 나자 700MB로 올라갔습니다.",
+    "pyspark": {
+      "anchor": "PySpark 4.2.0은 Python 3.10 이상과 Java 17 이상을 요구합니다.",
       "kind": "pypi",
-      "package": "pyarrow",
-      "why": "5백만 줄 표를 Polars 에서 DuckDB 로 넘길 때 최대 메모리가 453MB 에서 700MB 로 올라간다고 재서 적었다. 그 차이는 Polars 의 문자열 표현과 Arrow 규격이 다르기 때문에 생기므로 PyArrow 25.0.1 에서 메이저가 바뀌면 두 값을 다시 재야 한다."
+      "package": "pyspark",
+      "why": "PySpark 4.2.0의 공식 설치 조건과 Spark DataFrame API를 사용한다. 메이저가 바뀌면 Python과 Java 최소 버전, local 실행 코드를 다시 확인해야 한다."
     }
   }
 }
