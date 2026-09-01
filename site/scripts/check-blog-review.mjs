@@ -24,7 +24,7 @@ export const reviewName = "review.json";
 /**
  * 평가자 루프를 강제하기 전에 이미 발행된 글.
  *
- * 면제 목록을 코드에 숨기지 않고 여기 못 박는다. 이 세 편만 `loop: not-run` 을 쓸 수 있고
+ * 면제 목록을 코드에 숨기지 않고 여기 못 박는다. 이 다섯 편만 `loop: not-run` 을 쓸 수 있고
  * 006 부터는 그 상태 자체가 불가능하다. 면제가 새 글로 번지지 않고, 검증 안 된 글이
  * 공개 기록으로 남는다. 이 목록에 글을 더하지 않는다.
  */
@@ -37,17 +37,22 @@ export const legacyPosts = new Set([
 ]);
 
 /**
- * 라운드 수의 위아래.
+ * 현재 절차와 기존 평가 이력의 라운드 수.
  *
- * 전역 스킬은 `세 차례를 고쳐도 의견이 남으면 억지로 통과시키지 말고` 라고 한다.
- * 그 셋은 **수정 횟수**이지 평가 횟수가 아니다. 수정을 세 번 하면 그것을 확인하는
- * 라운드가 한 번 더 붙으므로 평가 라운드는 최대 넷이다.
- *
- * 2026-08-27 에 이 값을 3 으로 박아 두었다가 004 를 세 번 고친 뒤 확인 라운드에서 막혔다.
- * 스킬의 수를 옮겨 적으면서 한 칸 줄인 것이고, 스킬이 경고한 그 사고를 이 파일이 그대로 냈다.
+ * 현재 전역 스킬은 첫 평가 뒤 한 번 고치고, 같은 평가자가 수정본을 한 번 다시 읽게 한다.
+ * 새 기록은 두 라운드만 받는다. 001, 003, 004 의 네 라운드는 규칙을 바꾸기 전에 실제로 돈
+ * 평가 이력이므로 지우지 않고 그대로 받는다. 세 라운드는 어느 절차에도 속하지 않는다.
  */
-const minRounds = 2;
-const maxRounds = 4;
+const currentRoundCount = 2;
+const legacyRoundCount = 4;
+const legacyLongRoundPosts = new Set([
+  "001-ai-needs-an-environment",
+  "003-python-qr",
+  "004-dataframe-libraries",
+]);
+
+const allowedRoundCountsFor = (postId) =>
+  legacyLongRoundPosts.has(postId) ? [currentRoundCount, legacyRoundCount] : [currentRoundCount];
 
 const squeeze = (text) => String(text ?? "").replace(/\s+/g, " ").trim();
 const filled = (value) => typeof value === "string" && value.trim().length > 0;
@@ -83,22 +88,21 @@ export function reviewProblems(record, body, postId) {
   /*
    * 끝까지 돌렸는데 평가자가 계속 새 지적을 내는 상태.
    *
-   * 전역 스킬은 이 경우를 알고 길을 열어 두었다. `세 차례를 고쳐도 의견이 남으면 억지로
-   * 통과시키지 않는다. 그 루프는 실패한 것이므로 해결하지 못한 문장과 의견 차이를 그대로
-   * 보고한다. 이 보고는 종료가 아니라 사람이 판단할 일이 생겼다는 알림이다.`
+   * 전역 스킬은 재평가에서 새 지적이 남으면 평가자를 더 붙이거나 평가를 반복하지 않고
+   * 해결하지 못한 문장과 의견 차이를 사람에게 그대로 보고하게 한다.
    *
    * 그런데 이 파일에는 그 상태를 적을 자리가 없었다. `not-run` 은 안 돌린 것이고 rounds 는
    * 수렴한 것이라, 끝까지 돌렸는데 안 끝난 기록은 어느 쪽으로도 못 적었다. 남는 길은 마지막
    * 라운드의 findings 를 빈 배열로 적는 거짓이거나 `not-run` 으로 도망가는 것뿐이다.
    * 도달 불가능한 기준은 조작을 부른다.
    *
-   * 2026-08-27 실측이 근거다. 001 과 003 과 005 를 다섯 역할로 네 라운드 돌렸더니 지적이
+   * 2026-08-27 실측이 근거다. 001 과 003 과 005 를 기존 절차로 네 라운드 돌렸더니 지적이
    * 113, 101, 114, 113 으로 줄지 않았다. 마지막 라운드가 새로 집은 자리 가운데는 앞 세 라운드가
    * 통과시킨 원문 문장이 있었다 (`link.png 를 더블클릭해서 컴퓨터 화면에 띄웁니다`). 글이
    * 나빠서가 아니라 평가자가 매번 다른 자리를 본다. 004 도 마지막 라운드에 16 건이 남아 있다.
    *
-   * 도피처가 되지 않게 조건을 건다. 라운드를 끝까지 돌리고, 경위를 적고, 나머지 형식 검사는
-   * 그대로 받는다. 한두 라운드 만에 이 값을 쓰면 아래에서 막힌다.
+   * 도피처가 되지 않게 조건을 건다. 허용된 마지막 라운드까지 읽고, 경위를 적고, 나머지 형식
+   * 검사는 그대로 받는다. 첫 평가만 하고 이 값을 쓰면 아래에서 막힌다.
    */
   const unresolved = record.loop === "unresolved";
   if (unresolved && !filled(record.why)) {
@@ -111,27 +115,28 @@ export function reviewProblems(record, body, postId) {
     say("rounds 배열이 없습니다. 전역 $blog-writing 의 `여러 명이 따로 읽고 다시 고치기` 결과를 적습니다");
     return problems;
   }
-  if (rounds.length < minRounds) {
+  const allowedRoundCounts = allowedRoundCountsFor(postId);
+  if (rounds.length < currentRoundCount) {
     say(
-      `rounds 가 ${rounds.length} 회입니다. 수정본은 앞 의견을 보지 않은 같은 수의 평가자가 다시 읽습니다`,
+      `rounds 가 ${rounds.length} 회입니다. 같은 평가자가 수정본을 한 번 다시 읽습니다`,
     );
   }
-  if (rounds.length > maxRounds) {
+  if (rounds.length >= currentRoundCount && !allowedRoundCounts.includes(rounds.length)) {
     say(
-      `rounds 가 ${rounds.length} 회입니다. 세 차례를 고쳐도 의견이 남으면 억지로 통과시키지 말고 ` +
-        "해결하지 못한 문장과 의견 차이를 보고합니다",
+      `rounds 가 ${rounds.length} 회입니다. 첫 평가와 수정본 재평가 한 번만 기록합니다`,
     );
   }
-  // 실패 선언은 끝까지 가 본 사람만 할 수 있다. 두 라운드 만에 손을 들면 여기서 막힌다.
-  if (unresolved && rounds.length !== maxRounds) {
+  // 실패 선언은 허용된 마지막 평가까지 가 본 사람만 할 수 있다.
+  if (unresolved && !allowedRoundCounts.includes(rounds.length)) {
     say(
-      `loop: unresolved 는 rounds 를 ${maxRounds} 회까지 돌린 뒤에만 씁니다 (지금 ${rounds.length} 회). ` +
-        "세 차례 고치고 다시 읽혔는데도 의견이 남았을 때의 기록입니다",
+      `loop: unresolved 는 허용된 마지막 평가까지 읽힌 뒤에만 씁니다 (지금 ${rounds.length} 회). ` +
+        "수정본 재평가에서도 의견이 남았을 때의 기록입니다",
     );
   }
 
-  // 라운드마다 평가자가 몇 명인지는 스킬이 정한다. 여기서는 라운드 사이에 같은지만 본다.
+  // 평가자의 수와 역할 이름은 스킬이 정한다. 여기서는 두 라운드의 수와 역할 구성이 같은지만 본다.
   let headcount = null;
+  let firstRoleKey = null;
   /** 인용문 하나가 몇 번째 라운드들에서 집혔는가. 같은 자리를 다시 집었는지 보려고 모은다. */
   const quotedIn = new Map();
   /** 그 인용문을 몇 사람이 집었는가. 라운드가 달라도 사람 수로 센다. */
@@ -185,6 +190,12 @@ export function reviewProblems(record, body, postId) {
         }
       });
     });
+
+    const roleKey = [...roles].sort().join("\u0000");
+    if (firstRoleKey === null) firstRoleKey = roleKey;
+    else if (roleKey !== firstRoleKey) {
+      say(`${at} 의 역할 구성이 첫 라운드와 다릅니다. 같은 역할로 수정본을 다시 읽습니다`);
+    }
   });
 
   // 고치지 않기로 한 지적은 이유와 함께 남긴다. 다만 다음 평가자가 같은 자리를 다시 집으면
@@ -211,7 +222,7 @@ export function reviewProblems(record, body, postId) {
    * 이 검사기가 잡아야 할 것은 여럿이 같은 자리를 짚었는데도 그대로 둔 경우다.
    *
    * 2026-08-27 에 이 자리를 사람 수로 세지 않아서 004 가 10 건, 001 과 003 과 005 가 176 건
-   * 걸렸다. 전부 한 사람이 한 번 집은 자리였다. 평가자를 다섯 역할로 네 라운드 돌리면 글의
+   * 걸렸다. 전부 한 사람이 한 번 집은 자리였다. 여러 역할로 네 라운드 돌리면 글의
    * 거의 모든 문장이 한 번씩은 지적되므로, 그 기준으로는 글 전체를 kept 에 옮겨 적어야 한다.
    * 그러면 kept 는 판단의 기록이 아니라 통과용 목록이 된다.
    */

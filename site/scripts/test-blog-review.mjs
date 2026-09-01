@@ -81,14 +81,14 @@ const agreed = () => ({
 
 pass("루프를 돌고 끝난 기록", finished(), fixedBody);
 pass("루프 이전에 발행된 글", { version: 1, loop: "not-run", why: "강제 이전에 나갔다" }, unfixedBody, LEGACY);
-pass("세 라운드까지는 허용", {
+block("새 기록을 세 라운드까지 반복함", {
   version: 1,
   rounds: [
     { reviewers: [{ role: "첫 독자", findings: [{ quote: "가", why: "나", fix: "다" }] }] },
     { reviewers: [{ role: "첫 독자", findings: [{ quote: "라", why: "마", fix: "바" }] }] },
     { reviewers: [{ role: "첫 독자", findings: [] }] },
   ],
-}, "고친 본문");
+}, "고친 본문", "재평가 한 번만 기록합니다");
 pass("고치지 않기로 하고 이유를 남김", {
   ...agreed(),
   kept: [{ quote: "물어볼 것은 한 줄짜리입니다", why: "다음 절의 말장난이 이 문장에 걸려 있어 그대로 둔다" }],
@@ -124,10 +124,10 @@ block(
   "한 라운드만 돌고 끝냄",
   { version: 1, rounds: [{ reviewers: [{ role: "첫 독자", findings: [] }] }] },
   fixedBody,
-  "같은 수의 평가자가 다시 읽습니다",
+  "같은 평가자가 수정본을 한 번 다시 읽습니다",
 );
-// 수정 세 번 뒤에 확인 라운드가 한 번 더 붙으므로 평가 라운드 넷은 정상이다.
-pass("세 번 고치고 네 번째로 확인함", {
+// 규칙을 바꾸기 전에 실제로 돈 네 라운드 기록은 이력으로 남긴다.
+pass("기존 글의 네 라운드 이력을 보존함", {
   version: 1,
   rounds: [
     { reviewers: [{ role: "첫 독자", findings: [{ quote: "가", why: "나", fix: "다" }] }] },
@@ -135,8 +135,8 @@ pass("세 번 고치고 네 번째로 확인함", {
     { reviewers: [{ role: "첫 독자", findings: [{ quote: "사", why: "아", fix: "자" }] }] },
     { reviewers: [{ role: "첫 독자", findings: [] }] },
   ],
-}, "고친 본문");
-block("다섯 라운드까지 가면 통과시키지 않는다", {
+}, "고친 본문", LEGACY);
+block("기존 글도 다섯 라운드까지 가면 통과시키지 않는다", {
   version: 1,
   rounds: [
     { reviewers: [{ role: "첫 독자", findings: [{ quote: "가", why: "나", fix: "다" }] }] },
@@ -145,7 +145,7 @@ block("다섯 라운드까지 가면 통과시키지 않는다", {
     { reviewers: [{ role: "첫 독자", findings: [{ quote: "차", why: "카", fix: "타" }] }] },
     { reviewers: [{ role: "첫 독자", findings: [] }] },
   ],
-}, "고친 본문", "억지로 통과시키지 말고");
+}, "고친 본문", "재평가 한 번만 기록합니다", LEGACY);
 block("두 번째 라운드에 평가자가 줄어듦", {
   version: 1,
   rounds: [
@@ -158,6 +158,13 @@ block("두 번째 라운드에 평가자가 줄어듦", {
     { reviewers: [{ role: "첫 독자", findings: [] }] },
   ],
 }, fixedBody, "같은 수의 평가자가 다시 읽습니다");
+block("두 번째 라운드에 역할이 바뀜", {
+  version: 1,
+  rounds: [
+    { reviewers: [{ role: "첫 독자", findings: [] }] },
+    { reviewers: [{ role: "구조 편집자", findings: [] }] },
+  ],
+}, fixedBody, "역할 구성이 첫 라운드와 다릅니다");
 block("마지막 라운드에 지적이 남음", {
   version: 1,
   rounds: [
@@ -169,13 +176,13 @@ block("마지막 라운드에 지적이 남음", {
 /*
  * 끝까지 돌렸는데 수렴하지 않은 기록.
  *
- * 전역 스킬이 정한 세 번째 종료다. 그 자리가 없으면 정직한 기록이 막히고 findings 를 빈 배열로
- * 적는 거짓만 남는다. 그렇다고 아무 때나 쓰면 도피처가 되므로 끝까지 가 본 기록만 받는다.
+ * 수정본 재평가에서도 의견이 남은 기록이다. 그 자리가 없으면 정직한 기록이 막히고 findings 를
+ * 빈 배열로 적는 거짓만 남는다. 그렇다고 첫 평가 뒤 바로 쓰면 도피처가 되므로 재평가 기록만 받는다.
  */
 const unresolvedRecord = () => ({
   version: 1,
   loop: "unresolved",
-  why: "네 라운드를 돌렸고 지적이 줄지 않았다. 마지막 라운드가 앞 세 라운드가 통과시킨 문장을 새로 집었다",
+  why: "수정본을 한 번 다시 읽혔지만 새 지적이 남아 사람이 판단해야 한다",
   rounds: [
     {
       reviewers: [
@@ -189,18 +196,6 @@ const unresolvedRecord = () => ({
         { role: "구조 편집자", findings: [] },
       ],
     },
-    {
-      reviewers: [
-        { role: "첫 독자", findings: [{ quote: "사", why: "아", fix: "자" }] },
-        { role: "구조 편집자", findings: [] },
-      ],
-    },
-    {
-      reviewers: [
-        { role: "첫 독자", findings: [{ quote: "차", why: "카", fix: "타" }] },
-        { role: "구조 편집자", findings: [] },
-      ],
-    },
   ],
 });
 pass("끝까지 돌렸는데 의견이 남은 기록", unresolvedRecord(), "고친 본문");
@@ -211,10 +206,10 @@ block(
   "why 에 루프가 수렴하지 않은 경위",
 );
 block(
-  "두 라운드 만에 손을 듦",
-  { ...unresolvedRecord(), rounds: unresolvedRecord().rounds.slice(0, 2) },
+  "한 라운드 만에 손을 듦",
+  { ...unresolvedRecord(), rounds: unresolvedRecord().rounds.slice(0, 1) },
   "고친 본문",
-  "회까지 돌린 뒤에만 씁니다",
+  "허용된 마지막 평가까지 읽힌 뒤에만 씁니다",
 );
 block(
   "unresolved 라도 여럿이 집은 문장은 고쳐야 한다",
@@ -275,10 +270,11 @@ block(
   "남기기로 한 자리를 다음 평가자가 다시 집음",
   {
     version: 1,
+    loop: "unresolved",
+    why: "수정본 재평가에서도 같은 자리가 남아 사람이 판단해야 한다",
     rounds: [
       { reviewers: [{ role: "첫 독자", findings: [{ quote: "같은 자리", why: "가", fix: "나" }] }] },
       { reviewers: [{ role: "첫 독자", findings: [{ quote: "같은 자리", why: "다", fix: "라" }] }] },
-      { reviewers: [{ role: "첫 독자", findings: [] }] },
     ],
     kept: [{ quote: "같은 자리", why: "그대로 두기로 했다" }],
   },
