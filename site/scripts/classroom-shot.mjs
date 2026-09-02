@@ -72,7 +72,7 @@ console.log(`  검수용 강의방 ${base}/room/${ROOM}  카테고리 ${category
 const first = process.argv[3] ?? null;
 
 /**
- * titleMin과 visualMin은 좌측 설명, 우측 단일 시각자료 무대의 실제 렌더 하한이다.
+ * titleMin과 visualMin은 위쪽 정보와 아래쪽 단일 시각자료 무대의 실제 렌더 하한이다.
  */
 const VIEWPORTS = [
   { id: "desktop", width: 1920, height: 900, dpr: 1, isMobile: false, hasTouch: false,
