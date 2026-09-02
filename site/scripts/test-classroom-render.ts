@@ -15,6 +15,8 @@ import {
   splitCourseSections,
   inline,
   esc,
+  mediaContentType,
+  ROOM_MEDIA_KEY,
   type CourseScene,
 } from "../classroom-render.ts";
 
@@ -77,6 +79,59 @@ check("영상은 슬라이더에 섞이지 않는다", () => {
   assert.ok(html.includes("<video"));
   // 앞뒤 이미지가 각각 혼자라 슬라이더가 생기지 않는다
   assert.ok(!html.includes("slider"));
+});
+
+// 비공개 시각물. KV 의 media/<sha256>.<ext> 를 방 경로로 그리고, 방 밖에서는 자리만 보인다.
+const ROOM_KEY = `${"a".repeat(64)}.webp`;
+const IN_ROOM = { visual: 0, mediaBase: "/room/x/media" };
+
+check("비공개 시각물은 방 경로로 그린다", () => {
+  const html = renderMarkdown(`![장표](room://${ROOM_KEY} "캡션")`, [], {}, { ...IN_ROOM });
+  assert.ok(html.includes(`<img src="/room/x/media/${ROOM_KEY}"`));
+  assert.ok(html.includes("<figcaption>캡션</figcaption>"));
+  assert.ok(!html.includes("room://"));
+});
+
+check("읽기와 강의 렌더 모두 방 경로를 받는다", () => {
+  const body = ["## 절", "", "### 부제", "", `![장표](room://${ROOM_KEY})`].join("\n");
+  const post = renderPost(body, {}, {}, { mediaBase: "/room/y/media" });
+  assert.ok(post.html.includes(`/room/y/media/${ROOM_KEY}`));
+  const scene: CourseScene = {
+    id: "s1",
+    role: "open",
+    layout: "stage",
+    beats: [{ effect: "enter", targets: ["visual.1"], note: "" }],
+    visualCount: 1,
+  } as CourseScene;
+  const lecture = renderLecture(body, [scene], {}, {}, { mediaBase: "/room/y/media" });
+  assert.ok(lecture.ok);
+  assert.ok(lecture.html.includes(`/room/y/media/${ROOM_KEY}`));
+});
+
+check("방 경로가 없으면 비공개 시각물은 자리만 보인다", () => {
+  const html = renderMarkdown(`![장표](room://${ROOM_KEY})`);
+  assert.ok(html.includes("비공개 시각물"));
+  assert.ok(!html.includes("<img"));
+});
+
+check("모양이 틀린 비공개 주소는 깨진 그림 대신 오류로 드러난다", () => {
+  const html = renderMarkdown("![장표](room://profile.png)", [], {}, { ...IN_ROOM });
+  assert.ok(html.includes("주소 오류"));
+  assert.ok(!html.includes("<img"));
+});
+
+check("비공개 영상은 재생기가 된다", () => {
+  const key = `${"b".repeat(64)}.mp4`;
+  const html = renderMarkdown(`![시연](room://${key})`, [], {}, { ...IN_ROOM });
+  assert.ok(html.includes(`<video src="/room/x/media/${key}"`));
+});
+
+check("비공개 객체 이름과 content-type", () => {
+  assert.equal(mediaContentType(ROOM_KEY), "image/webp");
+  assert.equal(mediaContentType(`${"b".repeat(64)}.mp4`), "video/mp4");
+  assert.ok(ROOM_MEDIA_KEY.test(ROOM_KEY));
+  assert.ok(!ROOM_MEDIA_KEY.test("../bundle"));
+  assert.ok(!ROOM_MEDIA_KEY.test(`${"a".repeat(64)}.svg`));
 });
 
 check("제목과 목록이 제 태그로 나간다", () => {

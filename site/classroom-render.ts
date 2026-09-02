@@ -80,6 +80,37 @@ function leadOut(html: string): string {
 const PENDING = /^media:\/\/([a-z0-9-]+)$/i;
 
 /**
+ * 비공개 시각물.
+ *
+ * `room://<sha256>.<ext>` 는 교안 KV 네임스페이스의 `media/<sha256>.<ext>` 를 가리킨다. 강사
+ * 사진과 연락처가 든 장표처럼 공개 데이터셋(Hugging Face)에 올리면 안 되는 것이 여기로 온다
+ * (2026-09-02 운영자 결정). Worker 는 방 세션이 있는 요청에만 준다. 교안은 방 이름을 모르므로
+ * 렌더러가 `/room/<방>/media/<이름>` 으로 바꿔 그린다. 주소는 내용 해시라 추측할 수 없다.
+ *
+ * **`eddmpython-course/scripts/roomMediaCatalog.mjs` 의 `ROOM_MEDIA` 와 같아야 한다.**
+ * 한쪽을 고치면 다른 쪽도 같은 날 고친다.
+ */
+export const ROOM_MEDIA = /^room:\/\/([a-f0-9]{64}\.(?:png|webp|jpg|gif|mp4|webm))$/;
+/** Worker 가 경로에서 받는 객체 이름. `..` 같은 것은 여기서 걸러진다. */
+export const ROOM_MEDIA_KEY = /^[a-f0-9]{64}\.(?:png|webp|jpg|gif|mp4|webm)$/;
+const MEDIA_TYPES: Record<string, string> = {
+  png: "image/png",
+  webp: "image/webp",
+  jpg: "image/jpeg",
+  gif: "image/gif",
+  mp4: "video/mp4",
+  webm: "video/webm",
+};
+
+export function mediaContentType(key: string): string {
+  return MEDIA_TYPES[key.slice(key.lastIndexOf(".") + 1)] ?? "application/octet-stream";
+}
+
+export function mediaSrc(base: string, key: string): string {
+  return `${base}/${key}`;
+}
+
+/**
  * 실행 칸 주소. 교안이 링크 하나짜리 문단으로 적는다.
  *
  * **모양은 공개 블로그의 `src/components/Markdown.tsx` 의 `CODARO_CELL` 과 같아야 한다.**
@@ -377,13 +408,14 @@ function youtubeFigure(
   )}" target="_blank" rel="noreferrer">YouTube에서 열기</a></figcaption></figure>`;
 }
 
-function pendingMedia(key: string, alt: string, caption: string): string {
-  return `<div class="pending"><b>시각물 준비 중</b><span>${esc(alt)}</span>${
+function pendingMedia(key: string, alt: string, caption: string, label = "시각물 준비 중"): string {
+  return `<div class="pending"><b>${esc(label)}</b><span>${esc(alt)}</span>${
     caption ? `<i>${esc(caption)}</i>` : ""
   }<i>${esc(key)}</i></div>`;
 }
 
-type RenderState = { visual: number };
+/** `mediaBase` 는 비공개 시각물이 붙을 방 경로다. 방 밖(검사, 감사)에서는 없다. */
+type RenderState = { visual: number; mediaBase?: string };
 
 function visual(html: string, state: RenderState): string {
   state.visual += 1;
@@ -427,21 +459,34 @@ function blocks(text: string, headings: string[], cells: Cells, state: RenderSta
         images.push(visual(pendingMedia(waiting[1], img[1], img[3] ?? ""), state));
         continue;
       }
+      let src = img[2];
+      if (/^room:\/\//i.test(src)) {
+        // 비공개 시각물. 방 경로를 모르는 자리(검사, 감사)에서는 자리만 보이고, 주소 모양이
+        // 틀리면 깨진 그림 대신 그 사실을 드러낸다. 조용히 링크로 흘리면 발행한 사람이 모른다.
+        const priv = src.match(ROOM_MEDIA);
+        if (!priv || !state.mediaBase) {
+          images.push(
+            visual(pendingMedia(src, img[1], img[3] ?? "", priv ? "비공개 시각물" : "비공개 시각물 주소 오류"), state),
+          );
+          continue;
+        }
+        src = mediaSrc(state.mediaBase, priv[1]);
+      }
       // 영상도 시각 자산이다. 확장자로 갈라 태그를 바꾼다.
       //
       // 캡션(img[3])을 반드시 같이 그린다. 2026-08-21 까지 정규식은 캡션을 잡아 놓고
       // 여기서 버렸다. 교안 캡션 45개가 수강생 화면에 하나도 안 나갔다. 캡션은 그 장면을
       // 어떻게 읽을지 말하는 자리라 그게 없으면 도식만 덩그러니 뜬다.
       const caption = img[3] ? `<figcaption>${esc(img[3])}</figcaption>` : "";
-      if (VIDEO.test(img[2])) {
+      if (VIDEO.test(src)) {
         flush();
         out.push(visual(
-          `<figure class="media"><video src="${esc(img[2])}" controls playsinline preload="metadata"></video>${caption}</figure>`,
+          `<figure class="media"><video src="${esc(src)}" controls playsinline preload="metadata"></video>${caption}</figure>`,
           state,
         ));
       } else {
         images.push(
-          visual(`<figure class="media"><img src="${esc(img[2])}" alt="${esc(img[1])}" loading="lazy">${caption}</figure>`, state),
+          visual(`<figure class="media"><img src="${esc(src)}" alt="${esc(img[1])}" loading="lazy">${caption}</figure>`, state),
         );
       }
       continue;
@@ -535,9 +580,10 @@ export function renderPost(
   body: string,
   cells: Cells = {},
   glossary: Glossary = {},
+  options: { mediaBase?: string } = {},
 ): { html: string; headings: string[]; hasCells: boolean; visuals: number } {
   const headings: string[] = [];
-  const state = { visual: 0 };
+  const state: RenderState = { visual: 0, mediaBase: options.mediaBase };
   const marked = markGlossaryTerms(body, glossary);
   const html = applyGlossary(renderMarkdown(marked, headings, cells, state), glossary, "term-r");
   // 실행 칸이 없는 글에는 파이썬 런타임 스크립트를 붙이지 않는다.
@@ -586,6 +632,7 @@ export function renderLecture(
   scenes: CourseScene[],
   cells: Cells = {},
   glossary: Glossary = {},
+  options: { mediaBase?: string } = {},
 ): { html: string; hasCells: boolean; ok: boolean } {
   const sections = splitCourseSections(markGlossaryTerms(body, glossary));
   if (!scenes.length || sections.length !== scenes.length) return { html: "", hasCells: false, ok: false };
@@ -594,7 +641,7 @@ export function renderLecture(
   for (let index = 0; index < scenes.length; index += 1) {
     const scene = scenes[index];
     const section = sections[index];
-    const state = { visual: 0 };
+    const state: RenderState = { visual: 0, mediaBase: options.mediaBase };
     const html = renderMarkdown(section.content, [], cells, state);
     if (state.visual !== scene.visualCount) return { html: "", hasCells: false, ok: false };
     hasCells ||= html.includes('data-cell="');

@@ -17,8 +17,10 @@
 import {
   COURSE_SCENE_RUNTIME,
   esc,
+  mediaContentType,
   renderLecture,
   renderPost,
+  ROOM_MEDIA_KEY,
 } from "./classroom-render";
 import { SYMBOL, symbolMarkup } from "./src/brand";
 import { DESIGN } from "./src/design";
@@ -1253,6 +1255,30 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     );
   }
 
+  /**
+   * 비공개 시각물. 교안 KV 의 `media/<sha256>.<ext>` 를 방 세션이 있고 방이 열린 요청에만 준다.
+   *
+   * 강사 사진과 연락처가 든 장표처럼 Hugging Face 에 올리면 안 되는 것이 여기로 온다
+   * (2026-09-02 운영자 결정). 카테고리 잠금까지는 묻지 않는다. 열리지 않은 글의 주소는 화면에
+   * 나가지 않고, 이름이 내용 해시라 목록 없이는 추측할 수 없기 때문이다. `media` 는 카테고리
+   * 슬러그(`NN-...`)가 될 수 없어 글 주소와 겹치지 않는다.
+   */
+  if (parts[1] === "media" && parts.length === 3) {
+    const key = parts[2];
+    if (!ROOM_MEDIA_KEY.test(key)) return new Response("not found", { status: 404 });
+    const bytes = await env.COURSE.get(`media/${key}`, { type: "arrayBuffer", cacheTtl: 3600 });
+    if (!bytes) return new Response("없는 시각물입니다.", { status: 404 });
+    return new Response(bytes, {
+      headers: {
+        "content-type": mediaContentType(key),
+        // 내용 해시 주소라 영원히 같다. 다만 공유 캐시에는 남기지 않는다. 비공개 자료다.
+        "cache-control": "private, max-age=31536000, immutable",
+        etag: `"${key}"`,
+        "x-robots-tag": "noindex",
+      },
+    });
+  }
+
   const courseState = await course(env);
   const all = courseState.categories;
   const open = visible(all, room.unlocked);
@@ -1313,8 +1339,10 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     const at = category.posts.findIndex((p) => p.id === parts[2]);
     const post = category.posts[at];
     if (!post) return new Response("없는 글입니다.", { status: 404 });
-    const { html, headings, hasCells } = renderPost(post.body, category.cells ?? {}, courseState.glossary);
-    const lecture = renderLecture(post.body, post.scenes ?? [], category.cells ?? {}, courseState.glossary);
+    // 비공개 시각물은 이 방의 경로로 붙는다. 쿠키가 방 경로에 묶여 있어 그 아래 주소에만 실린다.
+    const media = { mediaBase: `${roomPath(slug)}/media` };
+    const { html, headings, hasCells } = renderPost(post.body, category.cells ?? {}, courseState.glossary, media);
+    const lecture = renderLecture(post.body, post.scenes ?? [], category.cells ?? {}, courseState.glossary, media);
 
     // 왼쪽. 같은 과정의 글을 오간다. 강의 중에 앞 편으로 되돌아가는 일이 잦다.
     const nav = category.posts
