@@ -104,6 +104,12 @@
       "post": "005-python-history",
       "sha256": "dd263228b071495adb445023a0ceb12bbabdb1c6f58eb5479d2adf5e8475af91"
     },
+    "01-ai-agent-scenes/agent-verdict-map": {
+      "assetKey": "agent-verdict-map",
+      "path": "objects/sha256/06/06ce1cd65c077785a695cc6bd06b31e53575974bcb73cca1593c128d8129d55f.png",
+      "post": "01-ai-agent-scenes",
+      "sha256": "06ce1cd65c077785a695cc6bd06b31e53575974bcb73cca1593c128d8129d55f"
+    },
     "01-instructor-introduction/automation-criteria": {
       "assetKey": "automation-criteria",
       "path": "objects/sha256/b7/b71c5c6932e145f3ce0a283b358ca130e0a65b0d5a787d25a4acad9e2d78e97c.png",
@@ -175,6 +181,12 @@
       "path": "objects/sha256/fc/fccc9d5483911e31eb35e18b446c600489f6b24a40918683aec92398c8415115.png",
       "post": "02-course-blueprint",
       "sha256": "fccc9d5483911e31eb35e18b446c600489f6b24a40918683aec92398c8415115"
+    },
+    "04-model-and-harness/model-context-lifetimes": {
+      "assetKey": "model-context-lifetimes",
+      "path": "objects/sha256/d8/d8cb4b13291caf89432c83370dc4f69b45e3cfd96b36ef6bbc32c3d4f1ee4bda.png",
+      "post": "04-model-and-harness",
+      "sha256": "d8cb4b13291caf89432c83370dc4f69b45e3cfd96b36ef6bbc32c3d4f1ee4bda"
     }
   },
   "objectPrefix": "objects/sha256",
@@ -258,6 +270,16 @@
       "sourcePost": "021-python-project-runbook",
       "visualSubject": "빈 복제 폴더와 추적된 소스 및 계약 파일과 잠금 격자와 새 가상환경 상자와 합성 입력 Excel과 결과 Excel과 여덟 칸 테스트 행 및 제외된 옛 파일",
       "width": 1536
+    },
+    "06ce1cd65c077785a695cc6bd06b31e53575974bcb73cca1593c128d8129d55f": {
+      "alt": "목표에서 현재 상태와 도구 행동과 결과 관찰과 다음 행동으로 이어지고 승인과 중단 조건이 전체를 감싸는 에이전트 판정 지도",
+      "bytes": 1108282,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/06/06ce1cd65c077785a695cc6bd06b31e53575974bcb73cca1593c128d8129d55f.png",
+      "sourcePost": "01-ai-agent-scenes",
+      "visualSubject": "목표에서 현재 상태와 도구 행동과 결과 관찰과 다음 행동으로 이어지고 승인과 중단 조건이 전체를 감싸는 에이전트 판정 지도",
+      "width": 1672
     },
     "06db9bae71ecbeb350ff87dbbed92dca39c5aef3448c34fe92dcf9bb40eb08c5": {
       "alt": "AI 작업지시서의 목적과 입력 및 출력과 규칙과 예외와 검증과 제약과 완료조건 여덟 칸이 연결된 모습",
@@ -2839,6 +2861,16 @@
       "sourcePost": "017-python-list-dictionary",
       "visualSubject": "거래 목록 화면에 놓인 금액 토큰 네 개의 순서 트랙과 시작 위치표와 마지막 방향 및 가운데 두 칸의 슬라이스 범위",
       "width": 1536
+    },
+    "d8cb4b13291caf89432c83370dc4f69b45e3cfd96b36ef6bbc32c3d4f1ee4bda": {
+      "alt": "학습된 모델과 현재 컨텍스트와 프로젝트 및 Git 기록을 세 층으로 나누고 프로젝트 기록을 다음 대화에서 다시 읽는 구조도",
+      "bytes": 1100306,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/d8/d8cb4b13291caf89432c83370dc4f69b45e3cfd96b36ef6bbc32c3d4f1ee4bda.png",
+      "sourcePost": "04-model-and-harness",
+      "visualSubject": "학습된 모델과 현재 컨텍스트와 프로젝트 및 Git 기록을 세 층으로 나누고 프로젝트 기록을 다음 대화에서 다시 읽는 구조",
+      "width": 1672
     },
     "d90745837d66c16e2b9b6dea8b845cdf4d0514234f8654a388effb58175c6964": {
       "alt": "편집기의 전체 파일 실행 버튼과 통합 터미널의 명시적 명령이 같은 파일과 실행기로 모이는 장면",
