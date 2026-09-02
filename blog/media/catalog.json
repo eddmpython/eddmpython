@@ -178,6 +178,18 @@
       "post": "01-merge-expense-files",
       "sha256": "e096b86c1503251401fc7073640c6fbbf1e0b8ccafeaf12f1c74e3a1d4f9803a"
     },
+    "01-verify-ai-project-reading/claim-evidence-map": {
+      "assetKey": "claim-evidence-map",
+      "path": "objects/sha256/66/66587f0ea8353788b8619750bfee93328369f0002f869212eaa1ac7d79ba6ea8.png",
+      "post": "01-verify-ai-project-reading",
+      "sha256": "66587f0ea8353788b8619750bfee93328369f0002f869212eaa1ac7d79ba6ea8"
+    },
+    "01-why-ai-automation/rule-ai-escalation": {
+      "assetKey": "rule-ai-escalation",
+      "path": "objects/sha256/40/40632ebbb8f1b179bbc09b85d7a541666136538b630249f7a4d479260544b19f.png",
+      "post": "01-why-ai-automation",
+      "sha256": "40632ebbb8f1b179bbc09b85d7a541666136538b630249f7a4d479260544b19f"
+    },
     "02-course-blueprint/ai-work-system": {
       "assetKey": "ai-work-system",
       "path": "objects/sha256/08/0817a48648a83c20f22f86b419c577ec2e3eac75d9792f1a8e1abac1e2a8396d.png",
@@ -206,11 +218,35 @@
       "post": "02-course-blueprint",
       "sha256": "fccc9d5483911e31eb35e18b446c600489f6b24a40918683aec92398c8415115"
     },
+    "02-first-codex-change/verified-change-path": {
+      "assetKey": "verified-change-path",
+      "path": "objects/sha256/db/db089a31ab402f26b97a3d2bea912f1b1a82520fec7331decb77c64bfa3a6184.png",
+      "post": "02-first-codex-change",
+      "sha256": "db089a31ab402f26b97a3d2bea912f1b1a82520fec7331decb77c64bfa3a6184"
+    },
+    "02-first-git-github-backup/git-recovery-loop": {
+      "assetKey": "git-recovery-loop",
+      "path": "objects/sha256/cb/cb6e6a92a07d26020aae8249a4818e3694091b74c19a0508e28f6a5be5b0a0ab.png",
+      "post": "02-first-git-github-backup",
+      "sha256": "cb6e6a92a07d26020aae8249a4818e3694091b74c19a0508e28f6a5be5b0a0ab"
+    },
+    "02-frontier-ai-accounts/account-setup-flow": {
+      "assetKey": "account-setup-flow",
+      "path": "objects/sha256/09/0928cfc635ad87a9711aa9f10c587c64ad84fda42a8c171b437745755056d8a6.png",
+      "post": "02-frontier-ai-accounts",
+      "sha256": "0928cfc635ad87a9711aa9f10c587c64ad84fda42a8c171b437745755056d8a6"
+    },
     "02-what-is-python/python-fit-decision": {
       "assetKey": "python-fit-decision",
       "path": "objects/sha256/4c/4cb92f14416032a364193bac4d1f4f2888a364bb24dc3a6fb720c2fa0d1fcb43.png",
       "post": "02-what-is-python",
       "sha256": "4cb92f14416032a364193bac4d1f4f2888a364bb24dc3a6fb720c2fa0d1fcb43"
+    },
+    "03-connect-codex-to-vscode/codex-project-boundary": {
+      "assetKey": "codex-project-boundary",
+      "path": "objects/sha256/ca/ca06079cd661134f44c77819bbd3c501e7b80ca04f5f0831cdcab0bc554d2d61.png",
+      "post": "03-connect-codex-to-vscode",
+      "sha256": "ca06079cd661134f44c77819bbd3c501e7b80ca04f5f0831cdcab0bc554d2d61"
     },
     "03-department-summary/groupby-three-steps": {
       "assetKey": "groupby-three-steps",
@@ -224,11 +260,29 @@
       "post": "03-python-outside-excel",
       "sha256": "c8416172e8bdae5d4e402d6b782700f9de8431dea56fc8c5b567aa3143ecf036"
     },
+    "03-turn-failure-into-test/regression-loop": {
+      "assetKey": "regression-loop",
+      "path": "objects/sha256/94/94a9eaa469bfce7413843ef238c42d08129014817baa3d77a5b8e4a67c2db569.png",
+      "post": "03-turn-failure-into-test",
+      "sha256": "94a9eaa469bfce7413843ef238c42d08129014817baa3d77a5b8e4a67c2db569"
+    },
+    "04-add-review-reason/tdd-flow": {
+      "assetKey": "tdd-flow",
+      "path": "objects/sha256/c4/c4731b24c9f18d94b299fa54ff29fb218395dc31c322c4cc5fb5b5e93d50bdb7.png",
+      "post": "04-add-review-reason",
+      "sha256": "c4731b24c9f18d94b299fa54ff29fb218395dc31c322c4cc5fb5b5e93d50bdb7"
+    },
     "04-model-and-harness/model-context-lifetimes": {
       "assetKey": "model-context-lifetimes",
       "path": "objects/sha256/d8/d8cb4b13291caf89432c83370dc4f69b45e3cfd96b36ef6bbc32c3d4f1ee4bda.png",
       "post": "04-model-and-harness",
       "sha256": "d8cb4b13291caf89432c83370dc4f69b45e3cfd96b36ef6bbc32c3d4f1ee4bda"
+    },
+    "04-model-and-harness/model-harness-map": {
+      "assetKey": "model-harness-map",
+      "path": "objects/sha256/93/933b20300e6ec07810fe43925301191d8d55700de81fe06308dee3845bdb11fd.png",
+      "post": "04-model-and-harness",
+      "sha256": "933b20300e6ec07810fe43925301191d8d55700de81fe06308dee3845bdb11fd"
     },
     "04-run-python-online/notebook-code-memory": {
       "assetKey": "notebook-code-memory",
@@ -248,6 +302,18 @@
       "post": "04-xlwings-lite-practice",
       "sha256": "288d431ea35cfe138c987810d5cde0d14a683bd10b8a3ee5c0be0999c739217c"
     },
+    "05-handle-payment-header/header-alias-map": {
+      "assetKey": "header-alias-map",
+      "path": "objects/sha256/42/42fd015f91fdfcd6694a37a8dee08775a6af301bbc7756da793f9edcdc2a7ca0.png",
+      "post": "05-handle-payment-header",
+      "sha256": "42fd015f91fdfcd6694a37a8dee08775a6af301bbc7756da793f9edcdc2a7ca0"
+    },
+    "05-project-instructions-for-ai/instruction-scope": {
+      "assetKey": "instruction-scope",
+      "path": "objects/sha256/f8/f8cfe20051817877de23c035959dcf60be3e94fb8eb0a13e9f7cf6824cf94df9.png",
+      "post": "05-project-instructions-for-ai",
+      "sha256": "f8cfe20051817877de23c035959dcf60be3e94fb8eb0a13e9f7cf6824cf94df9"
+    },
     "05-run-python-in-vscode/local-rerun-change": {
       "assetKey": "local-rerun-change",
       "path": "objects/sha256/fe/fe283e01c0128ef3230fc13890755a665b70c72461409e912e649845c57831d1.png",
@@ -260,6 +326,18 @@
       "post": "05-scheduled-run",
       "sha256": "ef5ccd1b0f9d98e41ed276199aebbc8342b4ccbc524c6bf3d28f856023554279"
     },
+    "06-choose-model-and-run-loop/agent-work-loop": {
+      "assetKey": "agent-work-loop",
+      "path": "objects/sha256/06/060a3bed476791504f4641d3e22bb25f2a243f4172e55cb4499301dbceb841a9.png",
+      "post": "06-choose-model-and-run-loop",
+      "sha256": "060a3bed476791504f4641d3e22bb25f2a243f4172e55cb4499301dbceb841a9"
+    },
+    "06-leave-failure-log/run-outcome-branches": {
+      "assetKey": "run-outcome-branches",
+      "path": "objects/sha256/80/8047c2cf8a139b81c3f6cfa43248fc98f3f71b25f10f65a5973b7c768d16dbac.png",
+      "post": "06-leave-failure-log",
+      "sha256": "8047c2cf8a139b81c3f6cfa43248fc98f3f71b25f10f65a5973b7c768d16dbac"
+    },
     "06-uv-virtual-environment/isolated-projects": {
       "assetKey": "isolated-projects",
       "path": "objects/sha256/0c/0c80902222a0ac10e5ba9a3ebf290d4cf674fe9a81290c4621b1a45bc66b9cd5.png",
@@ -271,6 +349,12 @@
       "path": "objects/sha256/dc/dcea317ea9a022c4bbcfa312c1fc092a1488033cfadd3bfb6002a1b198c699f5.png",
       "post": "06-uv-virtual-environment",
       "sha256": "dcea317ea9a022c4bbcfa312c1fc092a1488033cfadd3bfb6002a1b198c699f5"
+    },
+    "07-solo-sales-automation/capstone-checkpoints": {
+      "assetKey": "capstone-checkpoints",
+      "path": "objects/sha256/24/24d53bb05afea240137302f678d0d9657e3448816cfc7dc77f791e99b450e880.png",
+      "post": "07-solo-sales-automation",
+      "sha256": "24d53bb05afea240137302f678d0d9657e3448816cfc7dc77f791e99b450e880"
     }
   },
   "objectPrefix": "objects/sha256",
@@ -345,6 +429,16 @@
       "visualSubject": "정상 Excel 자동화 결과 화면과 격리된 상쇄 금액 및 중복 행 및 누락 시트 및 원본 지문 변경 테스트 상자",
       "width": 1536
     },
+    "060a3bed476791504f4641d3e22bb25f2a243f4172e55cb4499301dbceb841a9": {
+      "alt": "요구에서 계획과 승인과 수정과 실행과 검증과 diff와 커밋을 거쳐 다시 요구로 돌아오는 작업 루프",
+      "bytes": 1368717,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/06/060a3bed476791504f4641d3e22bb25f2a243f4172e55cb4499301dbceb841a9.png",
+      "sourcePost": "06-choose-model-and-run-loop",
+      "visualSubject": "요구, 계획, 승인, 수정, 실행, 검증, diff와 커밋이 원형으로 이어지는 작업 루프",
+      "width": 1672
+    },
     "067a134337d618f096b6b66a5935dcdc2b2b2f53594927e7b5f6d72449c583b6": {
       "alt": "빈 복제 폴더가 잠긴 환경과 합성 입력과 실행과 테스트를 차례로 거쳐 같은 논리 결과를 만드는 모습",
       "bytes": 1150025,
@@ -414,6 +508,16 @@
       "sourcePost": "033-ai-variant-excel",
       "visualSubject": "기존 파일 회귀 테스트와 변형 파일 테스트 및 균형 잡힌 결과 비교판",
       "width": 1536
+    },
+    "0928cfc635ad87a9711aa9f10c587c64ad84fda42a8c171b437745755056d8a6": {
+      "alt": "AI 계정에서 로그인 확인과 Git 설치와 GitHub 비공개 저장소와 첫 질문을 거쳐 준비 완료로 이어지는 흐름도",
+      "bytes": 1065884,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/09/0928cfc635ad87a9711aa9f10c587c64ad84fda42a8c171b437745755056d8a6.png",
+      "sourcePost": "02-frontier-ai-accounts",
+      "visualSubject": "AI 계정, 로그인 확인, Git 설치, GitHub 비공개 저장소, 첫 질문과 준비 완료가 이어지는 여섯 단계",
+      "width": 1672
     },
     "0979bf850559ea1d9f585f2cfc6b526e29dd2aa15f02814dedf49ef3f9d99705": {
       "alt": "거래일과 부서 및 금액 열의 자료형과 빈값 수가 허용 기준표와 비교되는 모습",
@@ -866,6 +970,16 @@
       "visualSubject": "부서별 지출 딕셔너리 세 건과 여섯 문법 코드 단계 및 합계와 거래별 분류 결과표",
       "width": 1536
     },
+    "24d53bb05afea240137302f678d0d9657e3448816cfc7dc77f791e99b450e880": {
+      "alt": "brief에서 작업명세와 환경과 코드와 테스트와 diff를 거쳐 커밋에 도착하는 독립 개발 체크포인트",
+      "bytes": 1027091,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/24/24d53bb05afea240137302f678d0d9657e3448816cfc7dc77f791e99b450e880.png",
+      "sourcePost": "07-solo-sales-automation",
+      "visualSubject": "brief, 작업명세, 환경, 코드, 테스트, diff와 커밋의 일곱 체크포인트",
+      "width": 1672
+    },
     "24d7eea4bf390f460821442d8f945293776a0d03bb5f996ce50eb598646a12a0": {
       "alt": "PowerShell 명령이 프로젝트 루트와 소스 패키지와 설정 파일과 잠금 파일을 차례로 만드는 모습",
       "bytes": 1191791,
@@ -1196,6 +1310,16 @@
       "visualSubject": "금액 목록과 합계 결과 막대 및 필터 결과 목록과 존재 검사 결과 프레임과 일반 반복 코드 프레임",
       "width": 1536
     },
+    "40632ebbb8f1b179bbc09b85d7a541666136538b630249f7a4d479260544b19f": {
+      "alt": "입력 열 건이 규칙을 지나 자동 처리 여덟 건과 AI 제안 두 건으로 갈리고 사람 승인을 거쳐 규칙으로 돌아오는 흐름도",
+      "bytes": 1019628,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/40/40632ebbb8f1b179bbc09b85d7a541666136538b630249f7a4d479260544b19f.png",
+      "sourcePost": "01-why-ai-automation",
+      "visualSubject": "입력 열 건이 규칙을 지나 자동 처리 여덟 건과 AI 제안 두 건으로 갈리고 사람 승인을 거치는 흐름",
+      "width": 1672
+    },
     "41bd712f25bb7d76d19a96baedd661c9bb93b0b1b63555d8639e36e1ea09d5fd": {
       "alt": "부모 경로와 자식 이름이 하나의 경로로 합쳐지고 폴더와 파일 종류 검사 및 전체 경로 확인으로 이어지는 순서",
       "bytes": 1204615,
@@ -1225,6 +1349,16 @@
       "sourcePost": "003-what-is-terminal",
       "visualSubject": "세 탭이 있는 Windows Terminal 화면과 PowerShell 해석 화면, 내부 명령과 외부 실행 파일 및 실행 중 프로세스 카드",
       "width": 1536
+    },
+    "42fd015f91fdfcd6694a37a8dee08775a6af301bbc7756da793f9edcdc2a7ca0": {
+      "alt": "지출액과 사용금액과 결제금액 머리글이 금액으로 통일되고 두 테스트 PASS로 이어지는 별칭 구조도",
+      "bytes": 985831,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/42/42fd015f91fdfcd6694a37a8dee08775a6af301bbc7756da793f9edcdc2a7ca0.png",
+      "sourcePost": "05-handle-payment-header",
+      "visualSubject": "지출액, 사용금액과 결제금액이 금액으로 모이고 두 테스트 PASS로 이어지는 구조",
+      "width": 1672
     },
     "43940dcf0d18aad56ad02c0a917f279d9c550275ec2ef0fd4e8eec73625a7dd9": {
       "alt": "어두운 바닥에 놓인 휴대폰 화면이 작은 사각 타일 격자로 덮여 있고 그 위에서 가는 리본 한 줄이 들려 올라오는 장면",
@@ -1659,6 +1793,16 @@
       "visualSubject": "중앙 잠금 파일, 두 컴퓨터의 같은 패키지 트리와 실행기 파일, 경계 밖의 운영체제 파일과 환경 변수 카드와 드라이버 블록과 입력 데이터 파일",
       "width": 1536
     },
+    "66587f0ea8353788b8619750bfee93328369f0002f869212eaa1ac7d79ba6ea8": {
+      "alt": "Codex 주장이 실행 파일과 xlsx 대상과 라이브러리와 열 이름과 출력과 검증으로 나뉘어 코드 근거에 연결되는 지도",
+      "bytes": 721548,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/66/66587f0ea8353788b8619750bfee93328369f0002f869212eaa1ac7d79ba6ea8.png",
+      "sourcePost": "01-verify-ai-project-reading",
+      "visualSubject": "Codex 주장과 실행 파일, xlsx 대상, 라이브러리, 열 이름, 출력, 검증 및 코드 근거",
+      "width": 1672
+    },
     "676a279344492625cf752619379fede637caf8aceff9d5baf766df2ef9b3d8fb": {
       "alt": "함수에 정상값과 경계값 및 실패값을 넣고 기대 결과와 실제 결과를 비교하는 테스트 모습",
       "bytes": 1272723,
@@ -2030,6 +2174,16 @@
       "visualSubject": "한쪽은 삭고 한쪽은 매끈한 금속 덩이와 그 위를 끊김 없이 가로지르는 홈",
       "width": 1216
     },
+    "8047c2cf8a139b81c3f6cfa43248fc98f3f71b25f10f65a5973b7c768d16dbac": {
+      "alt": "실행이 종료 코드 0과 PASS와 결과 파일의 성공 경로와 비정상 종료와 FAIL 로그와 새 결과 없음의 실패 경로로 갈리는 구조도",
+      "bytes": 1088117,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/80/8047c2cf8a139b81c3f6cfa43248fc98f3f71b25f10f65a5973b7c768d16dbac.png",
+      "sourcePost": "06-leave-failure-log",
+      "visualSubject": "실행에서 갈라지는 종료 코드 0, PASS, 결과 파일과 비정상 종료, FAIL 로그, 새 결과 없음",
+      "width": 1672
+    },
     "813bf48e3146e990e4ad935132cf21e891459aadaf1272ff6ec404a9d05080b4": {
       "alt": "한 파일 스크립트와 설치되는 소스 패키지가 서로 다른 테스트와 실행 요구에 연결된 모습",
       "bytes": 1149355,
@@ -2275,6 +2429,16 @@
       "visualSubject": "넓은 판으로 갈라진 바닥과 그 사이를 멀리까지 지나는 좁은 통로 하나",
       "width": 1216
     },
+    "933b20300e6ec07810fe43925301191d8d55700de81fe06308dee3845bdb11fd": {
+      "alt": "컨텍스트와 도구와 경계가 모델로 들어가 실행과 결과로 이어지고 검증이 다시 모델로 돌아오는 구조도",
+      "bytes": 975411,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/93/933b20300e6ec07810fe43925301191d8d55700de81fe06308dee3845bdb11fd.png",
+      "sourcePost": "04-model-and-harness",
+      "visualSubject": "컨텍스트와 도구와 경계가 모델로 들어가고 실행과 결과를 거쳐 검증이 모델로 돌아오는 순환 구조",
+      "width": 1672
+    },
     "9350676bec68e5034004743b273718ab9a8dc8620a35704298eac1bb278b92b0": {
       "alt": "어두운 바탕에 놓인 접시 안에 잘라 낸 작은 종이 조각 아홉 개가 모여 있고 그 옆에는 아무것도 잘리지 않은 종이 한 장이 그대로 놓여 있는 화면",
       "bytes": 76242,
@@ -2294,6 +2458,16 @@
       "sourcePost": "024-excel-input-contract",
       "visualSubject": "Excel 파일 두 개와 파일 이름 검사 및 시트 탭 검사와 필수 열 표 검사 및 누락 열 오류 카드",
       "width": 1536
+    },
+    "94a9eaa469bfce7413843ef238c42d08129014817baa3d77a5b8e4a67c2db569": {
+      "alt": "실패 재현이 고정 표본과 pytest를 거쳐 같은 실패 차단으로 이어지고 다시 재현 조건을 지키는 회귀 테스트 루프",
+      "bytes": 1028717,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/94/94a9eaa469bfce7413843ef238c42d08129014817baa3d77a5b8e4a67c2db569.png",
+      "sourcePost": "03-turn-failure-into-test",
+      "visualSubject": "실패 재현, 고정 표본, pytest와 같은 실패 차단의 순환",
+      "width": 1672
     },
     "94eca10d4df8e2dfc9c453f91f1a4dbf6fa3cd1acc4256473b67d3b80601f14b": {
       "alt": "입력 폴더에서 선택된 Excel 파일 세 개가 열 검사표를 통과하고 원본 위치 꼬리표를 받는 모습",
@@ -2866,6 +3040,16 @@
       "visualSubject": "장식이 섞인 금액 문자열 카드 세 개와 공백 및 기호 제거 필터와 숫자 변환 카드 및 오류 행",
       "width": 1536
     },
+    "c4731b24c9f18d94b299fa54ff29fb218395dc31c322c4cc5fb5b5e93d50bdb7": {
+      "alt": "기대 결과에서 실패 테스트와 최소 수정을 거쳐 전체 통과로 이어지는 테스트 주도 개발 흐름",
+      "bytes": 1022684,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/c4/c4731b24c9f18d94b299fa54ff29fb218395dc31c322c4cc5fb5b5e93d50bdb7.png",
+      "sourcePost": "04-add-review-reason",
+      "visualSubject": "기대 결과, 실패 테스트, 최소 수정과 전체 통과의 네 단계",
+      "width": 1672
+    },
     "c488ba7323bf36a02f765f8644dfac04919af49d124d8a564f2fb9cca9f1ccfc": {
       "alt": "금액 목록의 세 카드가 같은 비교 코드 블록을 차례로 통과해 세 줄의 결과 목록으로 쌓이는 모습",
       "bytes": 1187983,
@@ -2945,6 +3129,26 @@
       "sourcePost": "031-ai-code-analysis",
       "visualSubject": "터미널 명령 화면과 Python 진입 파일 및 Excel 입력과 변환 함수 카드와 결과 파일",
       "width": 1536
+    },
+    "ca06079cd661134f44c77819bbd3c501e7b80ca04f5f0831cdcab0bc554d2d61": {
+      "alt": "프로젝트 루트 안의 파일 읽기와 편집과 터미널 동작이 승인 경계를 거쳐 외부 연결로 나뉘는 구조도",
+      "bytes": 1002797,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/ca/ca06079cd661134f44c77819bbd3c501e7b80ca04f5f0831cdcab0bc554d2d61.png",
+      "sourcePost": "03-connect-codex-to-vscode",
+      "visualSubject": "프로젝트 루트 안의 파일 읽기와 편집과 터미널 동작, 승인 경계와 외부 연결",
+      "width": 1672
+    },
+    "cb6e6a92a07d26020aae8249a4818e3694091b74c19a0508e28f6a5be5b0a0ab": {
+      "alt": "작업 폴더가 Git 커밋을 거쳐 GitHub 비공개 저장소에 올라가고 필요할 때 복구되는 흐름도",
+      "bytes": 990730,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/cb/cb6e6a92a07d26020aae8249a4818e3694091b74c19a0508e28f6a5be5b0a0ab.png",
+      "sourcePost": "02-first-git-github-backup",
+      "visualSubject": "작업 폴더, Git 커밋과 GitHub 비공개 저장소가 이어지고 저장소에서 작업 폴더로 복구되는 흐름",
+      "width": 1672
     },
     "cbdeb8663b99217f0e54d3619e88073865101fb16b87d6cd08bfb8493fbbc4a7": {
       "alt": "노트북 파일의 코드는 남고 실행 중 변수는 사라지며 다시 열어 위에서부터 실행하면 변수가 복구되는 과정",
@@ -3085,6 +3289,16 @@
       "sourcePost": "039-handoff-runbook",
       "visualSubject": "작성자와 동료 사이의 분리선과 저장소 파일 및 인수인계서와 터미널 실행 화면과 재시험 결과",
       "width": 1536
+    },
+    "db089a31ab402f26b97a3d2bea912f1b1a82520fec7331decb77c64bfa3a6184": {
+      "alt": "작업명세와 계획 승인과 diff와 두 번 실행과 세 PASS를 거쳐 커밋에 도착하는 검증 경로",
+      "bytes": 1002692,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/db/db089a31ab402f26b97a3d2bea912f1b1a82520fec7331decb77c64bfa3a6184.png",
+      "sourcePost": "02-first-codex-change",
+      "visualSubject": "작업명세, 계획 승인, diff, 두 번 실행, 세 PASS와 커밋의 검증 경로",
+      "width": 1672
     },
     "db09a4aa1753cf6577e84aff28e08e885bd7bed60230cc7a2d76cff155108b8c": {
       "alt": "새 검토 창이 변경 내역을 읽고 옆의 실제 테스트 장치가 결과물을 작동시키는 이중 검증대",
@@ -3456,6 +3670,16 @@
       "sourcePost": "012-vscode-python-project",
       "visualSubject": "단일 코드 파일만 있는 편집기 화면과 입력 파일, 출력 파일, 코드 파일이 연결된 프로젝트 폴더 트리",
       "width": 1536
+    },
+    "f8cfe20051817877de23c035959dcf60be3e94fb8eb0a13e9f7cf6824cf94df9": {
+      "alt": "전역 지침 안에 프로젝트 AGENTS.md가 있고 그 안에 하위 폴더 지침과 작업 파일이 차례로 포함된 범위 구조도",
+      "bytes": 969203,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/f8/f8cfe20051817877de23c035959dcf60be3e94fb8eb0a13e9f7cf6824cf94df9.png",
+      "sourcePost": "05-project-instructions-for-ai",
+      "visualSubject": "전역 지침, 프로젝트 AGENTS.md, 하위 폴더 지침과 작업 파일이 차례로 포함된 구조",
+      "width": 1672
     },
     "fb40e2dc5315a361eae21cc4d38414fa735df0d4bb89600f956b361303fe0d12": {
       "alt": "Excel 입력 계약이 폴더와 파일 수와 시트와 열과 자료형과 고유 키의 층으로 분해된 모습",
