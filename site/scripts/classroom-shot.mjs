@@ -313,6 +313,29 @@ for (const viewport of activeViewports) {
       JSON.stringify(visualGroup),
     );
 
+    const readingCaption = value(await evaluate(session, `(() => {
+      const carousel = document.querySelector('article .visual-carousel');
+      const frame = carousel?.querySelector('.visual-carousel-frame');
+      const caption = carousel?.querySelector(':scope > .visual-carousel-caption');
+      const active = caption?.querySelector('[data-carousel-description-active="true"]');
+      if (!frame || !caption || !active) return null;
+      const frameBox = frame.getBoundingClientRect();
+      const captionBox = caption.getBoundingClientRect();
+      return {
+        gap:Math.round((captionBox.top - frameBox.bottom) * 100) / 100,
+        text:active.textContent.trim(),
+        below:captionBox.top >= frameBox.bottom,
+      };
+    })()`));
+    record(
+      `${viewport.id} 교안 시각물 아래 보조설명`,
+      PREVIEW_ONLY || readingCaption?.below === true &&
+        readingCaption.gap >= 6 &&
+        readingCaption.gap <= 20 &&
+        Boolean(readingCaption.text),
+      JSON.stringify(readingCaption),
+    );
+
     // 읽기 본문과 같은 H2가 전체화면 장면이 되고 한 장표에 시각자료 하나만 보이는지 본다.
     const lectureButton = Number(
       value(await evaluate(session, `document.querySelectorAll('[data-lecture-open]').length`)),

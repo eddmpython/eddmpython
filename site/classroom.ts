@@ -221,6 +221,9 @@ article tbody tr:last-child td { border-bottom:0; }
   width:auto; margin:0; padding:.45rem .6rem; border-radius:.4rem;
   background:color-mix(in srgb,var(--eddm-carbon) 82%,transparent); color:var(--eddm-ivory);
   font-size:.78rem; line-height:1.45; }
+.visual-carousel-caption { margin:.65rem 0 0; color:var(--eddm-text-muted); }
+.visual-carousel-caption p { margin:0; font-size:.88rem; line-height:1.65; }
+.visual-carousel-caption[hidden], .visual-carousel-caption p[hidden] { display:none; }
 .visual-carousel .yt .frame { width:100%; height:100%; max-width:none; padding:0; aspect-ratio:16/9; }
 .visual-carousel .yt.tall .frame { width:100%; height:100%; aspect-ratio:16/9; }
 .visual-carousel .course-embed iframe { display:block; width:100%; height:100%; max-width:100%; max-height:100%;
@@ -688,7 +691,8 @@ const CAROUSEL_SCRIPT = `
     const previous = root.querySelector("[data-carousel-prev]");
     const next = root.querySelector("[data-carousel-next]");
     const status = root.querySelector("[data-carousel-status]");
-    const support = root.closest(".lecture-scene")?.querySelector(":scope > .scene-head > [data-carousel-support]");
+    const support = root.querySelector(":scope > [data-carousel-support]")
+      || root.closest(".lecture-scene")?.querySelector(":scope > .scene-head > [data-carousel-support]");
     const descriptions = support ? [...support.querySelectorAll("[data-carousel-description]")] : [];
     let at = 0;
     const show = (nextAt, notify = true) => {

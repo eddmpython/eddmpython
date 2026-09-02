@@ -87,11 +87,11 @@ check("읽기 모드는 H2의 모든 시각물을 하나의 16대9 캐러셀로 
     "",
     "첫 일반 문단은 원래 읽기 본문입니다.",
     "",
-    "![첫 시각물](a.png)",
+    '![첫 시각물](a.png "첫 시각물 보조설명")',
     "",
     "나머지 본문입니다.",
     "",
-    "![둘째 시각물](b.png)",
+    '![둘째 시각물](b.png "둘째 시각물 보조설명")',
   ].join("\n");
   const scene = { id: "s1", role: "open", layout: "sequence", fit: "cover", visualCount: 2,
     beats: [{ effect: "enter", targets: [1, 2] }] } as CourseScene;
@@ -104,17 +104,24 @@ check("읽기 모드는 H2의 모든 시각물을 하나의 16대9 캐러셀로 
   assert.ok(html.includes('data-visual="2"'));
   assert.ok(html.includes("data-carousel-prev"));
   assert.ok(!html.includes("scene-support"));
+  assert.ok(html.includes('class="visual-carousel-caption"'));
+  assert.ok(html.includes('data-carousel-description="1" data-carousel-description-active="true">첫 시각물 보조설명'));
+  assert.ok(html.includes('data-carousel-description="2" hidden aria-hidden="true">둘째 시각물 보조설명'));
+  assert.ok(html.indexOf("visual-carousel-frame") < html.indexOf("visual-carousel-caption"));
+  assert.ok(!html.includes("<figcaption>첫 시각물 보조설명</figcaption>"));
   assert.ok(html.includes("<p>첫 일반 문단은 원래 읽기 본문입니다.</p>"));
   assert.ok(html.indexOf("첫 일반 문단은 원래 읽기 본문입니다.") < html.indexOf("visual-carousel"));
   assert.ok(html.indexOf("visual-carousel") < html.indexOf("나머지 본문입니다."));
 });
 
 check("시각물이 하나여도 읽기와 강의가 같은 16대9 프레임 구조를 쓴다", () => {
-  const { html } = renderPost("## 한 장면\n\n### 한 시각물입니다\n\n보조설명입니다.\n\n![한 장](a.png)");
+  const { html } = renderPost('## 한 장면\n\n### 한 시각물입니다\n\n보조설명입니다.\n\n![한 장](a.png "한 장의 캡션")');
   assert.ok(html.includes('class="visual-carousel"'));
   assert.ok(html.includes('data-carousel-count="1"'));
   assert.ok(!html.includes("data-carousel-prev"));
   assert.ok(!html.includes("scene-support"));
+  assert.ok(html.includes('class="visual-carousel-caption"'));
+  assert.ok(html.indexOf("visual-carousel-frame") < html.indexOf("한 장의 캡션"));
 });
 
 // 비공개 시각물. KV 의 media/<sha256>.<ext> 를 방 경로로 그리고, 방 밖에서는 자리만 보인다.
@@ -469,7 +476,7 @@ check("캡션 없는 이미지는 figcaption 을 만들지 않는다", () => {
   assert.ok(!html.includes("<figcaption"));
 });
 
-check("캐러셀 안의 시각물마다 캡션이 붙는다", () => {
+check("교안 캐러셀의 시각물마다 프레임 아래 캡션이 붙는다", () => {
   const { html } = renderPost([
     "## 캡션 장면",
     "",
@@ -481,7 +488,9 @@ check("캐러셀 안의 시각물마다 캡션이 붙는다", () => {
     "",
     '![b](https://a.b/2.png "둘째")',
   ].join("\n"));
-  assert.equal(html.match(/<figcaption>/g)?.length, 2);
+  assert.equal(html.match(/data-carousel-description=/g)?.length, 2);
+  assert.ok(!html.includes("<figcaption>"));
+  assert.ok(html.indexOf("visual-carousel-frame") < html.indexOf("visual-carousel-caption"));
   assert.ok(html.includes("첫째") && html.includes("둘째"));
   assert.equal(html.match(/class="visual-carousel"/g)?.length, 1);
   assert.ok(html.includes('data-visual="1"'));

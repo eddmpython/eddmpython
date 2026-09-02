@@ -592,25 +592,38 @@ function carouselItem(html: string, index: number): string {
   return html.replace(TOP_VISUAL, `<$1 data-carousel-item="${index}" $2`);
 }
 
-function visualCarousel(visuals: string[], fit: CourseScene["fit"] = "contain", label = "시각물"): string {
+function stripVisualCaption(visual: string): string {
+  return visual.replace(/<figcaption>[\s\S]*?<\/figcaption>/, "");
+}
+
+function visualCarousel(
+  visuals: string[],
+  fit: CourseScene["fit"] = "contain",
+  label = "시각물",
+  captionBelow = false,
+): string {
   if (!visuals.length) return "";
-  const items = visuals.map((item, index) => carouselItem(item, index + 1)).join("");
+  const items = visuals.map((item, index) => carouselItem(
+    captionBelow ? stripVisualCaption(item) : item,
+    index + 1,
+  )).join("");
   const controls = visuals.length > 1
     ? `<div class="visual-carousel-controls"><button type="button" data-carousel-prev aria-label="이전 시각물">←</button><span data-carousel-status aria-live="polite">1 / ${visuals.length}</span><button type="button" data-carousel-next aria-label="다음 시각물">→</button></div>`
     : "";
+  const support = captionBelow ? visualSupport(visuals, "visual-carousel-caption") : "";
   return `<div class="visual-carousel" data-visual-carousel data-carousel-count="${visuals.length}" data-fit="${esc(
     fit || "contain",
-  )}" aria-label="${esc(label)} 캐러셀"><div class="visual-carousel-frame"><div class="visual-carousel-track">${items}</div>${controls}</div></div>`;
+  )}" aria-label="${esc(label)} 캐러셀"><div class="visual-carousel-frame"><div class="visual-carousel-track">${items}</div>${controls}</div>${support}</div>`;
 }
 
-function visualSupport(visuals: string[]): string {
+function visualSupport(visuals: string[], className = "scene-support"): string {
   const descriptions = visuals.map((visual) => visual.match(/<figcaption>([\s\S]*?)<\/figcaption>/)?.[1]?.trim() || "");
   if (!descriptions.some(Boolean)) return "";
   const items = descriptions.map((description, index) => {
     const active = index === 0;
     return `<p data-carousel-description="${index + 1}"${active ? ' data-carousel-description-active="true"' : ' hidden aria-hidden="true"'}>${description}</p>`;
   }).join("");
-  return `<div class="scene-support" data-carousel-support>${items}</div>`;
+  return `<div class="${className}" data-carousel-support>${items}</div>`;
 }
 
 function groupReadingCarousels(parts: string[], scenes: CourseScene[]): string {
@@ -630,7 +643,7 @@ function groupReadingCarousels(parts: string[], scenes: CourseScene[]): string {
       const title = content.find((part) => part.startsWith("<h2 "))?.replace(/<[^>]+>/g, "") || "시각물";
       const firstVisualAt = section.findIndex((part) => TOP_VISUAL.test(part));
       const insertAt = section.slice(0, firstVisualAt).filter((part) => !TOP_VISUAL.test(part)).length;
-      content.splice(insertAt, 0, visualCarousel(visuals, scenes[sceneIndex]?.fit, title));
+      content.splice(insertAt, 0, visualCarousel(visuals, scenes[sceneIndex]?.fit, title, true));
     }
     out.push(...content);
     section = [];
