@@ -324,33 +324,34 @@ body.lecture-on { overflow:hidden; }
   overflow:hidden; display:grid; grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1fr);
   touch-action:pan-y; }
 .lecture-stage > .lecture-scene { grid-column:1; grid-row:1; min-height:0; }
-/* PPT처럼 왼쪽은 말할 내용, 오른쪽은 규격화된 단일 시각자료 무대다. */
+/* 장표는 제목, 부제, 보조설명, 규격화된 단일 시각자료를 위에서 아래로 쌓는다. */
 .lecture-scene { display:none; position:relative; width:100%; height:100%; min-width:0; min-height:0;
-  box-sizing:border-box; padding:clamp(1.4rem,3.2vw,4rem); contain:layout style;
-  grid-template-columns:minmax(16rem,28%) minmax(0,1fr); grid-template-areas:"head canvas";
-  gap:clamp(1.6rem,3.2vw,4.5rem); }
+  box-sizing:border-box; padding:clamp(1.15rem,2.6vw,3rem) clamp(1.2rem,3.4vw,4rem); contain:layout style;
+  grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(0,1fr);
+  grid-template-areas:"head" "canvas"; gap:clamp(.75rem,1.6vh,1.25rem); }
 .lecture-scene.on { display:grid; }
 .lecture-scene.on .scene-head { animation:scene-head var(--lecture-motion) ease both; }
-.scene-head { grid-area:head; position:relative; z-index:2; min-width:0; min-height:0; align-self:center;
-  display:flex; flex-direction:column; justify-content:center; }
-.scene-meta { display:flex; align-items:center; gap:.7rem; margin-bottom:clamp(1.2rem,3vh,2.4rem); }
+.scene-head { grid-area:head; position:relative; z-index:2; min-width:0; min-height:0; align-self:start; }
+.scene-meta { display:flex; align-items:center; gap:.7rem; margin-bottom:clamp(.45rem,1vh,.8rem); }
 .scene-index { display:flex; align-items:center; gap:.6rem; color:var(--eddm-accent); font-size:.72rem;
   font-weight:700; letter-spacing:.12em; font-variant-numeric:tabular-nums; }
 .scene-index::after { content:""; width:2.6rem; height:1px; background:var(--eddm-accent-line); }
 .scene-cue { min-height:.85rem; color:var(--eddm-accent); font-size:.66rem; font-weight:650;
   letter-spacing:.08em; white-space:nowrap; opacity:.82; }
 .scene-copy { min-width:0; opacity:1; transition:opacity var(--lecture-motion) ease; }
-.scene-head h2 { margin:0; font-size:clamp(2.25rem,3.6vw,4.7rem); line-height:1.03;
+.scene-head h2 { margin:0; font-size:clamp(2.2rem,3.8vw,4.1rem); line-height:1.02;
   letter-spacing:-.05em; text-wrap:balance; }
-.scene-subtitle { margin:clamp(.8rem,1.8vh,1.35rem) 0 0; color:var(--eddm-text-muted);
-  font-size:clamp(1.02rem,1.35vw,1.55rem); line-height:1.5; text-wrap:balance; }
-.scene-visual-note { margin:clamp(1.25rem,3vh,2.25rem) 0 0; padding-top:1rem;
-  border-top:1px solid var(--eddm-line-base); color:var(--eddm-text-muted);
-  font-size:clamp(.82rem,.9vw,1rem); line-height:1.55; }
+.scene-subtitle { max-width:92rem; margin:clamp(.4rem,1vh,.7rem) 0 0; color:var(--eddm-text-muted);
+  font-size:clamp(.98rem,1.25vw,1.4rem); line-height:1.4; text-wrap:balance; }
+.scene-support { height:clamp(4rem,8vh,5.5rem); margin-top:clamp(.5rem,1.1vh,.85rem); padding-top:.55rem;
+  box-sizing:border-box; overflow:auto; border-top:1px solid var(--eddm-line-base); scrollbar-width:none; }
+.scene-support::-webkit-scrollbar { display:none; }
+.scene-visual-note { margin:0; color:var(--eddm-text-muted);
+  font-size:clamp(.78rem,.85vw,.95rem); line-height:1.45; }
 .scene-visual-note[hidden] { display:none; }
-.scene-callout { display:none; margin:clamp(1.1rem,2.5vh,2rem) 0 0; padding:.15rem 0 .15rem .9rem;
+.scene-callout { display:none; margin:.4rem 0 0; padding:.1rem 0 .1rem .8rem;
   border-left:2px solid var(--eddm-accent); color:var(--eddm-ivory);
-  font-size:clamp(.92rem,1.05vw,1.18rem); line-height:1.55; }
+  font-size:clamp(.82rem,.9vw,1rem); line-height:1.45; }
 .scene-callout.on { display:block; animation:scene-callout var(--lecture-motion) ease-out both; }
 .scene-canvas { grid-area:canvas; align-self:stretch; min-width:0; min-height:0; overflow:hidden;
   display:grid; place-items:center; contain:layout style; }
@@ -427,7 +428,6 @@ body.lecture-on { overflow:hidden; }
   .lecture-rail button, .lecture-rail .theme-toggle { height:2rem; padding:0; }
   .lecture-progress { font-size:.58rem; letter-spacing:.02em; }
   .lecture-alert { left:calc(50% + 2.25rem); max-width:calc(100vw - 7rem); }
-  .lecture-scene { grid-template-columns:minmax(14rem,29%) minmax(0,1fr); }
 }
 @media (max-width:900px) {
   .lecture-deck { grid-template-columns:3.6rem minmax(0,1fr); }
@@ -440,16 +440,14 @@ body.lecture-on { overflow:hidden; }
   .lecture-progress { margin-bottom:.4rem; padding-bottom:.4rem; }
   .lecture-rail button, .lecture-rail .theme-toggle { height:1.8rem; }
   .lecture-actions { display:grid; grid-template-columns:minmax(0,1fr); }
-  .lecture-scene { padding:clamp(.9rem,4vw,1.4rem); grid-template-columns:minmax(0,1fr);
-    grid-template-rows:auto minmax(0,1fr); grid-template-areas:"head" "canvas"; gap:.85rem; }
-  .scene-head { align-self:start; display:grid; grid-template-columns:auto minmax(0,1fr); gap:.45rem .7rem; }
-  .scene-meta { grid-column:1/-1; margin-bottom:.15rem; }
+  .lecture-scene { padding:clamp(.8rem,3.5vw,1.25rem); gap:.65rem; }
+  .scene-meta { margin-bottom:.25rem; }
   .scene-index::after { width:1.4rem; }
   .scene-head h2 { font-size:clamp(1.5rem,7vw,2.35rem); }
-  .scene-subtitle { margin-top:.4rem; font-size:.88rem; line-height:1.4; }
-  .scene-visual-note, .scene-callout { margin-top:.55rem; padding-top:.5rem; font-size:.74rem; line-height:1.4; }
-  .scene-visual-note { height:3.4rem; box-sizing:border-box; overflow:auto; }
-  .scene-callout { padding-top:.1rem; }
+  .scene-subtitle { margin-top:.3rem; font-size:.86rem; line-height:1.35; }
+  .scene-support { height:4rem; margin-top:.35rem; padding-top:.4rem; }
+  .scene-visual-note, .scene-callout { font-size:.72rem; line-height:1.35; }
+  .scene-callout { margin-top:.25rem; }
   .scene-canvas { place-items:start stretch; }
   .scene-canvas figure.media[data-scene-visible="true"],
   .scene-canvas figure.yt[data-scene-visible="true"],
@@ -464,11 +462,13 @@ body.lecture-on { overflow:hidden; }
   .lecture-rail-foot { padding-top:.45rem; }
   .lecture-progress { margin-bottom:.4rem; padding-bottom:.35rem; }
   .lecture-rail button, .lecture-rail .theme-toggle { height:1.8rem; }
-  .lecture-scene { padding:1.15rem 1.5rem; gap:1.5rem; }
-  .scene-meta { margin-bottom:.75rem; }
-  .scene-head h2 { font-size:clamp(1.9rem,3.3vw,3.1rem); }
-  .scene-subtitle { margin-top:.45rem; font-size:.92rem; }
-  .scene-visual-note, .scene-callout { margin-top:.75rem; font-size:.8rem; }
+  .lecture-scene { padding:.75rem 1.25rem; gap:.5rem; }
+  .scene-meta { margin-bottom:.25rem; }
+  .scene-head h2 { font-size:clamp(1.75rem,3.1vw,2.8rem); }
+  .scene-subtitle { margin-top:.2rem; font-size:.82rem; }
+  .scene-support { height:2.8rem; margin-top:.25rem; padding-top:.3rem; }
+  .scene-visual-note, .scene-callout { font-size:.7rem; line-height:1.3; }
+  .scene-callout { margin-top:.15rem; }
 }
 @media (prefers-reduced-motion:reduce) {
   .scene-canvas [data-visual][data-scene-visible="true"], .scene-callout.on, .scene-head { animation:none; }
@@ -653,7 +653,7 @@ const CELL_SCRIPT = `
  *
  * 발표자 노트, 발표자 분리 창, 발표 시간은 계약 3 과 함께 걷어냈다 (2026-08-31 운영자 지시).
  * 다중 대상 beat는 렌더러가 같은 좌표의 연속 프레임으로 펼친다. 브라우저는 완성된 프레임
- * 하나만 투영하며 좌측 인덱스와 앞뒤 단추로 이동한다.
+ * 하나만 투영하며 왼쪽 인덱스와 앞뒤 단추로 이동한다.
  */
 const LECTURE_SCRIPT = `
 (() => {
@@ -823,7 +823,7 @@ const LECTURE_SCRIPT = `
     });
   };
 
-  // 사례 라벨을 바로 아래 시각물에 붙이고, 장표에서는 캡션과 함께 왼쪽 설명 칸으로 옮긴다.
+  // 사례 라벨을 바로 아래 시각물에 붙이고, 장표에서는 캡션과 함께 시각물 위 보조설명으로 옮긴다.
   scenes.forEach((scene) => {
     let labels = [];
     scene.querySelectorAll(".scene-canvas .lb, .scene-canvas h4, .scene-canvas [data-visual]").forEach((node) => {

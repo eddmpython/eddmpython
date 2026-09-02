@@ -652,7 +652,7 @@ export function renderLecture(
     )}" data-layout="${esc(scene.layout)}" data-beats="${esc(JSON.stringify(scene.beats))}" data-timeline="${esc(JSON.stringify(timeline))}" role="group" aria-roledescription="슬라이드" aria-labelledby="${esc(titleId)}" aria-hidden="true" inert>
   <header class="scene-head"><div class="scene-meta"><span class="scene-index">${String(index + 1).padStart(2, "0")}</span><span class="scene-cue" data-scene-cue></span></div><div class="scene-copy"><h2 id="${esc(titleId)}" tabindex="-1">${esc(
     section.title,
-  )}</h2><p class="scene-subtitle">${esc(section.subtitle)}</p><p class="scene-visual-note" data-scene-visual-note hidden></p><p class="scene-callout" data-scene-callout aria-live="polite"></p></div></header>
+  )}</h2><p class="scene-subtitle">${esc(section.subtitle)}</p><div class="scene-support"><p class="scene-visual-note" data-scene-visual-note hidden></p><p class="scene-callout" data-scene-callout aria-live="polite"></p></div></div></header>
   <div class="scene-canvas">${html}</div>
 </section>`);
   }

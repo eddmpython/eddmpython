@@ -361,9 +361,7 @@ for (const viewport of activeViewports) {
           title: scene?.querySelector('.scene-head h2')?.textContent.trim(),
           titleSize: parseFloat(getComputedStyle(scene?.querySelector('.scene-head h2')).fontSize),
           visible: scene?.querySelectorAll('[data-scene-visible="true"]').length,
-          headBeforeCanvas: headBox && canvasBox
-            ? (innerWidth > 900 ? headBox.right <= canvasBox.left + 1 : headBox.bottom <= canvasBox.top + 1)
-            : null,
+          headBeforeCanvas: headBox && canvasBox ? headBox.bottom <= canvasBox.top + 1 : null,
           railFullHeight: railBox ? Math.abs(railBox.top) <= 1 && Math.abs(railBox.bottom - innerHeight) <= 1 : null,
           railItems: deck?.querySelectorAll('[data-lecture-map-scene]').length,
           railCurrent: deck?.querySelectorAll('[data-lecture-map-scene][aria-current="step"]').length,
@@ -388,7 +386,7 @@ for (const viewport of activeViewports) {
           progress: deck?.querySelector('[data-lecture-progress]')?.textContent.trim(),
         };
       })()`));
-      // 런타임 6. 좌측 인덱스와 단일 시각자료 장표로 열리고 상하 크롬은 없다.
+      // 런타임 6. 왼쪽 인덱스와 세로 정보 흐름, 단일 시각자료 장표로 열리고 상하 크롬은 없다.
       record(
         `${viewport.id} 강의 모드 첫 장면`,
         lectureStart?.hidden === false &&
@@ -615,7 +613,7 @@ for (const viewport of activeViewports) {
         const frame = visual?.querySelector('img, video, iframe, pre') ?? visual;
         const caption = visual?.querySelector('figcaption');
         const label = scene.querySelector('[data-scene-label-visible="true"]');
-        const subtitle = scene.querySelector('.scene-head p');
+        const subtitle = scene.querySelector('.scene-subtitle');
         const labelRect = label?.getBoundingClientRect();
         const subtitleRect = subtitle?.getBoundingClientRect();
         return {
@@ -640,9 +638,9 @@ for (const viewport of activeViewports) {
       record(
         `${viewport.id} 개막 enter 화면`,
         firstBeat?.visible === 1 &&
-          firstBeat?.effect === "enter" &&
-          firstBeat?.sceneEffect === "enter" &&
-          firstBeat?.cue === "살펴보기" &&
+          ["enter", "replace", "compare", "compose"].includes(firstBeat?.effect) &&
+          firstBeat?.sceneEffect === firstBeat?.effect &&
+          Boolean(firstBeat?.cue) &&
           firstBeat?.phase === "ready" &&
           firstBeat?.width >= viewport.visualMin &&
           firstBeat?.frameBorder === "1px" &&
@@ -710,10 +708,10 @@ for (const viewport of activeViewports) {
         };
       })()`));
       record(
-        `${viewport.id} 키보드 비교 장표`,
-        keyboardBeat?.effect === "compare" &&
-          keyboardBeat?.sceneEffect === "compare" &&
-          keyboardBeat?.cue === "비교" &&
+        `${viewport.id} 키보드 다음 장표`,
+        ["enter", "replace", "compare", "compose", "focus", "run", "simulate"].includes(keyboardBeat?.effect) &&
+          keyboardBeat?.sceneEffect === keyboardBeat?.effect &&
+          Boolean(keyboardBeat?.cue) &&
           keyboardBeat?.visible === 1 &&
           /^02 \/ \d+$/.test(keyboardBeat?.progress ?? "") &&
           keyboardBeat?.hash === "#lecture=s1.2",
@@ -721,7 +719,7 @@ for (const viewport of activeViewports) {
       );
       await save(session, "07-lecture-frame", false);
 
-      // 계약 6: 판단 문장은 현재 단일 시각자료 장표의 왼쪽 설명에 함께 실린다.
+      // 계약 6: 판단 문장은 현재 단일 시각자료 장표의 보조설명에 함께 실린다.
       const annotationState = value(await evaluate(session, `(() => {
         const deck = document.querySelector('[data-lecture-deck]');
         const scene = deck.querySelector('.lecture-scene.on');
@@ -735,26 +733,39 @@ for (const viewport of activeViewports) {
         };
       })()`));
       await save(session, "07-lecture-annotation", false);
-      annotationState.clearedAfterBack = Boolean(value(await evaluate(session, `(async () => {
+      annotationState.transitions = value(await evaluate(session, `(async () => {
         const deck = document.querySelector('[data-lecture-deck]');
         const waitFrame = (key) => new Promise((resolve) => {
           deck.addEventListener('lectureframe', resolve, { once:true });
           document.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles:true }));
         });
+        const before = document.querySelector('.lecture-scene.on [data-scene-callout]')?.textContent || '';
         await waitFrame('ArrowLeft');
         const callout = document.querySelector('.lecture-scene.on [data-scene-callout]');
-        const cleared = !callout.classList.contains('on') && callout.textContent === '';
+        const stableWithinCarousel = callout.classList.contains('on') && callout.textContent === before;
+        await new Promise((resolve) => {
+          deck.addEventListener('lectureframe', resolve, { once:true });
+          deck.querySelector('[data-lecture-map-scene="1"]').click();
+        });
+        const nextCallout = document.querySelector('.lecture-scene.on [data-scene-callout]');
+        const clearedAfterScene = !nextCallout.classList.contains('on') && nextCallout.textContent === '';
+        await new Promise((resolve) => {
+          deck.addEventListener('lectureframe', resolve, { once:true });
+          deck.querySelector('[data-lecture-map-scene="0"]').click();
+        });
         await waitFrame('ArrowRight');
-        return cleared;
-      })()`)));
+        return { stableWithinCarousel, clearedAfterScene, restored:location.hash };
+      })()`));
       record(
         `${viewport.id} 장표에 실린 판단 문장`,
-        annotationState?.effect === "compare" &&
+        ["enter", "replace", "compare", "compose"].includes(annotationState?.effect) &&
           annotationState?.calloutVisible === true &&
-          annotationState?.callout?.includes("종류마다 멈추는 자리") &&
+          Boolean(annotationState?.callout) &&
           annotationState?.visible === 1 &&
           annotationState?.hash === "#lecture=s1.2" &&
-          annotationState?.clearedAfterBack === true,
+          annotationState?.transitions?.stableWithinCarousel === true &&
+          annotationState?.transitions?.clearedAfterScene === true &&
+          annotationState?.transitions?.restored === "#lecture=s1.2",
         JSON.stringify(annotationState),
       );
 
@@ -770,17 +781,18 @@ for (const viewport of activeViewports) {
           });
           const after = deck.querySelector('[data-lecture-progress]').textContent.trim();
           const hash = location.hash;
+          const hashMatchesFrame = /^#lecture=s\\d+\\.\\d+$/.test(hash);
           await new Promise((resolve) => {
             deck.addEventListener('lectureframe', resolve, { once:true });
             document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowLeft', bubbles:true }));
           });
-          return { before, after, hash, restored:location.hash };
+          return { before, after, hash, hashMatchesFrame, restored:location.hash };
         })()`));
         record(
           `${viewport.id} 좌우 스와이프 이동`,
-          /^02 \/ \d+$/.test(swipeState?.before ?? "") &&
-            /^03 \/ \d+$/.test(swipeState?.after ?? "") &&
-            swipeState?.hash === "#lecture=s1.3" &&
+          Number.parseInt(swipeState?.after ?? "", 10) === Number.parseInt(swipeState?.before ?? "", 10) + 1 &&
+            swipeState?.hashMatchesFrame === true &&
+            swipeState?.hash !== swipeState?.restored &&
             swipeState?.restored === "#lecture=s1.2",
           JSON.stringify(swipeState),
         );
@@ -1028,7 +1040,7 @@ for (const viewport of activeViewports) {
     record(`${viewport.id} 시각 자산 확대`, zoomState === "on", zoomState);
     if (zoomState === "on") await save(session, "04-zoom");
 
-    // 가로가 넓고 세로가 낮은 강의 화면에서도 시각물은 본문 폭의 왼쪽이 아니라 무대 중앙에 놓여야 한다.
+    // 가로가 넓고 세로가 낮은 강의 화면에서도 시각물은 보조설명 아래의 전체 무대를 써야 한다.
     const comparePost = value(
       await evaluate(
         session,
@@ -1076,6 +1088,9 @@ for (const viewport of activeViewports) {
         rail: box(rail),
         stage: box(stage),
         head: box(scene?.querySelector('.scene-head')),
+        title: box(scene?.querySelector('.scene-head h2')),
+        subtitle: box(scene?.querySelector('.scene-subtitle')),
+        support: box(scene?.querySelector('.scene-support')),
         canvas: box(scene?.querySelector('.scene-canvas')),
         visual: box(visual),
         media: mediaBox,
@@ -1093,7 +1108,7 @@ for (const viewport of activeViewports) {
         bottomBars: deck?.querySelectorAll('.lecture-foot').length,
       };
     })()`));
-    // PPT 구도. 좌측 인덱스, 왼쪽 설명, 오른쪽 단일 시각자료 무대가 화면을 모두 쓴다.
+    // PPT 구도. 왼쪽 인덱스 옆에서 제목, 부제, 보조설명, 단일 시각자료가 세로로 이어진다.
     record(
       `${viewport.id} 레이아웃별 강의 무대`,
       balancedStage?.deck?.left === 0 &&
@@ -1105,14 +1120,16 @@ for (const viewport of activeViewports) {
         Math.abs(balancedStage?.rail?.bottom - balancedStage?.viewportHeight) <= 1 &&
         Math.abs(balancedStage?.stage?.left - balancedStage?.rail?.right) <= 1 &&
         Math.abs(balancedStage?.stage?.right - balancedStage?.viewport) <= 1 &&
-        (viewport.width > 900
-          ? balancedStage?.head?.right <= balancedStage?.canvas?.left + 1
-          : balancedStage?.head?.bottom <= balancedStage?.canvas?.top + 1) &&
+        balancedStage?.title?.bottom <= balancedStage?.subtitle?.top + 1 &&
+        balancedStage?.subtitle?.bottom <= balancedStage?.support?.top + 1 &&
+        balancedStage?.support?.bottom <= balancedStage?.canvas?.top + 1 &&
+        balancedStage?.head?.bottom <= balancedStage?.canvas?.top + 1 &&
         balancedStage?.visual?.left >= balancedStage?.canvas?.left - 1 &&
         balancedStage?.visual?.right <= balancedStage?.canvas?.right + 1 &&
         balancedStage?.visual?.top >= balancedStage?.canvas?.top - 1 &&
         balancedStage?.visual?.bottom <= balancedStage?.canvas?.bottom + 1 &&
-        balancedStage?.canvas?.width >= balancedStage?.stage?.width * (viewport.width > 900 ? 0.58 : 0.85) &&
+        balancedStage?.canvas?.width >= balancedStage?.stage?.width * 0.85 &&
+        balancedStage?.canvas?.height >= balancedStage?.stage?.height * 0.45 &&
         balancedStage?.topBars === 0 && balancedStage?.bottomBars === 0,
       JSON.stringify(balancedStage),
     );
