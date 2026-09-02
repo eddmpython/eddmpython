@@ -146,7 +146,7 @@ article h2:first-child { margin-top:0; padding-top:0; border-top:0; }
 /* 섹션 번호. 목차의 번호와 같아서 지금 몇 번째인지 세지 않고 안다. */
 article h2 .sn { flex:0 0 auto; font-size:.82rem; font-weight:500; letter-spacing:.04em;
   color:var(--eddm-accent-dim); font-variant-numeric:tabular-nums; }
-article h3 { margin:0 0 .55rem 2.1rem; padding-bottom:.75rem; border-bottom:1px solid var(--eddm-line-base);
+article h3 { margin:0 0 .55rem; padding:0; border:0;
   font-size:.95rem; font-weight:400; line-height:1.65; color:var(--eddm-text-muted); }
 article h3 + figure.media, article h3 + .visual-carousel, article h3 + .yt,
 article h3 + img, article h3 + video, article h3 + .pending { margin-top:.7rem; }
