@@ -356,6 +356,10 @@ for (const viewport of activeViewports) {
         const canvas = scene?.querySelector('.scene-canvas');
         const headBox = head?.getBoundingClientRect();
         const canvasBox = canvas?.getBoundingClientRect();
+        const sceneBox = scene?.getBoundingClientRect();
+        const copyBox = scene?.querySelector('.scene-copy')?.getBoundingClientRect();
+        const supportBox = scene?.querySelector('.scene-support')?.getBoundingClientRect();
+        const visualBox = scene?.querySelector('.visual-carousel')?.getBoundingClientRect();
         const railBox = deck?.querySelector('.lecture-rail')?.getBoundingClientRect();
         const railItems = [...(deck?.querySelectorAll('[data-lecture-map-scene]') ?? [])];
         const thumbBoxes = railItems.map((item) => item.querySelector('.lecture-map-thumb')?.getBoundingClientRect());
@@ -368,6 +372,10 @@ for (const viewport of activeViewports) {
           titleSize: parseFloat(getComputedStyle(scene?.querySelector('.scene-head h2')).fontSize),
           visible: scene?.querySelectorAll('[data-scene-visible="true"]').length,
           headBeforeCanvas: headBox && canvasBox ? headBox.bottom <= canvasBox.top + 1 : null,
+          visualWidthRatio: sceneBox && visualBox ? visualBox.width / sceneBox.width : null,
+          lineToSupport: copyBox && supportBox ? supportBox.top - copyBox.bottom : null,
+          topSpace: sceneBox && headBox ? headBox.top - sceneBox.top : null,
+          bottomSpace: sceneBox && visualBox ? sceneBox.bottom - visualBox.bottom : null,
           railFullHeight: railBox ? Math.abs(railBox.top) <= 1 && Math.abs(railBox.bottom - innerHeight) <= 1 : null,
           railItems: railItems.length,
           railThumbs: deck?.querySelectorAll('.lecture-map-thumb').length,
@@ -404,6 +412,11 @@ for (const viewport of activeViewports) {
           Boolean(lectureStart?.title) &&
           lectureStart?.visible === 1 &&
           lectureStart?.headBeforeCanvas === true &&
+          lectureStart?.visualWidthRatio > .5 &&
+          lectureStart?.visualWidthRatio < .9 &&
+          lectureStart?.lineToSupport >= 14 &&
+          lectureStart?.topSpace >= (viewport.height > 650 && viewport.width > 900 ? 44 : 10) &&
+          lectureStart?.bottomSpace >= (viewport.height > 650 && viewport.width > 900 ? 44 : 10) &&
           lectureStart?.railFullHeight === true &&
           lectureStart?.railItems === lectureStart?.slideTotal &&
           lectureStart?.railThumbs === lectureStart?.slideTotal &&
