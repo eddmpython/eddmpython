@@ -50,9 +50,10 @@ const COURSE_SCHEMA = new Set([1, 2, 3, 4]);
 /**
  * 3 은 첫 beat 자동 재생, enter/replace 다중 대상(셋까지), compare 개막을 더한 판이다.
  * 4 는 단독 annotate 를 없애고 판단 문장을 아무 beat 의 note 로 실은 판이다. 5 는 서로 다른
- * 시각자산 둘을 묶는 compose 와 pair, lead 레이아웃을 더했다. 이전 장면도 함께 받는다.
+ * 시각자산 둘을 연결하는 compose 와 pair, lead 레이아웃을 더했다. 6은 다중 대상을 같은
+ * 좌표의 단일 시각자료 장표로 펼친다. 이전 장면도 함께 받는다.
  */
-const COURSE_SCENE_CONTRACTS = new Set([1, 2, 3, 4, 5]);
+const COURSE_SCENE_CONTRACTS = new Set([1, 2, 3, 4, 5, 6]);
 
 export type CourseState = { ok: boolean; categories: CourseCategory[]; glossary: Record<string, string> };
 
@@ -66,11 +67,11 @@ const sceneRoles = new Set(["open", "explain", "invert", "close"]);
 const sceneLayouts = new Set(["stage", "sequence", "compare", "pair", "lead", "code", "demo"]);
 const sceneEffects = new Set(["enter", "replace", "focus", "compare", "compose", "annotate", "run", "simulate"]);
 const sceneEffectRules = {
-  enter: { min: 1, max: 3, requiresVisible: false, visibility: "append" },
-  replace: { min: 1, max: 3, requiresVisible: false, visibility: "replace" },
+  enter: { min: 1, max: 3, requiresVisible: false, visibility: "carousel" },
+  replace: { min: 1, max: 3, requiresVisible: false, visibility: "carousel" },
   focus: { min: 1, max: 1, requiresVisible: true, visibility: "keep" },
-  compare: { min: 2, max: 2, requiresVisible: false, visibility: "replace" },
-  compose: { min: 2, max: 2, requiresVisible: false, visibility: "replace" },
+  compare: { min: 2, max: 2, requiresVisible: false, visibility: "carousel" },
+  compose: { min: 2, max: 2, requiresVisible: false, visibility: "carousel" },
   annotate: { min: 1, max: 1, requiresVisible: true, visibility: "keep" },
   run: { min: 1, max: 1, requiresVisible: true, visibility: "keep" },
   simulate: { min: 1, max: 1, requiresVisible: true, visibility: "keep" },
@@ -98,18 +99,17 @@ const isScene = (value: unknown): value is CourseScene => {
           : beat.note === undefined || Boolean(typeof beat.note === "string" && beat.note.trim())),
     )
   );
-  // 첫 beat 는 장면을 여는 화면이다. compare 와 compose 는 두 자료를 완성된 구도로 바로 연다.
+  // 첫 beat 는 장면을 여는 화면이다. 여러 target 은 같은 좌표의 연속 장표로 펼쳐진다.
   if (!shapeOk || !["enter", "replace", "compare", "compose"].includes(scene.beats[0]?.effect)) return false;
   const isCompositionLayout = scene.layout === "pair" || scene.layout === "lead";
   if (isCompositionLayout && (scene.visualCount !== 2 || scene.beats[0]?.effect !== "compose")) return false;
   if (!isCompositionLayout && scene.beats.some((beat) => beat.effect === "compose")) return false;
-  const visible = new Set<number>();
+  const introduced = new Set<number>();
   for (const beat of scene.beats) {
     const rule = sceneEffectRules[beat.effect];
     if (beat.targets.length < rule.min || beat.targets.length > rule.max) return false;
-    if (rule.requiresVisible && beat.targets.some((target) => !visible.has(target))) return false;
-    if (rule.visibility === "replace") visible.clear();
-    if (rule.visibility !== "keep") beat.targets.forEach((target) => visible.add(target));
+    if (rule.requiresVisible && beat.targets.some((target) => !introduced.has(target))) return false;
+    if (rule.visibility !== "keep") beat.targets.forEach((target) => introduced.add(target));
   }
   return true;
 };

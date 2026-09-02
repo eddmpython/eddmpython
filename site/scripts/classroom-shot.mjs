@@ -72,30 +72,23 @@ console.log(`  검수용 강의방 ${base}/room/${ROOM}  카테고리 ${category
 const first = process.argv[3] ?? null;
 
 /**
- * titleMin 은 상단 제목 띠의 실제 렌더 크기에서 잰 하한이다. 런타임 4 부터 모든 장면이
- * 제목 상단 PPT 구도라서 옛 빈 제목 장면의 초대형 제목 기준(72px 급)은 더는 없다.
+ * titleMin과 visualMin은 좌측 설명, 우측 단일 시각자료 무대의 실제 렌더 하한이다.
  */
 const VIEWPORTS = [
   { id: "desktop", width: 1920, height: 900, dpr: 1, isMobile: false, hasTouch: false,
-    sectionTitle: "24px", centerGap: 24, headIndent: 88, titleMin: 56, visualMin: 700,
-    compareColumns: 2, wideComposition: true, runPython: true },
+    sectionTitle: "24px", titleMin: 56, visualMin: 700, runPython: true },
   { id: "projector", width: 1366, height: 768, dpr: 1, isMobile: false, hasTouch: false,
-    sectionTitle: "24px", centerGap: 24, headIndent: 88, titleMin: 42, visualMin: 620,
-    compareColumns: 2, wideComposition: true, runPython: false },
+    sectionTitle: "24px", titleMin: 42, visualMin: 620, runPython: false },
   // 1366x768 화면을 브라우저 125%로 쓸 때의 유효 CSS viewport다.
   // visualMin 440: 현재 개막 비교 장면의 첫 이미지는 441px 로 그려진다.
   { id: "projector-125", width: 1093, height: 614, dpr: 1.25, isMobile: false, hasTouch: false,
-    sectionTitle: "24px", centerGap: 24, headIndent: 88, titleMin: 28, visualMin: 440,
-    compareColumns: 2, wideComposition: true, runPython: false },
+    sectionTitle: "24px", titleMin: 28, visualMin: 440, runPython: false },
   { id: "tablet-landscape", width: 1180, height: 820, dpr: 1, isMobile: true, hasTouch: true,
-    sectionTitle: "24px", centerGap: 20, headIndent: 88, titleMin: 36, visualMin: 540,
-    compareColumns: 2, wideComposition: true, runPython: false },
+    sectionTitle: "24px", titleMin: 36, visualMin: 540, runPython: false },
   { id: "tablet-portrait", width: 820, height: 1180, dpr: 1, isMobile: true, hasTouch: true,
-    sectionTitle: "24px", centerGap: 24, headIndent: 88, titleMin: 30, visualMin: 620,
-    compareColumns: 1, wideComposition: false, runPython: false },
+    sectionTitle: "24px", titleMin: 30, visualMin: 620, runPython: false },
   { id: "mobile", width: 390, height: 844, dpr: 1, isMobile: true, hasTouch: true,
-    sectionTitle: "22px", centerGap: 14, headIndent: 0, titleMin: 22, visualMin: 320,
-    compareColumns: 1, wideComposition: false, runPython: false },
+    sectionTitle: "22px", titleMin: 22, visualMin: 290, runPython: false },
 ];
 const requestedViewports = new Set(
   String(process.env.CR_VIEWPORTS ?? "").split(",").map((id) => id.trim()).filter(Boolean),
@@ -317,7 +310,7 @@ for (const viewport of activeViewports) {
       JSON.stringify(visualGroup),
     );
 
-    // 읽기 본문과 같은 H2가 전체화면 장면이 되고 클릭마다 beat가 진행되는지 본다.
+    // 읽기 본문과 같은 H2가 전체화면 장면이 되고 한 장표에 시각자료 하나만 보이는지 본다.
     const lectureButton = Number(
       value(await evaluate(session, `document.querySelectorAll('[data-lecture-open]').length`)),
     );
@@ -360,6 +353,7 @@ for (const viewport of activeViewports) {
         const canvas = scene?.querySelector('.scene-canvas');
         const headBox = head?.getBoundingClientRect();
         const canvasBox = canvas?.getBoundingClientRect();
+        const railBox = deck?.querySelector('.lecture-rail')?.getBoundingClientRect();
         return {
           hidden: deck?.hidden,
           body: document.body.classList.contains('lecture-on'),
@@ -367,7 +361,12 @@ for (const viewport of activeViewports) {
           title: scene?.querySelector('.scene-head h2')?.textContent.trim(),
           titleSize: parseFloat(getComputedStyle(scene?.querySelector('.scene-head h2')).fontSize),
           visible: scene?.querySelectorAll('[data-scene-visible="true"]').length,
-          headAboveCanvas: headBox && canvasBox ? headBox.bottom <= canvasBox.top + 1 : null,
+          headBeforeCanvas: headBox && canvasBox
+            ? (innerWidth > 900 ? headBox.right <= canvasBox.left + 1 : headBox.bottom <= canvasBox.top + 1)
+            : null,
+          railFullHeight: railBox ? Math.abs(railBox.top) <= 1 && Math.abs(railBox.bottom - innerHeight) <= 1 : null,
+          railItems: deck?.querySelectorAll('[data-lecture-map-scene]').length,
+          railCurrent: deck?.querySelectorAll('[data-lecture-map-scene][aria-current="step"]').length,
           symbolWidth: deck?.querySelector('.lecture-symbol')?.getBoundingClientRect().width,
           themeButtons: document.querySelectorAll('[data-theme-toggle]').length,
           lectureThemeButtons: deck?.querySelectorAll('[data-theme-toggle]').length,
@@ -389,106 +388,96 @@ for (const viewport of activeViewports) {
           progress: deck?.querySelector('[data-lecture-progress]')?.textContent.trim(),
         };
       })()`));
-      // 런타임 5. 장면이 첫 beat 를 자동 실행한 화면으로 열리고 발표자 노트 표면은 없다.
+      // 런타임 6. 좌측 인덱스와 단일 시각자료 장표로 열리고 상하 크롬은 없다.
       record(
         `${viewport.id} 강의 모드 첫 장면`,
         lectureStart?.hidden === false &&
           lectureStart?.body === true &&
           lectureStart?.scenes > 0 &&
           lectureStart?.title === "자동화를 보는 세 가지 동작" &&
-          lectureStart?.visible > 0 &&
-          lectureStart?.headAboveCanvas === true &&
+          lectureStart?.visible === 1 &&
+          lectureStart?.headBeforeCanvas === true &&
+          lectureStart?.railFullHeight === true &&
+          lectureStart?.railItems === lectureStart?.scenes &&
+          lectureStart?.railCurrent === 1 &&
           lectureStart?.symbolWidth >= 20 &&
           lectureStart?.themeButtons === 2 &&
           lectureStart?.lectureThemeButtons === 1 &&
           lectureStart?.presenterButtons === 0 &&
           lectureStart?.noteButtons === 0 &&
           lectureStart?.fullscreenButtons === 1 &&
-          lectureStart?.runtime === "5" &&
-          lectureStart?.sceneRuntime === "5" &&
+          lectureStart?.runtime === "6" &&
+          lectureStart?.sceneRuntime === "6" &&
           lectureStart?.phase === "ready" &&
           lectureStart?.activeInert === false &&
           lectureStart?.inactiveInert === true &&
           lectureStart?.prevDisabled === true &&
           lectureStart?.nextDisabled === false &&
-          /장면 1 \/ \d+/.test(lectureStart?.status ?? "") &&
+          /장표 1 \/ \d+/.test(lectureStart?.status ?? "") &&
           lectureStart?.deckHeight === lectureStart?.viewportHeight &&
           lectureStart?.titleSize >= viewport.titleMin &&
           lectureStart?.progressValue === "0" &&
           /^#lecture=s1\.1$/.test(lectureStart?.hash ?? "") &&
-          /· 0 \/ \d+$/.test(lectureStart?.progress ?? ""),
+          /^01 \/ \d+$/.test(lectureStart?.progress ?? ""),
         JSON.stringify(lectureStart),
       );
       await save(session, "06-lecture-title", false);
 
-      await client.act(
-        session,
-        [{ kind: "click", selector: "[data-lecture-map-toggle]", expectedRisk: "externalEffect" }],
-        { timeoutMs: 30000 },
-      );
-      const mapState = value(await evaluate(session, `(() => {
+      const railState = value(await evaluate(session, `(() => {
         const deck = document.querySelector('[data-lecture-deck]');
-        const map = deck?.querySelector('[data-lecture-map]');
-        const items = [...(map?.querySelectorAll('[data-lecture-map-scene]') ?? [])];
+        const rail = deck?.querySelector('.lecture-rail');
+        const items = [...(rail?.querySelectorAll('[data-lecture-map-scene]') ?? [])];
+        const currentItem = items.find((item) => item.getAttribute('aria-current') === 'step');
+        const currentNumber = currentItem?.querySelector('span');
+        const rect = rail?.getBoundingClientRect();
         return {
-          hidden:map?.hidden,
-          expanded:deck?.querySelector('[data-lecture-map-toggle]')?.getAttribute('aria-expanded'),
           items:items.length,
           current:items.filter((item) => item.getAttribute('aria-current') === 'step').length,
-          currentTitle:items.find((item) => item.getAttribute('aria-current') === 'step')?.querySelector('b')?.textContent.trim(),
-          stageInert:deck?.querySelector('.lecture-stage')?.hasAttribute('inert'),
-          barInert:deck?.querySelector('.lecture-bar')?.hasAttribute('inert'),
-          footInert:deck?.querySelector('.lecture-foot')?.hasAttribute('inert'),
+          currentTitle:currentItem?.querySelector('b')?.textContent.trim(),
+          currentNumber:currentNumber?.textContent.trim(),
+          currentNumberVisible:Boolean(currentNumber?.getClientRects().length),
+          fullHeight:rect ? Math.abs(rect.top) <= 1 && Math.abs(rect.bottom - innerHeight) <= 1 : false,
+          topBars:deck?.querySelectorAll('.lecture-bar').length,
+          bottomBars:deck?.querySelectorAll('.lecture-foot').length,
         };
       })()`));
       record(
-        `${viewport.id} 장면 지도와 관객 집중 화면`,
-        mapState?.hidden === false &&
-          mapState?.expanded === "true" &&
-          mapState?.items === 12 &&
-          mapState?.current === 1 &&
-          mapState?.currentTitle === "자동화를 보는 세 가지 동작" &&
-          mapState?.stageInert === true &&
-          mapState?.barInert === true &&
-          mapState?.footInert === true,
-        JSON.stringify(mapState),
+        `${viewport.id} 상시 장표 인덱스와 무크롬 무대`,
+        railState?.items === 12 &&
+          railState?.current === 1 &&
+          railState?.currentTitle === "자동화를 보는 세 가지 동작" &&
+          railState?.currentNumber === "01" &&
+          railState?.currentNumberVisible === true &&
+          railState?.fullHeight === true &&
+          railState?.topBars === 0 &&
+          railState?.bottomBars === 0,
+        JSON.stringify(railState),
       );
-      await save(session, "15-lecture-map", false);
-      const mapNavigation = value(await evaluate(session, `(async () => {
+      await save(session, "15-lecture-rail", false);
+      const railNavigation = value(await evaluate(session, `(async () => {
         const deck = document.querySelector('[data-lecture-deck]');
-        document.dispatchEvent(new KeyboardEvent('keydown', { key:'Escape', bubbles:true }));
-        const closed = {
-          hidden:deck.querySelector('[data-lecture-map]').hidden,
-          expanded:deck.querySelector('[data-lecture-map-toggle]').getAttribute('aria-expanded'),
-          deckHidden:deck.hidden,
-          stageInert:deck.querySelector('.lecture-stage').hasAttribute('inert'),
-        };
-        document.dispatchEvent(new KeyboardEvent('keydown', { key:'m', bubbles:true }));
         await new Promise((resolve) => {
           deck.addEventListener('lectureframe', resolve, { once:true });
           deck.querySelector('[data-lecture-map-scene="1"]').click();
         });
         const jumped = {
-          mapHidden:deck.querySelector('[data-lecture-map]').hidden,
           progress:deck.querySelector('[data-lecture-progress]').textContent.trim(),
           title:deck.querySelector('.lecture-scene.on h2')?.textContent.trim(),
+          current:deck.querySelector('[data-lecture-map-scene][aria-current="step"]')?.dataset.lectureMapScene,
         };
         await new Promise((resolve) => {
           deck.addEventListener('lectureframe', resolve, { once:true });
           document.dispatchEvent(new KeyboardEvent('keydown', { key:'Home', bubbles:true }));
         });
-        return { closed, jumped };
+        return { jumped, restored:location.hash };
       })()`));
       record(
-        `${viewport.id} 장면 지도 키보드와 즉시 이동`,
-        mapNavigation?.closed?.hidden === true &&
-          mapNavigation?.closed?.expanded === "false" &&
-          mapNavigation?.closed?.deckHidden === false &&
-          mapNavigation?.closed?.stageInert === false &&
-          mapNavigation?.jumped?.mapHidden === true &&
-          /^02 \/ 12(?: · 0 \/ \d+)?$/.test(mapNavigation?.jumped?.progress ?? "") &&
-          mapNavigation?.jumped?.title === "마우스와 키보드 자동화",
-        JSON.stringify(mapNavigation),
+        `${viewport.id} 장표 인덱스 즉시 이동`,
+        /^\d+ \/ \d+$/.test(railNavigation?.jumped?.progress ?? "") &&
+          railNavigation?.jumped?.title === "마우스와 키보드 자동화" &&
+          railNavigation?.jumped?.current === "1" &&
+          railNavigation?.restored === "#lecture=s1.1",
+        JSON.stringify(railNavigation),
       );
       const blankState = value(await evaluate(session, `(() => {
         const deck = document.querySelector('[data-lecture-deck]');
@@ -617,7 +606,7 @@ for (const viewport of activeViewports) {
       );
       await save(session, "06-lecture-title-dark", false);
 
-      // 런타임 4 는 첫 beat 가 자동 실행된 채 열린다. 클릭 없이 개막 화면을 그대로 검사한다.
+      // 런타임 6은 첫 프레임이 자동 실행된 채 열린다. 클릭 없이 단일 시각자료를 검사한다.
       await evaluate(session, `new Promise((resolve) => setTimeout(resolve, 350))`);
       const firstBeat = value(await evaluate(session, `(() => {
         const deck = document.querySelector('[data-lecture-deck]');
@@ -662,7 +651,7 @@ for (const viewport of activeViewports) {
           firstBeat?.captionBackground === "rgba(0, 0, 0, 0)" &&
           (firstBeat?.labelTop === null || firstBeat?.labelTop >= firstBeat?.subtitleBottom + 8) &&
           Number(firstBeat?.progressValue) >= 0 &&
-          /· 0 \/ \d+$/.test(firstBeat?.progress ?? "") &&
+          /^01 \/ \d+$/.test(firstBeat?.progress ?? "") &&
           /^#lecture=s1\.1$/.test(firstBeat?.hash ?? ""),
         JSON.stringify(firstBeat),
       );
@@ -721,18 +710,18 @@ for (const viewport of activeViewports) {
         };
       })()`));
       record(
-        `${viewport.id} 키보드 비교 비트`,
+        `${viewport.id} 키보드 비교 장표`,
         keyboardBeat?.effect === "compare" &&
           keyboardBeat?.sceneEffect === "compare" &&
           keyboardBeat?.cue === "비교" &&
-          keyboardBeat?.visible === 2 &&
-          /· 1 \/ \d+$/.test(keyboardBeat?.progress ?? "") &&
+          keyboardBeat?.visible === 1 &&
+          /^02 \/ \d+$/.test(keyboardBeat?.progress ?? "") &&
           keyboardBeat?.hash === "#lecture=s1.2",
         JSON.stringify(keyboardBeat),
       );
-      await save(session, "07-lecture-beat", false);
+      await save(session, "07-lecture-frame", false);
 
-      // 계약 5: 판단 문장은 단독 클릭이 아니라 지금 compare 비트에 함께 실려 나온다.
+      // 계약 6: 판단 문장은 현재 단일 시각자료 장표의 왼쪽 설명에 함께 실린다.
       const annotationState = value(await evaluate(session, `(() => {
         const deck = document.querySelector('[data-lecture-deck]');
         const scene = deck.querySelector('.lecture-scene.on');
@@ -759,11 +748,11 @@ for (const viewport of activeViewports) {
         return cleared;
       })()`)));
       record(
-        `${viewport.id} beat 에 실린 판단 문장`,
+        `${viewport.id} 장표에 실린 판단 문장`,
         annotationState?.effect === "compare" &&
           annotationState?.calloutVisible === true &&
           annotationState?.callout?.includes("종류마다 멈추는 자리") &&
-          annotationState?.visible === 2 &&
+          annotationState?.visible === 1 &&
           annotationState?.hash === "#lecture=s1.2" &&
           annotationState?.clearedAfterBack === true,
         JSON.stringify(annotationState),
@@ -789,9 +778,9 @@ for (const viewport of activeViewports) {
         })()`));
         record(
           `${viewport.id} 좌우 스와이프 이동`,
-          /^01 \/ \d+ · 1 \/ 1$/.test(swipeState?.before ?? "") &&
-            /^02 \/ \d+ · 0 \/ 3$/.test(swipeState?.after ?? "") &&
-            swipeState?.hash === "#lecture=s2.1" &&
+          /^02 \/ \d+$/.test(swipeState?.before ?? "") &&
+            /^03 \/ \d+$/.test(swipeState?.after ?? "") &&
+            swipeState?.hash === "#lecture=s1.3" &&
             swipeState?.restored === "#lecture=s1.2",
           JSON.stringify(swipeState),
         );
@@ -876,10 +865,10 @@ for (const viewport of activeViewports) {
         `${viewport.id} 시작과 끝 조작 상태`,
         boundaryState?.end?.prev === false &&
           boundaryState?.end?.next === true &&
-          /장면 12 \/ 12/.test(boundaryState?.end?.status ?? "") &&
+          /장표 (\d+) \/ \1/.test(boundaryState?.end?.status ?? "") &&
           boundaryState?.start?.prev === true &&
           boundaryState?.start?.next === false &&
-          /장면 1 \/ 12/.test(boundaryState?.start?.status ?? ""),
+          /장표 1 \/ \d+/.test(boundaryState?.start?.status ?? ""),
         JSON.stringify(boundaryState),
       );
 
@@ -1066,7 +1055,7 @@ for (const viewport of activeViewports) {
       const scene = deck?.querySelector('.lecture-scene.on');
       const visual = scene?.querySelector('[data-scene-visible="true"]');
       const media = visual?.querySelector('img, video, iframe') ?? visual;
-      const brand = deck?.querySelector('.lecture-brand');
+      const rail = deck?.querySelector('.lecture-rail');
       const box = (node) => {
         const rect = node?.getBoundingClientRect();
         return rect ? {
@@ -1084,13 +1073,12 @@ for (const viewport of activeViewports) {
         viewport: innerWidth,
         viewportHeight: innerHeight,
         deck: box(deck),
+        rail: box(rail),
         stage: box(stage),
-        footer: box(deck?.querySelector('.lecture-foot')),
         head: box(scene?.querySelector('.scene-head')),
         canvas: box(scene?.querySelector('.scene-canvas')),
         visual: box(visual),
         media: mediaBox,
-        centerGap: mediaBox ? Math.abs(mediaBox.center - innerWidth / 2) : null,
         visualStyle: visual ? {
           display: getComputedStyle(visual).display,
           width: getComputedStyle(visual).width,
@@ -1101,75 +1089,85 @@ for (const viewport of activeViewports) {
           marginLeft: getComputedStyle(media).marginLeft,
           justifySelf: getComputedStyle(media).justifySelf,
         } : null,
-        brandLeft: box(brand)?.left,
-        brandClipped: brand ? brand.scrollWidth > brand.clientWidth : null,
+        topBars: deck?.querySelectorAll('.lecture-bar').length,
+        bottomBars: deck?.querySelectorAll('.lecture-foot').length,
       };
     })()`));
-    // PPT 구도. 제목 띠가 위이고, 제목·시각물·판단 문장이 같은 왼쪽 기준선에서 시작한다.
+    // PPT 구도. 좌측 인덱스, 왼쪽 설명, 오른쪽 단일 시각자료 무대가 화면을 모두 쓴다.
     record(
       `${viewport.id} 레이아웃별 강의 무대`,
       balancedStage?.deck?.left === 0 &&
         balancedStage?.deck?.top === 0 &&
         balancedStage?.deck?.width === balancedStage?.viewport &&
         balancedStage?.deck?.height === balancedStage?.viewportHeight &&
-        balancedStage?.stage?.left === 0 &&
-        balancedStage?.stage?.width === balancedStage?.viewport &&
-        Math.abs(balancedStage?.footer?.bottom - balancedStage?.viewportHeight) <= 1 &&
-        balancedStage?.head?.bottom <= balancedStage?.canvas?.top + 1 &&
-        Math.abs(balancedStage?.visual?.left - (balancedStage?.head?.left + viewport.headIndent)) <= 3 &&
-        (!viewport.wideComposition ||
-          (balancedStage?.brandLeft >= 16 && balancedStage?.brandClipped === false)),
+        balancedStage?.rail?.left === 0 &&
+        balancedStage?.rail?.top === 0 &&
+        Math.abs(balancedStage?.rail?.bottom - balancedStage?.viewportHeight) <= 1 &&
+        Math.abs(balancedStage?.stage?.left - balancedStage?.rail?.right) <= 1 &&
+        Math.abs(balancedStage?.stage?.right - balancedStage?.viewport) <= 1 &&
+        (viewport.width > 900
+          ? balancedStage?.head?.right <= balancedStage?.canvas?.left + 1
+          : balancedStage?.head?.bottom <= balancedStage?.canvas?.top + 1) &&
+        balancedStage?.visual?.left >= balancedStage?.canvas?.left - 1 &&
+        balancedStage?.visual?.right <= balancedStage?.canvas?.right + 1 &&
+        balancedStage?.visual?.top >= balancedStage?.canvas?.top - 1 &&
+        balancedStage?.visual?.bottom <= balancedStage?.canvas?.bottom + 1 &&
+        balancedStage?.canvas?.width >= balancedStage?.stage?.width * (viewport.width > 900 ? 0.58 : 0.85) &&
+        balancedStage?.topBars === 0 && balancedStage?.bottomBars === 0,
       JSON.stringify(balancedStage),
     );
     await save(session, "09-lecture-balanced", false);
-    // 계약 3 의 비교 장면은 enter 개막 뒤 compare 한 클릭이다.
+    // 계약 6의 비교 장면은 두 자료를 같은 좌표의 연속 장표로 펼친다.
     await evaluate(session, `document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowRight', bubbles:true }))`);
-    const compareLayout = value(await evaluate(session, `(() => {
-      const scene = document.querySelector('.lecture-scene.on');
-      const canvas = scene?.querySelector('.scene-canvas');
-      const visuals = [...(scene?.querySelectorAll('[data-scene-visible="true"]') ?? [])]
-        .map((visual) => {
+    const compareLayout = value(await evaluate(session, `(async () => {
+      const read = () => {
+        const scene = document.querySelector('.lecture-scene.on');
+        const canvas = scene?.querySelector('.scene-canvas');
+        const canvasRect = canvas?.getBoundingClientRect();
+        const visuals = [...(scene?.querySelectorAll('[data-scene-visible="true"]') ?? [])].map((visual) => {
           const rect = visual.getBoundingClientRect();
-          const style = getComputedStyle(visual);
           return {
+            id: visual.dataset.visual,
             left: rect.left,
             top: rect.top,
             right: rect.right,
             bottom: rect.bottom,
-            center: rect.left + rect.width / 2,
-            height: rect.height,
-            background: style.backgroundColor,
-            radius: parseFloat(style.borderTopLeftRadius),
-            whiteSpace: style.whiteSpace,
           };
         });
-      return {
-        activeLayout: scene?.dataset.activeLayout,
-        effect: scene?.dataset.sceneEffect,
-        cue: scene?.querySelector('[data-scene-cue]')?.textContent.trim(),
-        columns: getComputedStyle(canvas).gridTemplateColumns.split(' ').filter(Boolean).length,
-        visuals,
+        return {
+          effect: scene?.dataset.sceneEffect,
+          cue: scene?.querySelector('[data-scene-cue]')?.textContent.trim(),
+          canvas: canvasRect ? { left:canvasRect.left, top:canvasRect.top, right:canvasRect.right, bottom:canvasRect.bottom } : null,
+          visuals,
+          hash: location.hash,
+        };
       };
+      const first = read();
+      await new Promise((resolve) => {
+        document.querySelector('[data-lecture-deck]').addEventListener('lectureframe', resolve, { once:true });
+        document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowRight', bubbles:true }));
+      });
+      return { first, second:read() };
     })()`));
+    const sameBox = (a, b) => a && b && ["left", "top", "right", "bottom"].every((key) => Math.abs(a[key] - b[key]) <= 2);
     record(
-      `${viewport.id} compare 순간 열 분할`,
-        compareLayout?.activeLayout === "compare" &&
-        compareLayout?.effect === "compare" &&
-        compareLayout?.cue === "비교" &&
-        compareLayout?.visuals?.length === 2 &&
-        compareLayout.visuals.every((visual) => visual.right > visual.left && visual.bottom > visual.top) &&
-        compareLayout?.columns === viewport.compareColumns &&
-        (viewport.compareColumns === 2
-          ? compareLayout.visuals[0].center < viewport.width / 2 &&
-            compareLayout.visuals[1].center > viewport.width / 2 &&
-            compareLayout.visuals[0].right <= compareLayout.visuals[1].left
-          : compareLayout.visuals[0].bottom < compareLayout.visuals[1].top),
+      `${viewport.id} compare 단일 무대 캐러셀`,
+        compareLayout?.first?.effect === "compare" &&
+        compareLayout?.second?.effect === "compare" &&
+        compareLayout?.first?.cue === "비교" &&
+        compareLayout?.second?.cue === "비교" &&
+        compareLayout?.first?.visuals?.length === 1 &&
+        compareLayout?.second?.visuals?.length === 1 &&
+        compareLayout?.first?.visuals?.[0]?.id !== compareLayout?.second?.visuals?.[0]?.id &&
+        sameBox(compareLayout?.first?.canvas, compareLayout?.second?.canvas) &&
+        sameBox(compareLayout?.first?.visuals?.[0], compareLayout?.second?.visuals?.[0]) &&
+        compareLayout?.first?.hash === "#lecture=s2.2" &&
+        compareLayout?.second?.hash === "#lecture=s2.3",
       JSON.stringify(compareLayout),
     );
     await save(session, "10-lecture-compare", false);
 
-    // 계약 5 의 compose 장면은 다이어그램과 표를 같은 무대에서 읽게 한다.
-    // 넓은 화면은 두 열, 900px 이하 화면은 한 열로 쌓여야 하며 어느 쪽도 무대 밖으로 잘리면 안 된다.
+    // 계약 6의 compose 장면은 다이어그램과 표를 같은 규격의 연속 장표로 잇는다.
     const composePost = value(
       await evaluate(
         session,
@@ -1189,48 +1187,43 @@ for (const viewport of activeViewports) {
       [{ kind: "waitFor", selector: ".lecture-scene.on[data-scene-effect=\"compose\"]", timeoutMs: 15000, expectedRisk: "read" }],
       { timeoutMs: 30000 },
     );
-    const composeLayout = value(await evaluate(session, `(() => {
-      const scene = document.querySelector('.lecture-scene.on');
-      const canvas = scene?.querySelector('.scene-canvas');
-      const canvasRect = canvas?.getBoundingClientRect();
-      const table = scene?.querySelector('.table-wrap');
-      const visuals = [...(scene?.querySelectorAll('[data-scene-visible="true"]') ?? [])]
-        .map((visual) => {
-          const rect = visual.getBoundingClientRect();
-          return {
+    const composeLayout = value(await evaluate(session, `(async () => {
+      const read = () => {
+        const scene = document.querySelector('.lecture-scene.on');
+        const canvas = scene?.querySelector('.scene-canvas');
+        const canvasRect = canvas?.getBoundingClientRect();
+        const visual = scene?.querySelector('[data-scene-visible="true"]');
+        const rect = visual?.getBoundingClientRect();
+        return {
+          effect: scene?.dataset.sceneEffect,
+          cue: scene?.querySelector('[data-scene-cue]')?.textContent.trim(),
+          canvas: canvasRect ? { left:canvasRect.left, top:canvasRect.top, right:canvasRect.right, bottom:canvasRect.bottom } : null,
+          visual: rect ? {
+            id: visual.dataset.visual,
             tag: visual.tagName.toLowerCase(),
-            top: Math.round(rect.top),
-            bottom: Math.round(rect.bottom),
-            left: Math.round(rect.left),
-            right: Math.round(rect.right),
-            inside: canvasRect
-              ? rect.left >= canvasRect.left - 1 && rect.right <= canvasRect.right + 1
-              : false,
-          };
-        });
-      return {
-        activeLayout: scene?.dataset.activeLayout,
-        effect: scene?.dataset.sceneEffect,
-        cue: scene?.querySelector('[data-scene-cue]')?.textContent.trim(),
-        columns: getComputedStyle(canvas).gridTemplateColumns.split(' ').filter(Boolean).length,
-        tableFit: table ? table.scrollHeight <= table.clientHeight + 1 : true,
-        visuals,
+            left:rect.left, top:rect.top, right:rect.right, bottom:rect.bottom,
+          } : null,
+          visible: scene?.querySelectorAll('[data-scene-visible="true"]').length,
+        };
       };
+      const first = read();
+      await new Promise((resolve) => {
+        document.querySelector('[data-lecture-deck]').addEventListener('lectureframe', resolve, { once:true });
+        document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowRight', bubbles:true }));
+      });
+      return { first, second:read() };
     })()`));
-    const composeColumns = viewport.wideComposition ? 2 : 1;
     record(
-      `${viewport.id} compose 순간 자산 조합`,
-      composeLayout?.activeLayout === "lead" &&
-        composeLayout?.effect === "compose" &&
-        composeLayout?.cue === "함께 보기" &&
-        composeLayout?.columns === composeColumns &&
-        composeLayout?.tableFit === true &&
-        composeLayout?.visuals?.length === 2 &&
-        composeLayout.visuals.every((visual) => visual.inside) &&
-        (composeColumns === 2
-          ? Math.abs(composeLayout.visuals[0].top - composeLayout.visuals[1].top) <= 4 &&
-            composeLayout.visuals[0].right <= composeLayout.visuals[1].left
-          : composeLayout.visuals[0].bottom <= composeLayout.visuals[1].top),
+      `${viewport.id} compose 단일 무대 캐러셀`,
+      composeLayout?.first?.effect === "compose" &&
+        composeLayout?.second?.effect === "compose" &&
+        composeLayout?.first?.cue === "함께 보기" &&
+        composeLayout?.second?.cue === "함께 보기" &&
+        composeLayout?.first?.visible === 1 &&
+        composeLayout?.second?.visible === 1 &&
+        composeLayout?.first?.visual?.id !== composeLayout?.second?.visual?.id &&
+        sameBox(composeLayout?.first?.canvas, composeLayout?.second?.canvas) &&
+        sameBox(composeLayout?.first?.visual, composeLayout?.second?.visual),
       JSON.stringify(composeLayout),
     );
     await save(session, "11-lecture-compose", false);
@@ -1252,15 +1245,15 @@ for (const viewport of activeViewports) {
     );
     const focusState = value(await evaluate(session, `(() => {
       const deck = document.querySelector('[data-lecture-deck]');
-      const bar = deck?.querySelector('.lecture-bar');
-      const foot = deck?.querySelector('.lecture-foot');
+      const rail = deck?.querySelector('.lecture-rail');
+      const stage = deck?.querySelector('.lecture-stage');
       const scene = document.querySelector('.lecture-scene.on');
       const visual = scene?.querySelector('[data-scene-focus="true"]');
       const title = scene?.querySelector('.scene-head > div:last-child');
       const callout = scene?.querySelector('[data-scene-callout]');
       const deckRect = deck?.getBoundingClientRect();
-      const barRect = bar?.getBoundingClientRect();
-      const footRect = foot?.getBoundingClientRect();
+      const railRect = rail?.getBoundingClientRect();
+      const stageRect = stage?.getBoundingClientRect();
       return {
         effect: scene?.dataset.sceneEffect,
         cue: scene?.querySelector('[data-scene-cue]')?.textContent.trim(),
@@ -1275,10 +1268,12 @@ for (const viewport of activeViewports) {
           deckLeft: Math.round(deckRect?.left ?? -1),
           deckWidth: Math.round(deckRect?.width ?? -1),
           deckHeight: Math.round(deckRect?.height ?? -1),
-          barTop: Math.round(barRect?.top ?? -1),
-          barLeft: Math.round(barRect?.left ?? -1),
-          barWidth: Math.round(barRect?.width ?? -1),
-          footBottom: Math.round(footRect?.bottom ?? -1),
+          railTop: Math.round(railRect?.top ?? -1),
+          railLeft: Math.round(railRect?.left ?? -1),
+          railBottom: Math.round(railRect?.bottom ?? -1),
+          railRight: Math.round(railRect?.right ?? -1),
+          stageLeft: Math.round(stageRect?.left ?? -1),
+          stageRight: Math.round(stageRect?.right ?? -1),
           viewportWidth: window.innerWidth,
           viewportHeight: window.innerHeight,
         },
@@ -1298,10 +1293,11 @@ for (const viewport of activeViewports) {
         focusState?.shell?.deckLeft === 0 &&
         focusState?.shell?.deckWidth === focusState?.shell?.viewportWidth &&
         focusState?.shell?.deckHeight === focusState?.shell?.viewportHeight &&
-        focusState?.shell?.barTop === 0 &&
-        focusState?.shell?.barLeft === 0 &&
-        focusState?.shell?.barWidth === focusState?.shell?.viewportWidth &&
-        focusState?.shell?.footBottom === focusState?.shell?.viewportHeight,
+        focusState?.shell?.railTop === 0 &&
+        focusState?.shell?.railLeft === 0 &&
+        focusState?.shell?.railBottom === focusState?.shell?.viewportHeight &&
+        focusState?.shell?.stageLeft === focusState?.shell?.railRight &&
+        focusState?.shell?.stageRight === focusState?.shell?.viewportWidth,
       JSON.stringify(focusState),
     );
     await save(session, "11-lecture-focus", false);
@@ -1332,8 +1328,8 @@ for (const viewport of activeViewports) {
     });
     session = (await client.attachSession(opened.output.targetRef, { timeoutMs: 30000 })).output;
 
-    // URL로 장면과 beat를 복구하고, 실행 칸에 simulate와 run 효과가 실제로 이어지는지 본다.
-    // 계약 3 의 s2 는 표와 실행 칸을 개막에서 짝지어 올린다 (enter v1,v2 / simulate / run).
+    // URL로 장면과 프레임을 복구하고, 실행 칸에 simulate와 run 효과가 실제로 이어지는지 본다.
+    // 계약 6의 s2는 표와 실행 칸을 같은 좌표의 연속 장표로 펼친다.
     await evaluate(session, `location.hash = '#lecture=s2.1'; location.reload()`, false);
     await client.act(
       session,
@@ -1354,11 +1350,12 @@ for (const viewport of activeViewports) {
       `${viewport.id} 강의 위치 URL 복구`,
       restoredLecture?.hidden === false &&
         restoredLecture?.scene === "s2" &&
-        /02 \/ \d+ · 0 \/ 2/.test(restoredLecture?.progress ?? "") &&
-        restoredLecture?.visible === 2,
+        /^\d+ \/ \d+$/.test(restoredLecture?.progress ?? "") &&
+        restoredLecture?.visible === 1,
       JSON.stringify(restoredLecture),
     );
 
+    await evaluate(session, `document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowRight', bubbles:true }))`);
     await evaluate(session, `document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowRight', bubbles:true }))`);
     const simulated = value(await evaluate(session, `(() => {
       const scene = document.querySelector('.lecture-scene.on');
@@ -1372,10 +1369,10 @@ for (const viewport of activeViewports) {
     })()`));
     record(
       `${viewport.id} simulate 효과`,
-      simulated?.live === "true" &&
+        simulated?.live === "true" &&
         simulated?.effect === "simulate" &&
         simulated?.cue === "직접 조작" &&
-        /· 1 \/ 2/.test(simulated?.progress ?? ""),
+        /^\d+ \/ \d+$/.test(simulated?.progress ?? ""),
       JSON.stringify(simulated),
     );
 

@@ -102,10 +102,10 @@ export type CourseScene = {
 };
 
 /**
- * 5 는 서로 다른 시각자산 둘을 같은 비중이나 주자료와 보조자료 구도로 묶는 판이다.
- * 이전 계약의 장면은 같은 상태 전이 규칙으로 그대로 렌더링한다.
+ * 5 는 서로 다른 시각자산 둘의 학습 관계를 기록한다. 6은 모든 관계를 같은 좌표의
+ * 단일 시각자료 장표로 펼친다. 이전 계약의 장면도 같은 규격으로 렌더링한다.
  */
-export const COURSE_SCENE_RUNTIME = 5;
+export const COURSE_SCENE_RUNTIME = 6;
 
 export type CourseSceneFrame = {
   effect: CourseSceneBeat["effect"];
@@ -118,6 +118,8 @@ export type CourseSceneFrame = {
   annotationTargets: number[];
   interaction: number[];
   cue: string;
+  sequenceIndex: number;
+  sequenceTotal: number;
 };
 
 const COURSE_SCENE_CUES: Record<CourseSceneBeat["effect"], string> = {
@@ -139,51 +141,33 @@ const COURSE_SCENE_CUES: Record<CourseSceneBeat["effect"], string> = {
  * 렌더러가 상태를 확정하고 브라우저는 현재 프레임 하나만 투영한다.
  */
 export function compileSceneTimeline(scene: CourseScene): CourseSceneFrame[] {
-  const visible = new Set<number>();
-  let focus: number[] = [];
-  let compare: number[] = [];
-  let composition: number[] = [];
-  let annotation = "";
-  let annotationTargets: number[] = [];
-  let interaction: number[] = [];
   const frames: CourseSceneFrame[] = [];
 
   for (const beat of scene.beats) {
-    const changesVisibility = beat.effect === "enter" || beat.effect === "replace" || beat.effect === "compare" || beat.effect === "compose";
-    if (changesVisibility) {
-      focus = [];
-      annotation = "";
-      annotationTargets = [];
-      interaction = [];
-      compare = [];
-      composition = [];
-    }
-    if (beat.effect === "replace" || beat.effect === "compare" || beat.effect === "compose") visible.clear();
-    if (changesVisibility) beat.targets.forEach((target) => visible.add(target));
-    if (beat.effect === "focus") focus = [...beat.targets];
-    if (beat.effect === "compare") compare = [...beat.targets];
-    if (beat.effect === "compose") composition = [...beat.targets];
     /**
-     * 판단 문장. 계약 4 부터는 아무 beat 의 note 로 실려 그 화면과 함께 나타난다.
-     * annotate 는 계약 3 이하의 형식이고 note 가 필수라 같은 줄 하나로 둘 다 처리된다.
+     * 계약 6부터 장표 한 장에는 시각자료 하나만 둔다. 예전 계약의 다중 대상 beat는
+     * 교안을 다시 쓰게 하지 않고 같은 무대의 연속 프레임으로 펼친다. 비교와 조합의 뜻은
+     * cue에 남지만 두 자료를 축소해 한 화면에 놓지 않는다.
      */
-    if (beat.note) {
-      annotation = beat.note;
-      annotationTargets = [...beat.targets];
-    }
-    if (beat.effect === "run" || beat.effect === "simulate") interaction = [...beat.targets];
-
-    frames.push({
-      effect: beat.effect,
-      targets: [...beat.targets],
-      visible: [...visible],
-      focus: [...focus],
-      compare: [...compare],
-      composition: [...composition],
-      annotation,
-      annotationTargets: [...annotationTargets],
-      interaction: [...interaction],
-      cue: COURSE_SCENE_CUES[beat.effect],
+    beat.targets.forEach((target, index) => {
+      const focused = beat.effect === "focus" ? [target] : [];
+      const compared = beat.effect === "compare" ? [target] : [];
+      const composed = beat.effect === "compose" ? [target] : [];
+      const interacting = beat.effect === "run" || beat.effect === "simulate" ? [target] : [];
+      frames.push({
+        effect: beat.effect,
+        targets: [target],
+        visible: [target],
+        focus: focused,
+        compare: compared,
+        composition: composed,
+        annotation: beat.note || "",
+        annotationTargets: beat.note ? [target] : [],
+        interaction: interacting,
+        cue: COURSE_SCENE_CUES[beat.effect],
+        sequenceIndex: index + 1,
+        sequenceTotal: beat.targets.length,
+      });
     });
   }
   return frames;
@@ -619,11 +603,10 @@ export function renderLecture(
     rendered.push(`<section class="lecture-scene" data-scene-runtime="${COURSE_SCENE_RUNTIME}" data-scene="${esc(scene.id)}" data-role="${esc(
       scene.role,
     )}" data-layout="${esc(scene.layout)}" data-beats="${esc(JSON.stringify(scene.beats))}" data-timeline="${esc(JSON.stringify(timeline))}" role="group" aria-roledescription="슬라이드" aria-labelledby="${esc(titleId)}" aria-hidden="true" inert>
-  <header class="scene-head"><div class="scene-meta"><span class="scene-index">${String(index + 1).padStart(2, "0")}</span><span class="scene-cue" data-scene-cue></span></div><div><h2 id="${esc(titleId)}" tabindex="-1">${esc(
+  <header class="scene-head"><div class="scene-meta"><span class="scene-index">${String(index + 1).padStart(2, "0")}</span><span class="scene-cue" data-scene-cue></span></div><div class="scene-copy"><h2 id="${esc(titleId)}" tabindex="-1">${esc(
     section.title,
-  )}</h2><p>${esc(section.subtitle)}</p></div></header>
+  )}</h2><p class="scene-subtitle">${esc(section.subtitle)}</p><p class="scene-visual-note" data-scene-visual-note hidden></p><p class="scene-callout" data-scene-callout aria-live="polite"></p></div></header>
   <div class="scene-canvas">${html}</div>
-  <p class="scene-callout" data-scene-callout aria-live="polite"></p>
 </section>`);
   }
   // 읽기 화면(term-r)과 id 가 겹치지 않게 접두어를 다르게 둔다. 같은 페이지에 둘 다 있다.

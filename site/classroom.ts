@@ -246,417 +246,231 @@ article a:hover { border-bottom-color:var(--eddm-accent); }
 .pending i { display:block; margin-top:.5rem; font-size:.75rem; color:var(--eddm-text-faint); font-style:normal; }
 .slider .pending { flex:0 0 88%; margin:0; scroll-snap-align:center; }
 
-/* 같은 교안의 강의 장면 투영. 읽기 본문과 별도 슬라이드 원고를 만들지 않는다. */
+/* 강의 모드는 이미지 무대가 본체다. 상하 크롬 없이 왼쪽 인덱스와 장표만 화면을 쓴다. */
 .lecture-deck[hidden] { display:none; }
-.lecture-deck { position:fixed; inset:0; z-index:100; display:grid; grid-template-rows:auto minmax(0,1fr) auto;
-  --eddm-lecture-progress:0%;
-  /* 시각물 높이 캡은 선호값이다. 캔버스가 flex 열이라 라벨과 캡션까지 더해 넘치면
-     시각물이 비율을 지키며 줄어든다. 고정 vh 캡만 믿던 판은 제목 위로 겹치거나 잘렸다. */
-  --lecture-stage-max:100rem; --lecture-visual-max:82rem; --lecture-visual-height:56vh;
-  /* 한 장면의 왼쪽 기준선. 제목(scene-meta 4.5rem + 머리 열 간격 1rem 뒤), 시각물, 판단
-     문장이 전부 이 선에서 시작한다. scene-meta 폭을 바꾸면 이 값도 같이 바꾼다. */
-  --lecture-head-indent:5.5rem;
-  --lecture-gutter-block:clamp(1.35rem,3vw,3rem); --lecture-gutter-inline:clamp(1rem,5vw,5rem);
-  --lecture-motion:220ms;
+.lecture-deck { position:fixed; inset:0; z-index:100; display:grid;
+  grid-template-columns:clamp(12rem,14vw,15.5rem) minmax(0,1fr); grid-template-rows:minmax(0,1fr);
+  --eddm-lecture-progress:0%; --lecture-motion:220ms;
   width:100vw; height:100vh; height:100dvh; max-width:none; max-height:none; margin:0; padding:0;
   overflow:hidden; background:var(--eddm-carbon); color:var(--eddm-ivory); }
 .lecture-deck::before { content:""; position:absolute; z-index:0; inset:0; pointer-events:none;
-  background:
-    linear-gradient(90deg,var(--eddm-accent-line) 0,transparent 18%) top left/44rem 1px no-repeat,
-    radial-gradient(circle at 8% 0%,var(--eddm-accent-bg),transparent 34rem); }
-.lecture-deck:fullscreen { width:100vw; height:100vh; height:100dvh; max-width:none; max-height:none; margin:0; padding:0; }
+  background:radial-gradient(circle at 15% 0%,var(--eddm-accent-bg),transparent 36rem); }
+.lecture-deck:fullscreen { width:100vw; height:100vh; height:100dvh; margin:0; }
 body.lecture-on { overflow:hidden; }
-.lecture-bar { position:relative; z-index:4; display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
-  align-items:center; gap:1.25rem; min-height:4.25rem;
-  padding-top:max(.55rem,env(safe-area-inset-top));
-  padding-right:max(clamp(1rem,2.4vw,2.75rem),env(safe-area-inset-right));
-  padding-bottom:.55rem;
-  padding-left:max(clamp(1rem,2.4vw,2.75rem),env(safe-area-inset-left));
-  border-bottom:1px solid var(--eddm-line-base); background:color-mix(in srgb,var(--eddm-carbon) 94%,transparent); }
-.lecture-bar::after { content:""; position:absolute; left:0; bottom:-1px; width:var(--eddm-lecture-progress);
-  height:2px; background:var(--eddm-accent);
-  transition:width .28s ease-out; }
-.lecture-brand { min-width:0; display:flex; align-items:center; gap:.7rem; color:var(--eddm-text-muted); }
-.lecture-symbol-wrap { flex:0 0 auto; display:grid; place-items:center; width:2rem; height:2rem; }
-.lecture-symbol { width:1.65rem; height:auto; color:var(--eddm-ivory); }
-.lecture-brand-copy { min-width:0; display:grid; gap:.08rem; }
-.lecture-brand-copy b { color:var(--eddm-ivory); font-size:.7rem; font-weight:650; letter-spacing:.1em;
-  text-transform:uppercase; }
-.lecture-brand-copy i { overflow:hidden; color:var(--eddm-text-muted); font-size:.74rem; font-style:normal;
+.lecture-rail { position:relative; z-index:4; grid-column:1; grid-row:1; min-width:0; min-height:0;
+  display:grid; grid-template-rows:auto minmax(0,1fr) auto;
+  padding:max(1rem,env(safe-area-inset-top)) .75rem max(.8rem,env(safe-area-inset-bottom))
+    max(.75rem,env(safe-area-inset-left));
+  border-right:1px solid var(--eddm-line-base);
+  background:color-mix(in srgb,var(--eddm-carbon) 96%,transparent); }
+.lecture-brand { min-width:0; display:flex; align-items:center; gap:.65rem; padding:.25rem .35rem .9rem;
+  color:var(--eddm-text-muted); }
+.lecture-symbol-wrap { flex:0 0 auto; display:grid; place-items:center; width:1.8rem; height:1.8rem; }
+.lecture-symbol { width:1.55rem; height:auto; color:var(--eddm-ivory); }
+.lecture-brand-copy { min-width:0; display:grid; gap:.1rem; }
+.lecture-brand-copy b { overflow:hidden; color:var(--eddm-ivory); font-size:.66rem; font-weight:650;
+  letter-spacing:.1em; text-transform:uppercase; white-space:nowrap; text-overflow:ellipsis; }
+.lecture-brand-copy i { overflow:hidden; color:var(--eddm-text-faint); font-size:.68rem; font-style:normal;
   white-space:nowrap; text-overflow:ellipsis; }
-.lecture-progress { min-width:8.6rem; color:var(--eddm-accent); font-size:.76rem; font-weight:650;
-  letter-spacing:.08em; text-align:center;
+.lecture-map-list { min-height:0; overflow:auto; display:grid; align-content:start; gap:.22rem;
+  padding:.7rem .1rem; border-top:1px solid var(--eddm-line-base); border-bottom:1px solid var(--eddm-line-base);
+  scrollbar-width:thin; }
+.lecture-map-item { position:relative; min-width:0; display:grid; grid-template-columns:2rem minmax(0,1fr) auto;
+  align-items:center; gap:.45rem; min-height:2.75rem; padding:.5rem .55rem; border:0; border-radius:.4rem;
+  background:transparent; color:var(--eddm-text-muted); text-align:left;
+  transition:color .15s ease,background .15s ease; }
+.lecture-map-item::before { content:""; position:absolute; left:0; top:.45rem; bottom:.45rem; width:2px;
+  background:transparent; }
+.lecture-map-item:hover { color:var(--eddm-ivory); background:var(--eddm-hover); }
+.lecture-map-item[aria-current="step"] { color:var(--eddm-ivory); background:var(--eddm-accent-bg); }
+.lecture-map-item[aria-current="step"]::before { background:var(--eddm-accent); }
+.lecture-map-item span { color:var(--eddm-accent); font-size:.65rem; font-weight:700; letter-spacing:.1em;
   font-variant-numeric:tabular-nums; }
-.lecture-actions { display:flex; justify-content:flex-end; gap:.45rem; }
-.lecture-actions button, .lecture-foot button { display:flex; align-items:center; justify-content:center; gap:.45rem;
-  min-width:2.4rem; height:2.4rem; padding:.3rem .68rem; border:1px solid var(--eddm-line-base);
-  border-radius:.45rem; background:transparent; color:var(--eddm-text-muted); font-size:.76rem;
+.lecture-map-item b { min-width:0; overflow:hidden; font-size:.73rem; font-weight:560; line-height:1.35;
+  white-space:nowrap; text-overflow:ellipsis; }
+.lecture-map-item small { color:var(--eddm-text-faint); font-size:.6rem; white-space:nowrap; }
+.lecture-rail-foot { min-width:0; padding:.75rem .1rem 0; }
+.lecture-progress { position:relative; display:block; overflow:hidden; margin:0 0 .65rem; padding-bottom:.55rem;
+  color:var(--eddm-accent); font-size:.68rem; font-weight:650; letter-spacing:.08em; text-align:center;
+  font-variant-numeric:tabular-nums; }
+.lecture-progress::before, .lecture-progress::after { content:""; position:absolute; left:0; bottom:0; height:2px; }
+.lecture-progress::before { width:100%; background:var(--eddm-line-base); }
+.lecture-progress::after { width:var(--eddm-lecture-progress); background:var(--eddm-accent); transition:width .28s ease-out; }
+.lecture-nav, .lecture-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.35rem; }
+.lecture-actions { margin-top:.35rem; }
+.lecture-rail button, .lecture-rail .theme-toggle { display:flex; align-items:center; justify-content:center; gap:.35rem;
+  width:100%; min-width:0; height:2.25rem; margin:0; padding:.25rem .4rem;
+  border:1px solid var(--eddm-line-base); border-radius:.4rem; background:transparent;
+  color:var(--eddm-text-muted); font-size:.66rem; cursor:pointer;
   transition:color .15s ease,border-color .15s ease,background .15s ease; }
-.lecture-actions button:hover, .lecture-foot button:hover { color:var(--eddm-ivory); border-color:var(--eddm-accent-line);
+.lecture-rail button:hover, .lecture-rail .theme-toggle:hover { color:var(--eddm-ivory);
+  border-color:var(--eddm-accent-line); background:var(--eddm-accent-bg); }
+.lecture-rail button[aria-pressed="true"] { color:var(--eddm-accent); border-color:var(--eddm-accent-line);
   background:var(--eddm-accent-bg); }
-.lecture-actions button[aria-pressed="true"] { color:var(--eddm-accent); border-color:var(--eddm-accent-line);
-  background:var(--eddm-accent-bg); }
-.lecture-actions button:disabled, .lecture-foot button:disabled { opacity:.3; cursor:not-allowed;
-  color:var(--eddm-text-faint); border-color:var(--eddm-line-base); background:transparent; }
-.lecture-actions button > svg, .lecture-foot button > svg { width:1rem; height:1rem; flex:0 0 auto; }
-.lecture-alert { position:absolute; z-index:7; top:5rem; left:50%; width:max-content;
-  max-width:min(34rem,calc(100vw - 2rem)); margin:0; padding:.7rem .95rem;
+.lecture-rail button:disabled { opacity:.28; cursor:not-allowed; }
+.lecture-rail button svg, .lecture-rail .theme-toggle svg { flex:0 0 auto; width:.95rem; height:.95rem; }
+.lecture-alert { position:absolute; z-index:7; top:1rem; left:calc(50% + 6rem); width:max-content;
+  max-width:min(34rem,calc(100vw - 15rem)); margin:0; padding:.7rem .95rem;
   border:1px solid var(--eddm-accent-line); border-radius:.5rem;
   background:color-mix(in srgb,var(--eddm-ink) 96%,var(--eddm-accent)); color:var(--eddm-ivory);
-  font-size:.8rem; line-height:1.5; text-align:center;
-  box-shadow:0 1rem 2.5rem color-mix(in srgb,var(--eddm-ink) 48%,transparent);
-  transform:translateX(-50%); }
+  font-size:.8rem; line-height:1.5; text-align:center; transform:translateX(-50%); }
 .lecture-alert[hidden] { display:none; }
-.lecture-map { position:absolute; z-index:8; inset:0; overflow:auto;
-  padding:max(2rem,env(safe-area-inset-top)) max(clamp(1rem,4vw,4rem),env(safe-area-inset-right))
-    max(2rem,env(safe-area-inset-bottom)) max(clamp(1rem,4vw,4rem),env(safe-area-inset-left));
-  background:color-mix(in srgb,var(--eddm-carbon) 98%,var(--eddm-ink)); color:var(--eddm-ivory); }
-.lecture-map[hidden] { display:none; }
-.lecture-map-inner { width:min(82rem,100%); min-height:100%; margin:0 auto; display:grid;
-  grid-template-rows:auto 1fr auto; gap:clamp(1.5rem,4vh,3rem); }
-.lecture-map-head { display:flex; align-items:start; justify-content:space-between; gap:2rem;
-  padding-bottom:1rem; border-bottom:1px solid var(--eddm-line-base); }
-.lecture-map-head h2 { margin:0; font-size:clamp(2.15rem,4.5vw,4.6rem); line-height:1; letter-spacing:-.045em; }
-.lecture-map-head p { margin:.65rem 0 0; color:var(--eddm-text-muted); font-size:clamp(.9rem,1.2vw,1.1rem); }
-.lecture-map-close { flex:0 0 auto; display:grid; place-items:center; width:2.7rem; height:2.7rem;
-  border:1px solid var(--eddm-line-base); border-radius:.45rem; color:var(--eddm-text-muted); }
-.lecture-map-close:hover { color:var(--eddm-ivory); border-color:var(--eddm-accent-line); background:var(--eddm-accent-bg); }
-.lecture-map-close svg { width:1.05rem; height:1.05rem; }
-.lecture-map-list { align-self:start; display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:.65rem; counter-reset:lecture-map; }
-.lecture-map-item { counter-increment:lecture-map; min-width:0; min-height:6.5rem; padding:1rem 1.1rem;
-  border:1px solid var(--eddm-line-base); border-radius:.5rem; background:transparent; color:var(--eddm-text);
-  text-align:left; transition:border-color .15s ease,background .15s ease,color .15s ease; }
-.lecture-map-item:hover { border-color:var(--eddm-accent-line); background:var(--eddm-accent-bg); color:var(--eddm-ivory); }
-.lecture-map-item[aria-current="step"] { border-color:var(--eddm-accent); background:var(--eddm-accent-bg); color:var(--eddm-ivory); }
-.lecture-map-item span { display:block; margin-bottom:.65rem; color:var(--eddm-accent); font-size:.68rem;
-  font-weight:650; letter-spacing:.12em; font-variant-numeric:tabular-nums; }
-.lecture-map-item b { display:block; overflow:hidden; font-size:clamp(1rem,1.35vw,1.25rem); line-height:1.35;
-  text-overflow:ellipsis; }
-.lecture-map-foot { display:flex; align-items:center; justify-content:space-between; gap:1.5rem;
-  padding-top:1rem; border-top:1px solid var(--eddm-line-base); }
-.lecture-map-foot p { margin:0; color:var(--eddm-text-faint); font-size:.75rem; line-height:1.5; }
-.lecture-map-blank { flex:0 0 auto; display:flex; align-items:center; gap:.55rem; min-height:2.6rem;
-  padding:.45rem .8rem; border:1px solid var(--eddm-line-base); border-radius:.45rem;
-  color:var(--eddm-text-muted); }
-.lecture-map-blank:hover, .lecture-map-blank[aria-pressed="true"] { color:var(--eddm-ivory);
-  border-color:var(--eddm-accent-line); background:var(--eddm-accent-bg); }
-.lecture-map-blank svg { width:1rem; height:1rem; }
 .lecture-break { position:absolute; z-index:9; inset:0; display:block; width:100%; height:100%;
   border:0; background:var(--eddm-carbon); color:transparent; cursor:pointer; }
 .lecture-break[hidden] { display:none; }
-.lecture-stage { position:relative; z-index:1; min-height:0; overflow:hidden; display:grid;
-  grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1fr); touch-action:pan-y; }
+.lecture-stage { position:relative; z-index:1; grid-column:2; grid-row:1; min-width:0; min-height:0;
+  overflow:hidden; display:grid; grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1fr);
+  touch-action:pan-y; }
 .lecture-stage > .lecture-scene { grid-column:1; grid-row:1; min-height:0; }
-/**
- * 장면 구도는 하나다. 제목 띠가 위, 시각물이 남은 화면 전체, 판단 문장이 아래 (PPT 구도).
- * 계약 2 까지 쓰던 좌우 분할(제목 왼쪽 고정폭)은 시각물이 가벼우면 화면 대부분이 비어서
- * 2026-08-31 운영자 지시로 폐기했다. 장면은 첫 beat 가 자동으로 실행된 채 열리므로
- * 빈 제목 장면(data-scene-empty)도 없다.
- */
-.lecture-scene { display:none; position:relative; width:100%; height:100%;
-  box-sizing:border-box;
-  padding-top:var(--lecture-gutter-block);
-  padding-right:max(var(--lecture-gutter-inline),env(safe-area-inset-right));
-  padding-bottom:var(--lecture-gutter-block);
-  padding-left:max(var(--lecture-gutter-inline),env(safe-area-inset-left));
-  contain:layout style;
-  grid-template-areas:"head" "canvas" "callout";
-  grid-template-rows:auto minmax(0,1fr) auto; gap:clamp(1rem,2vh,1.75rem); }
+/* PPT처럼 왼쪽은 말할 내용, 오른쪽은 규격화된 단일 시각자료 무대다. */
+.lecture-scene { display:none; position:relative; width:100%; height:100%; min-width:0; min-height:0;
+  box-sizing:border-box; padding:clamp(1.4rem,3.2vw,4rem); contain:layout style;
+  grid-template-columns:minmax(16rem,28%) minmax(0,1fr); grid-template-areas:"head canvas";
+  gap:clamp(1.6rem,3.2vw,4.5rem); }
 .lecture-scene.on { display:grid; }
 .lecture-scene.on .scene-head { animation:scene-head var(--lecture-motion) ease both; }
-.scene-head { grid-area:head; position:relative; z-index:2; display:grid; grid-template-columns:auto minmax(0,1fr);
-  align-items:start; gap:.75rem 1rem; max-width:var(--lecture-stage-max);
-  width:100%; margin:0 auto; }
-.scene-meta { display:grid; justify-items:start; gap:.45rem; width:4.5rem; min-width:4.5rem; padding-top:.42rem; }
-.scene-index { display:flex; align-items:center; gap:.55rem;
-  color:var(--eddm-accent); font-size:.74rem; font-weight:650; letter-spacing:.12em; font-variant-numeric:tabular-nums; }
-.scene-index::after { content:""; width:2.4rem; height:1px; background:var(--eddm-accent-line); }
-.scene-cue { width:4.5rem; min-height:.85rem; color:var(--eddm-text-faint); font-size:.65rem; font-weight:650;
-  letter-spacing:.08em; white-space:nowrap; opacity:0; transform:translateY(-2px);
-  transition:opacity var(--lecture-motion) ease,transform var(--lecture-motion) ease; }
-.scene-cue:not(:empty) { color:var(--eddm-accent); opacity:.82; transform:none; }
-.scene-head > div { min-width:0; }
-.scene-head > div:last-child { opacity:1; transition:opacity var(--lecture-motion) ease; }
-.scene-head h2 { margin:0; font-size:clamp(2.15rem,3.5vw,4.1rem); line-height:1.05;
-  letter-spacing:-.045em; text-wrap:balance; }
-.scene-head p { max-width:72rem; margin:.7rem 0 0; color:var(--eddm-text-muted);
-  font-size:clamp(1.15rem,1.6vw,2rem); line-height:1.45; text-wrap:balance; }
-/**
- * 캔버스는 flex 열이다. 시각물, 라벨, 캡션의 합이 남은 화면보다 크면 시각물이
- * min-height:0 과 flex-shrink 로 줄어들어 어떤 장면도 제목 띠를 침범하거나 잘리지 않는다.
- * compare, pair, lead 순간만 아래 override 가 두 자료를 위한 grid 로 바꾼다.
- */
-.scene-canvas { grid-area:canvas; align-self:stretch; display:flex; flex-direction:column;
-  justify-content:center; align-items:flex-start; gap:clamp(.8rem,2vw,1.6rem);
-  width:auto; min-height:0;
-  margin-left:calc(max((100% - var(--lecture-stage-max)) / 2, 0px) + var(--lecture-head-indent));
-  margin-right:max((100% - var(--lecture-stage-max)) / 2, 0px);
-  contain:layout style; overflow:hidden; }
-.scene-canvas > * { min-height:0; }
-/* 표, 코드, 실행 칸은 줄이지 않는다. 줄이면 머리 행만 남는 스크롤 상자가 된다
-   (2026-09-01 실측). 넘칠 때 줄어드는 것은 비율을 지키는 이미지와 영상의 몫이고,
-   이들이 큰 경우는 자신의 최대 높이 캡과 내부 스크롤이 막는다. */
-.scene-canvas .table-wrap, .scene-canvas pre, .scene-canvas .cell { flex:0 0 auto; }
+.scene-head { grid-area:head; position:relative; z-index:2; min-width:0; min-height:0; align-self:center;
+  display:flex; flex-direction:column; justify-content:center; }
+.scene-meta { display:flex; align-items:center; gap:.7rem; margin-bottom:clamp(1.2rem,3vh,2.4rem); }
+.scene-index { display:flex; align-items:center; gap:.6rem; color:var(--eddm-accent); font-size:.72rem;
+  font-weight:700; letter-spacing:.12em; font-variant-numeric:tabular-nums; }
+.scene-index::after { content:""; width:2.6rem; height:1px; background:var(--eddm-accent-line); }
+.scene-cue { min-height:.85rem; color:var(--eddm-accent); font-size:.66rem; font-weight:650;
+  letter-spacing:.08em; white-space:nowrap; opacity:.82; }
+.scene-copy { min-width:0; opacity:1; transition:opacity var(--lecture-motion) ease; }
+.scene-head h2 { margin:0; font-size:clamp(2.25rem,3.6vw,4.7rem); line-height:1.03;
+  letter-spacing:-.05em; text-wrap:balance; }
+.scene-subtitle { margin:clamp(.8rem,1.8vh,1.35rem) 0 0; color:var(--eddm-text-muted);
+  font-size:clamp(1.02rem,1.35vw,1.55rem); line-height:1.5; text-wrap:balance; }
+.scene-visual-note { margin:clamp(1.25rem,3vh,2.25rem) 0 0; padding-top:1rem;
+  border-top:1px solid var(--eddm-line-base); color:var(--eddm-text-muted);
+  font-size:clamp(.82rem,.9vw,1rem); line-height:1.55; }
+.scene-visual-note[hidden] { display:none; }
+.scene-callout { display:none; margin:clamp(1.1rem,2.5vh,2rem) 0 0; padding:.15rem 0 .15rem .9rem;
+  border-left:2px solid var(--eddm-accent); color:var(--eddm-ivory);
+  font-size:clamp(.92rem,1.05vw,1.18rem); line-height:1.55; }
+.scene-callout.on { display:block; animation:scene-callout var(--lecture-motion) ease-out both; }
+.scene-canvas { grid-area:canvas; align-self:stretch; min-width:0; min-height:0; overflow:hidden;
+  display:grid; place-items:center; contain:layout style; }
 .scene-canvas > p:not(.lb), .scene-canvas > ul, .scene-canvas > ol { display:none; }
 .scene-canvas .slider { display:contents; }
-.scene-canvas .lb, .scene-canvas h4 { display:none; grid-column:1/-1; justify-self:start;
-  align-self:flex-start; flex:0 0 auto; margin:0;
-  padding:0 0 .45rem; border-bottom:1px solid var(--eddm-accent-line); color:var(--eddm-accent);
-  font-size:clamp(.86rem,1vw,1.05rem); font-weight:650; }
-.scene-canvas [data-scene-label-visible="true"] { display:flex; }
-.scene-canvas [data-visual] { display:none; justify-self:center; max-width:100%; max-height:100%; margin:0; opacity:1;
-  transition:opacity var(--lecture-motion) ease,filter var(--lecture-motion) ease,box-shadow var(--lecture-motion) ease; }
-.scene-canvas [data-visual][data-scene-visible="true"] { display:block; animation:scene-enter var(--lecture-motion) cubic-bezier(.2,.7,.2,1) both; }
-.scene-canvas figure.media[data-scene-visible="true"] { display:flex; flex-direction:column;
-  align-items:center; min-height:0; }
+.scene-canvas .lb, .scene-canvas h4 { display:none; }
+.scene-canvas [data-visual] { display:none; width:100%; height:100%; max-width:100%; max-height:100%;
+  min-width:0; min-height:0; margin:0; opacity:1;
+  transition:opacity var(--lecture-motion) ease,filter var(--lecture-motion) ease; }
+.scene-canvas [data-visual][data-scene-visible="true"] { display:block;
+  animation:scene-enter var(--lecture-motion) cubic-bezier(.2,.7,.2,1) both; }
+.scene-canvas figure.media[data-scene-visible="true"],
+.scene-canvas figure.yt[data-scene-visible="true"],
+.scene-canvas figure.course-embed[data-scene-visible="true"] { display:flex; flex-direction:column;
+  align-items:center; justify-content:center; }
 .scene-canvas [data-visual][data-scene-effect="replace"] { animation-name:scene-replace; }
-.scene-canvas [data-visual][data-scene-effect="compare"] { animation-name:scene-pair; }
-.scene-canvas [data-visual][data-scene-effect="compose"] { animation-name:scene-pair; }
+.scene-canvas [data-visual][data-scene-effect="compare"],
+.scene-canvas [data-visual][data-scene-effect="compose"] { animation-name:scene-carousel; }
 .scene-canvas [data-visual][data-scene-active="true"] { will-change:transform,opacity; }
-/**
- * 강조는 대비로만 한다. 테두리와 후광을 두르지 않는다.
- *
- * 강조할 대상에 선을 두르면 그 선이 학습 대상보다 먼저 눈에 들어온다. 화면 뒤에서 보는
- * 사람에게는 내용이 아니라 상자만 남는다. 짚어야 할 대상은 밝게 두고 나머지를 내린다.
- * 2026-08-24 운영자 지시로 테두리 강조를 원천 금지했다.
- * scripts/check-brand.mjs 가 이 구역에 outline 과 box-shadow 가 다시 들어오면 막는다.
- */
-.scene-canvas [data-visual][data-scene-focus="true"] { filter:brightness(1.12) contrast(1.04); }
-.scene-canvas [data-visual][data-scene-dim="true"] { opacity:.14; filter:saturate(.4) brightness(.8); }
-.scene-canvas [data-visual][data-scene-live="true"] { filter:brightness(1.12); }
-.lecture-scene[data-scene-effect="focus"] .scene-head > div:last-child { opacity:.42; }
-.scene-canvas figure.media img, .scene-canvas .yt,
-.scene-canvas .course-embed, .scene-canvas iframe { max-height:var(--lecture-visual-height); max-width:100%; margin:0 auto; }
-.scene-canvas figure.media video { max-height:var(--lecture-visual-height); max-width:100%; margin:0 auto; }
-.scene-canvas figure.media, .scene-canvas .yt, .scene-canvas .course-embed { width:var(--lecture-visual-max); max-width:100%; }
-.scene-canvas figure.media img, .scene-canvas figure.media video {
-  width:auto; height:auto; max-width:100%; justify-self:center; min-height:0; flex:0 1 auto;
-  object-fit:contain; object-position:center; border:1px solid var(--eddm-line-strong); border-radius:.5rem;
-  background:var(--eddm-ink); box-shadow:0 1.25rem 3.5rem color-mix(in srgb,var(--eddm-ink) 44%,transparent); }
-html:not([data-theme="dark"]) .scene-canvas figure.media img,
-html:not([data-theme="dark"]) .scene-canvas figure.media video {
-  box-shadow:0 1.25rem 3.5rem color-mix(in srgb,var(--eddm-ivory) 18%,transparent); }
-.scene-canvas figure.media[data-scene-visible="true"] { width:auto; max-width:100%; }
+.scene-canvas [data-visual][data-scene-focus="true"],
+.scene-canvas [data-visual][data-scene-live="true"] { filter:brightness(1.12) contrast(1.04); }
+.lecture-scene[data-scene-effect="focus"] .scene-copy { opacity:.5; }
+.scene-canvas figure.media img, .scene-canvas figure.media video { display:block; width:auto; height:auto;
+  max-width:100%; max-height:100%; min-width:0; min-height:0; object-fit:contain; object-position:center;
+  border:1px solid var(--eddm-line-strong); border-radius:.55rem; background:var(--eddm-ink); }
+.scene-canvas figure.media figcaption, .scene-canvas .yt figcaption,
+.scene-canvas .course-embed figcaption { display:none; }
+.scene-canvas .yt .frame { width:100%; max-height:100%; aspect-ratio:16/9; }
+.scene-canvas .yt.tall .frame { width:auto; height:100%; aspect-ratio:9/16; }
+.scene-canvas .course-embed iframe { display:block; width:100%; max-width:100%; max-height:100%;
+  aspect-ratio:var(--course-embed-ratio,16/9); border:0; border-radius:.65rem; background:var(--eddm-raise); }
+.scene-canvas pre, .scene-canvas .table-wrap, .scene-canvas .cell { width:100%; height:100%; max-width:100%;
+  max-height:100%; box-sizing:border-box; overflow:auto; margin:0; }
+.scene-canvas pre { padding:clamp(1.15rem,2.2vw,2.4rem); border:1px solid var(--eddm-line-strong);
+  border-radius:.55rem; background:color-mix(in srgb,var(--eddm-ink) 94%,var(--eddm-accent));
+  color:var(--eddm-ivory); font-family:${DESIGN.font.mono}; font-size:clamp(.9rem,1.3vw,1.4rem);
+  line-height:1.6; white-space:pre; }
+.scene-canvas .table-wrap { border:1px solid var(--eddm-line-strong); border-radius:.55rem;
+  background:var(--eddm-raise); }
+.scene-canvas table { width:100%; border-collapse:collapse; }
+.scene-canvas th, .scene-canvas td { padding:clamp(.65rem,1.2vw,1rem); border-bottom:1px solid var(--eddm-line-base);
+  text-align:left; font-size:clamp(.82rem,1.05vw,1.12rem); line-height:1.45; }
+.scene-canvas th { position:sticky; top:0; z-index:1; background:var(--eddm-hover); color:var(--eddm-ivory); }
+.scene-canvas td { color:var(--eddm-text); }
 .scene-canvas [data-media-host] { position:relative; }
-.scene-media-status { display:none; place-items:center; justify-self:stretch; width:min(52rem,100%);
-  min-height:clamp(12rem,32vh,24rem); padding:2rem; border:1px solid var(--eddm-line-strong);
-  border-radius:.5rem; background:var(--eddm-raise); color:var(--eddm-text-muted); text-align:center; }
+.scene-media-status { display:none; place-items:center; width:100%; height:100%; min-height:12rem; padding:2rem;
+  box-sizing:border-box; border:1px solid var(--eddm-line-strong); border-radius:.55rem;
+  background:var(--eddm-raise); color:var(--eddm-text-muted); text-align:center; }
 .scene-media-status span { display:block; max-width:32rem; font-size:clamp(.95rem,1.2vw,1.15rem); line-height:1.6; }
 .scene-media-status button { margin-top:1rem; padding:.55rem .9rem; border:1px solid var(--eddm-accent-line);
   border-radius:.45rem; background:transparent; color:var(--eddm-ivory); font:inherit; cursor:pointer; }
 .scene-canvas [data-media-state="loading"] > .scene-media-status,
 .scene-canvas [data-media-state="error"] > .scene-media-status { display:grid; }
 .scene-canvas [data-media-state="loading"] > .scene-media-status button { display:none; }
-.scene-canvas [data-media-state="loading"] > img,
-.scene-canvas [data-media-state="loading"] > video,
-.scene-canvas [data-media-state="loading"] > iframe,
-.scene-canvas [data-media-state="error"] > img,
-.scene-canvas [data-media-state="error"] > video,
-.scene-canvas [data-media-state="error"] > iframe { display:none; }
-.scene-canvas figure.media figcaption, .scene-canvas .yt figcaption, .scene-canvas .course-embed figcaption {
-  margin-top:.65rem; color:var(--eddm-text-muted); font-size:clamp(.86rem,1vw,1.05rem); line-height:1.45; }
-.scene-canvas figure.media figcaption { width:max-content; max-width:100%; text-align:center; }
-.scene-canvas pre { width:var(--lecture-visual-max); max-width:100%; max-height:var(--lecture-visual-height); overflow:auto; margin:0; padding:clamp(1.15rem,2.2vw,2.25rem);
-  border:1px solid var(--eddm-line-strong); border-radius:.5rem;
-  background:color-mix(in srgb,var(--eddm-ink) 94%,var(--eddm-accent)); color:var(--eddm-ivory);
-  box-shadow:0 1.1rem 3rem color-mix(in srgb,var(--eddm-ink) 38%,transparent);
-  font-family:${DESIGN.font.mono}; font-size:clamp(.95rem,1.35vw,1.4rem); line-height:1.6; white-space:pre; }
-html:not([data-theme="dark"]) .scene-canvas pre {
-  box-shadow:0 1.1rem 3rem color-mix(in srgb,var(--eddm-ivory) 14%,transparent); }
-.scene-canvas .table-wrap { width:var(--lecture-visual-max); max-width:100%; max-height:var(--lecture-visual-height); overflow:auto;
-  border:1px solid var(--eddm-line-strong); border-radius:.5rem; background:var(--eddm-raise); }
-.scene-canvas table { width:100%; border-collapse:collapse; }
-.scene-canvas th, .scene-canvas td { padding:.85rem 1rem; border-bottom:1px solid var(--eddm-line-base);
-  text-align:left; font-size:clamp(.9rem,1.1vw,1.15rem); line-height:1.45; }
-.scene-canvas th { background:var(--eddm-hover); color:var(--eddm-ivory); }
-.scene-canvas td { color:var(--eddm-text); }
-.scene-canvas .cell { width:var(--lecture-visual-max); max-width:100%; max-height:var(--lecture-visual-height); overflow:auto; margin:0; }
-.scene-canvas .course-embed { width:var(--lecture-visual-max); max-width:100%; }
-.course-embed iframe { display:block; width:100%; aspect-ratio:var(--course-embed-ratio,16/9); border:0; border-radius:.65rem;
-  background:var(--eddm-raise); }
-.course-embed figcaption { margin-top:.55rem; color:var(--eddm-text-muted); }
-.lecture-scene[data-active-layout="compare"] .scene-canvas,
-.lecture-scene[data-active-layout="pair"] .scene-canvas,
-.lecture-scene[data-active-layout="lead"] .scene-canvas {
-  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-content:center; align-items:start;
-  justify-items:center; column-gap:clamp(1.5rem,3vw,3rem); row-gap:.75rem; }
-.lecture-scene[data-active-layout="lead"] .scene-canvas { grid-template-columns:minmax(0,3fr) minmax(18rem,2fr); }
-.lecture-scene[data-active-layout="compare"] .scene-canvas [data-scene-label-for],
-.lecture-scene[data-active-layout="pair"] .scene-canvas [data-scene-label-for],
-.lecture-scene[data-active-layout="lead"] .scene-canvas [data-scene-label-for] { width:100%; box-sizing:border-box; }
-.lecture-scene[data-active-layout="compare"] .scene-canvas pre,
-.lecture-scene[data-active-layout="pair"] .scene-canvas pre,
-.lecture-scene[data-active-layout="lead"] .scene-canvas pre { width:100%; height:clamp(12rem,28vh,18rem);
-  min-height:0; box-sizing:border-box; white-space:pre-wrap; overflow-wrap:anywhere; }
-.lecture-scene[data-active-layout="compare"] .scene-canvas [data-scene-label-for][data-scene-slot="1"],
-.lecture-scene[data-active-layout="pair"] .scene-canvas [data-scene-label-for][data-scene-slot="1"],
-.lecture-scene[data-active-layout="lead"] .scene-canvas [data-scene-label-for][data-scene-slot="1"] {
-  grid-column:1; grid-row:1; }
-.lecture-scene[data-active-layout="compare"] .scene-canvas [data-scene-label-for][data-scene-slot="2"],
-.lecture-scene[data-active-layout="pair"] .scene-canvas [data-scene-label-for][data-scene-slot="2"],
-.lecture-scene[data-active-layout="lead"] .scene-canvas [data-scene-label-for][data-scene-slot="2"] {
-  grid-column:2; grid-row:1; }
-.lecture-scene[data-active-layout="compare"] .scene-canvas [data-visual][data-scene-slot="1"],
-.lecture-scene[data-active-layout="pair"] .scene-canvas [data-visual][data-scene-slot="1"],
-.lecture-scene[data-active-layout="lead"] .scene-canvas [data-visual][data-scene-slot="1"] {
-  grid-column:1; grid-row:2; }
-.lecture-scene[data-active-layout="compare"] .scene-canvas [data-visual][data-scene-slot="2"],
-.lecture-scene[data-active-layout="pair"] .scene-canvas [data-visual][data-scene-slot="2"],
-.lecture-scene[data-active-layout="lead"] .scene-canvas [data-visual][data-scene-slot="2"] {
-  grid-column:2; grid-row:2; }
-.lecture-scene[data-active-layout="pair"] .scene-canvas [data-visual],
-.lecture-scene[data-active-layout="lead"] .scene-canvas [data-visual] { width:100%; box-sizing:border-box; }
-.lecture-scene[data-active-layout="pair"] .scene-canvas figure.media[data-scene-visible="true"],
-.lecture-scene[data-active-layout="lead"] .scene-canvas figure.media[data-scene-visible="true"] { width:100%; }
-.lecture-scene[data-active-layout="pair"] .scene-canvas figure.media img,
-.lecture-scene[data-active-layout="pair"] .scene-canvas figure.media video,
-.lecture-scene[data-active-layout="lead"] .scene-canvas figure.media img,
-.lecture-scene[data-active-layout="lead"] .scene-canvas figure.media video,
-.lecture-scene[data-active-layout="pair"] .scene-canvas .table-wrap,
-.lecture-scene[data-active-layout="lead"] .scene-canvas .table-wrap { max-height:44vh; }
-.lecture-scene[data-active-layout="pair"] .scene-canvas th,
-.lecture-scene[data-active-layout="pair"] .scene-canvas td,
-.lecture-scene[data-active-layout="lead"] .scene-canvas th,
-.lecture-scene[data-active-layout="lead"] .scene-canvas td {
-  padding:.55rem .65rem; font-size:clamp(.78rem,.95vw,1rem); line-height:1.35; }
-.lecture-scene[data-layout="code"] { --lecture-visual-max:92rem; }
-.lecture-scene[data-layout="demo"] { --lecture-visual-max:88rem; }
-.lecture-scene[data-layout="demo"] .scene-canvas [data-visual] { width:var(--lecture-visual-max); max-width:100%; }
-.scene-callout { grid-area:callout; display:flex; align-items:center; width:auto;
-  height:clamp(3.4rem,6vh,4.4rem); min-height:0; box-sizing:border-box; overflow:auto;
-  margin-top:0; margin-bottom:0;
-  margin-left:calc(max((100% - var(--lecture-stage-max)) / 2, 0px) + var(--lecture-head-indent));
-  margin-right:max((100% - var(--lecture-stage-max)) / 2, 0px);
-  padding:.25rem 0 .25rem 1rem;
-  border-left:2px solid transparent; color:transparent; font-size:clamp(1rem,1.2vw,1.35rem); line-height:1.5;
-  transform:translateY(4px); }
-.scene-callout.on { border-left-color:var(--eddm-accent); color:var(--eddm-ivory);
-  animation:scene-callout var(--lecture-motion) ease-out both; }
-.lecture-foot { position:relative; z-index:4; display:flex; align-items:center; justify-content:flex-end; gap:1rem;
-  min-height:3.6rem;
-  padding-top:.5rem;
-  padding-right:max(clamp(1rem,2.4vw,2.75rem),env(safe-area-inset-right));
-  padding-bottom:max(.5rem,env(safe-area-inset-bottom));
-  padding-left:max(clamp(1rem,2.4vw,2.75rem),env(safe-area-inset-left));
-  border-top:1px solid var(--eddm-line-base);
-  background:color-mix(in srgb,var(--eddm-carbon) 94%,transparent); }
-.lecture-nav { display:flex; gap:.45rem; }
+.scene-canvas [data-media-host][data-media-state="loading"] > img,
+.scene-canvas [data-media-host][data-media-state="loading"] > video,
+.scene-canvas [data-media-host][data-media-state="loading"] > iframe,
+.scene-canvas [data-media-host][data-media-state="error"] > img,
+.scene-canvas [data-media-host][data-media-state="error"] > video,
+.scene-canvas [data-media-host][data-media-state="error"] > iframe { display:none; }
 @keyframes scene-enter { from { opacity:0; transform:translateY(10px) scale(.988); } to { opacity:1; transform:none; } }
-@keyframes scene-replace { from { opacity:0; transform:translateX(14px); } to { opacity:1; transform:none; } }
-@keyframes scene-pair { from { opacity:0; transform:scale(.992); } to { opacity:1; transform:none; } }
+@keyframes scene-replace { from { opacity:0; transform:translateX(18px); } to { opacity:1; transform:none; } }
+@keyframes scene-carousel { from { opacity:0; } to { opacity:1; } }
 @keyframes scene-callout { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
 @keyframes scene-head { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
-@media (max-width:980px) {
-  .lecture-map-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
+@media (max-width:1200px) {
+  .lecture-deck { grid-template-columns:4.5rem minmax(0,1fr); }
+  .lecture-rail { padding-right:.5rem; padding-left:max(.5rem,env(safe-area-inset-left)); }
+  .lecture-brand { justify-content:center; padding-right:0; padding-left:0; }
+  .lecture-brand-copy, .lecture-map-item b, .lecture-map-item small,
+  .lecture-nav button span, .lecture-actions button span { display:none; }
+  .lecture-map-item { grid-template-columns:1fr; justify-items:center; padding:.45rem .2rem; }
+  .lecture-nav, .lecture-actions { grid-template-columns:minmax(0,1fr); }
+  .lecture-rail button, .lecture-rail .theme-toggle { height:2rem; padding:0; }
+  .lecture-progress { font-size:.58rem; letter-spacing:.02em; }
+  .lecture-alert { left:calc(50% + 2.25rem); max-width:calc(100vw - 7rem); }
+  .lecture-scene { grid-template-columns:minmax(14rem,29%) minmax(0,1fr); }
 }
 @media (max-width:900px) {
-  .lecture-scene[data-active-layout="compare"] .scene-canvas,
-  .lecture-scene[data-active-layout="pair"] .scene-canvas,
-  .lecture-scene[data-active-layout="lead"] .scene-canvas { grid-template-columns:minmax(0,1fr); }
-  .lecture-scene[data-active-layout="compare"] .scene-canvas [data-scene-label-for][data-scene-slot="1"],
-  .lecture-scene[data-active-layout="pair"] .scene-canvas [data-scene-label-for][data-scene-slot="1"],
-  .lecture-scene[data-active-layout="lead"] .scene-canvas [data-scene-label-for][data-scene-slot="1"] {
-    grid-column:1; grid-row:1; }
-  .lecture-scene[data-active-layout="compare"] .scene-canvas [data-visual][data-scene-slot="1"],
-  .lecture-scene[data-active-layout="pair"] .scene-canvas [data-visual][data-scene-slot="1"],
-  .lecture-scene[data-active-layout="lead"] .scene-canvas [data-visual][data-scene-slot="1"] {
-    grid-column:1; grid-row:2; }
-  .lecture-scene[data-active-layout="compare"] .scene-canvas [data-scene-label-for][data-scene-slot="2"],
-  .lecture-scene[data-active-layout="pair"] .scene-canvas [data-scene-label-for][data-scene-slot="2"],
-  .lecture-scene[data-active-layout="lead"] .scene-canvas [data-scene-label-for][data-scene-slot="2"] {
-    grid-column:1; grid-row:3; }
-  .lecture-scene[data-active-layout="compare"] .scene-canvas [data-visual][data-scene-slot="2"],
-  .lecture-scene[data-active-layout="pair"] .scene-canvas [data-visual][data-scene-slot="2"],
-  .lecture-scene[data-active-layout="lead"] .scene-canvas [data-visual][data-scene-slot="2"] {
-    grid-column:1; grid-row:4; }
-  .lecture-scene[data-active-layout="pair"] .scene-canvas figure.media img,
-  .lecture-scene[data-active-layout="pair"] .scene-canvas figure.media video,
-  .lecture-scene[data-active-layout="lead"] .scene-canvas figure.media img,
-  .lecture-scene[data-active-layout="lead"] .scene-canvas figure.media video,
-  .lecture-scene[data-active-layout="pair"] .scene-canvas .table-wrap,
-  .lecture-scene[data-active-layout="lead"] .scene-canvas .table-wrap { max-height:25vh; }
-  .lecture-scene[data-active-layout="pair"] .scene-canvas th,
-  .lecture-scene[data-active-layout="pair"] .scene-canvas td,
-  .lecture-scene[data-active-layout="lead"] .scene-canvas th,
-  .lecture-scene[data-active-layout="lead"] .scene-canvas td {
-    padding:.4rem .5rem; font-size:clamp(.74rem,1.6vw,.9rem); line-height:1.3; }
-}
-@media (max-width:720px) {
-  .lecture-map { padding:1rem max(.8rem,env(safe-area-inset-right))
-    max(1rem,env(safe-area-inset-bottom)) max(.8rem,env(safe-area-inset-left)); }
-  .lecture-map-inner { gap:1rem; }
-  .lecture-map-head { gap:1rem; }
-  .lecture-map-head h2 { font-size:2rem; }
-  .lecture-map-head p { margin-top:.4rem; font-size:.78rem; }
-  .lecture-map-list { grid-template-columns:minmax(0,1fr); gap:.45rem; }
-  .lecture-map-item { min-height:4.5rem; padding:.75rem .85rem; }
-  .lecture-map-item span { margin-bottom:.35rem; }
-  .lecture-map-foot { align-items:stretch; flex-direction:column; gap:.75rem; }
-  .lecture-map-blank { justify-content:center; }
-  /* 좁은 화면은 기준선을 접는다. 들여쓰기가 화면 폭을 먹어 시각물이 작아지기 때문이다
-     (운영 실측: 66px 들여쓰기에 390px 화면의 개막 영상이 297px). 대신 장면 번호를 제목
-     위 한 열로 쌓아 번호, 제목, 시각물, 판단 문장이 전부 거터 한 선에서 시작한다. */
-  .lecture-deck { --lecture-gutter-block:1rem; --lecture-gutter-inline:.85rem; --lecture-visual-height:48vh;
-    --lecture-head-indent:0rem; }
-  .scene-head { grid-template-columns:minmax(0,1fr); gap:.45rem; }
-  .scene-head .scene-meta { display:flex; align-items:center; width:auto; min-width:0; padding-top:0; gap:.55rem; }
-  .scene-head .scene-cue { width:auto; }
-  .lecture-bar { grid-template-columns:minmax(0,1fr) auto; gap:.65rem; min-height:4rem;
-    padding-top:max(.45rem,env(safe-area-inset-top));
-    padding-right:max(.75rem,env(safe-area-inset-right));
-    padding-bottom:.45rem;
-    padding-left:max(.75rem,env(safe-area-inset-left)); }
-  .lecture-symbol-wrap { width:2rem; height:2rem; }
-  .lecture-brand-copy b { font-size:.64rem; white-space:nowrap; }
-  .lecture-brand-copy i { display:none; }
-  .lecture-progress { grid-row:2; grid-column:1/-1; justify-self:center; min-width:0; padding:.2rem 0;
-    font-size:.68rem; }
-  .lecture-actions { gap:.3rem; }
-  .lecture-actions button { width:2.2rem; min-width:2.2rem; height:2.3rem; padding:0; }
-  .lecture-actions button span { display:none; }
-  .lecture-scene { gap:.7rem; }
-  .scene-head { gap:.55rem .7rem; }
-  .scene-meta { width:3.4rem; min-width:3.4rem; padding-top:.32rem; gap:.28rem; }
-  .scene-index { font-size:.68rem; }
+  .lecture-deck { grid-template-columns:3.6rem minmax(0,1fr); }
+  .lecture-rail { padding-top:max(.65rem,env(safe-area-inset-top)); padding-right:.35rem;
+    padding-bottom:max(.5rem,env(safe-area-inset-bottom)); padding-left:max(.35rem,env(safe-area-inset-left)); }
+  .lecture-brand { padding-bottom:.55rem; }
+  .lecture-map-list { padding:.45rem 0; }
+  .lecture-map-item { min-height:2.25rem; }
+  .lecture-rail-foot { padding-top:.5rem; }
+  .lecture-progress { margin-bottom:.4rem; padding-bottom:.4rem; }
+  .lecture-rail button, .lecture-rail .theme-toggle { height:1.8rem; }
+  .lecture-actions { display:grid; grid-template-columns:minmax(0,1fr); }
+  .lecture-scene { padding:clamp(.9rem,4vw,1.4rem); grid-template-columns:minmax(0,1fr);
+    grid-template-rows:auto minmax(0,1fr); grid-template-areas:"head" "canvas"; gap:.85rem; }
+  .scene-head { align-self:start; display:grid; grid-template-columns:auto minmax(0,1fr); gap:.45rem .7rem; }
+  .scene-meta { grid-column:1/-1; margin-bottom:.15rem; }
   .scene-index::after { width:1.4rem; }
-  .scene-cue { width:3.4rem; font-size:.58rem; letter-spacing:.04em; }
-  .scene-head h2 { font-size:clamp(1.55rem,7vw,2.25rem); }
-  .scene-head p { margin-top:.45rem; font-size:.95rem; line-height:1.45; }
-  .lecture-scene[data-active-layout="compare"] .scene-canvas pre { height:clamp(7rem,17vh,9rem); padding:.75rem;
-    font-size:.7rem; line-height:1.5; }
-  .lecture-scene[data-layout="code"] .scene-canvas pre { white-space:pre-wrap; overflow-wrap:anywhere; }
-  .lecture-foot { min-height:3.4rem;
-    padding-top:.45rem;
-    padding-right:max(.75rem,env(safe-area-inset-right));
-    padding-bottom:max(.45rem,env(safe-area-inset-bottom));
-    padding-left:max(.75rem,env(safe-area-inset-left));
-    justify-content:flex-end; }
-  .lecture-foot button { height:2.45rem; }
-  .scene-canvas figure.media img, .scene-canvas figure.media video, .scene-canvas .yt,
-  .scene-canvas .course-embed, .scene-canvas pre, .scene-canvas .table-wrap, .scene-canvas .cell { max-height:48vh; }
+  .scene-head h2 { font-size:clamp(1.5rem,7vw,2.35rem); }
+  .scene-subtitle { margin-top:.4rem; font-size:.88rem; line-height:1.4; }
+  .scene-visual-note, .scene-callout { margin-top:.55rem; padding-top:.5rem; font-size:.74rem; line-height:1.4; }
+  .scene-visual-note { height:3.4rem; box-sizing:border-box; overflow:auto; }
+  .scene-callout { padding-top:.1rem; }
+  .scene-canvas { place-items:start stretch; }
+  .scene-canvas figure.media[data-scene-visible="true"],
+  .scene-canvas figure.yt[data-scene-visible="true"],
+  .scene-canvas figure.course-embed[data-scene-visible="true"] { justify-content:flex-start; }
+  .scene-canvas pre { padding:.85rem; font-size:.75rem; white-space:pre-wrap; overflow-wrap:anywhere; }
+  .scene-canvas th, .scene-canvas td { padding:.5rem .55rem; font-size:.72rem; }
 }
-@media (max-width:480px) {
-  .lecture-brand-copy { display:none; }
-}
-@media (max-height:650px) and (min-width:721px) {
-  /* 낮은 화면은 캡을 후하게 둔다. 44vh 는 프로젝터 125% 확대에서 영상 폭을 480px 아래로
-     떨어뜨렸다 (운영 실측 479px). 넘치면 flex 축소가 지키므로 캡이 후해도 안전하다. */
-  .lecture-deck { --lecture-gutter-block:.65rem; --lecture-visual-height:48vh; }
-  .lecture-bar { min-height:3.25rem; padding-top:.3rem; padding-bottom:.3rem; }
-  .lecture-actions button { height:2.15rem; }
-  .lecture-scene { gap:.45rem; }
-  .scene-head h2 { font-size:clamp(1.9rem,3vw,2.6rem); }
-  .scene-head p { margin-top:.35rem; font-size:clamp(.95rem,1.25vw,1.15rem); line-height:1.35; }
-  .scene-canvas { gap:.45rem; }
-  .scene-canvas figure.media video { max-height:44vh; }
-  .scene-callout { height:2.5rem; font-size:.95rem; }
-  .lecture-foot { min-height:2.75rem; padding-top:.3rem; padding-bottom:.3rem; }
+@media (max-height:650px) and (min-width:901px) {
+  .lecture-brand { padding-bottom:.45rem; }
+  .lecture-map-list { padding:.35rem .1rem; }
+  .lecture-map-item { min-height:2.15rem; padding:.35rem .5rem; }
+  .lecture-rail-foot { padding-top:.45rem; }
+  .lecture-progress { margin-bottom:.4rem; padding-bottom:.35rem; }
+  .lecture-rail button, .lecture-rail .theme-toggle { height:1.8rem; }
+  .lecture-scene { padding:1.15rem 1.5rem; gap:1.5rem; }
+  .scene-meta { margin-bottom:.75rem; }
+  .scene-head h2 { font-size:clamp(1.9rem,3.3vw,3.1rem); }
+  .scene-subtitle { margin-top:.45rem; font-size:.92rem; }
+  .scene-visual-note, .scene-callout { margin-top:.75rem; font-size:.8rem; }
 }
 @media (prefers-reduced-motion:reduce) {
-  .scene-canvas [data-visual][data-scene-visible="true"] { animation:none; }
-  .scene-callout.on { animation:none; transform:none; }
-  .scene-cue { transition:none; transform:none; }
+  .scene-canvas [data-visual][data-scene-visible="true"], .scene-callout.on, .scene-head { animation:none; }
+  .scene-copy { transition:none; }
 }
 `;
 
@@ -833,11 +647,11 @@ const CELL_SCRIPT = `
 `;
 
 /**
- * H2 장면과 선언된 beat를 전체화면 강의 흐름으로 실행한다.
+ * H2 장면과 선언된 beat를 한 장표 한 시각자료의 전체화면 강의 흐름으로 실행한다.
  *
  * 발표자 노트, 발표자 분리 창, 발표 시간은 계약 3 과 함께 걷어냈다 (2026-08-31 운영자 지시).
- * 설명은 강사가 말로 하고 화면은 제목, 부제, 시각물만 진다. 장면은 첫 beat 를 자동으로
- * 실행한 화면으로 열리므로 beatAt 은 0 부터 시작하고 클릭 수는 beat 수보다 하나 적다.
+ * 다중 대상 beat는 렌더러가 같은 좌표의 연속 프레임으로 펼친다. 브라우저는 완성된 프레임
+ * 하나만 투영하며 좌측 인덱스와 앞뒤 단추로 이동한다.
  */
 const LECTURE_SCRIPT = `
 (() => {
@@ -848,10 +662,7 @@ const LECTURE_SCRIPT = `
   if (!scenes.length) return;
   if (scenes.some((scene) => scene.dataset.sceneRuntime !== deck.dataset.lectureRuntime)) return;
   const progress = deck.querySelector("[data-lecture-progress]");
-  const mapButton = deck.querySelector("[data-lecture-map-toggle]");
-  const mapPanel = deck.querySelector("[data-lecture-map]");
   const mapList = deck.querySelector("[data-lecture-map-list]");
-  const mapClose = deck.querySelector("[data-lecture-map-close]");
   const blankButton = deck.querySelector("[data-lecture-blank-toggle]");
   const blankLabel = deck.querySelector("[data-lecture-blank-label]");
   const breakScreen = deck.querySelector("[data-lecture-break]");
@@ -861,11 +672,10 @@ const LECTURE_SCRIPT = `
   const nextButton = deck.querySelector("[data-lecture-next]");
   const status = deck.querySelector("[data-lecture-status]");
   let sceneAt = 0;
-  let beatAt = 0;
+  let frameAt = 0;
   let beforeHash = "";
   let opened = false;
   let alertTimer = null;
-  let mapOpen = false;
   let blanked = false;
 
   const showAlert = (message) => {
@@ -880,22 +690,20 @@ const LECTURE_SCRIPT = `
     }, 6000);
   };
 
-  const mapSurfaces = [...deck.querySelectorAll(".lecture-bar, .lecture-stage, .lecture-foot")];
-  const syncSurfaceInert = () => mapSurfaces.forEach((surface) => {
-    surface.toggleAttribute("inert", mapOpen || blanked);
-  });
   const mapItems = scenes.map((scene, index) => {
     const button = document.createElement("button");
     const number = document.createElement("span");
     const title = document.createElement("b");
+    const count = document.createElement("small");
     button.type = "button";
     button.className = "lecture-map-item";
     button.dataset.lectureMapScene = String(index);
     number.textContent = String(index + 1).padStart(2, "0");
     title.textContent = scene.querySelector("h2")?.textContent.trim() || "강의 장면";
-    button.append(number, title);
+    count.textContent = scene.querySelectorAll("[data-visual]").length + "장";
+    button.setAttribute("aria-label", number.textContent + " " + title.textContent + " · " + count.textContent);
+    button.append(number, title, count);
     button.addEventListener("click", () => {
-      setMapOpen(false, false);
       showScene(index, 0);
       deck.focus({ preventScroll:true });
     });
@@ -906,36 +714,20 @@ const LECTURE_SCRIPT = `
     if (index === sceneAt) item.setAttribute("aria-current", "step");
     else item.removeAttribute("aria-current");
   });
-  const setMapOpen = (active, restoreFocus = true) => {
-    mapOpen = Boolean(active);
-    mapPanel.hidden = !mapOpen;
-    mapButton.setAttribute("aria-expanded", mapOpen ? "true" : "false");
-    mapButton.setAttribute("aria-label", mapOpen ? "장면 지도 닫기" : "장면 지도 열기");
-    mapButton.title = mapOpen ? "장면 지도 닫기" : "장면 지도 열기";
-    syncSurfaceInert();
-    if (mapOpen) {
-      syncMap();
-      (mapItems[sceneAt] || mapClose).focus({ preventScroll:true });
-    } else if (restoreFocus) mapButton.focus({ preventScroll:true });
-  };
-  const toggleMap = () => setMapOpen(!mapOpen);
-
   const syncBlankUi = () => {
     deck.dataset.audienceBlanked = blanked ? "true" : "false";
     blankButton.setAttribute("aria-pressed", blanked ? "true" : "false");
-    blankLabel.textContent = blanked ? "관객 화면 다시 보이기" : "관객 화면 가리기";
+    const blankTitle = blanked ? "관객 화면 다시 보이기" : "관객 화면 가리기";
+    blankButton.setAttribute("aria-label", blankTitle);
+    blankButton.title = blankTitle;
+    blankLabel.textContent = blanked ? "보이기" : "가리기";
     breakScreen.hidden = !blanked;
-    syncSurfaceInert();
+    deck.querySelector(".lecture-rail").toggleAttribute("inert", blanked);
+    deck.querySelector(".lecture-stage").toggleAttribute("inert", blanked);
   };
   const setBlanked = (active) => {
     blanked = Boolean(active);
-    if (mapOpen) setMapOpen(false, false);
     syncBlankUi();
-  };
-
-  const beatsOf = (scene) => {
-    try { return JSON.parse(scene.dataset.beats || "[]"); }
-    catch { return []; }
   };
   const framesOf = (scene) => {
     try { return JSON.parse(scene.dataset.timeline || "[]"); }
@@ -957,9 +749,7 @@ const LECTURE_SCRIPT = `
     delete visual.dataset.sceneEffect;
     delete visual.dataset.sceneActive;
     delete visual.dataset.sceneFocus;
-    delete visual.dataset.sceneDim;
     delete visual.dataset.sceneLive;
-    delete visual.dataset.sceneSlot;
   });
   const mediaHosts = new Map();
   const bindMedia = (media) => {
@@ -1026,12 +816,12 @@ const LECTURE_SCRIPT = `
     paintFrame = requestAnimationFrame(() => {
       paintFrame = requestAnimationFrame(() => {
         deck.dataset.scenePhase = "ready";
-        deck.dispatchEvent(new CustomEvent("lectureframe", { detail: { scene: sceneAt, beat: beatAt } }));
+        deck.dispatchEvent(new CustomEvent("lectureframe", { detail: { scene: sceneAt, frame: frameAt } }));
       });
     });
   };
 
-  // 사례 라벨을 바로 아래 시각물에 붙인다. 라벨은 자기 시각물이 보일 때만 함께 보인다.
+  // 사례 라벨을 바로 아래 시각물에 붙이고, 장표에서는 캡션과 함께 왼쪽 설명 칸으로 옮긴다.
   scenes.forEach((scene) => {
     let labels = [];
     scene.querySelectorAll(".scene-canvas .lb, .scene-canvas h4, .scene-canvas [data-visual]").forEach((node) => {
@@ -1042,13 +832,16 @@ const LECTURE_SCRIPT = `
     });
   });
 
-  const syncLabels = (scene) => {
-    scene.querySelectorAll("[data-scene-label-for]").forEach((label) => {
-      const visual = scene.querySelector('[data-visual="' + label.dataset.sceneLabelFor + '"]');
-      label.dataset.sceneLabelVisible = visual?.dataset.sceneVisible === "true" ? "true" : "false";
-      if (visual?.dataset.sceneSlot) label.dataset.sceneSlot = visual.dataset.sceneSlot;
-      else delete label.dataset.sceneSlot;
-    });
+  const syncVisualNote = (scene, visual) => {
+    const note = scene.querySelector("[data-scene-visual-note]");
+    if (!note) return;
+    const id = visual?.dataset.visual || "";
+    const label = scene.querySelector('[data-scene-label-for="' + id + '"]')?.textContent.trim() || "";
+    const caption = visual?.querySelector("figcaption")?.textContent.trim() || "";
+    const count = allVisuals(scene).length;
+    const position = count > 1 && id ? "자료 " + id + " / " + count : "";
+    note.textContent = [position, label, caption].filter(Boolean).join(" · ");
+    note.hidden = !note.textContent;
   };
 
   const trigger = (visual, effect) => {
@@ -1068,56 +861,46 @@ const LECTURE_SCRIPT = `
   };
   const syncControls = () => {
     const lastScene = scenes.length - 1;
-    const lastBeat = beatsOf(scenes[lastScene]).length - 1;
-    const atStart = sceneAt === 0 && beatAt === 0;
-    const atEnd = sceneAt === lastScene && beatAt === lastBeat;
+    const lastFrame = framesOf(scenes[lastScene]).length - 1;
+    const atStart = sceneAt === 0 && frameAt === 0;
+    const atEnd = sceneAt === lastScene && frameAt === lastFrame;
     prevButton.disabled = atStart;
     nextButton.disabled = atEnd;
     prevButton.setAttribute("aria-disabled", atStart ? "true" : "false");
     nextButton.setAttribute("aria-disabled", atEnd ? "true" : "false");
   };
-  const announce = (scene, frame, beats) => {
+  const frameCounts = scenes.map((scene) => Math.max(1, framesOf(scene).length));
+  const totalFrames = frameCounts.reduce((sum, count) => sum + count, 0);
+  const globalFrame = () => frameCounts.slice(0, sceneAt).reduce((sum, count) => sum + count, 0) + frameAt + 1;
+  const announce = (scene, frame) => {
     if (!status) return;
     const title = scene.querySelector("h2")?.textContent.trim() || "강의 장면";
-    const clicks = beats.length - 1;
-    status.textContent = "장면 " + (sceneAt + 1) + " / " + scenes.length + " · " + title
-      + (clicks > 0 ? " · 클릭 " + beatAt + " / " + clicks : "")
+    status.textContent = "장표 " + globalFrame() + " / " + totalFrames + " · " + title
       + (frame?.cue ? " · " + frame.cue : "");
   };
 
   const apply = (fire = false) => {
     const scene = scenes[sceneAt];
-    const beats = beatsOf(scene);
     const frames = framesOf(scene);
-    const frame = frames[beatAt] || frames[0] || null;
+    const frame = frames[frameAt] || frames[0] || null;
     const visible = new Set(frame?.visible || []);
     const focused = new Set(frame?.focus || []);
     const active = new Set(frame?.targets || []);
     const interacting = new Set(frame?.interaction || []);
-    const compare = frame?.compare || [];
-    const composition = frame?.composition || [];
-    const arrangement = compare.length === 2
-      ? "compare"
-      : composition.length === 2 && (scene.dataset.layout === "pair" || scene.dataset.layout === "lead")
-        ? scene.dataset.layout
-        : "";
-    const slots = compare.length === 2 ? compare : composition;
     const cue = scene.querySelector("[data-scene-cue]");
-    flag(scene, "activeLayout", Boolean(arrangement), arrangement);
     flag(scene, "sceneEffect", Boolean(frame), frame?.effect || "");
     if (cue) cue.textContent = frame?.cue || "";
+    let shownVisual = null;
     allVisuals(scene).forEach((visual) => {
       const id = Number(visual.dataset.visual);
       const isVisible = visible.has(id);
       const isActive = active.has(id);
+      if (isVisible) shownVisual = visual;
       flag(visual, "sceneVisible", isVisible);
       flag(visual, "sceneActive", isActive);
       flag(visual, "sceneFocus", focused.has(id));
-      flag(visual, "sceneDim", focused.size > 0 && isVisible && !focused.has(id));
       flag(visual, "sceneLive", interacting.has(id));
       flag(visual, "sceneEffect", isActive, frame?.effect || "");
-      const slot = slots.indexOf(id);
-      flag(visual, "sceneSlot", slot >= 0, String(slot + 1));
     });
     const callout = scene.querySelector("[data-scene-callout]");
     callout.textContent = frame?.annotation || "";
@@ -1125,25 +908,23 @@ const LECTURE_SCRIPT = `
     if (fire && frame && (frame.effect === "run" || frame.effect === "simulate")) {
       targetsOf(scene, frame).forEach((visual) => trigger(visual, frame.effect));
     }
-    syncLabels(scene);
-    const clicks = beats.length - 1;
-    const ratio = Math.min(1, (sceneAt + (clicks > 0 ? beatAt / clicks : 1)) / scenes.length);
+    syncVisualNote(scene, shownVisual);
+    const current = globalFrame();
+    const ratio = totalFrames > 1 ? (current - 1) / (totalFrames - 1) : 1;
     deck.style.setProperty("--eddm-lecture-progress", (ratio * 100).toFixed(2) + "%");
-    // 클릭이 없는 장면에는 장면 번호만 보인다. 0 / 0 은 셈이 아니라 소음이다.
-    progress.textContent = String(sceneAt + 1).padStart(2, "0") + " / " + String(scenes.length).padStart(2, "0")
-      + (clicks > 0 ? " · " + beatAt + " / " + clicks : "");
+    progress.textContent = String(current).padStart(2, "0") + " / " + String(totalFrames).padStart(2, "0");
     progress.setAttribute("aria-valuenow", String(Math.round(ratio * 100)));
     syncMap();
-    history.replaceState(null, "", "#lecture=" + scene.dataset.scene + "." + (beatAt + 1));
+    history.replaceState(null, "", "#lecture=" + scene.dataset.scene + "." + (frameAt + 1));
     syncControls();
-    announce(scene, frame, beats);
+    announce(scene, frame);
     markPaint();
   };
 
-  const showScene = (nextScene, nextBeat = 0, fire = false) => {
+  const showScene = (nextScene, nextFrame = 0, fire = false) => {
     sceneAt = Math.max(0, Math.min(scenes.length - 1, nextScene));
-    const beats = beatsOf(scenes[sceneAt]);
-    beatAt = Math.max(0, Math.min(beats.length - 1, nextBeat));
+    const frames = framesOf(scenes[sceneAt]);
+    frameAt = Math.max(0, Math.min(Math.max(0, frames.length - 1), nextFrame));
     scenes.forEach((scene, index) => {
       scene.classList.toggle("on", index === sceneAt);
       scene.setAttribute("aria-hidden", index === sceneAt ? "false" : "true");
@@ -1156,14 +937,14 @@ const LECTURE_SCRIPT = `
   };
 
   const next = () => {
-    const beats = beatsOf(scenes[sceneAt]);
-    if (beatAt < beats.length - 1) showScene(sceneAt, beatAt + 1, true);
+    const frames = framesOf(scenes[sceneAt]);
+    if (frameAt < frames.length - 1) showScene(sceneAt, frameAt + 1, true);
     else if (sceneAt < scenes.length - 1) showScene(sceneAt + 1, 0);
   };
   const prev = () => {
-    if (beatAt > 0) showScene(sceneAt, beatAt - 1);
+    if (frameAt > 0) showScene(sceneAt, frameAt - 1);
     else if (sceneAt > 0) {
-      const before = beatsOf(scenes[sceneAt - 1]);
+      const before = framesOf(scenes[sceneAt - 1]);
       showScene(sceneAt - 1, before.length - 1);
     }
   };
@@ -1188,7 +969,6 @@ const LECTURE_SCRIPT = `
 
   const close = async () => {
     if (!opened) return;
-    if (mapOpen) setMapOpen(false, false);
     setBlanked(false);
     opened = false;
     deck.hidden = true;
@@ -1212,18 +992,17 @@ const LECTURE_SCRIPT = `
     if (!fromHash) beforeHash = location.hash && !location.hash.startsWith("#lecture=") ? location.hash : location.pathname + location.search;
     deck.hidden = false;
     document.body.classList.add("lecture-on");
-    setMapOpen(false, false);
     blanked = false;
     syncBlankUi();
     let targetScene = nearestScene();
-    let targetBeat = 0;
+    let targetFrame = 0;
     const saved = location.hash.match(/^#lecture=(s\\d+)\\.(\\d+)$/);
     if (saved) {
       const found = scenes.findIndex((scene) => scene.dataset.scene === saved[1]);
       if (found >= 0) targetScene = found;
-      targetBeat = Number(saved[2]) - 1;
+      targetFrame = Number(saved[2]) - 1;
     }
-    showScene(targetScene, targetBeat);
+    showScene(targetScene, targetFrame);
     deck.focus({ preventScroll:true });
     if (!fromHash && deck.requestFullscreen) await deck.requestFullscreen().catch(() => {});
     syncFullscreen();
@@ -1233,8 +1012,6 @@ const LECTURE_SCRIPT = `
   deck.querySelector("[data-lecture-close]").addEventListener("click", () => { void close(); });
   nextButton.addEventListener("click", next);
   prevButton.addEventListener("click", prev);
-  mapButton.addEventListener("click", toggleMap);
-  mapClose.addEventListener("click", () => setMapOpen(false));
   blankButton.addEventListener("click", () => setBlanked(!blanked));
   breakScreen.addEventListener("click", () => setBlanked(false));
   fullscreenButton.addEventListener("click", () => { void toggleFullscreen(); });
@@ -1276,13 +1053,6 @@ const LECTURE_SCRIPT = `
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
       return;
     }
-    if (mapOpen) {
-      if (event.key === "Escape" || event.key.toLowerCase() === "m") {
-        event.preventDefault();
-        setMapOpen(false);
-      }
-      return;
-    }
     if (blanked) {
       if (event.key === "Escape" || event.key.toLowerCase() === "b") {
         event.preventDefault();
@@ -1294,9 +1064,8 @@ const LECTURE_SCRIPT = `
     if (["ArrowRight", "PageDown", " "].includes(event.key)) { event.preventDefault(); next(); }
     else if (["ArrowLeft", "PageUp"].includes(event.key)) { event.preventDefault(); prev(); }
     else if (event.key === "Home") { event.preventDefault(); showScene(0, 0); }
-    else if (event.key === "End") { event.preventDefault(); const last = scenes.length - 1; showScene(last, beatsOf(scenes[last]).length - 1); }
+    else if (event.key === "End") { event.preventDefault(); const last = scenes.length - 1; showScene(last, framesOf(scenes[last]).length - 1); }
     else if (event.key.toLowerCase() === "f") { event.preventDefault(); void toggleFullscreen(); }
-    else if (event.key.toLowerCase() === "m") { event.preventDefault(); toggleMap(); }
     else if (event.key.toLowerCase() === "b") { event.preventDefault(); setBlanked(!blanked); }
     else if (event.key === "Escape") { event.preventDefault(); void close(); }
   });
@@ -1591,35 +1360,29 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
       ? `<div class="lecture-deck" data-lecture-deck data-lecture-runtime="${COURSE_SCENE_RUNTIME}" role="dialog" aria-modal="true" aria-label="${esc(
           post.title,
         )} 강의 모드" tabindex="-1" hidden>
-           <header class="lecture-bar">
+           <aside class="lecture-rail" aria-label="강의 장표 인덱스">
              <span class="lecture-brand">
                <span class="lecture-symbol-wrap"><svg class="lecture-symbol" viewBox="${esc(SYMBOL.viewBox)}" aria-hidden="true">${symbolMarkup()}</svg></span>
                <span class="lecture-brand-copy"><b>eddmpython course</b><i>${esc(category.title)} · ${esc(post.title)}</i></span>
              </span>
-             <span class="lecture-progress" data-lecture-progress role="progressbar" aria-label="강의 진행률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">01 / ${String(post.scenes?.length ?? 0).padStart(2, "0")}</span>
-             <div class="lecture-actions">
-               ${themeToggle("lecture-theme-toggle")}
-               <button type="button" data-lecture-map-toggle aria-controls="lecture-scene-map" aria-expanded="false" aria-label="장면 지도 열기" title="장면 지도 열기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg><span>장면</span></button>
-               <button type="button" data-lecture-fullscreen aria-label="전체화면 시작" title="전체화면 시작" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3.5H3.5V8M16 3.5h4.5V8M8 20.5H3.5V16M16 20.5h4.5V16"/></svg><span>전체화면</span></button>
-               <button type="button" data-lecture-close aria-label="강의 모드 닫기" title="강의 모드 닫기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg><span>닫기</span></button>
+             <nav class="lecture-map-list" data-lecture-map-list aria-label="장표 바로가기"></nav>
+             <div class="lecture-rail-foot">
+               <span class="lecture-progress" data-lecture-progress role="progressbar" aria-label="강의 진행률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">01 / 01</span>
+               <div class="lecture-nav"><button type="button" data-lecture-prev aria-label="이전 장표" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg><span>이전</span></button><button type="button" data-lecture-next aria-label="다음 장표"><span>다음</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button></div>
+               <div class="lecture-actions">
+                 ${themeToggle("lecture-theme-toggle")}
+                 <button type="button" class="lecture-tool-secondary" data-lecture-fullscreen aria-label="전체화면 시작" title="전체화면 시작" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3.5H3.5V8M16 3.5h4.5V8M8 20.5H3.5V16M16 20.5h4.5V16"/></svg><span>전체화면</span></button>
+                 <button type="button" class="lecture-tool-secondary" data-lecture-blank-toggle aria-pressed="false" aria-label="관객 화면 가리기" title="관객 화면 가리기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="13" rx="1.5"/><path d="M8 21h8M12 17.5V21"/></svg><span data-lecture-blank-label>가리기</span></button>
+                 <button type="button" data-lecture-close aria-label="강의 모드 닫기" title="강의 모드 닫기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg><span>닫기</span></button>
+               </div>
              </div>
-           </header>
+           </aside>
            <p class="lecture-alert" data-lecture-alert role="status" aria-live="assertive" aria-atomic="true" hidden></p>
-           <section class="lecture-map" id="lecture-scene-map" data-lecture-map role="dialog" aria-modal="true" aria-label="장면 지도" hidden>
-             <div class="lecture-map-inner">
-               <header class="lecture-map-head"><div><h2>장면 지도</h2><p>제목을 선택하면 해당 장면의 시작 화면으로 이동합니다</p></div><button type="button" class="lecture-map-close" data-lecture-map-close aria-label="장면 지도 닫기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></header>
-               <div class="lecture-map-list" data-lecture-map-list></div>
-               <footer class="lecture-map-foot"><p>← → 장면 이동 · M 장면 지도 · B 관객 화면 가리기 · Esc 닫기</p><button type="button" class="lecture-map-blank" data-lecture-blank-toggle aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="13" rx="1.5"/><path d="M8 21h8M12 17.5V21"/></svg><span data-lecture-blank-label>관객 화면 가리기</span></button></footer>
-             </div>
-           </section>
            <button type="button" class="lecture-break" data-lecture-break aria-label="관객 화면 다시 보이기" hidden><span class="sr-only">클릭하거나 B를 눌러 강의 화면으로 돌아갑니다</span></button>
            <div class="lecture-stage">
              ${lecture.html}
            </div>
            <p class="sr-only" data-lecture-status aria-live="polite" aria-atomic="true"></p>
-           <footer class="lecture-foot">
-             <div class="lecture-nav"><button type="button" data-lecture-prev aria-label="이전 비트" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg><span>이전</span></button><button type="button" data-lecture-next aria-label="다음 비트"><span>다음</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button></div>
-           </footer>
          </div>`
       : "";
 

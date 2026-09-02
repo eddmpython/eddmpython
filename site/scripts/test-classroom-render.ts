@@ -418,8 +418,8 @@ check("읽기 본문 하나를 장면과 비트 계약으로 투영한다", () =
   ];
   const lecture = renderLecture(body, scenes);
   assert.equal(lecture.ok, true);
-  // 5 는 서로 다른 시각자산 둘을 한 프레임에 묶는 판이다.
-  assert.equal(COURSE_SCENE_RUNTIME, 5);
+  // 6 은 장표 한 장에 시각자료 하나만 두고 다중 대상을 연속 프레임으로 펼치는 판이다.
+  assert.equal(COURSE_SCENE_RUNTIME, 6);
   assert.equal(lecture.html.match(/class="lecture-scene"/g)?.length, 2);
   assert.ok(lecture.html.includes('data-layout="stage"'));
   assert.ok(lecture.html.includes(`data-scene-runtime="${COURSE_SCENE_RUNTIME}"`));
@@ -433,7 +433,7 @@ check("읽기 본문 하나를 장면과 비트 계약으로 투영한다", () =
   assert.ok(lecture.html.includes("결과를 확인합니다"));
 });
 
-check("계약 3 의 다중 대상 enter 와 compare 개막을 프레임으로 계산한다", () => {
+check("계약 6 의 다중 대상 enter 와 compare를 단일 시각자료 프레임으로 펼친다", () => {
   const frames = compileSceneTimeline({
     id: "s1",
     role: "open",
@@ -445,9 +445,12 @@ check("계약 3 의 다중 대상 enter 와 compare 개막을 프레임으로 �
       { effect: "replace", targets: [3] },
     ],
   });
-  assert.deepEqual(frames[0].visible, [1, 2]);
-  assert.equal(frames[1].annotation, "짝지어 올린 화면입니다");
-  assert.deepEqual(frames[2].visible, [3]);
+  assert.deepEqual(frames[0].visible, [1]);
+  assert.deepEqual(frames[1].visible, [2]);
+  assert.deepEqual([frames[0].sequenceIndex, frames[0].sequenceTotal], [1, 2]);
+  assert.deepEqual([frames[1].sequenceIndex, frames[1].sequenceTotal], [2, 2]);
+  assert.equal(frames[2].annotation, "짝지어 올린 화면입니다");
+  assert.deepEqual(frames[3].visible, [3]);
 
   const opened = compileSceneTimeline({
     id: "s2",
@@ -456,8 +459,8 @@ check("계약 3 의 다중 대상 enter 와 compare 개막을 프레임으로 �
     visualCount: 2,
     beats: [{ effect: "compare", targets: [1, 2] }],
   });
-  assert.deepEqual(opened[0].visible, [1, 2]);
-  assert.deepEqual(opened[0].compare, [1, 2]);
+  assert.deepEqual(opened.map((frame) => frame.visible), [[1], [2]]);
+  assert.deepEqual(opened.map((frame) => frame.compare), [[1], [2]]);
 });
 
 check("계약 4 의 판단 문장은 아무 beat 의 note 로 실려 그 화면과 함께 나온다", () => {
@@ -478,7 +481,7 @@ check("계약 4 의 판단 문장은 아무 beat 의 note 로 실려 그 화면�
   assert.equal(frames[2].annotation, "");
 });
 
-check("계약 5 의 compose 는 pair 와 lead 구도에 쓸 두 대상을 보존한다", () => {
+check("계약 6 의 compose 는 pair 와 lead의 두 대상을 연속 장표로 보존한다", () => {
   const frames = compileSceneTimeline({
     id: "s1",
     role: "open",
@@ -489,12 +492,13 @@ check("계약 5 의 compose 는 pair 와 lead 구도에 쓸 두 대상을 보존
       { effect: "focus", targets: [2] },
     ],
   });
-  assert.deepEqual(frames[0].visible, [1, 2]);
-  assert.deepEqual(frames[0].composition, [1, 2]);
+  assert.deepEqual(frames[0].visible, [1]);
+  assert.deepEqual(frames[0].composition, [1]);
   assert.deepEqual(frames[0].compare, []);
   assert.equal(frames[0].cue, "함께 보기");
-  assert.deepEqual(frames[1].composition, [1, 2]);
-  assert.deepEqual(frames[1].focus, [2]);
+  assert.deepEqual(frames[1].visible, [2]);
+  assert.deepEqual(frames[1].composition, [2]);
+  assert.deepEqual(frames[2].focus, [2]);
 
   const lecture = renderLecture(
     "## 조합 장면\n\n### 구조와 근거를 함께 읽습니다\n\n![구조도](https://example.com/a.png)\n\n| 부품 | 근거 |\n|---|---|\n| 도구 | 실행 결과 |",
@@ -520,10 +524,10 @@ check("효과를 클릭별 완성 프레임으로 한 번만 계산한다", () =
       { effect: "run", targets: [3] },
     ],
   });
-  assert.deepEqual(frames[1].visible, [1, 2]);
+  assert.deepEqual(frames[1].visible, [2]);
   assert.deepEqual(frames[2].focus, [2]);
   assert.equal(frames[3].annotation, "둘째 화면을 읽습니다");
-  assert.deepEqual(frames[3].focus, [2]);
+  assert.deepEqual(frames[3].focus, []);
   assert.deepEqual(frames[4].visible, [3]);
   assert.deepEqual(frames[4].focus, []);
   assert.equal(frames[4].annotation, "");
