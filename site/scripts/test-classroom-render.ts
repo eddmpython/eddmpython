@@ -55,15 +55,14 @@ check("교안 본문의 HTML 도 태그가 되지 않는다", () => {
   assert.ok(html.includes("&lt;img"));
 });
 
-check("연속 이미지는 슬라이더가 된다", () => {
+check("마크다운 단계는 연속 시각물을 원래 순서로 보존한다", () => {
   const html = renderMarkdown(["![하나](a.png)", "", "![둘](b.png)", "", "![셋](c.png)"].join("\n"));
-  assert.equal(html.match(/<div class="slider">/g)?.length, 1);
+  assert.ok(!html.includes("visual-carousel"));
   assert.equal(html.match(/<img /g)?.length, 3);
 });
 
-check("이미지 하나는 슬라이더가 아니다", () => {
+check("마크다운 단계의 이미지 하나는 시각물로 렌더링된다", () => {
   const html = renderMarkdown("![하나](a.png)");
-  assert.ok(!html.includes("slider"));
   assert.ok(html.includes('<img src="a.png"'));
 });
 
@@ -74,11 +73,48 @@ check("영상은 재생기가 된다", () => {
   assert.ok(!html.includes("<img"));
 });
 
-check("영상은 슬라이더에 섞이지 않는다", () => {
+check("영상과 이미지는 마크다운 단계에서 각각 시각물로 남는다", () => {
   const html = renderMarkdown(["![a](a.png)", "", "![v](v.webm)", "", "![b](b.png)"].join("\n"));
   assert.ok(html.includes("<video"));
-  // 앞뒤 이미지가 각각 혼자라 슬라이더가 생기지 않는다
-  assert.ok(!html.includes("slider"));
+  assert.equal(html.match(/data-visual=/g)?.length, 3);
+});
+
+check("읽기 모드는 H2의 모든 시각물을 하나의 16대9 캐러셀로 묶는다", () => {
+  const body = [
+    "## 캐러셀 장면",
+    "",
+    "### 같은 자리에서 순서대로 봅니다",
+    "",
+    "첫 일반 문단은 원래 읽기 본문입니다.",
+    "",
+    "![첫 시각물](a.png)",
+    "",
+    "나머지 본문입니다.",
+    "",
+    "![둘째 시각물](b.png)",
+  ].join("\n");
+  const scene = { id: "s1", role: "open", layout: "sequence", fit: "cover", visualCount: 2,
+    beats: [{ effect: "enter", targets: [1, 2] }] } as CourseScene;
+  const { html } = renderPost(body, {}, {}, { scenes: [scene] });
+  assert.equal(html.match(/class="visual-carousel"/g)?.length, 1);
+  assert.ok(html.includes('data-carousel-count="2"'));
+  assert.ok(html.includes('data-fit="cover"'));
+  assert.equal(html.match(/data-carousel-item=/g)?.length, 2);
+  assert.ok(html.includes('data-visual="1"'));
+  assert.ok(html.includes('data-visual="2"'));
+  assert.ok(html.includes("data-carousel-prev"));
+  assert.ok(!html.includes("scene-support"));
+  assert.ok(html.includes("<p>첫 일반 문단은 원래 읽기 본문입니다.</p>"));
+  assert.ok(html.indexOf("첫 일반 문단은 원래 읽기 본문입니다.") < html.indexOf("visual-carousel"));
+  assert.ok(html.indexOf("visual-carousel") < html.indexOf("나머지 본문입니다."));
+});
+
+check("시각물이 하나여도 읽기와 강의가 같은 16대9 프레임 구조를 쓴다", () => {
+  const { html } = renderPost("## 한 장면\n\n### 한 시각물입니다\n\n보조설명입니다.\n\n![한 장](a.png)");
+  assert.ok(html.includes('class="visual-carousel"'));
+  assert.ok(html.includes('data-carousel-count="1"'));
+  assert.ok(!html.includes("data-carousel-prev"));
+  assert.ok(!html.includes("scene-support"));
 });
 
 // 비공개 시각물. KV 의 media/<sha256>.<ext> 를 방 경로로 그리고, 방 밖에서는 자리만 보인다.
@@ -156,6 +192,35 @@ check("GFM 표를 머리와 본문 셀로 그린다", () => {
   assert.match(html, /<th scope="col">도구<\/th>/);
   assert.match(html, /<td><strong>공유<\/strong>할 때<\/td>/);
   assert.match(html, /<td><code>\.py<\/code>로 남길 때<\/td>/);
+});
+
+check("표는 읽기 본문에 남고 시각물로 세지 않는다", () => {
+  // 계약 7. 표는 무대에 오르지 않으므로 data-visual 이 없고 강의 장면의 시각물 수에도 안 든다.
+  const body = [
+    "## 절",
+    "",
+    "### 부제",
+    "",
+    "| 이름 | 역할 |",
+    "|---|---|",
+    "| 김주현 | 강사 |",
+    "",
+    "![그림](https://example.com/a.png)",
+  ].join("\n");
+  const post = renderPost(body);
+  assert.match(post.html, /<div class="table-wrap"><table>/);
+  assert.doesNotMatch(post.html, /table-wrap"[^>]*data-visual/);
+  assert.equal(post.visuals, 1);
+  const scene: CourseScene = {
+    id: "s1",
+    role: "open",
+    layout: "stage",
+    beats: [{ effect: "enter", targets: [1], note: "" }],
+    visualCount: 1,
+  } as CourseScene;
+  const lecture = renderLecture(body, [scene]);
+  assert.ok(lecture.ok);
+  assert.ok(lecture.html.includes('data-visual="1"'));
 });
 
 check("열 수가 다른 표는 문단으로 안전하게 남긴다", () => {
@@ -404,13 +469,21 @@ check("캡션 없는 이미지는 figcaption 을 만들지 않는다", () => {
   assert.ok(!html.includes("<figcaption"));
 });
 
-check("슬라이더 안의 장마다 캡션이 붙는다", () => {
-  const html = renderMarkdown(
-    ['![a](https://a.b/1.png "첫째")', "", '![b](https://a.b/2.png "둘째")'].join("\n"),
-  );
+check("캐러셀 안의 시각물마다 캡션이 붙는다", () => {
+  const { html } = renderPost([
+    "## 캡션 장면",
+    "",
+    "### 두 시각물을 확인합니다",
+    "",
+    "보조설명입니다.",
+    "",
+    '![a](https://a.b/1.png "첫째")',
+    "",
+    '![b](https://a.b/2.png "둘째")',
+  ].join("\n"));
   assert.equal(html.match(/<figcaption>/g)?.length, 2);
   assert.ok(html.includes("첫째") && html.includes("둘째"));
-  assert.equal(html.match(/<div class="slider">/g)?.length, 1);
+  assert.equal(html.match(/class="visual-carousel"/g)?.length, 1);
   assert.ok(html.includes('data-visual="1"'));
   assert.ok(html.includes('data-visual="2"'));
 });
@@ -454,7 +527,7 @@ check("읽기 본문 하나를 장면과 비트 계약으로 투영한다", () =
     "",
     "설명은 읽기 모드 본문입니다. 강의 화면에는 나오지 않습니다.",
     "",
-    "![첫 그림](https://example.com/a.svg)",
+    '![첫 그림](https://example.com/a.svg "첫 그림이 보여 주는 핵심입니다")',
     "",
     "## 결과 확인",
     "",
@@ -465,7 +538,7 @@ check("읽기 본문 하나를 장면과 비트 계약으로 투영한다", () =
     "```",
   ].join("\n");
   const scenes: CourseScene[] = [
-    { id: "s1", role: "open", layout: "stage", visualCount: 1, beats: [{ effect: "enter", targets: [1] }] },
+    { id: "s1", role: "open", layout: "stage", fit: "cover-top", visualCount: 1, beats: [{ effect: "enter", targets: [1] }] },
     { id: "s2", role: "close", layout: "code", visualCount: 1, beats: [
       { effect: "enter", targets: [1] },
       { effect: "annotate", targets: [1], note: "결과를 확인합니다" },
@@ -473,12 +546,16 @@ check("읽기 본문 하나를 장면과 비트 계약으로 투영한다", () =
   ];
   const lecture = renderLecture(body, scenes);
   assert.equal(lecture.ok, true);
-  // 6 은 장표 한 장에 시각자료 하나만 두고 다중 대상을 연속 프레임으로 펼치는 판이다.
-  assert.equal(COURSE_SCENE_RUNTIME, 6);
+  // 강의 셸은 H2 하나를 장표 하나로 만들고 모든 시각물을 같은 캐러셀에 둔다.
+  assert.equal(COURSE_SCENE_RUNTIME, 9);
   assert.equal(lecture.html.match(/class="lecture-scene"/g)?.length, 2);
   assert.ok(lecture.html.includes('data-layout="stage"'));
+  assert.ok(lecture.html.includes('data-fit="cover-top"'));
+  assert.ok(lecture.html.includes('data-fit="contain"'));
   assert.ok(lecture.html.includes(`data-scene-runtime="${COURSE_SCENE_RUNTIME}"`));
   assert.ok(lecture.html.includes("data-timeline="));
+  assert.ok(!lecture.html.includes("data-beats="));
+  assert.ok(!lecture.html.includes("effect&quot;:&quot;annotate"));
   assert.ok(lecture.html.includes("data-scene-cue"));
   assert.equal(lecture.html.match(/aria-roledescription="슬라이드"/g)?.length, 2);
   assert.equal(lecture.html.match(/aria-hidden="true" inert/g)?.length, 2);
@@ -486,6 +563,12 @@ check("읽기 본문 하나를 장면과 비트 계약으로 투영한다", () =
   assert.ok(lecture.html.includes('id="lecture-s1-title" tabindex="-1"'));
   assert.ok(lecture.html.includes("설명은 읽기 모드 본문입니다."));
   assert.ok(lecture.html.includes("결과를 확인합니다"));
+  assert.equal(lecture.html.match(/class="scene-support"/g)?.length, 1);
+  assert.ok(lecture.html.includes('<p data-carousel-description="1" data-carousel-description-active="true">첫 그림이 보여 주는 핵심입니다</p>'));
+  assert.ok(!lecture.html.includes('<div class="scene-support"><p>설명은 읽기 모드 본문입니다.'));
+  assert.equal(lecture.html.match(/class="visual-carousel"/g)?.length, 2);
+  assert.ok(!lecture.html.includes("data-scene-visual-note"));
+  assert.ok(!lecture.html.includes("data-scene-callout"));
 });
 
 check("계약 6 의 다중 대상 enter 와 compare를 단일 시각자료 프레임으로 펼친다", () => {
@@ -536,7 +619,7 @@ check("계약 4 의 판단 문장은 아무 beat 의 note 로 실려 그 화면�
   assert.equal(frames[2].annotation, "");
 });
 
-check("계약 6 의 compose 는 pair 와 lead의 두 대상을 연속 장표로 보존한다", () => {
+check("compose 는 pair 와 lead의 두 대상을 같은 장표의 캐러셀로 보존한다", () => {
   const frames = compileSceneTimeline({
     id: "s1",
     role: "open",
@@ -556,12 +639,16 @@ check("계약 6 의 compose 는 pair 와 lead의 두 대상을 연속 장표로 
   assert.deepEqual(frames[2].focus, [2]);
 
   const lecture = renderLecture(
-    "## 조합 장면\n\n### 구조와 근거를 함께 읽습니다\n\n![구조도](https://example.com/a.png)\n\n| 부품 | 근거 |\n|---|---|\n| 도구 | 실행 결과 |",
+    "## 조합 장면\n\n### 구조와 근거를 함께 읽습니다\n\n본문 설명은 읽기 모드에 남습니다.\n\n![구조도](https://example.com/a.png \"첫 구조 설명\")\n\n![실행 화면](https://example.com/b.png \"둘째 실행 설명\")",
     [{ id: "s1", role: "open", layout: "lead", visualCount: 2, beats: [{ effect: "compose", targets: [1, 2] }] }],
   );
   assert.equal(lecture.ok, true);
   assert.ok(lecture.html.includes('data-layout="lead"'));
   assert.ok(lecture.html.includes("composition"));
+  assert.equal(lecture.html.match(/data-carousel-description=/g)?.length, 2);
+  assert.ok(lecture.html.includes('data-carousel-description="1" data-carousel-description-active="true">첫 구조 설명'));
+  assert.ok(lecture.html.includes('data-carousel-description="2" hidden aria-hidden="true">둘째 실행 설명'));
+  assert.ok(!lecture.html.includes('<div class="scene-support"><p>본문 설명은 읽기 모드에 남습니다.'));
 });
 
 check("효과를 클릭별 완성 프레임으로 한 번만 계산한다", () => {

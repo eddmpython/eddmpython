@@ -51,9 +51,12 @@ const COURSE_SCHEMA = new Set([1, 2, 3, 4]);
  * 3 은 첫 beat 자동 재생, enter/replace 다중 대상(셋까지), compare 개막을 더한 판이다.
  * 4 는 단독 annotate 를 없애고 판단 문장을 아무 beat 의 note 로 실은 판이다. 5 는 서로 다른
  * 시각자산 둘을 연결하는 compose 와 pair, lead 레이아웃을 더했다. 6은 다중 대상을 같은
- * 좌표의 단일 시각자료 장표로 펼친다. 이전 장면도 함께 받는다.
+ * 좌표의 단일 시각자료 장표로 펼친다. 7은 표를 무대에서 빼고, 8은 시각물을 16:9로
+ * 고정한다. 9는 H2 안의 모든 시각물을 읽기와 강의 양쪽에서 같은 16:9 캐러셀로 표시한다.
+ * 읽기 본문은 원래 순서를 유지하고 강의 모드는 현재 시각물 캡션을 가로줄 아래의 보조설명으로
+ * 쓴다. 이전 장면도 함께 받는다.
  */
-const COURSE_SCENE_CONTRACTS = new Set([1, 2, 3, 4, 5, 6]);
+const COURSE_SCENE_CONTRACTS = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
 export type CourseState = { ok: boolean; categories: CourseCategory[]; glossary: Record<string, string> };
 
@@ -99,7 +102,7 @@ const isScene = (value: unknown): value is CourseScene => {
           : beat.note === undefined || Boolean(typeof beat.note === "string" && beat.note.trim())),
     )
   );
-  // 첫 beat 는 장면을 여는 화면이다. 여러 target 은 같은 좌표의 연속 장표로 펼쳐진다.
+  // 첫 beat 는 장면을 여는 화면이다. 여러 target 은 같은 좌표의 캐러셀 항목으로 펼쳐진다.
   if (!shapeOk || !["enter", "replace", "compare", "compose"].includes(scene.beats[0]?.effect)) return false;
   const isCompositionLayout = scene.layout === "pair" || scene.layout === "lead";
   if (isCompositionLayout && (scene.visualCount !== 2 || scene.beats[0]?.effect !== "compose")) return false;

@@ -128,15 +128,20 @@ export type CourseScene = {
   id: string;
   role: "open" | "explain" | "invert" | "close";
   layout: "stage" | "sequence" | "compare" | "pair" | "lead" | "code" | "demo";
+  fit?: "contain" | "cover" | "cover-top";
   visualCount: number;
   beats: CourseSceneBeat[];
 };
 
 /**
  * 5 는 서로 다른 시각자산 둘의 학습 관계를 기록한다. 6은 모든 관계를 같은 좌표의
- * 단일 시각자료 장표로 펼친다. 이전 계약의 장면도 같은 규격으로 렌더링한다.
+ * 단일 시각자료 장표로 펼친다. 7 은 표를 시각물에서 빼고, 8 은 모든 무대를 16:9로 고정한다. 교안 정본
+ * (`eddmpython-course/scripts/course-scene.mjs`) 과 같은 날 같이 움직인다.
+ *
+ * 표를 시각물로 세던 계약 6 이하의 묶음은 장면의 시각물 수가 어긋나 강의 모드가 닫히므로,
+ * 이 런타임을 배포한 직후 교안을 다시 발행한다.
  */
-export const COURSE_SCENE_RUNTIME = 6;
+export const COURSE_SCENE_RUNTIME = 9;
 
 export type CourseSceneFrame = {
   effect: CourseSceneBeat["effect"];
@@ -446,7 +451,7 @@ function blocks(text: string, headings: string[], cells: Cells, state: RenderSta
   let images: string[] = [];
   const flush = () => {
     if (!images.length) return;
-      out.push(images.length > 1 ? `<div class="slider">${images.join("")}</div>` : images[0]);
+    out.push(...images);
     images = [];
   };
   for (const raw of text.split(/\n{2,}/)) {
@@ -504,7 +509,9 @@ function blocks(text: string, headings: string[], cells: Cells, state: RenderSta
       );
     } else if (b.startsWith("### ")) out.push(`<h3>${esc(b.slice(4))}</h3>`);
     else if (b.startsWith("#### ")) out.push(`<h4>${esc(b.slice(5))}</h4>`);
-    else if (table) out.push(visual(table, state));
+    // 표는 읽기 본문이지 강의 시각물이 아니다 (계약 7, 2026-09-02 운영자 지시). data-visual 을
+    // 붙이지 않으므로 강의 무대 CSS 가 문단처럼 숨기고 시각물 수에도 들지 않는다.
+    else if (table) out.push(table);
     else if (/^[-*]\s/m.test(b)) {
       const items = b.split("\n").filter((l) => /^[-*]\s/.test(l.trim()));
       out.push(`<ul>${items.map((l) => `<li>${inline(l.trim().slice(2))}</li>`).join("")}</ul>`);
@@ -543,12 +550,12 @@ function blocks(text: string, headings: string[], cells: Cells, state: RenderSta
  * 문단이 되어 수강생 화면에 코드가 부서져 나온다. 강의장에서 그대로 따라 치는 것이라
  * 부서지면 그 시간이 통째로 날아간다.
  */
-export function renderMarkdown(
+function renderMarkdownParts(
   body: string,
   headings: string[] = [],
   cells: Cells = {},
   state: RenderState = { visual: 0 },
-): string {
+): string[] {
   const text = body.replace(/\r\n/g, "\n");
   const out: string[] = [];
   const fence = /^```([^\n]*)\n([\s\S]*?)^```[ \t]*$/gm;
@@ -567,6 +574,75 @@ export function renderMarkdown(
     at = m.index + m[0].length;
   }
   out.push(...blocks(text.slice(at), headings, cells, state));
+  return out;
+}
+
+export function renderMarkdown(
+  body: string,
+  headings: string[] = [],
+  cells: Cells = {},
+  state: RenderState = { visual: 0 },
+): string {
+  return renderMarkdownParts(body, headings, cells, state).join("\n");
+}
+
+const TOP_VISUAL = /^<([a-z]+)\s+(data-visual="\d+")/;
+
+function carouselItem(html: string, index: number): string {
+  return html.replace(TOP_VISUAL, `<$1 data-carousel-item="${index}" $2`);
+}
+
+function visualCarousel(visuals: string[], fit: CourseScene["fit"] = "contain", label = "시각물"): string {
+  if (!visuals.length) return "";
+  const items = visuals.map((item, index) => carouselItem(item, index + 1)).join("");
+  const controls = visuals.length > 1
+    ? `<div class="visual-carousel-controls"><button type="button" data-carousel-prev aria-label="이전 시각물">←</button><span data-carousel-status aria-live="polite">1 / ${visuals.length}</span><button type="button" data-carousel-next aria-label="다음 시각물">→</button></div>`
+    : "";
+  return `<div class="visual-carousel" data-visual-carousel data-carousel-count="${visuals.length}" data-fit="${esc(
+    fit || "contain",
+  )}" aria-label="${esc(label)} 캐러셀"><div class="visual-carousel-frame"><div class="visual-carousel-track">${items}</div>${controls}</div></div>`;
+}
+
+function visualSupport(visuals: string[]): string {
+  const descriptions = visuals.map((visual) => visual.match(/<figcaption>([\s\S]*?)<\/figcaption>/)?.[1]?.trim() || "");
+  if (!descriptions.some(Boolean)) return "";
+  const items = descriptions.map((description, index) => {
+    const active = index === 0;
+    return `<p data-carousel-description="${index + 1}"${active ? ' data-carousel-description-active="true"' : ' hidden aria-hidden="true"'}>${description}</p>`;
+  }).join("");
+  return `<div class="scene-support" data-carousel-support>${items}</div>`;
+}
+
+function groupReadingCarousels(parts: string[], scenes: CourseScene[]): string {
+  const out: string[] = [];
+  let section: string[] = [];
+  let sceneIndex = -1;
+  const flush = () => {
+    if (!section.length) return;
+    if (sceneIndex < 0) {
+      out.push(...section);
+      section = [];
+      return;
+    }
+    const visuals = section.filter((part) => TOP_VISUAL.test(part));
+    const content = section.filter((part) => !TOP_VISUAL.test(part));
+    if (visuals.length) {
+      const title = content.find((part) => part.startsWith("<h2 "))?.replace(/<[^>]+>/g, "") || "시각물";
+      const firstVisualAt = section.findIndex((part) => TOP_VISUAL.test(part));
+      const insertAt = section.slice(0, firstVisualAt).filter((part) => !TOP_VISUAL.test(part)).length;
+      content.splice(insertAt, 0, visualCarousel(visuals, scenes[sceneIndex]?.fit, title));
+    }
+    out.push(...content);
+    section = [];
+  };
+  for (const part of parts) {
+    if (part.startsWith("<h2 ")) {
+      flush();
+      sceneIndex += 1;
+    }
+    section.push(part);
+  }
+  flush();
   return out.join("\n");
 }
 
@@ -580,12 +656,13 @@ export function renderPost(
   body: string,
   cells: Cells = {},
   glossary: Glossary = {},
-  options: { mediaBase?: string } = {},
+  options: { mediaBase?: string; scenes?: CourseScene[] } = {},
 ): { html: string; headings: string[]; hasCells: boolean; visuals: number } {
   const headings: string[] = [];
   const state: RenderState = { visual: 0, mediaBase: options.mediaBase };
   const marked = markGlossaryTerms(body, glossary);
-  const html = applyGlossary(renderMarkdown(marked, headings, cells, state), glossary, "term-r");
+  const parts = renderMarkdownParts(marked, headings, cells, state);
+  const html = applyGlossary(groupReadingCarousels(parts, options.scenes ?? []), glossary, "term-r");
   // 실행 칸이 없는 글에는 파이썬 런타임 스크립트를 붙이지 않는다.
   return { html, headings, hasCells: html.includes('data-cell="'), visuals: state.visual };
 }
@@ -642,17 +719,21 @@ export function renderLecture(
     const scene = scenes[index];
     const section = sections[index];
     const state: RenderState = { visual: 0, mediaBase: options.mediaBase };
-    const html = renderMarkdown(section.content, [], cells, state);
+    const parts = renderMarkdownParts(section.content, [], cells, state);
     if (state.visual !== scene.visualCount) return { html: "", hasCells: false, ok: false };
+    const visuals = parts.filter((part) => TOP_VISUAL.test(part));
+    const content = parts.filter((part) => !TOP_VISUAL.test(part));
+    const support = visualSupport(visuals);
+    const html = [visualCarousel(visuals, scene.fit, section.title), ...content].join("\n");
     hasCells ||= html.includes('data-cell="');
-    const timeline = compileSceneTimeline(scene);
+    const timeline = compileSceneTimeline(scene).slice(0, 1);
     const titleId = `lecture-${scene.id}-title`;
     rendered.push(`<section class="lecture-scene" data-scene-runtime="${COURSE_SCENE_RUNTIME}" data-scene="${esc(scene.id)}" data-role="${esc(
       scene.role,
-    )}" data-layout="${esc(scene.layout)}" data-beats="${esc(JSON.stringify(scene.beats))}" data-timeline="${esc(JSON.stringify(timeline))}" role="group" aria-roledescription="슬라이드" aria-labelledby="${esc(titleId)}" aria-hidden="true" inert>
+    )}" data-layout="${esc(scene.layout)}" data-fit="${esc(scene.fit || "contain")}" data-timeline="${esc(JSON.stringify(timeline))}" role="group" aria-roledescription="슬라이드" aria-labelledby="${esc(titleId)}" aria-hidden="true" inert>
   <header class="scene-head"><div class="scene-meta"><span class="scene-index">${String(index + 1).padStart(2, "0")}</span><span class="scene-cue" data-scene-cue></span></div><div class="scene-copy"><h2 id="${esc(titleId)}" tabindex="-1">${esc(
     section.title,
-  )}</h2><p class="scene-subtitle">${esc(section.subtitle)}</p><div class="scene-support"><p class="scene-visual-note" data-scene-visual-note hidden></p><p class="scene-callout" data-scene-callout aria-live="polite"></p></div></div></header>
+  )}</h2><p class="scene-subtitle">${esc(section.subtitle)}</p></div>${support}</header>
   <div class="scene-canvas">${html}</div>
 </section>`);
   }

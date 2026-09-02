@@ -201,6 +201,11 @@ export default {
       const res = await handleRoom(request, env as unknown as SiteEnv, url);
       return withHeaders(res, (res.headers.get("content-type") ?? "").includes("text/html"));
     }
+    // 전체 교안 검수 라우터는 LOCAL_PREVIEW_BYPASS와 로컬 호스트를 handleRoom이 함께 확인한다.
+    if (pathname === "/room-test" || pathname.startsWith("/room-test/")) {
+      const res = await handleRoom(request, env as unknown as SiteEnv, url);
+      return withHeaders(res, (res.headers.get("content-type") ?? "").includes("text/html"));
+    }
 
     const first = url.pathname.split("/")[1] ?? "";
     const upstream = PROXIED[first];

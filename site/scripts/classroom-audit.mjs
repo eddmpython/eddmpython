@@ -117,19 +117,8 @@ for (const post of postFiles) {
     return language !== "course-scene" && language !== "course-embed";
   }).length;
   const tables = (outside.match(/^\|(?:\s*:?-{3,}:?\s*\|){2,}/gm) ?? []).length;
-  let imageRun = 0;
-  let sliders = 0;
-  for (const block of outside.split(/\n{2,}/).map((value) => value.trim()).filter(Boolean)) {
-    const image = block.match(/^!\[[^\]]*\]\((\S+)(?:\s+"[^"]*")?\)$/);
-    if (image && !/\.(?:mp4|webm|mov)(?:\?.*)?$/i.test(image[1])) {
-      imageRun += 1;
-      continue;
-    }
-    if (imageRun > 1) sliders += 1;
-    imageRun = 0;
-  }
-  if (imageRun > 1) sliders += 1;
-  expected[id] = { captions, sections, cells, pending, codeBlocks, tables, sliders };
+  // 현재 계약은 H2 하나가 캐러셀 하나다. 시각물이 하나여도 같은 16:9 프레임을 쓴다.
+  expected[id] = { captions, sections, cells, pending, codeBlocks, tables, carousels: sections };
 }
 
 const manifestPath = join(OUT, "pyproc-control.json");
@@ -233,7 +222,11 @@ try {
           h2: document.querySelectorAll('article h2').length,
           h3: document.querySelectorAll('article h3').length,
           captions: document.querySelectorAll('article figure.media figcaption').length,
-          sliders: document.querySelectorAll('article .slider').length,
+          carousels: document.querySelectorAll('article .visual-carousel').length,
+          carouselRatios: [...document.querySelectorAll('article .visual-carousel-frame')].map((frame) => {
+            const box = frame.getBoundingClientRect();
+            return box.height > 0 ? box.width / box.height : 0;
+          }),
           pending: document.querySelectorAll('article .pending').length,
           rawCodaro: document.body.innerHTML.includes('codaro/run'),
           cells: [...document.querySelectorAll('article [data-cell]')].map(c => c.dataset.cell),
@@ -252,7 +245,12 @@ try {
     record(`${id} 섹션 ${exp.sections}개`, m.h2 === exp.sections, `화면 ${m.h2}`);
     record(`${id} 부제가 섹션마다`, m.h3 === exp.sections, `h3 ${m.h3}`);
     record(`${id} 캡션 ${exp.captions}개 그려짐`, m.captions === exp.captions, `화면 ${m.captions}`);
-    record(`${id} 캐러셀 ${exp.sliders}개 그려짐`, m.sliders === exp.sliders, `화면 ${m.sliders}`);
+    record(`${id} H2별 캐러셀 ${exp.carousels}개`, m.carousels === exp.carousels, `화면 ${m.carousels}`);
+    record(
+      `${id} 캐러셀 전부 16:9`,
+      m.carouselRatios.length === exp.carousels && m.carouselRatios.every((ratio) => Math.abs(ratio - 16 / 9) < 0.02),
+      `비율 ${m.carouselRatios.map((ratio) => ratio.toFixed(3)).join(",")}`,
+    );
     record(`${id} 준비 중 칸 0`, m.pending === 0 && exp.pending === 0, `화면 ${m.pending}, 원본 ${exp.pending}`);
     record(`${id} 생 codaro 주소 없음`, m.rawCodaro === false, String(m.rawCodaro));
     record(`${id} 실행 칸 ${exp.cells.length}개`, m.cells.length === exp.cells.length && m.missing === 0 && exp.cells.every((c) => m.cells.includes(c)), `화면 ${m.cells.join(",")} 미발견 ${m.missing}`);

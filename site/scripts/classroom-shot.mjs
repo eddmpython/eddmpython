@@ -33,7 +33,8 @@ const ROOM = "shot";
  * 명시적으로 찾으므로 시작점도 같은 계약으로 고른다. 전체 카테고리 도달 여부는
  * classroom-audit.mjs가 별도로 검사한다.
  */
-const PROBE_CATEGORY = "01-automation-start";
+const PROBE_CATEGORY = process.env.CR_CATEGORY ?? "01-automation-start";
+const PREVIEW_ONLY = process.env.CR_PREVIEW_ONLY === "1";
 /**
  * 비밀번호를 소스에 적지 않는다. 매번 새로 뽑는다.
  *
@@ -302,7 +303,7 @@ for (const viewport of activeViewports) {
     })()`));
     record(
       `${viewport.id} 소제목과 시각물 묶음`,
-      visualGroup !== null &&
+      PREVIEW_ONLY || visualGroup !== null &&
         visualGroup.gap >= 0 &&
         visualGroup.gap <= 12 &&
         visualGroup.background !== "rgba(0, 0, 0, 0)" &&
@@ -354,6 +355,9 @@ for (const viewport of activeViewports) {
         const headBox = head?.getBoundingClientRect();
         const canvasBox = canvas?.getBoundingClientRect();
         const railBox = deck?.querySelector('.lecture-rail')?.getBoundingClientRect();
+        const railItems = [...(deck?.querySelectorAll('[data-lecture-map-scene]') ?? [])];
+        const thumbBoxes = railItems.map((item) => item.querySelector('.lecture-map-thumb')?.getBoundingClientRect());
+        const slideTotal = deck?.querySelectorAll('.lecture-scene').length ?? 0;
         return {
           hidden: deck?.hidden,
           body: document.body.classList.contains('lecture-on'),
@@ -363,7 +367,11 @@ for (const viewport of activeViewports) {
           visible: scene?.querySelectorAll('[data-scene-visible="true"]').length,
           headBeforeCanvas: headBox && canvasBox ? headBox.bottom <= canvasBox.top + 1 : null,
           railFullHeight: railBox ? Math.abs(railBox.top) <= 1 && Math.abs(railBox.bottom - innerHeight) <= 1 : null,
-          railItems: deck?.querySelectorAll('[data-lecture-map-scene]').length,
+          railItems: railItems.length,
+          railThumbs: deck?.querySelectorAll('.lecture-map-thumb').length,
+          slideTotal,
+          railThumbsSized: thumbBoxes.every((box) => box && box.width > 60 && box.height > 34),
+          railThumbsOrdered: thumbBoxes.every((box, index) => index === 0 || thumbBoxes[index - 1].bottom <= box.top + 1),
           railCurrent: deck?.querySelectorAll('[data-lecture-map-scene][aria-current="step"]').length,
           symbolWidth: deck?.querySelector('.lecture-symbol')?.getBoundingClientRect().width,
           themeButtons: document.querySelectorAll('[data-theme-toggle]').length,
@@ -376,8 +384,7 @@ for (const viewport of activeViewports) {
           phase: deck?.dataset.scenePhase,
           activeInert: scene?.hasAttribute('inert'),
           inactiveInert: [...(deck?.querySelectorAll('.lecture-scene:not(.on)') ?? [])].every((item) => item.hasAttribute('inert')),
-          prevDisabled: deck?.querySelector('[data-lecture-prev]')?.disabled,
-          nextDisabled: deck?.querySelector('[data-lecture-next]')?.disabled,
+          removedControls: deck?.querySelectorAll('[data-lecture-prev], [data-lecture-next], [data-lecture-blank-toggle], [data-lecture-close], [data-lecture-break]').length,
           status: deck?.querySelector('[data-lecture-status]')?.textContent.trim(),
           deckHeight: Math.round(deck?.getBoundingClientRect().height ?? -1),
           viewportHeight: innerHeight,
@@ -386,17 +393,20 @@ for (const viewport of activeViewports) {
           progress: deck?.querySelector('[data-lecture-progress]')?.textContent.trim(),
         };
       })()`));
-      // 런타임 6. 왼쪽 인덱스와 세로 정보 흐름, 단일 시각자료 장표로 열리고 상하 크롬은 없다.
+      // 왼쪽 화면 축소판과 세로 정보 흐름, 단일 시각자료 화면으로 열리고 상하 크롬은 없다.
       record(
         `${viewport.id} 강의 모드 첫 장면`,
         lectureStart?.hidden === false &&
           lectureStart?.body === true &&
           lectureStart?.scenes > 0 &&
-          lectureStart?.title === "자동화를 보는 세 가지 동작" &&
+          Boolean(lectureStart?.title) &&
           lectureStart?.visible === 1 &&
           lectureStart?.headBeforeCanvas === true &&
           lectureStart?.railFullHeight === true &&
-          lectureStart?.railItems === lectureStart?.scenes &&
+          lectureStart?.railItems === lectureStart?.slideTotal &&
+          lectureStart?.railThumbs === lectureStart?.slideTotal &&
+          lectureStart?.railThumbsSized === true &&
+          lectureStart?.railThumbsOrdered === true &&
           lectureStart?.railCurrent === 1 &&
           lectureStart?.symbolWidth >= 20 &&
           lectureStart?.themeButtons === 2 &&
@@ -404,14 +414,12 @@ for (const viewport of activeViewports) {
           lectureStart?.presenterButtons === 0 &&
           lectureStart?.noteButtons === 0 &&
           lectureStart?.fullscreenButtons === 1 &&
-          lectureStart?.runtime === "6" &&
-          lectureStart?.sceneRuntime === "6" &&
+          lectureStart?.runtime === lectureStart?.sceneRuntime &&
           lectureStart?.phase === "ready" &&
           lectureStart?.activeInert === false &&
           lectureStart?.inactiveInert === true &&
-          lectureStart?.prevDisabled === true &&
-          lectureStart?.nextDisabled === false &&
-          /장표 1 \/ \d+/.test(lectureStart?.status ?? "") &&
+          lectureStart?.removedControls === 0 &&
+          /화면 1 \/ \d+/.test(lectureStart?.status ?? "") &&
           lectureStart?.deckHeight === lectureStart?.viewportHeight &&
           lectureStart?.titleSize >= viewport.titleMin &&
           lectureStart?.progressValue === "0" &&
@@ -424,12 +432,65 @@ for (const viewport of activeViewports) {
       const railState = value(await evaluate(session, `(() => {
         const deck = document.querySelector('[data-lecture-deck]');
         const rail = deck?.querySelector('.lecture-rail');
+        const stageBox = deck?.querySelector('.lecture-stage')?.getBoundingClientRect();
         const items = [...(rail?.querySelectorAll('[data-lecture-map-scene]') ?? [])];
         const currentItem = items.find((item) => item.getAttribute('aria-current') === 'step');
         const currentNumber = currentItem?.querySelector('span');
         const rect = rail?.getBoundingClientRect();
+        const thumbs = items.map((item) => item.querySelector('.lecture-map-thumb'));
         return {
           items:items.length,
+          thumbs:thumbs.filter(Boolean).length,
+          thumbsPopulated:thumbs.every((thumb) => {
+            const visual = thumb?.querySelector('.lecture-map-thumb-visual');
+            return Boolean(visual?.firstElementChild || visual?.dataset.kind);
+          }),
+          thumbsRatio:thumbs.every((thumb) => {
+            const box = thumb?.getBoundingClientRect();
+            return box && stageBox && Math.abs(box.width / box.height - stageBox.width / stageBox.height) < .03;
+          }),
+          framesRatio:thumbs.every((thumb) => {
+            const box = thumb?.querySelector('.lecture-map-thumb-frame')?.getBoundingClientRect();
+            return box && Math.abs(box.width / box.height - 16 / 9) < .03;
+          }),
+          frameBoxes:thumbs.map((thumb) => {
+            const box = thumb?.querySelector('.lecture-map-thumb-frame')?.getBoundingClientRect();
+            return box ? { width:Math.round(box.width), height:Math.round(box.height) } : null;
+          }),
+          visualBoxes:thumbs.map((thumb) => {
+            const box = thumb?.querySelector('.lecture-map-thumb-visual')?.getBoundingClientRect();
+            return box ? { width:Math.round(box.width), height:Math.round(box.height) } : null;
+          }),
+          previewMedia:thumbs.map((thumb) => {
+            const media = thumb?.querySelector('img, video');
+            const box = media?.getBoundingClientRect();
+            const style = media ? getComputedStyle(media) : null;
+            return media ? {
+              tag:media.tagName,
+              complete:media.matches('img') ? media.complete : media.readyState,
+              naturalWidth:media.matches('img') ? media.naturalWidth : media.videoWidth,
+              width:Math.round(box?.width ?? 0),
+              height:Math.round(box?.height ?? 0),
+              display:style.display,
+              visibility:style.visibility,
+              opacity:style.opacity,
+              objectFit:style.objectFit,
+              transform:style.transform,
+            } : null;
+          }),
+          previewMediaReady:thumbs.every((thumb) => {
+            const media = thumb?.querySelector('img, video');
+            const frame = thumb?.querySelector('.lecture-map-thumb-frame');
+            if (!media) return Boolean(frame?.firstElementChild || frame?.dataset.kind);
+            const box = media?.getBoundingClientRect();
+            if (!box || box.width <= 0 || box.height <= 0) return false;
+            return media.matches('img') ? media.complete && media.naturalWidth > 0 : media.readyState >= 1 && media.videoWidth > 0;
+          }),
+          copyAligned:thumbs.every((thumb) => {
+            const copyBox = thumb?.querySelector('.lecture-map-thumb-copy')?.getBoundingClientRect();
+            const frameBox = thumb?.querySelector('.lecture-map-thumb-frame')?.getBoundingClientRect();
+            return copyBox && frameBox && Math.abs(copyBox.width - frameBox.width) <= 2;
+          }),
           current:items.filter((item) => item.getAttribute('aria-current') === 'step').length,
           currentTitle:currentItem?.querySelector('b')?.textContent.trim(),
           currentNumber:currentNumber?.textContent.trim(),
@@ -440,10 +501,16 @@ for (const viewport of activeViewports) {
         };
       })()`));
       record(
-        `${viewport.id} 상시 장표 인덱스와 무크롬 무대`,
-        railState?.items === 12 &&
+        `${viewport.id} 상시 화면 축소판과 무크롬 무대`,
+        railState?.items === lectureStart?.slideTotal &&
+          railState?.thumbs === railState?.items &&
+          railState?.thumbsPopulated === true &&
+          railState?.thumbsRatio === true &&
+          railState?.framesRatio === true &&
+          railState?.copyAligned === true &&
+          railState?.previewMediaReady === true &&
           railState?.current === 1 &&
-          railState?.currentTitle === "자동화를 보는 세 가지 동작" &&
+          railState?.currentTitle === lectureStart?.title &&
           railState?.currentNumber === "01" &&
           railState?.currentNumberVisible === true &&
           railState?.fullHeight === true &&
@@ -454,60 +521,79 @@ for (const viewport of activeViewports) {
       await save(session, "15-lecture-rail", false);
       const railNavigation = value(await evaluate(session, `(async () => {
         const deck = document.querySelector('[data-lecture-deck]');
+        const target = [...deck.querySelectorAll('[data-lecture-map-scene]')][1];
+        const targetScene = target?.dataset.lectureMapScene;
+        const sceneId = deck.querySelectorAll('.lecture-scene')[Number(targetScene)]?.dataset.scene;
         await new Promise((resolve) => {
           deck.addEventListener('lectureframe', resolve, { once:true });
-          deck.querySelector('[data-lecture-map-scene="1"]').click();
+          target.click();
         });
         const jumped = {
           progress:deck.querySelector('[data-lecture-progress]').textContent.trim(),
           title:deck.querySelector('.lecture-scene.on h2')?.textContent.trim(),
-          current:deck.querySelector('[data-lecture-map-scene][aria-current="step"]')?.dataset.lectureMapScene,
+          currentScene:deck.querySelector('[data-lecture-map-scene][aria-current="step"]')?.dataset.lectureMapScene,
+          hash:location.hash,
         };
+        return { targetScene, expectedHash:'#lecture=' + sceneId + '.1', jumped };
+      })()`));
+      await save(session, "16-lecture-second", false);
+      const restored = value(await evaluate(session, `(async () => {
+        const deck = document.querySelector('[data-lecture-deck]');
         await new Promise((resolve) => {
           deck.addEventListener('lectureframe', resolve, { once:true });
           document.dispatchEvent(new KeyboardEvent('keydown', { key:'Home', bubbles:true }));
         });
-        return { jumped, restored:location.hash };
+        return location.hash;
       })()`));
       record(
-        `${viewport.id} 장표 인덱스 즉시 이동`,
-        /^\d+ \/ \d+$/.test(railNavigation?.jumped?.progress ?? "") &&
-          railNavigation?.jumped?.title === "마우스와 키보드 자동화" &&
-          railNavigation?.jumped?.current === "1" &&
-          railNavigation?.restored === "#lecture=s1.1",
-        JSON.stringify(railNavigation),
+        `${viewport.id} 화면 축소판 즉시 이동`,
+        /^02 \/ \d+$/.test(railNavigation?.jumped?.progress ?? "") &&
+          Boolean(railNavigation?.jumped?.title) &&
+          railNavigation?.jumped?.currentScene === railNavigation?.targetScene &&
+          railNavigation?.jumped?.hash === railNavigation?.expectedHash &&
+          restored === "#lecture=s1.1",
+        JSON.stringify({ ...railNavigation, restored }),
       );
-      const blankState = value(await evaluate(session, `(() => {
-        const deck = document.querySelector('[data-lecture-deck]');
-        const progress = deck.querySelector('[data-lecture-progress]').textContent.trim();
-        document.dispatchEvent(new KeyboardEvent('keydown', { key:'b', bubbles:true }));
-        const covered = {
-          blanked:deck.dataset.audienceBlanked,
-          hidden:deck.querySelector('[data-lecture-break]').hidden,
-          stageInert:deck.querySelector('.lecture-stage').hasAttribute('inert'),
-          progress:deck.querySelector('[data-lecture-progress]').textContent.trim(),
-        };
-        document.dispatchEvent(new KeyboardEvent('keydown', { key:'b', bubbles:true }));
-        const restored = {
-          blanked:deck.dataset.audienceBlanked,
-          hidden:deck.querySelector('[data-lecture-break]').hidden,
-          stageInert:deck.querySelector('.lecture-stage').hasAttribute('inert'),
-          progress:deck.querySelector('[data-lecture-progress]').textContent.trim(),
-        };
-        return { progress, covered, restored };
-      })()`));
-      record(
-        `${viewport.id} 관객 화면 가리기와 복구`,
-        blankState?.covered?.blanked === "true" &&
-          blankState?.covered?.hidden === false &&
-          blankState?.covered?.stageInert === true &&
-          blankState?.covered?.progress === blankState?.progress &&
-          blankState?.restored?.blanked === "false" &&
-          blankState?.restored?.hidden === true &&
-          blankState?.restored?.stageInert === false &&
-          blankState?.restored?.progress === blankState?.progress,
-        JSON.stringify(blankState),
-      );
+      if (PREVIEW_ONLY) {
+        const remainingSlides = [];
+        for (let index = 2; index < lectureStart.slideTotal; index += 1) {
+          const slide = value(await evaluate(session, `(async () => {
+            const deck = document.querySelector('[data-lecture-deck]');
+            await new Promise((resolve) => {
+              deck.addEventListener('lectureframe', resolve, { once:true });
+              deck.querySelectorAll('[data-lecture-map-scene]')[${index}].click();
+            });
+            const scene = deck.querySelector('.lecture-scene.on');
+            const visual = scene?.querySelector('[data-scene-visible="true"]');
+            const box = visual?.getBoundingClientRect();
+            return {
+              index:${index},
+              title:scene?.querySelector('h2')?.textContent.trim(),
+              ratio:box ? box.width / box.height : 0,
+              fit:scene?.dataset.fit,
+            };
+          })()`));
+          remainingSlides.push(slide);
+          if (index === 2) await save(session, "17-lecture-third", false);
+          if (index === 3) await save(session, "18-lecture-fourth", false);
+        }
+        record(
+          `${viewport.id} 나머지 16대9 장표`,
+          remainingSlides?.length === Math.max(0, lectureStart.slideTotal - 2) &&
+            remainingSlides?.every((slide) => Math.abs(slide.ratio - 16 / 9) < .03 && slide.fit === "cover"),
+          JSON.stringify(remainingSlides),
+        );
+        await evaluate(session, `(async () => {
+          document.dispatchEvent(new KeyboardEvent('keydown', { key:'Escape', bubbles:true }));
+          await new Promise((resolve) => setTimeout(resolve, 80));
+        })()`);
+        const lectureClosed = value(await evaluate(session, `(() => ({
+          hidden: document.querySelector('[data-lecture-deck]')?.hidden,
+          body: document.body.classList.contains('lecture-on'),
+        }))()`));
+        record(`${viewport.id} 강의 모드 종료`, lectureClosed?.hidden === true && lectureClosed?.body === false, JSON.stringify(lectureClosed));
+        continue;
+      }
 
       const fullscreenExit = value(await evaluate(session, `(async () => {
         const deck = document.querySelector('[data-lecture-deck]');
@@ -604,7 +690,7 @@ for (const viewport of activeViewports) {
       );
       await save(session, "06-lecture-title-dark", false);
 
-      // 런타임 6은 첫 프레임이 자동 실행된 채 열린다. 클릭 없이 단일 시각자료를 검사한다.
+      // 장면은 첫 시각물이 자동으로 열린다. 제목 아래의 캡션 보조설명과 16:9 프레임을 검사한다.
       await evaluate(session, `new Promise((resolve) => setTimeout(resolve, 350))`);
       const firstBeat = value(await evaluate(session, `(() => {
         const deck = document.querySelector('[data-lecture-deck]');
@@ -612,10 +698,17 @@ for (const viewport of activeViewports) {
         const visual = scene.querySelector('[data-scene-visible="true"]');
         const frame = visual?.querySelector('img, video, iframe, pre') ?? visual;
         const caption = visual?.querySelector('figcaption');
+        const support = scene.querySelector('[data-carousel-support]');
+        const supportActive = support?.querySelector('[data-carousel-description-active="true"]');
+        const carouselFrame = scene.querySelector('.visual-carousel-frame');
         const label = scene.querySelector('[data-scene-label-visible="true"]');
         const subtitle = scene.querySelector('.scene-subtitle');
+        const head = scene.querySelector('.scene-head');
         const labelRect = label?.getBoundingClientRect();
         const subtitleRect = subtitle?.getBoundingClientRect();
+        const visualRect = visual?.getBoundingClientRect();
+        const headRect = head?.getBoundingClientRect();
+        const supportRect = support?.getBoundingClientRect();
         return {
           visible: scene.querySelectorAll('[data-scene-visible="true"]').length,
           effect: visual?.dataset.sceneEffect,
@@ -623,9 +716,18 @@ for (const viewport of activeViewports) {
           cue: scene?.querySelector('[data-scene-cue]')?.textContent.trim(),
           phase: deck?.dataset.scenePhase,
           width: visual ? Math.round(visual.getBoundingClientRect().width) : 0,
-          frameBorder: frame ? getComputedStyle(frame).borderTopWidth : null,
-          frameRadius: frame ? parseFloat(getComputedStyle(frame).borderTopLeftRadius) : null,
-          captionBackground: caption ? getComputedStyle(caption).backgroundColor : null,
+          ratio: visualRect ? visualRect.width / visualRect.height : 0,
+          headAligned: headRect && visualRect ? Math.abs(headRect.width - visualRect.width) <= 2 : false,
+          frameFit: frame ? getComputedStyle(frame).objectFit : null,
+          framePosition: frame ? getComputedStyle(frame).objectPosition : null,
+          frameBorder: carouselFrame ? getComputedStyle(carouselFrame).borderTopWidth : null,
+          frameRadius: carouselFrame ? parseFloat(getComputedStyle(carouselFrame).borderTopLeftRadius) : null,
+          captionDisplay: caption ? getComputedStyle(caption).display : null,
+          extraText: scene.querySelectorAll('.scene-support, [data-scene-visual-note], [data-scene-callout]').length,
+          supportText: supportActive?.textContent.trim() || '',
+          supportTop: supportRect ? Math.round(supportRect.top) : null,
+          supportBottom: supportRect ? Math.round(supportRect.bottom) : null,
+          visualTop: visualRect ? Math.round(visualRect.top) : null,
           labelTop: labelRect ? Math.round(labelRect.top) : null,
           labelLeft: labelRect ? Math.round(labelRect.left) : null,
           subtitleBottom: subtitleRect ? Math.round(subtitleRect.bottom) : null,
@@ -643,10 +745,18 @@ for (const viewport of activeViewports) {
           Boolean(firstBeat?.cue) &&
           firstBeat?.phase === "ready" &&
           firstBeat?.width >= viewport.visualMin &&
+          Math.abs(firstBeat?.ratio - 16 / 9) < .03 &&
+          firstBeat?.headAligned === true &&
+          ["contain", "cover"].includes(firstBeat?.frameFit) &&
+          Boolean(firstBeat?.framePosition) &&
           firstBeat?.frameBorder === "1px" &&
           firstBeat?.frameRadius >= 6 &&
           firstBeat?.frameRadius <= 10 &&
-          firstBeat?.captionBackground === "rgba(0, 0, 0, 0)" &&
+          (firstBeat?.captionDisplay === null || firstBeat?.captionDisplay === "none") &&
+          firstBeat?.extraText === 1 &&
+          Boolean(firstBeat?.supportText) &&
+          firstBeat?.supportTop >= firstBeat?.subtitleBottom &&
+          firstBeat?.visualTop >= firstBeat?.supportBottom &&
           (firstBeat?.labelTop === null || firstBeat?.labelTop >= firstBeat?.subtitleBottom + 8) &&
           Number(firstBeat?.progressValue) >= 0 &&
           /^01 \/ \d+$/.test(firstBeat?.progress ?? "") &&
@@ -724,64 +834,44 @@ for (const viewport of activeViewports) {
       );
       await save(session, "07-lecture-frame", false);
 
-      // 계약 6: 판단 문장은 현재 단일 시각자료 장표의 보조설명에 함께 실린다.
-      const annotationState = value(await evaluate(session, `(async () => {
+      const conciseSlide = value(await evaluate(session, `(() => {
         const deck = document.querySelector('[data-lecture-deck]');
-        const scenes = [...deck.querySelectorAll('.lecture-scene')];
-        const timelines = scenes.map((scene) => {
-          try { return JSON.parse(scene.dataset.timeline || '[]'); } catch { return []; }
-        });
-        const annotated = timelines.flatMap((timeline, sceneIndex) => timeline.map((frame, frameIndex) => ({
-          sceneIndex, frameIndex, annotation:String(frame.annotation || '').trim(),
-        }))).find((frame) => frame.annotation);
-        const clear = timelines.flatMap((timeline, sceneIndex) => timeline.map((frame, frameIndex) => ({
-          sceneIndex, frameIndex, annotation:String(frame.annotation || '').trim(),
-        }))).find((frame) => !frame.annotation && (frame.sceneIndex !== annotated?.sceneIndex || frame.frameIndex !== annotated?.frameIndex));
-        const waitFrame = (move) => new Promise((resolve) => {
-          deck.addEventListener('lectureframe', resolve, { once:true });
-          move();
-        });
-        const go = async (target) => {
-          await waitFrame(() => deck.querySelector('[data-lecture-map-scene="' + target.sceneIndex + '"]').click());
-          for (let index = 0; index < target.frameIndex; index += 1) {
-            await waitFrame(() => document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowRight', bubbles:true })));
-          }
-        };
-        if (!annotated || !clear) return { found:false };
-        await go(annotated);
-        let scene = deck.querySelector('.lecture-scene.on');
-        const callout = scene.querySelector('[data-scene-callout]');
-        const result = {
-          found:true,
-          effect: scene.dataset.sceneEffect,
-          callout: callout?.textContent.trim(),
-          calloutVisible: callout?.classList.contains('on'),
+        const scene = deck.querySelector('.lecture-scene.on');
+        const title = scene?.querySelector('.scene-head h2');
+        const subtitle = scene?.querySelector('.scene-subtitle');
+        const visual = scene?.querySelector('[data-scene-visible="true"]');
+        const caption = visual?.querySelector('figcaption');
+        const support = scene?.querySelector('[data-carousel-support]');
+        const supportActive = support?.querySelector('[data-carousel-description-active="true"]');
+        const titleRect = title?.getBoundingClientRect();
+        const subtitleRect = subtitle?.getBoundingClientRect();
+        const supportRect = support?.getBoundingClientRect();
+        const visualRect = visual?.getBoundingClientRect();
+        return {
+          title: title?.textContent.trim(),
+          subtitle: subtitle?.textContent.trim(),
           visible: scene.querySelectorAll('[data-scene-visible="true"]').length,
-          hash: location.hash,
-          expectedHash:'#lecture=s' + (annotated.sceneIndex + 1) + '.' + (annotated.frameIndex + 1),
+          extraText: scene.querySelectorAll('.scene-support, [data-scene-visual-note], [data-scene-callout]').length,
+          supportText: supportActive?.textContent.trim() || '',
+          captionDisplay: caption ? getComputedStyle(caption).display : null,
+          titleBeforeSubtitle: titleRect && subtitleRect ? titleRect.bottom <= subtitleRect.top + 1 : false,
+          subtitleBeforeSupport: subtitleRect && supportRect ? subtitleRect.bottom <= supportRect.top + 1 : false,
+          supportBeforeVisual: supportRect && visualRect ? supportRect.bottom <= visualRect.top + 1 : false,
         };
-        await go(clear);
-        const clearedCallout = deck.querySelector('.lecture-scene.on [data-scene-callout]');
-        result.cleared = !clearedCallout.classList.contains('on') && clearedCallout.textContent === '';
-        await go(annotated);
-        const restoredCallout = deck.querySelector('.lecture-scene.on [data-scene-callout]');
-        result.restored = restoredCallout.classList.contains('on') && restoredCallout.textContent.trim() === annotated.annotation;
-        result.restoredHash = location.hash;
-        return result;
       })()`));
-      await save(session, "07-lecture-annotation", false);
+      await save(session, "07-lecture-visual", false);
       record(
-        `${viewport.id} 장표에 실린 판단 문장`,
-        annotationState?.found === true &&
-          ["enter", "replace", "compare", "compose", "focus", "annotate", "run", "simulate"].includes(annotationState?.effect) &&
-          annotationState?.calloutVisible === true &&
-          Boolean(annotationState?.callout) &&
-          annotationState?.visible === 1 &&
-          annotationState?.hash === annotationState?.expectedHash &&
-          annotationState?.cleared === true &&
-          annotationState?.restored === true &&
-          annotationState?.restoredHash === annotationState?.expectedHash,
-        JSON.stringify(annotationState),
+        `${viewport.id} 제목 부제 캡션 시각물 장표`,
+        Boolean(conciseSlide?.title) &&
+          Boolean(conciseSlide?.subtitle) &&
+          conciseSlide?.visible === 1 &&
+          conciseSlide?.extraText === 1 &&
+          Boolean(conciseSlide?.supportText) &&
+          (conciseSlide?.captionDisplay === null || conciseSlide?.captionDisplay === "none") &&
+          conciseSlide?.titleBeforeSubtitle === true &&
+          conciseSlide?.subtitleBeforeSupport === true &&
+          conciseSlide?.supportBeforeVisual === true,
+        JSON.stringify(conciseSlide),
       );
 
       if (viewport.hasTouch) {
@@ -881,40 +971,42 @@ for (const viewport of activeViewports) {
         });
         await waitKey('End');
         const end = {
-          prev:deck.querySelector('[data-lecture-prev]').disabled,
-          next:deck.querySelector('[data-lecture-next]').disabled,
+          current:deck.querySelector('[data-lecture-map-scene][aria-current="step"] .lecture-map-no')?.textContent.trim(),
+          progress:deck.querySelector('[data-lecture-progress]').textContent.trim(),
           status:deck.querySelector('[data-lecture-status]').textContent.trim(),
         };
         await waitKey('Home');
         const start = {
-          prev:deck.querySelector('[data-lecture-prev]').disabled,
-          next:deck.querySelector('[data-lecture-next]').disabled,
+          current:deck.querySelector('[data-lecture-map-scene][aria-current="step"] .lecture-map-no')?.textContent.trim(),
+          progress:deck.querySelector('[data-lecture-progress]').textContent.trim(),
           status:deck.querySelector('[data-lecture-status]').textContent.trim(),
         };
         return { end, start };
       })()`));
       record(
-        `${viewport.id} 시작과 끝 조작 상태`,
-        boundaryState?.end?.prev === false &&
-          boundaryState?.end?.next === true &&
-          /장표 (\d+) \/ \1/.test(boundaryState?.end?.status ?? "") &&
-          boundaryState?.start?.prev === true &&
-          boundaryState?.start?.next === false &&
-          /장표 1 \/ \d+/.test(boundaryState?.start?.status ?? ""),
+        `${viewport.id} 시작과 끝 화면 축소판 상태`,
+        /^\d+ \/ \d+$/.test(boundaryState?.end?.progress ?? "") &&
+          boundaryState?.end?.progress?.split(" / ")[0] === boundaryState?.end?.progress?.split(" / ")[1] &&
+          boundaryState?.end?.current === boundaryState?.end?.progress?.split(" / ")[0] &&
+          /화면 (\d+) \/ \1/.test(boundaryState?.end?.status ?? "") &&
+          boundaryState?.start?.current === "01" &&
+          /^01 \/ \d+$/.test(boundaryState?.start?.progress ?? "") &&
+          /화면 1 \/ \d+/.test(boundaryState?.start?.status ?? ""),
         JSON.stringify(boundaryState),
       );
 
-      await client.act(
-        session,
-        [{ kind: "click", selector: "[data-lecture-close]", expectedRisk: "externalEffect" }],
-        { timeoutMs: 30000 },
-      );
+      await evaluate(session, `(async () => {
+        document.dispatchEvent(new KeyboardEvent('keydown', { key:'Escape', bubbles:true }));
+        await new Promise((resolve) => setTimeout(resolve, 80));
+      })()`);
       const lectureClosed = value(await evaluate(session, `(() => ({
         hidden: document.querySelector('[data-lecture-deck]')?.hidden,
         body: document.body.classList.contains('lecture-on'),
       }))()`));
       record(`${viewport.id} 강의 모드 종료`, lectureClosed?.hidden === true && lectureClosed?.body === false, JSON.stringify(lectureClosed));
     }
+
+    if (PREVIEW_ONLY) continue;
 
     // 강의장 모든 상태에서 같은 아이콘 토글을 쓰고, 선택한 테마를 html과 브라우저 기본 UI에 같이 건다.
     const lightTheme = value(
@@ -1060,7 +1152,7 @@ for (const viewport of activeViewports) {
     record(`${viewport.id} 시각 자산 확대`, zoomState === "on", zoomState);
     if (zoomState === "on") await save(session, "04-zoom");
 
-    // 가로가 넓고 세로가 낮은 강의 화면에서도 시각물은 보조설명 아래의 전체 무대를 써야 한다.
+    // 가로가 넓고 세로가 낮은 강의 화면에서도 시각물은 부제 아래의 전체 무대를 써야 한다.
     const comparePost = value(
       await evaluate(
         session,
@@ -1110,7 +1202,6 @@ for (const viewport of activeViewports) {
         head: box(scene?.querySelector('.scene-head')),
         title: box(scene?.querySelector('.scene-head h2')),
         subtitle: box(scene?.querySelector('.scene-subtitle')),
-        support: box(scene?.querySelector('.scene-support')),
         canvas: box(scene?.querySelector('.scene-canvas')),
         visual: box(visual),
         media: mediaBox,
@@ -1128,7 +1219,7 @@ for (const viewport of activeViewports) {
         bottomBars: deck?.querySelectorAll('.lecture-foot').length,
       };
     })()`));
-    // PPT 구도. 왼쪽 인덱스 옆에서 제목, 부제, 보조설명, 단일 시각자료가 세로로 이어진다.
+    // PPT 구도. 왼쪽 인덱스 옆에서 제목, 부제, 단일 시각자료가 세로로 이어진다.
     record(
       `${viewport.id} 레이아웃별 강의 무대`,
       balancedStage?.deck?.left === 0 &&
@@ -1141,8 +1232,7 @@ for (const viewport of activeViewports) {
         Math.abs(balancedStage?.stage?.left - balancedStage?.rail?.right) <= 1 &&
         Math.abs(balancedStage?.stage?.right - balancedStage?.viewport) <= 1 &&
         balancedStage?.title?.bottom <= balancedStage?.subtitle?.top + 1 &&
-        balancedStage?.subtitle?.bottom <= balancedStage?.support?.top + 1 &&
-        balancedStage?.support?.bottom <= balancedStage?.canvas?.top + 1 &&
+        balancedStage?.subtitle?.bottom <= balancedStage?.canvas?.top + 1 &&
         balancedStage?.head?.bottom <= balancedStage?.canvas?.top + 1 &&
         balancedStage?.visual?.left >= balancedStage?.canvas?.left - 1 &&
         balancedStage?.visual?.right <= balancedStage?.canvas?.right + 1 &&
@@ -1154,285 +1244,80 @@ for (const viewport of activeViewports) {
       JSON.stringify(balancedStage),
     );
     await save(session, "09-lecture-balanced", false);
-    // 계약 6의 비교 장면은 두 자료를 같은 좌표의 연속 장표로 펼친다.
-    await evaluate(session, `document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowRight', bubbles:true }))`);
-    const compareLayout = value(await evaluate(session, `(async () => {
-      const read = () => {
-        const scene = document.querySelector('.lecture-scene.on');
-        const canvas = scene?.querySelector('.scene-canvas');
-        const canvasRect = canvas?.getBoundingClientRect();
-        const visuals = [...(scene?.querySelectorAll('[data-scene-visible="true"]') ?? [])].map((visual) => {
-          const rect = visual.getBoundingClientRect();
-          return {
-            id: visual.dataset.visual,
-            left: rect.left,
-            top: rect.top,
-            right: rect.right,
-            bottom: rect.bottom,
-          };
-        });
-        return {
-          effect: scene?.dataset.sceneEffect,
-          cue: scene?.querySelector('[data-scene-cue]')?.textContent.trim(),
-          canvas: canvasRect ? { left:canvasRect.left, top:canvasRect.top, right:canvasRect.right, bottom:canvasRect.bottom } : null,
-          visuals,
-          hash: location.hash,
-        };
-      };
-      const first = read();
-      await new Promise((resolve) => {
-        document.querySelector('[data-lecture-deck]').addEventListener('lectureframe', resolve, { once:true });
-        document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowRight', bubbles:true }));
-      });
-      return { first, second:read() };
-    })()`));
-    const sameBox = (a, b) => a && b && ["left", "top", "right", "bottom"].every((key) => Math.abs(a[key] - b[key]) <= 2);
-    record(
-      `${viewport.id} compare 단일 무대 캐러셀`,
-        compareLayout?.first?.effect === "compare" &&
-        compareLayout?.second?.effect === "compare" &&
-        compareLayout?.first?.cue === "비교" &&
-        compareLayout?.second?.cue === "비교" &&
-        compareLayout?.first?.visuals?.length === 1 &&
-        compareLayout?.second?.visuals?.length === 1 &&
-        compareLayout?.first?.visuals?.[0]?.id !== compareLayout?.second?.visuals?.[0]?.id &&
-        sameBox(compareLayout?.first?.canvas, compareLayout?.second?.canvas) &&
-        sameBox(compareLayout?.first?.visuals?.[0], compareLayout?.second?.visuals?.[0]) &&
-        compareLayout?.first?.hash === "#lecture=s2.2" &&
-        compareLayout?.second?.hash === "#lecture=s2.3",
-      JSON.stringify(compareLayout),
-    );
-    await save(session, "10-lecture-compare", false);
-
-    // 계약 6의 compose 장면은 다이어그램과 표를 같은 규격의 연속 장표로 잇는다.
-    const composePost = value(
-      await evaluate(
-        session,
-        `(() => [...document.querySelectorAll('a.nav-post')]
-          .find((link) => link.getAttribute('href')?.endsWith('-run-python-in-vscode'))
-          ?.getAttribute('href') ?? null)()`,
-      ),
-    );
-    if (!composePost) throw new Error("run-python-in-vscode 조합 장면 글 링크를 못 찾았다");
-    await evaluate(
-      session,
-      `location.href = ${JSON.stringify(`${base}${composePost}#lecture=s2.1`)}`,
-      false,
-    );
-    await client.act(
-      session,
-      [{ kind: "waitFor", selector: ".lecture-scene.on[data-scene-effect=\"compose\"]", timeoutMs: 15000, expectedRisk: "read" }],
-      { timeoutMs: 30000 },
-    );
-    const composeLayout = value(await evaluate(session, `(async () => {
-      const read = () => {
-        const scene = document.querySelector('.lecture-scene.on');
-        const canvas = scene?.querySelector('.scene-canvas');
-        const canvasRect = canvas?.getBoundingClientRect();
-        const visual = scene?.querySelector('[data-scene-visible="true"]');
-        const rect = visual?.getBoundingClientRect();
-        return {
-          effect: scene?.dataset.sceneEffect,
-          cue: scene?.querySelector('[data-scene-cue]')?.textContent.trim(),
-          canvas: canvasRect ? { left:canvasRect.left, top:canvasRect.top, right:canvasRect.right, bottom:canvasRect.bottom } : null,
-          visual: rect ? {
-            id: visual.dataset.visual,
-            tag: visual.tagName.toLowerCase(),
-            left:rect.left, top:rect.top, right:rect.right, bottom:rect.bottom,
-          } : null,
-          visible: scene?.querySelectorAll('[data-scene-visible="true"]').length,
-        };
-      };
-      const first = read();
-      await new Promise((resolve) => {
-        document.querySelector('[data-lecture-deck]').addEventListener('lectureframe', resolve, { once:true });
-        document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowRight', bubbles:true }));
-      });
-      return { first, second:read() };
-    })()`));
-    record(
-      `${viewport.id} compose 단일 무대 캐러셀`,
-      composeLayout?.first?.effect === "compose" &&
-        composeLayout?.second?.effect === "compose" &&
-        composeLayout?.first?.cue === "함께 보기" &&
-        composeLayout?.second?.cue === "함께 보기" &&
-        composeLayout?.first?.visible === 1 &&
-        composeLayout?.second?.visible === 1 &&
-        composeLayout?.first?.visual?.id !== composeLayout?.second?.visual?.id &&
-        sameBox(composeLayout?.first?.canvas, composeLayout?.second?.canvas) &&
-        sameBox(composeLayout?.first?.visual, composeLayout?.second?.visual),
-      JSON.stringify(composeLayout),
-    );
-    await save(session, "11-lecture-compose", false);
-
-    const focusPost = value(
-      await evaluate(
-        session,
-        `(() => [...document.querySelectorAll('a.nav-post')]
-          .find((link) => link.getAttribute('href')?.endsWith('-run-python-in-vscode'))
-          ?.getAttribute('href') ?? null)()`,
-      ),
-    );
-    if (!focusPost) throw new Error("run-python-in-vscode focus 장면 글 링크를 못 찾았다");
-    await evaluate(session, `location.hash = '#lecture=s7.2'; location.reload()`, false);
-    await client.act(
-      session,
-      [{ kind: "waitFor", selector: '[data-lecture-deck][data-scene-phase="ready"] .lecture-scene.on [data-scene-focus="true"]', timeoutMs: 15000, expectedRisk: "read" }],
-      { timeoutMs: 30000 },
-    );
-    const focusState = value(await evaluate(session, `(() => {
+    // 같은 H2의 여러 시각물은 새 장표가 아니라 동일한 16:9 무대의 캐러셀 항목이다.
+    const carouselState = value(await evaluate(session, `(async () => {
       const deck = document.querySelector('[data-lecture-deck]');
-      const rail = deck?.querySelector('.lecture-rail');
-      const stage = deck?.querySelector('.lecture-stage');
-      const scene = document.querySelector('.lecture-scene.on');
-      const visual = scene?.querySelector('[data-scene-focus="true"]');
-      const title = scene?.querySelector('.scene-head > div:last-child');
-      const callout = scene?.querySelector('[data-scene-callout]');
-      const deckRect = deck?.getBoundingClientRect();
-      const railRect = rail?.getBoundingClientRect();
-      const stageRect = stage?.getBoundingClientRect();
-      return {
-        effect: scene?.dataset.sceneEffect,
-        cue: scene?.querySelector('[data-scene-cue]')?.textContent.trim(),
-        visible: scene?.querySelectorAll('[data-scene-visible="true"]').length,
-        focused: scene?.querySelectorAll('[data-scene-focus="true"]').length,
-        filter: visual ? getComputedStyle(visual).filter : null,
-        titleOpacity: title ? Number(getComputedStyle(title).opacity) : null,
-        callout: callout?.textContent.trim(),
-        shell: {
-          scrollX: window.scrollX,
-          deckTop: Math.round(deckRect?.top ?? -1),
-          deckLeft: Math.round(deckRect?.left ?? -1),
-          deckWidth: Math.round(deckRect?.width ?? -1),
-          deckHeight: Math.round(deckRect?.height ?? -1),
-          railTop: Math.round(railRect?.top ?? -1),
-          railLeft: Math.round(railRect?.left ?? -1),
-          railBottom: Math.round(railRect?.bottom ?? -1),
-          railRight: Math.round(railRect?.right ?? -1),
-          stageLeft: Math.round(stageRect?.left ?? -1),
-          stageRight: Math.round(stageRect?.right ?? -1),
-          viewportWidth: window.innerWidth,
-          viewportHeight: window.innerHeight,
-        },
+      const scenes = [...deck.querySelectorAll('.lecture-scene')];
+      const targetIndex = scenes.findIndex((scene) => scene.querySelectorAll('[data-carousel-item]').length > 1);
+      if (targetIndex < 0) return null;
+      await new Promise((resolve) => {
+        deck.addEventListener('lectureframe', resolve, { once:true });
+        deck.querySelector('[data-lecture-map-scene="' + targetIndex + '"]').click();
+      });
+      const scene = scenes[targetIndex];
+      const carousel = scene.querySelector('[data-visual-carousel]');
+      const read = () => {
+        const frame = carousel.querySelector('.visual-carousel-frame')?.getBoundingClientRect();
+        const visual = carousel.querySelector('[data-carousel-active="true"]');
+        const visualBox = visual?.getBoundingClientRect();
+        return {
+          scene:scene.dataset.scene,
+          at:Number(carousel.dataset.carouselAt),
+          count:Number(carousel.dataset.carouselCount),
+          visual:visual?.dataset.visual,
+          support:scene.querySelector('[data-carousel-description-active="true"]')?.textContent.trim() || '',
+          supportVisible:scene.querySelector('[data-carousel-support]') ? getComputedStyle(scene.querySelector('[data-carousel-support]')).display !== 'none' : false,
+          frame:frame ? { left:frame.left, top:frame.top, right:frame.right, bottom:frame.bottom } : null,
+          visualBox:visualBox ? { left:visualBox.left, top:visualBox.top, right:visualBox.right, bottom:visualBox.bottom } : null,
+          hash:location.hash,
+          progress:deck.querySelector('[data-lecture-progress]').textContent.trim(),
+        };
       };
+      const first = read();
+      await new Promise((resolve) => {
+        deck.addEventListener('lectureframe', resolve, { once:true });
+        carousel.querySelector('[data-carousel-next]').click();
+      });
+      return { first, second:read() };
     })()`));
+    const sameCarouselBox = (a, b) => a && b && ["left", "top", "right", "bottom"]
+      .every((key) => Math.abs(a[key] - b[key]) <= 2);
     record(
-      `${viewport.id} focus 핵심 강조`,
-      focusState?.effect === "focus" &&
-        focusState?.cue === "핵심" &&
-        focusState?.visible === 1 &&
-        focusState?.focused === 1 &&
-        focusState?.filter !== "none" &&
-        focusState?.titleOpacity <= 0.5 &&
-        focusState?.callout === "" &&
-        focusState?.shell?.scrollX === 0 &&
-        focusState?.shell?.deckTop === 0 &&
-        focusState?.shell?.deckLeft === 0 &&
-        focusState?.shell?.deckWidth === focusState?.shell?.viewportWidth &&
-        focusState?.shell?.deckHeight === focusState?.shell?.viewportHeight &&
-        focusState?.shell?.railTop === 0 &&
-        focusState?.shell?.railLeft === 0 &&
-        focusState?.shell?.railBottom === focusState?.shell?.viewportHeight &&
-        focusState?.shell?.stageLeft === focusState?.shell?.railRight &&
-        focusState?.shell?.stageRight === focusState?.shell?.viewportWidth,
-      JSON.stringify(focusState),
+      `${viewport.id} H2 내부 16대9 캐러셀`,
+      carouselState?.first?.scene === carouselState?.second?.scene &&
+        carouselState?.first?.count >= 2 &&
+        carouselState?.first?.at === 0 &&
+        carouselState?.second?.at === 1 &&
+        carouselState?.first?.visual !== carouselState?.second?.visual &&
+        carouselState?.first?.supportVisible === true &&
+        carouselState?.second?.supportVisible === true &&
+        Boolean(carouselState?.first?.support) &&
+        sameCarouselBox(carouselState?.first?.frame, carouselState?.second?.frame) &&
+        Math.abs((carouselState?.first?.frame?.right - carouselState?.first?.frame?.left) /
+          (carouselState?.first?.frame?.bottom - carouselState?.first?.frame?.top) - 16 / 9) < .03 &&
+        carouselState?.first?.progress === carouselState?.second?.progress &&
+        /\.1$/.test(carouselState?.first?.hash ?? "") &&
+        /\.2$/.test(carouselState?.second?.hash ?? ""),
+      JSON.stringify(carouselState),
     );
-    await save(session, "11-lecture-focus", false);
+    await save(session, "10-lecture-carousel", false);
 
-    /*
-     * 5) 실행 칸.
-     *
-     * 003 이 `값을 바꾸고 실행해 보시기 바랍니다` 라고 말하는 자리다.
-     * **2026-08-20 까지 여기가 생 주소가 그대로 보이는 링크였다.** 렌더러가 codaro 주소를
-     * 못 알아봤고, 교안 검사도 공개 저장소 검사도 그것을 볼 자리가 없어서 아무도 몰랐다.
-     * 그림만 찍고 넘어가면 같은 일이 또 난다. 그래서 눌러서 파이썬을 돌려 본다.
-     */
-    const cellPost = value(
+
+    const readingCellPost = value(
       await evaluate(
         session,
-        `(() => {
-          const links = [...document.querySelectorAll('a.nav-post')];
-          const target = links.find((link) => link.getAttribute('href')?.endsWith('-python-basic-syntax'));
-          return target?.getAttribute('href') ?? null;
-        })()`,
+        `(() => [...document.querySelectorAll('a.nav-post')]
+          .find((link) => link.getAttribute('href')?.endsWith('-python-basic-syntax'))
+          ?.getAttribute('href') ?? null)()`,
       ),
     );
-    if (!cellPost) throw new Error("python-basic-syntax 실행 칸 글 링크를 못 찾았다");
-    opened = await client.openTarget(`${base}${cellPost}`, {
+    if (!readingCellPost) throw new Error("python-basic-syntax 실행 칸 글 링크를 못 찾았다");
+    opened = await client.openTarget(`${base}${readingCellPost}`, {
       expectedRisk: "externalEffect",
       waitUntil: "load",
       timeoutMs: 30000,
     });
     session = (await client.attachSession(opened.output.targetRef, { timeoutMs: 30000 })).output;
-
-    // URL로 장면과 프레임을 복구하고, 실행 칸에 simulate와 run 효과가 실제로 이어지는지 본다.
-    // 계약 6의 s2는 표와 실행 칸을 같은 좌표의 연속 장표로 펼친다.
-    await evaluate(session, `location.hash = '#lecture=s2.1'; location.reload()`, false);
-    await client.act(
-      session,
-      [{ kind: "waitFor", selector: ".lecture-scene.on", timeoutMs: 15000, expectedRisk: "read" }],
-      { timeoutMs: 30000 },
-    );
-    const restoredLecture = value(await evaluate(session, `(() => {
-      const deck = document.querySelector('[data-lecture-deck]');
-      const scene = deck?.querySelector('.lecture-scene.on');
-      return {
-        hidden: deck?.hidden,
-        scene: scene?.dataset.scene,
-        progress: deck?.querySelector('[data-lecture-progress]')?.textContent.trim(),
-        visible: scene?.querySelectorAll('[data-scene-visible="true"]').length,
-      };
-    })()`));
-    record(
-      `${viewport.id} 강의 위치 URL 복구`,
-      restoredLecture?.hidden === false &&
-        restoredLecture?.scene === "s2" &&
-        /^\d+ \/ \d+$/.test(restoredLecture?.progress ?? "") &&
-        restoredLecture?.visible === 1,
-      JSON.stringify(restoredLecture),
-    );
-
-    await evaluate(session, `document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowRight', bubbles:true }))`);
-    await evaluate(session, `document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowRight', bubbles:true }))`);
-    const simulated = value(await evaluate(session, `(() => {
-      const scene = document.querySelector('.lecture-scene.on');
-      const visual = scene?.querySelector('[data-scene-live="true"]');
-      return {
-        live: visual?.dataset.sceneLive,
-        effect: scene?.dataset.sceneEffect,
-        cue: scene?.querySelector('[data-scene-cue]')?.textContent.trim(),
-        progress: document.querySelector('[data-lecture-progress]')?.textContent.trim(),
-      };
-    })()`));
-    record(
-      `${viewport.id} simulate 효과`,
-        simulated?.live === "true" &&
-        simulated?.effect === "simulate" &&
-        simulated?.cue === "직접 조작" &&
-        /^\d+ \/ \d+$/.test(simulated?.progress ?? ""),
-      JSON.stringify(simulated),
-    );
-
-    if (viewport.runPython) {
-      const lectureRun = String(value(await evaluate(session, `(async () => {
-        document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowRight', bubbles:true }));
-        const cell = document.querySelector('.lecture-scene.on [data-cell]');
-        const st = cell.querySelector('[data-state]');
-        const out = cell.querySelector('[data-out]');
-        for (let i = 0; i < 200; i++) {
-          await new Promise((r) => setTimeout(r, 500));
-          if (st.textContent === '완료' || st.textContent === '오류') break;
-        }
-        return st.textContent + ' :: ' + out.textContent.slice(0, 120);
-      })()`)));
-      record(`${viewport.id} run 효과`, lectureRun.startsWith("완료"), lectureRun);
-    }
-
-    await client.act(
-      session,
-      [{ kind: "click", selector: "[data-lecture-close]", expectedRisk: "externalEffect" }],
-      { timeoutMs: 30000 },
-    );
 
     const cells = Number(
       value(await evaluate(session, `document.querySelectorAll('[data-cell]').length`)),

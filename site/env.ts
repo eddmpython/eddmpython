@@ -17,4 +17,6 @@ export type Env = {
    * 비밀번호이고, 방 비밀번호와 같은 잠금 규칙 아래에서 검사한다.
    */
   ADMIN_PASSWORD?: string;
+  /** `npm run classroom:dev`가 preview 방과 `/room-test`에만 주입한다. 배포 환경에는 존재하지 않는다. */
+  LOCAL_PREVIEW_BYPASS?: string;
 };

@@ -135,6 +135,7 @@ function sharedDeclarations(): string {
     "--eddm-text": "color-mix(in srgb, var(--eddm-foreground) 75%, transparent)",
     /** 브랜드 색 원값. 테마와 무관하게 고정이라 로고 락업이 이것을 쓴다. */
     "--eddm-brand": PALETTE.brand,
+    "--eddm-paper": PALETTE.paper,
     "--eddm-text-muted": "color-mix(in srgb, var(--eddm-foreground) 55%, transparent)",
     "--eddm-text-dim": "color-mix(in srgb, var(--eddm-foreground) 45%, transparent)",
     "--eddm-text-faint": "color-mix(in srgb, var(--eddm-foreground) 35%, transparent)",
