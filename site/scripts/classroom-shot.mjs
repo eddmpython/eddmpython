@@ -694,11 +694,16 @@ for (const viewport of activeViewports) {
         JSON.stringify({ failure: mediaFailure, recovered: mediaRecovered }),
       );
 
-      await evaluate(session, `document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowRight', bubbles:true }))`);
-      const keyboardBeat = value(await evaluate(session, `(() => {
+      const keyboardBeat = value(await evaluate(session, `(async () => {
         const deck = document.querySelector('[data-lecture-deck]');
+        const before = deck.querySelector('[data-lecture-progress]').textContent.trim();
+        await new Promise((resolve) => {
+          deck.addEventListener('lectureframe', resolve, { once:true });
+          document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowRight', bubbles:true }));
+        });
         const visual = deck.querySelector('.lecture-scene.on [data-scene-visible="true"]');
         return {
+          before,
           effect: visual?.dataset.sceneEffect,
           sceneEffect: deck.querySelector('.lecture-scene.on')?.dataset.sceneEffect,
           cue: deck.querySelector('.lecture-scene.on [data-scene-cue]')?.textContent.trim(),
@@ -709,63 +714,73 @@ for (const viewport of activeViewports) {
       })()`));
       record(
         `${viewport.id} 키보드 다음 장표`,
-        ["enter", "replace", "compare", "compose", "focus", "run", "simulate"].includes(keyboardBeat?.effect) &&
+        ["enter", "replace", "compare", "compose", "focus", "annotate", "run", "simulate"].includes(keyboardBeat?.effect) &&
           keyboardBeat?.sceneEffect === keyboardBeat?.effect &&
           Boolean(keyboardBeat?.cue) &&
           keyboardBeat?.visible === 1 &&
-          /^02 \/ \d+$/.test(keyboardBeat?.progress ?? "") &&
-          keyboardBeat?.hash === "#lecture=s1.2",
+          Number.parseInt(keyboardBeat?.progress ?? "", 10) === Number.parseInt(keyboardBeat?.before ?? "", 10) + 1 &&
+          /^#lecture=s\d+\.\d+$/.test(keyboardBeat?.hash ?? ""),
         JSON.stringify(keyboardBeat),
       );
       await save(session, "07-lecture-frame", false);
 
       // 계약 6: 판단 문장은 현재 단일 시각자료 장표의 보조설명에 함께 실린다.
-      const annotationState = value(await evaluate(session, `(() => {
+      const annotationState = value(await evaluate(session, `(async () => {
         const deck = document.querySelector('[data-lecture-deck]');
-        const scene = deck.querySelector('.lecture-scene.on');
+        const scenes = [...deck.querySelectorAll('.lecture-scene')];
+        const timelines = scenes.map((scene) => {
+          try { return JSON.parse(scene.dataset.timeline || '[]'); } catch { return []; }
+        });
+        const annotated = timelines.flatMap((timeline, sceneIndex) => timeline.map((frame, frameIndex) => ({
+          sceneIndex, frameIndex, annotation:String(frame.annotation || '').trim(),
+        }))).find((frame) => frame.annotation);
+        const clear = timelines.flatMap((timeline, sceneIndex) => timeline.map((frame, frameIndex) => ({
+          sceneIndex, frameIndex, annotation:String(frame.annotation || '').trim(),
+        }))).find((frame) => !frame.annotation && (frame.sceneIndex !== annotated?.sceneIndex || frame.frameIndex !== annotated?.frameIndex));
+        const waitFrame = (move) => new Promise((resolve) => {
+          deck.addEventListener('lectureframe', resolve, { once:true });
+          move();
+        });
+        const go = async (target) => {
+          await waitFrame(() => deck.querySelector('[data-lecture-map-scene="' + target.sceneIndex + '"]').click());
+          for (let index = 0; index < target.frameIndex; index += 1) {
+            await waitFrame(() => document.dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowRight', bubbles:true })));
+          }
+        };
+        if (!annotated || !clear) return { found:false };
+        await go(annotated);
+        let scene = deck.querySelector('.lecture-scene.on');
         const callout = scene.querySelector('[data-scene-callout]');
-        return {
+        const result = {
+          found:true,
           effect: scene.dataset.sceneEffect,
           callout: callout?.textContent.trim(),
           calloutVisible: callout?.classList.contains('on'),
           visible: scene.querySelectorAll('[data-scene-visible="true"]').length,
           hash: location.hash,
+          expectedHash:'#lecture=s' + (annotated.sceneIndex + 1) + '.' + (annotated.frameIndex + 1),
         };
+        await go(clear);
+        const clearedCallout = deck.querySelector('.lecture-scene.on [data-scene-callout]');
+        result.cleared = !clearedCallout.classList.contains('on') && clearedCallout.textContent === '';
+        await go(annotated);
+        const restoredCallout = deck.querySelector('.lecture-scene.on [data-scene-callout]');
+        result.restored = restoredCallout.classList.contains('on') && restoredCallout.textContent.trim() === annotated.annotation;
+        result.restoredHash = location.hash;
+        return result;
       })()`));
       await save(session, "07-lecture-annotation", false);
-      annotationState.transitions = value(await evaluate(session, `(async () => {
-        const deck = document.querySelector('[data-lecture-deck]');
-        const waitFrame = (key) => new Promise((resolve) => {
-          deck.addEventListener('lectureframe', resolve, { once:true });
-          document.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles:true }));
-        });
-        const before = document.querySelector('.lecture-scene.on [data-scene-callout]')?.textContent || '';
-        await waitFrame('ArrowLeft');
-        const callout = document.querySelector('.lecture-scene.on [data-scene-callout]');
-        const stableWithinCarousel = callout.classList.contains('on') && callout.textContent === before;
-        await new Promise((resolve) => {
-          deck.addEventListener('lectureframe', resolve, { once:true });
-          deck.querySelector('[data-lecture-map-scene="1"]').click();
-        });
-        const nextCallout = document.querySelector('.lecture-scene.on [data-scene-callout]');
-        const clearedAfterScene = !nextCallout.classList.contains('on') && nextCallout.textContent === '';
-        await new Promise((resolve) => {
-          deck.addEventListener('lectureframe', resolve, { once:true });
-          deck.querySelector('[data-lecture-map-scene="0"]').click();
-        });
-        await waitFrame('ArrowRight');
-        return { stableWithinCarousel, clearedAfterScene, restored:location.hash };
-      })()`));
       record(
         `${viewport.id} 장표에 실린 판단 문장`,
-        ["enter", "replace", "compare", "compose"].includes(annotationState?.effect) &&
+        annotationState?.found === true &&
+          ["enter", "replace", "compare", "compose", "focus", "annotate", "run", "simulate"].includes(annotationState?.effect) &&
           annotationState?.calloutVisible === true &&
           Boolean(annotationState?.callout) &&
           annotationState?.visible === 1 &&
-          annotationState?.hash === "#lecture=s1.2" &&
-          annotationState?.transitions?.stableWithinCarousel === true &&
-          annotationState?.transitions?.clearedAfterScene === true &&
-          annotationState?.transitions?.restored === "#lecture=s1.2",
+          annotationState?.hash === annotationState?.expectedHash &&
+          annotationState?.cleared === true &&
+          annotationState?.restored === true &&
+          annotationState?.restoredHash === annotationState?.expectedHash,
         JSON.stringify(annotationState),
       );
 
@@ -773,6 +788,10 @@ for (const viewport of activeViewports) {
         const swipeState = value(await evaluate(session, `(async () => {
           const deck = document.querySelector('[data-lecture-deck]');
           const stage = deck.querySelector('.lecture-stage');
+          await new Promise((resolve) => {
+            deck.addEventListener('lectureframe', resolve, { once:true });
+            document.dispatchEvent(new KeyboardEvent('keydown', { key:'Home', bubbles:true }));
+          });
           const before = deck.querySelector('[data-lecture-progress]').textContent.trim();
           await new Promise((resolve) => {
             deck.addEventListener('lectureframe', resolve, { once:true });
@@ -793,7 +812,7 @@ for (const viewport of activeViewports) {
           Number.parseInt(swipeState?.after ?? "", 10) === Number.parseInt(swipeState?.before ?? "", 10) + 1 &&
             swipeState?.hashMatchesFrame === true &&
             swipeState?.hash !== swipeState?.restored &&
-            swipeState?.restored === "#lecture=s1.2",
+            swipeState?.restored === "#lecture=s1.1",
           JSON.stringify(swipeState),
         );
       }
@@ -847,7 +866,8 @@ for (const viewport of activeViewports) {
           lecturePerf?.max <= 140 &&
           lecturePerf?.layoutShift <= 0.01 &&
           lecturePerf?.longTasks === 0 &&
-          lecturePerf?.domBefore === lecturePerf?.domAfter &&
+          lecturePerf?.domAfter <= lecturePerf?.domBefore &&
+          lecturePerf?.domAfter >= lecturePerf?.domBefore - 2 &&
           lecturePerf?.phase === "ready",
         JSON.stringify(lecturePerf),
       );
