@@ -166,6 +166,18 @@
       "post": "01-instructor-introduction",
       "sha256": "d4bfad9ef9a4c0bba2d8d49d699f98f7574f58348ba2a6eb1fa3c37aa5e5cb8c"
     },
+    "02-course-blueprint/ai-work-system": {
+      "assetKey": "ai-work-system",
+      "path": "objects/sha256/08/0817a48648a83c20f22f86b419c577ec2e3eac75d9792f1a8e1abac1e2a8396d.png",
+      "post": "02-course-blueprint",
+      "sha256": "0817a48648a83c20f22f86b419c577ec2e3eac75d9792f1a8e1abac1e2a8396d"
+    },
+    "02-course-blueprint/completion-evidence-loop": {
+      "assetKey": "completion-evidence-loop",
+      "path": "objects/sha256/22/22f39c2ba8dad5a287af6cbc175efe7520571bbce8f0320bcaaa5d095ea95119.png",
+      "post": "02-course-blueprint",
+      "sha256": "22f39c2ba8dad5a287af6cbc175efe7520571bbce8f0320bcaaa5d095ea95119"
+    },
     "02-course-blueprint/foundation-layers": {
       "assetKey": "foundation-layers",
       "masterPath": "objects/sha256/8b/8b1ea44f1b104455dc14fe6733828fc5c8649329d4d14d4015f671df692d3507.png",
@@ -182,11 +194,41 @@
       "post": "02-course-blueprint",
       "sha256": "fccc9d5483911e31eb35e18b446c600489f6b24a40918683aec92398c8415115"
     },
+    "02-what-is-python/python-fit-decision": {
+      "assetKey": "python-fit-decision",
+      "path": "objects/sha256/4c/4cb92f14416032a364193bac4d1f4f2888a364bb24dc3a6fb720c2fa0d1fcb43.png",
+      "post": "02-what-is-python",
+      "sha256": "4cb92f14416032a364193bac4d1f4f2888a364bb24dc3a6fb720c2fa0d1fcb43"
+    },
     "04-model-and-harness/model-context-lifetimes": {
       "assetKey": "model-context-lifetimes",
       "path": "objects/sha256/d8/d8cb4b13291caf89432c83370dc4f69b45e3cfd96b36ef6bbc32c3d4f1ee4bda.png",
       "post": "04-model-and-harness",
       "sha256": "d8cb4b13291caf89432c83370dc4f69b45e3cfd96b36ef6bbc32c3d4f1ee4bda"
+    },
+    "04-run-python-online/notebook-code-memory": {
+      "assetKey": "notebook-code-memory",
+      "path": "objects/sha256/cb/cbdeb8663b99217f0e54d3619e88073865101fb16b87d6cd08bfb8493fbbc4a7.png",
+      "post": "04-run-python-online",
+      "sha256": "cbdeb8663b99217f0e54d3619e88073865101fb16b87d6cd08bfb8493fbbc4a7"
+    },
+    "05-run-python-in-vscode/local-rerun-change": {
+      "assetKey": "local-rerun-change",
+      "path": "objects/sha256/fe/fe283e01c0128ef3230fc13890755a665b70c72461409e912e649845c57831d1.png",
+      "post": "05-run-python-in-vscode",
+      "sha256": "fe283e01c0128ef3230fc13890755a665b70c72461409e912e649845c57831d1"
+    },
+    "06-uv-virtual-environment/isolated-projects": {
+      "assetKey": "isolated-projects",
+      "path": "objects/sha256/0c/0c80902222a0ac10e5ba9a3ebf290d4cf674fe9a81290c4621b1a45bc66b9cd5.png",
+      "post": "06-uv-virtual-environment",
+      "sha256": "0c80902222a0ac10e5ba9a3ebf290d4cf674fe9a81290c4621b1a45bc66b9cd5"
+    },
+    "06-uv-virtual-environment/uv-sync-rebuild": {
+      "assetKey": "uv-sync-rebuild",
+      "path": "objects/sha256/dc/dcea317ea9a022c4bbcfa312c1fc092a1488033cfadd3bfb6002a1b198c699f5.png",
+      "post": "06-uv-virtual-environment",
+      "sha256": "dcea317ea9a022c4bbcfa312c1fc092a1488033cfadd3bfb6002a1b198c699f5"
     }
   },
   "objectPrefix": "objects/sha256",
@@ -301,6 +343,16 @@
       "visualSubject": "원시 거래 카드와 정리 함수 모듈 및 분류 함수 모듈과 집계 함수 모듈 및 단계별 중간 결과 카드",
       "width": 1536
     },
+    "0817a48648a83c20f22f86b419c577ec2e3eac75d9792f1a8e1abac1e2a8396d": {
+      "alt": "지침과 권한 아래에서 컨텍스트와 모델과 도구가 실행 결과를 만들고 사람의 검증이 완료 또는 수정을 판정하는 구조",
+      "bytes": 491744,
+      "height": 900,
+      "mime": "image/png",
+      "path": "objects/sha256/08/0817a48648a83c20f22f86b419c577ec2e3eac75d9792f1a8e1abac1e2a8396d.png",
+      "sourcePost": "02-course-blueprint",
+      "visualSubject": "컨텍스트에서 모델과 도구와 실행 결과를 거쳐 사람의 검증과 실제 작업 완료로 이어지는 AI 작업 시스템",
+      "width": 1600
+    },
     "08804fa085a5c06307cbf4778def08cd2391ef856ded871e000bef68365231ab": {
       "alt": "서로 다른 세 Excel 파일의 금액 관련 열 이름이 표준 금액 열 하나로 모이는 모습",
       "bytes": 1172324,
@@ -380,6 +432,16 @@
       "sourcePost": "040-thirty-day-plan",
       "visualSubject": "여덟 칸 AI 작업지시서와 계획 화면 및 열 별칭 코드 파일과 변형 테스트 파일과 diff 결과",
       "width": 1536
+    },
+    "0c80902222a0ac10e5ba9a3ebf290d4cf674fe9a81290c4621b1a45bc66b9cd5": {
+      "alt": "전역 Python 한 자리를 공유하면 설치 변경이 서로 닿지만 두 프로젝트가 각자 가상 환경을 쓰면 라이브러리 버전이 격리되는 비교",
+      "bytes": 433825,
+      "height": 900,
+      "mime": "image/png",
+      "path": "objects/sha256/0c/0c80902222a0ac10e5ba9a3ebf290d4cf674fe9a81290c4621b1a45bc66b9cd5.png",
+      "sourcePost": "06-uv-virtual-environment",
+      "visualSubject": "전역 Python의 공유 설치와 두 프로젝트 안에 분리된 .venv 환경 비교",
+      "width": 1600
     },
     "0cb894f0e56bdcbd8e7aad687ef54d82a70dcc9675e6031acce0b242419989fd": {
       "alt": "Python Excel 자동화 수행평가의 다섯 영역이 합계 100점으로 구성된 채점표",
@@ -721,6 +783,16 @@
       "sourcePost": "004-ai-needs-an-environment",
       "visualSubject": "기존 변경이 있는 파일 화면, 비어 있는 도구 자리, 봉인된 비밀값, 잠긴 배포 버튼과 보고 카드",
       "width": 1536
+    },
+    "22f39c2ba8dad5a287af6cbc175efe7520571bbce8f0320bcaaa5d095ea95119": {
+      "alt": "변경 상태와 줄 단위 차이와 자동 테스트와 실행 로그가 완료 증거로 이어지고 테스트 실패는 변경 상태로 돌아가는 흐름",
+      "bytes": 504014,
+      "height": 900,
+      "mime": "image/png",
+      "path": "objects/sha256/22/22f39c2ba8dad5a287af6cbc175efe7520571bbce8f0320bcaaa5d095ea95119.png",
+      "sourcePost": "02-course-blueprint",
+      "visualSubject": "변경 상태, 줄 단위 차이, 자동 테스트와 실행 로그가 다시 확인 가능한 완료로 이어지는 증거 흐름",
+      "width": 1600
     },
     "23da085a737f2a035037f335c7524bd3fa263af6e18d2bda39207e110c20f267": {
       "alt": "두 지출 행의 금액이 서로 반대 방향으로 어긋나 합계 저울은 같지만 행별 대조선은 끊어진 모습",
@@ -1223,6 +1295,16 @@
       "sourcePost": "018-python-if-boundary",
       "visualSubject": "서로 다른 세 입력 토큰과 공통 거짓 결과 상태판 및 서로 분리된 세 업무 결과 상태함",
       "width": 1536
+    },
+    "4cb92f14416032a364193bac4d1f4f2888a364bb24dc3a6fb720c2fa0d1fcb43": {
+      "alt": "입력과 연결과 변경과 결과와 검증의 네 질문 가운데 해당 개수를 세어 파이썬 실험 여부를 고르는 판단 지도",
+      "bytes": 491578,
+      "height": 900,
+      "mime": "image/png",
+      "path": "objects/sha256/4c/4cb92f14416032a364193bac4d1f4f2888a364bb24dc3a6fb720c2fa0d1fcb43.png",
+      "sourcePost": "02-what-is-python",
+      "visualSubject": "입력과 연결, 변경, 결과와 검증의 네 질문이 하나의 점수와 도구 선택으로 모이는 판단 지도",
+      "width": 1600
     },
     "4d0846ebf46112ed3578ee859484bf0f31e21bf74736232d8e63777bb6f65454": {
       "alt": "여섯 거래가 반복문을 지나 처리 목록과 오류 목록 및 합계로 나뉘는 모습",
@@ -2772,6 +2854,16 @@
       "visualSubject": "터미널 명령 화면과 Python 진입 파일 및 Excel 입력과 변환 함수 카드와 결과 파일",
       "width": 1536
     },
+    "cbdeb8663b99217f0e54d3619e88073865101fb16b87d6cd08bfb8493fbbc4a7": {
+      "alt": "노트북 파일의 코드는 남고 실행 중 변수는 사라지며 다시 열어 위에서부터 실행하면 변수가 복구되는 과정",
+      "bytes": 527105,
+      "height": 900,
+      "mime": "image/png",
+      "path": "objects/sha256/cb/cbdeb8663b99217f0e54d3619e88073865101fb16b87d6cd08bfb8493fbbc4a7.png",
+      "sourcePost": "04-run-python-online",
+      "visualSubject": "노트북 파일의 코드와 실행 중 메모리의 변수가 브라우저 종료와 전체 재실행에서 다르게 유지되는 과정",
+      "width": 1600
+    },
     "d06f5719d26fdaefc402b08a088ed13d74078004223501de8a800c12b0a832fa": {
       "alt": "고정된 문자열 키는 같은 보관 칸을 다시 찾고 모양이 바뀌는 리스트 키는 경로가 끊기는 모습",
       "bytes": 1221317,
@@ -2931,6 +3023,16 @@
       "sourcePost": "023-excel-dataframe-map",
       "visualSubject": "DataFrame 표의 날짜와 부서 및 금액 열과 각 자료형 결과 카드 및 문자열이 섞인 금액 셀 오류",
       "width": 1536
+    },
+    "dcea317ea9a022c4bbcfa312c1fc092a1488033cfadd3bfb6002a1b198c699f5": {
+      "alt": "기존 PC에서 코드와 환경 기록만 보내고 새 PC에서 uv sync로 가상 환경을 다시 만들어 같은 xlsx 결과를 실행하는 과정",
+      "bytes": 506007,
+      "height": 900,
+      "mime": "image/png",
+      "path": "objects/sha256/dc/dcea317ea9a022c4bbcfa312c1fc092a1488033cfadd3bfb6002a1b198c699f5.png",
+      "sourcePost": "06-uv-virtual-environment",
+      "visualSubject": "기존 PC의 프로젝트 기록에서 uv sync를 거쳐 새 PC의 .venv와 실행 결과가 만들어지는 과정",
+      "width": 1600
     },
     "dd263228b071495adb445023a0ceb12bbabdb1c6f58eb5479d2adf5e8475af91": {
       "alt": "어두운 바닥에 놓인 넓은 판 하나가 가운데에서 갈라져 두 조각으로 벌어져 있고 그 틈을 가로질러 가는 다리 하나가 밝게 놓인 장면",
@@ -3303,6 +3405,16 @@
       "sourcePost": "012-vscode-python-project",
       "visualSubject": "폴더 트리와 코드 파일이 있는 편집기 화면, 확장 기능 버튼, 별도 인터프리터 파일, 터미널 결과",
       "width": 1536
+    },
+    "fe283e01c0128ef3230fc13890755a665b70c72461409e912e649845c57831d1": {
+      "alt": "기준금액을 10만원에서 5만원으로 바꾸고 파일을 저장해 다시 실행하자 확인필요가 1건에서 3건으로 달라지는 비교",
+      "bytes": 406800,
+      "height": 900,
+      "mime": "image/png",
+      "path": "objects/sha256/fe/fe283e01c0128ef3230fc13890755a665b70c72461409e912e649845c57831d1.png",
+      "sourcePost": "05-run-python-in-vscode",
+      "visualSubject": "기준금액 10만원의 첫 실행과 기준금액 5만원의 저장 후 재실행 결과 비교",
+      "width": 1600
     },
     "fe772ab3ab8fe75513272a46591222e7d2078730aadb2f012d99db9d2c92dab4": {
       "alt": "한 작업대에서 네 갈래 작업 방식이 읽기와 구현과 독립 모듈과 격리 공간으로 나뉘는 안내판",
