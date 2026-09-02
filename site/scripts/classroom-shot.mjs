@@ -76,6 +76,8 @@ const first = process.argv[3] ?? null;
  * titleMin과 visualMin은 위쪽 정보와 아래쪽 단일 시각자료 무대의 실제 렌더 하한이다.
  */
 const VIEWPORTS = [
+  { id: "desktop-wide", width: 2560, height: 1440, dpr: 1, isMobile: false, hasTouch: false,
+    sectionTitle: "24px", titleMin: 64, visualMin: 1800, runPython: false },
   { id: "desktop", width: 1920, height: 900, dpr: 1, isMobile: false, hasTouch: false,
     sectionTitle: "24px", titleMin: 56, visualMin: 700, runPython: true },
   { id: "projector", width: 1366, height: 768, dpr: 1, isMobile: false, hasTouch: false,
