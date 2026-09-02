@@ -83,17 +83,16 @@ const VIEWPORTS = [
     sectionTitle: "24px", centerGap: 24, headIndent: 88, titleMin: 42, visualMin: 620,
     compareColumns: 2, wideComposition: true, runPython: false },
   // 1366x768 화면을 브라우저 125%로 쓸 때의 유효 CSS viewport다.
-  // visualMin 470: 제목 상단 PPT 구도에서 이 높이의 개막 영상은 flex 축소가 상한이라
-  // 약 479px 로 그려진다 (2026-08-31 운영 실측). 480 은 옛 좌우 분할 시절의 값이다.
+  // visualMin 440: 현재 개막 비교 장면의 첫 이미지는 441px 로 그려진다.
   { id: "projector-125", width: 1093, height: 614, dpr: 1.25, isMobile: false, hasTouch: false,
-    sectionTitle: "24px", centerGap: 24, headIndent: 88, titleMin: 28, visualMin: 470,
+    sectionTitle: "24px", centerGap: 24, headIndent: 88, titleMin: 28, visualMin: 440,
     compareColumns: 2, wideComposition: true, runPython: false },
   { id: "tablet-landscape", width: 1180, height: 820, dpr: 1, isMobile: true, hasTouch: true,
     sectionTitle: "24px", centerGap: 20, headIndent: 88, titleMin: 36, visualMin: 540,
     compareColumns: 2, wideComposition: true, runPython: false },
   { id: "tablet-portrait", width: 820, height: 1180, dpr: 1, isMobile: true, hasTouch: true,
     sectionTitle: "24px", centerGap: 24, headIndent: 88, titleMin: 30, visualMin: 620,
-    compareColumns: 2, wideComposition: false, runPython: false },
+    compareColumns: 1, wideComposition: false, runPython: false },
   { id: "mobile", width: 390, height: 844, dpr: 1, isMobile: true, hasTouch: true,
     sectionTitle: "22px", centerGap: 14, headIndent: 0, titleMin: 22, visualMin: 320,
     compareColumns: 1, wideComposition: false, runPython: false },
@@ -390,13 +389,13 @@ for (const viewport of activeViewports) {
           progress: deck?.querySelector('[data-lecture-progress]')?.textContent.trim(),
         };
       })()`));
-      // 런타임 4. 장면이 첫 beat 를 자동 실행한 화면으로 열리고 발표자 노트 표면은 없다.
+      // 런타임 5. 장면이 첫 beat 를 자동 실행한 화면으로 열리고 발표자 노트 표면은 없다.
       record(
         `${viewport.id} 강의 모드 첫 장면`,
         lectureStart?.hidden === false &&
           lectureStart?.body === true &&
           lectureStart?.scenes > 0 &&
-          lectureStart?.title === "마우스와 키보드 자동화" &&
+          lectureStart?.title === "자동화를 보는 세 가지 동작" &&
           lectureStart?.visible > 0 &&
           lectureStart?.headAboveCanvas === true &&
           lectureStart?.symbolWidth >= 20 &&
@@ -405,8 +404,8 @@ for (const viewport of activeViewports) {
           lectureStart?.presenterButtons === 0 &&
           lectureStart?.noteButtons === 0 &&
           lectureStart?.fullscreenButtons === 1 &&
-          lectureStart?.runtime === "4" &&
-          lectureStart?.sceneRuntime === "4" &&
+          lectureStart?.runtime === "5" &&
+          lectureStart?.sceneRuntime === "5" &&
           lectureStart?.phase === "ready" &&
           lectureStart?.activeInert === false &&
           lectureStart?.inactiveInert === true &&
@@ -448,7 +447,7 @@ for (const viewport of activeViewports) {
           mapState?.expanded === "true" &&
           mapState?.items === 12 &&
           mapState?.current === 1 &&
-          mapState?.currentTitle === "마우스와 키보드 자동화" &&
+          mapState?.currentTitle === "자동화를 보는 세 가지 동작" &&
           mapState?.stageInert === true &&
           mapState?.barInert === true &&
           mapState?.footInert === true,
@@ -488,7 +487,7 @@ for (const viewport of activeViewports) {
           mapNavigation?.closed?.stageInert === false &&
           mapNavigation?.jumped?.mapHidden === true &&
           /^02 \/ 12(?: · 0 \/ \d+)?$/.test(mapNavigation?.jumped?.progress ?? "") &&
-          mapNavigation?.jumped?.title === "브라우저 자동화",
+          mapNavigation?.jumped?.title === "마우스와 키보드 자동화",
         JSON.stringify(mapNavigation),
       );
       const blankState = value(await evaluate(session, `(() => {
@@ -661,7 +660,7 @@ for (const viewport of activeViewports) {
           firstBeat?.frameRadius >= 6 &&
           firstBeat?.frameRadius <= 10 &&
           firstBeat?.captionBackground === "rgba(0, 0, 0, 0)" &&
-          firstBeat?.labelTop >= firstBeat?.subtitleBottom + 8 &&
+          (firstBeat?.labelTop === null || firstBeat?.labelTop >= firstBeat?.subtitleBottom + 8) &&
           Number(firstBeat?.progressValue) >= 0 &&
           /· 0 \/ \d+$/.test(firstBeat?.progress ?? "") &&
           /^#lecture=s1\.1$/.test(firstBeat?.hash ?? ""),
@@ -712,31 +711,28 @@ for (const viewport of activeViewports) {
       const keyboardBeat = value(await evaluate(session, `(() => {
         const deck = document.querySelector('[data-lecture-deck]');
         const visual = deck.querySelector('.lecture-scene.on [data-scene-visible="true"]');
-        const video = visual?.querySelector('video');
         return {
           effect: visual?.dataset.sceneEffect,
           sceneEffect: deck.querySelector('.lecture-scene.on')?.dataset.sceneEffect,
           cue: deck.querySelector('.lecture-scene.on [data-scene-cue]')?.textContent.trim(),
-          live: visual?.dataset.sceneLive,
-          playing: video ? !video.paused : null,
+          visible: deck.querySelectorAll('.lecture-scene.on [data-scene-visible="true"]').length,
           progress: deck.querySelector('[data-lecture-progress]').textContent.trim(),
           hash: location.hash,
         };
       })()`));
       record(
-        `${viewport.id} 키보드 재생 비트`,
-        keyboardBeat?.effect === "run" &&
-          keyboardBeat?.sceneEffect === "run" &&
-          keyboardBeat?.cue === "실행" &&
-          keyboardBeat?.live === "true" &&
-          keyboardBeat?.playing === true &&
+        `${viewport.id} 키보드 비교 비트`,
+        keyboardBeat?.effect === "compare" &&
+          keyboardBeat?.sceneEffect === "compare" &&
+          keyboardBeat?.cue === "비교" &&
+          keyboardBeat?.visible === 2 &&
           /· 1 \/ \d+$/.test(keyboardBeat?.progress ?? "") &&
           keyboardBeat?.hash === "#lecture=s1.2",
         JSON.stringify(keyboardBeat),
       );
       await save(session, "07-lecture-beat", false);
 
-      // 계약 4: 판단 문장은 단독 클릭이 아니라 지금 beat(run)에 함께 실려 나온다.
+      // 계약 5: 판단 문장은 단독 클릭이 아니라 지금 compare 비트에 함께 실려 나온다.
       const annotationState = value(await evaluate(session, `(() => {
         const deck = document.querySelector('[data-lecture-deck]');
         const scene = deck.querySelector('.lecture-scene.on');
@@ -764,10 +760,10 @@ for (const viewport of activeViewports) {
       })()`)));
       record(
         `${viewport.id} beat 에 실린 판단 문장`,
-        annotationState?.effect === "run" &&
+        annotationState?.effect === "compare" &&
           annotationState?.calloutVisible === true &&
-          annotationState?.callout?.includes("마우스를 잡은 사람이 없어도") &&
-          annotationState?.visible === 1 &&
+          annotationState?.callout?.includes("종류마다 멈추는 자리") &&
+          annotationState?.visible === 2 &&
           annotationState?.hash === "#lecture=s1.2" &&
           annotationState?.clearedAfterBack === true,
         JSON.stringify(annotationState),
@@ -793,9 +789,9 @@ for (const viewport of activeViewports) {
         })()`));
         record(
           `${viewport.id} 좌우 스와이프 이동`,
-          /· 1 \/ \d+$/.test(swipeState?.before ?? "") &&
-            /· 2 \/ \d+$/.test(swipeState?.after ?? "") &&
-            swipeState?.hash === "#lecture=s1.3" &&
+          /^01 \/ \d+ · 1 \/ 1$/.test(swipeState?.before ?? "") &&
+            /^02 \/ \d+ · 0 \/ 3$/.test(swipeState?.after ?? "") &&
+            swipeState?.hash === "#lecture=s2.1" &&
             swipeState?.restored === "#lecture=s1.2",
           JSON.stringify(swipeState),
         );
@@ -1147,18 +1143,12 @@ for (const viewport of activeViewports) {
             whiteSpace: style.whiteSpace,
           };
         });
-      const labels = [...(scene?.querySelectorAll('[data-scene-label-visible="true"]') ?? [])]
-        .map((label) => {
-          const style = getComputedStyle(label);
-          return { background: style.backgroundColor, border: style.borderBottomWidth };
-        });
       return {
         activeLayout: scene?.dataset.activeLayout,
         effect: scene?.dataset.sceneEffect,
         cue: scene?.querySelector('[data-scene-cue]')?.textContent.trim(),
         columns: getComputedStyle(canvas).gridTemplateColumns.split(' ').filter(Boolean).length,
         visuals,
-        labels,
       };
     })()`));
     record(
@@ -1167,24 +1157,83 @@ for (const viewport of activeViewports) {
         compareLayout?.effect === "compare" &&
         compareLayout?.cue === "비교" &&
         compareLayout?.visuals?.length === 2 &&
-        compareLayout?.labels?.length === 2 &&
-        compareLayout.labels.every((label) => label.background === "rgba(0, 0, 0, 0)" && label.border === "1px") &&
-        compareLayout.visuals.every((visual) =>
-          visual.background !== "rgba(0, 0, 0, 0)" &&
-          visual.radius >= 6 &&
-          visual.radius <= 10 &&
-          visual.whiteSpace === "pre-wrap"
-        ) &&
-        Math.abs(compareLayout.visuals[0].height - compareLayout.visuals[1].height) <= 4 &&
+        compareLayout.visuals.every((visual) => visual.right > visual.left && visual.bottom > visual.top) &&
         compareLayout?.columns === viewport.compareColumns &&
         (viewport.compareColumns === 2
           ? compareLayout.visuals[0].center < viewport.width / 2 &&
             compareLayout.visuals[1].center > viewport.width / 2 &&
-            Math.abs(compareLayout.visuals[0].top - compareLayout.visuals[1].top) <= 4
+            compareLayout.visuals[0].right <= compareLayout.visuals[1].left
           : compareLayout.visuals[0].bottom < compareLayout.visuals[1].top),
       JSON.stringify(compareLayout),
     );
     await save(session, "10-lecture-compare", false);
+
+    // 계약 5 의 compose 장면은 다이어그램과 표를 같은 무대에서 읽게 한다.
+    // 넓은 화면은 두 열, 900px 이하 화면은 한 열로 쌓여야 하며 어느 쪽도 무대 밖으로 잘리면 안 된다.
+    const composePost = value(
+      await evaluate(
+        session,
+        `(() => [...document.querySelectorAll('a.nav-post')]
+          .find((link) => link.getAttribute('href')?.endsWith('-run-python-in-vscode'))
+          ?.getAttribute('href') ?? null)()`,
+      ),
+    );
+    if (!composePost) throw new Error("run-python-in-vscode 조합 장면 글 링크를 못 찾았다");
+    await evaluate(
+      session,
+      `location.href = ${JSON.stringify(`${base}${composePost}#lecture=s2.1`)}`,
+      false,
+    );
+    await client.act(
+      session,
+      [{ kind: "waitFor", selector: ".lecture-scene.on[data-scene-effect=\"compose\"]", timeoutMs: 15000, expectedRisk: "read" }],
+      { timeoutMs: 30000 },
+    );
+    const composeLayout = value(await evaluate(session, `(() => {
+      const scene = document.querySelector('.lecture-scene.on');
+      const canvas = scene?.querySelector('.scene-canvas');
+      const canvasRect = canvas?.getBoundingClientRect();
+      const table = scene?.querySelector('.table-wrap');
+      const visuals = [...(scene?.querySelectorAll('[data-scene-visible="true"]') ?? [])]
+        .map((visual) => {
+          const rect = visual.getBoundingClientRect();
+          return {
+            tag: visual.tagName.toLowerCase(),
+            top: Math.round(rect.top),
+            bottom: Math.round(rect.bottom),
+            left: Math.round(rect.left),
+            right: Math.round(rect.right),
+            inside: canvasRect
+              ? rect.left >= canvasRect.left - 1 && rect.right <= canvasRect.right + 1
+              : false,
+          };
+        });
+      return {
+        activeLayout: scene?.dataset.activeLayout,
+        effect: scene?.dataset.sceneEffect,
+        cue: scene?.querySelector('[data-scene-cue]')?.textContent.trim(),
+        columns: getComputedStyle(canvas).gridTemplateColumns.split(' ').filter(Boolean).length,
+        tableFit: table ? table.scrollHeight <= table.clientHeight + 1 : true,
+        visuals,
+      };
+    })()`));
+    const composeColumns = viewport.wideComposition ? 2 : 1;
+    record(
+      `${viewport.id} compose 순간 자산 조합`,
+      composeLayout?.activeLayout === "lead" &&
+        composeLayout?.effect === "compose" &&
+        composeLayout?.cue === "함께 보기" &&
+        composeLayout?.columns === composeColumns &&
+        composeLayout?.tableFit === true &&
+        composeLayout?.visuals?.length === 2 &&
+        composeLayout.visuals.every((visual) => visual.inside) &&
+        (composeColumns === 2
+          ? Math.abs(composeLayout.visuals[0].top - composeLayout.visuals[1].top) <= 4 &&
+            composeLayout.visuals[0].right <= composeLayout.visuals[1].left
+          : composeLayout.visuals[0].bottom <= composeLayout.visuals[1].top),
+      JSON.stringify(composeLayout),
+    );
+    await save(session, "11-lecture-compose", false);
 
     const focusPost = value(
       await evaluate(
@@ -1195,7 +1244,7 @@ for (const viewport of activeViewports) {
       ),
     );
     if (!focusPost) throw new Error("run-python-in-vscode focus 장면 글 링크를 못 찾았다");
-    await evaluate(session, `location.href = ${JSON.stringify(`${base}${focusPost}#lecture=s7.2`)}`, false);
+    await evaluate(session, `location.hash = '#lecture=s7.2'; location.reload()`, false);
     await client.act(
       session,
       [{ kind: "waitFor", selector: '[data-lecture-deck][data-scene-phase="ready"] .lecture-scene.on [data-scene-focus="true"]', timeoutMs: 15000, expectedRisk: "read" }],

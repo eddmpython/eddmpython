@@ -89,23 +89,23 @@ const CODARO =
   /^https:\/\/eddmpython\.com\/codaro\/run\/\?example=([a-z0-9]+(?:-[a-z0-9]+)*)$/;
 
 export type CourseSceneBeat = {
-  effect: "enter" | "replace" | "focus" | "compare" | "annotate" | "run" | "simulate";
+  effect: "enter" | "replace" | "focus" | "compare" | "compose" | "annotate" | "run" | "simulate";
   targets: number[];
   note?: string;
 };
 export type CourseScene = {
   id: string;
   role: "open" | "explain" | "invert" | "close";
-  layout: "stage" | "sequence" | "compare" | "code" | "demo";
+  layout: "stage" | "sequence" | "compare" | "pair" | "lead" | "code" | "demo";
   visualCount: number;
   beats: CourseSceneBeat[];
 };
 
 /**
- * 4 는 발표자 노트를 걷어낸 PPT 구도 판이다. 장면이 첫 beat 를 자동으로 실행한 화면으로
- * 열리고(빈 제목 화면 없음), 클릭 수는 beat 수보다 하나 적다. 제목은 상단 띠에 남는다.
+ * 5 는 서로 다른 시각자산 둘을 같은 비중이나 주자료와 보조자료 구도로 묶는 판이다.
+ * 이전 계약의 장면은 같은 상태 전이 규칙으로 그대로 렌더링한다.
  */
-export const COURSE_SCENE_RUNTIME = 4;
+export const COURSE_SCENE_RUNTIME = 5;
 
 export type CourseSceneFrame = {
   effect: CourseSceneBeat["effect"];
@@ -113,6 +113,7 @@ export type CourseSceneFrame = {
   visible: number[];
   focus: number[];
   compare: number[];
+  composition: number[];
   annotation: string;
   annotationTargets: number[];
   interaction: number[];
@@ -124,6 +125,7 @@ const COURSE_SCENE_CUES: Record<CourseSceneBeat["effect"], string> = {
   replace: "다음 화면",
   focus: "핵심",
   compare: "비교",
+  compose: "함께 보기",
   annotate: "판단 기준",
   run: "실행",
   simulate: "직접 조작",
@@ -140,24 +142,27 @@ export function compileSceneTimeline(scene: CourseScene): CourseSceneFrame[] {
   const visible = new Set<number>();
   let focus: number[] = [];
   let compare: number[] = [];
+  let composition: number[] = [];
   let annotation = "";
   let annotationTargets: number[] = [];
   let interaction: number[] = [];
   const frames: CourseSceneFrame[] = [];
 
   for (const beat of scene.beats) {
-    const changesVisibility = beat.effect === "enter" || beat.effect === "replace" || beat.effect === "compare";
+    const changesVisibility = beat.effect === "enter" || beat.effect === "replace" || beat.effect === "compare" || beat.effect === "compose";
     if (changesVisibility) {
       focus = [];
       annotation = "";
       annotationTargets = [];
       interaction = [];
       compare = [];
+      composition = [];
     }
-    if (beat.effect === "replace" || beat.effect === "compare") visible.clear();
+    if (beat.effect === "replace" || beat.effect === "compare" || beat.effect === "compose") visible.clear();
     if (changesVisibility) beat.targets.forEach((target) => visible.add(target));
     if (beat.effect === "focus") focus = [...beat.targets];
     if (beat.effect === "compare") compare = [...beat.targets];
+    if (beat.effect === "compose") composition = [...beat.targets];
     /**
      * 판단 문장. 계약 4 부터는 아무 beat 의 note 로 실려 그 화면과 함께 나타난다.
      * annotate 는 계약 3 이하의 형식이고 note 가 필수라 같은 줄 하나로 둘 다 처리된다.
@@ -174,6 +179,7 @@ export function compileSceneTimeline(scene: CourseScene): CourseSceneFrame[] {
       visible: [...visible],
       focus: [...focus],
       compare: [...compare],
+      composition: [...composition],
       annotation,
       annotationTargets: [...annotationTargets],
       interaction: [...interaction],

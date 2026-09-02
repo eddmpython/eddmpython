@@ -385,7 +385,7 @@ body.lecture-on { overflow:hidden; }
 /**
  * 캔버스는 flex 열이다. 시각물, 라벨, 캡션의 합이 남은 화면보다 크면 시각물이
  * min-height:0 과 flex-shrink 로 줄어들어 어떤 장면도 제목 띠를 침범하거나 잘리지 않는다.
- * compare 순간만 아래 override 가 2열 grid 로 바꾼다.
+ * compare, pair, lead 순간만 아래 override 가 두 자료를 위한 grid 로 바꾼다.
  */
 .scene-canvas { grid-area:canvas; align-self:stretch; display:flex; flex-direction:column;
   justify-content:center; align-items:flex-start; gap:clamp(.8rem,2vw,1.6rem);
@@ -412,6 +412,7 @@ body.lecture-on { overflow:hidden; }
   align-items:center; min-height:0; }
 .scene-canvas [data-visual][data-scene-effect="replace"] { animation-name:scene-replace; }
 .scene-canvas [data-visual][data-scene-effect="compare"] { animation-name:scene-pair; }
+.scene-canvas [data-visual][data-scene-effect="compose"] { animation-name:scene-pair; }
 .scene-canvas [data-visual][data-scene-active="true"] { will-change:transform,opacity; }
 /**
  * 강조는 대비로만 한다. 테두리와 후광을 두르지 않는다.
@@ -475,20 +476,50 @@ html:not([data-theme="dark"]) .scene-canvas pre {
 .course-embed iframe { display:block; width:100%; aspect-ratio:var(--course-embed-ratio,16/9); border:0; border-radius:.65rem;
   background:var(--eddm-raise); }
 .course-embed figcaption { margin-top:.55rem; color:var(--eddm-text-muted); }
-.lecture-scene[data-active-layout="compare"] .scene-canvas {
+.lecture-scene[data-active-layout="compare"] .scene-canvas,
+.lecture-scene[data-active-layout="pair"] .scene-canvas,
+.lecture-scene[data-active-layout="lead"] .scene-canvas {
   display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-content:center; align-items:start;
   justify-items:center; column-gap:clamp(1.5rem,3vw,3rem); row-gap:.75rem; }
-.lecture-scene[data-active-layout="compare"] .scene-canvas [data-scene-label-for] { width:100%; box-sizing:border-box; }
-.lecture-scene[data-active-layout="compare"] .scene-canvas pre { width:100%; height:clamp(12rem,28vh,18rem);
+.lecture-scene[data-active-layout="lead"] .scene-canvas { grid-template-columns:minmax(0,3fr) minmax(18rem,2fr); }
+.lecture-scene[data-active-layout="compare"] .scene-canvas [data-scene-label-for],
+.lecture-scene[data-active-layout="pair"] .scene-canvas [data-scene-label-for],
+.lecture-scene[data-active-layout="lead"] .scene-canvas [data-scene-label-for] { width:100%; box-sizing:border-box; }
+.lecture-scene[data-active-layout="compare"] .scene-canvas pre,
+.lecture-scene[data-active-layout="pair"] .scene-canvas pre,
+.lecture-scene[data-active-layout="lead"] .scene-canvas pre { width:100%; height:clamp(12rem,28vh,18rem);
   min-height:0; box-sizing:border-box; white-space:pre-wrap; overflow-wrap:anywhere; }
-.lecture-scene[data-active-layout="compare"] .scene-canvas [data-scene-label-for][data-scene-slot="1"] {
+.lecture-scene[data-active-layout="compare"] .scene-canvas [data-scene-label-for][data-scene-slot="1"],
+.lecture-scene[data-active-layout="pair"] .scene-canvas [data-scene-label-for][data-scene-slot="1"],
+.lecture-scene[data-active-layout="lead"] .scene-canvas [data-scene-label-for][data-scene-slot="1"] {
   grid-column:1; grid-row:1; }
-.lecture-scene[data-active-layout="compare"] .scene-canvas [data-scene-label-for][data-scene-slot="2"] {
+.lecture-scene[data-active-layout="compare"] .scene-canvas [data-scene-label-for][data-scene-slot="2"],
+.lecture-scene[data-active-layout="pair"] .scene-canvas [data-scene-label-for][data-scene-slot="2"],
+.lecture-scene[data-active-layout="lead"] .scene-canvas [data-scene-label-for][data-scene-slot="2"] {
   grid-column:2; grid-row:1; }
-.lecture-scene[data-active-layout="compare"] .scene-canvas [data-visual][data-scene-slot="1"] {
+.lecture-scene[data-active-layout="compare"] .scene-canvas [data-visual][data-scene-slot="1"],
+.lecture-scene[data-active-layout="pair"] .scene-canvas [data-visual][data-scene-slot="1"],
+.lecture-scene[data-active-layout="lead"] .scene-canvas [data-visual][data-scene-slot="1"] {
   grid-column:1; grid-row:2; }
-.lecture-scene[data-active-layout="compare"] .scene-canvas [data-visual][data-scene-slot="2"] {
+.lecture-scene[data-active-layout="compare"] .scene-canvas [data-visual][data-scene-slot="2"],
+.lecture-scene[data-active-layout="pair"] .scene-canvas [data-visual][data-scene-slot="2"],
+.lecture-scene[data-active-layout="lead"] .scene-canvas [data-visual][data-scene-slot="2"] {
   grid-column:2; grid-row:2; }
+.lecture-scene[data-active-layout="pair"] .scene-canvas [data-visual],
+.lecture-scene[data-active-layout="lead"] .scene-canvas [data-visual] { width:100%; box-sizing:border-box; }
+.lecture-scene[data-active-layout="pair"] .scene-canvas figure.media[data-scene-visible="true"],
+.lecture-scene[data-active-layout="lead"] .scene-canvas figure.media[data-scene-visible="true"] { width:100%; }
+.lecture-scene[data-active-layout="pair"] .scene-canvas figure.media img,
+.lecture-scene[data-active-layout="pair"] .scene-canvas figure.media video,
+.lecture-scene[data-active-layout="lead"] .scene-canvas figure.media img,
+.lecture-scene[data-active-layout="lead"] .scene-canvas figure.media video,
+.lecture-scene[data-active-layout="pair"] .scene-canvas .table-wrap,
+.lecture-scene[data-active-layout="lead"] .scene-canvas .table-wrap { max-height:44vh; }
+.lecture-scene[data-active-layout="pair"] .scene-canvas th,
+.lecture-scene[data-active-layout="pair"] .scene-canvas td,
+.lecture-scene[data-active-layout="lead"] .scene-canvas th,
+.lecture-scene[data-active-layout="lead"] .scene-canvas td {
+  padding:.55rem .65rem; font-size:clamp(.78rem,.95vw,1rem); line-height:1.35; }
 .lecture-scene[data-layout="code"] { --lecture-visual-max:92rem; }
 .lecture-scene[data-layout="demo"] { --lecture-visual-max:88rem; }
 .lecture-scene[data-layout="demo"] .scene-canvas [data-visual] { width:var(--lecture-visual-max); max-width:100%; }
@@ -518,6 +549,38 @@ html:not([data-theme="dark"]) .scene-canvas pre {
 @keyframes scene-head { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
 @media (max-width:980px) {
   .lecture-map-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:900px) {
+  .lecture-scene[data-active-layout="compare"] .scene-canvas,
+  .lecture-scene[data-active-layout="pair"] .scene-canvas,
+  .lecture-scene[data-active-layout="lead"] .scene-canvas { grid-template-columns:minmax(0,1fr); }
+  .lecture-scene[data-active-layout="compare"] .scene-canvas [data-scene-label-for][data-scene-slot="1"],
+  .lecture-scene[data-active-layout="pair"] .scene-canvas [data-scene-label-for][data-scene-slot="1"],
+  .lecture-scene[data-active-layout="lead"] .scene-canvas [data-scene-label-for][data-scene-slot="1"] {
+    grid-column:1; grid-row:1; }
+  .lecture-scene[data-active-layout="compare"] .scene-canvas [data-visual][data-scene-slot="1"],
+  .lecture-scene[data-active-layout="pair"] .scene-canvas [data-visual][data-scene-slot="1"],
+  .lecture-scene[data-active-layout="lead"] .scene-canvas [data-visual][data-scene-slot="1"] {
+    grid-column:1; grid-row:2; }
+  .lecture-scene[data-active-layout="compare"] .scene-canvas [data-scene-label-for][data-scene-slot="2"],
+  .lecture-scene[data-active-layout="pair"] .scene-canvas [data-scene-label-for][data-scene-slot="2"],
+  .lecture-scene[data-active-layout="lead"] .scene-canvas [data-scene-label-for][data-scene-slot="2"] {
+    grid-column:1; grid-row:3; }
+  .lecture-scene[data-active-layout="compare"] .scene-canvas [data-visual][data-scene-slot="2"],
+  .lecture-scene[data-active-layout="pair"] .scene-canvas [data-visual][data-scene-slot="2"],
+  .lecture-scene[data-active-layout="lead"] .scene-canvas [data-visual][data-scene-slot="2"] {
+    grid-column:1; grid-row:4; }
+  .lecture-scene[data-active-layout="pair"] .scene-canvas figure.media img,
+  .lecture-scene[data-active-layout="pair"] .scene-canvas figure.media video,
+  .lecture-scene[data-active-layout="lead"] .scene-canvas figure.media img,
+  .lecture-scene[data-active-layout="lead"] .scene-canvas figure.media video,
+  .lecture-scene[data-active-layout="pair"] .scene-canvas .table-wrap,
+  .lecture-scene[data-active-layout="lead"] .scene-canvas .table-wrap { max-height:25vh; }
+  .lecture-scene[data-active-layout="pair"] .scene-canvas th,
+  .lecture-scene[data-active-layout="pair"] .scene-canvas td,
+  .lecture-scene[data-active-layout="lead"] .scene-canvas th,
+  .lecture-scene[data-active-layout="lead"] .scene-canvas td {
+    padding:.4rem .5rem; font-size:clamp(.74rem,1.6vw,.9rem); line-height:1.3; }
 }
 @media (max-width:720px) {
   .lecture-map { padding:1rem max(.8rem,env(safe-area-inset-right))
@@ -560,15 +623,6 @@ html:not([data-theme="dark"]) .scene-canvas pre {
   .scene-cue { width:3.4rem; font-size:.58rem; letter-spacing:.04em; }
   .scene-head h2 { font-size:clamp(1.55rem,7vw,2.25rem); }
   .scene-head p { margin-top:.45rem; font-size:.95rem; line-height:1.45; }
-  .lecture-scene[data-active-layout="compare"] .scene-canvas { grid-template-columns:minmax(0,1fr); }
-  .lecture-scene[data-active-layout="compare"] .scene-canvas [data-scene-label-for][data-scene-slot="1"] {
-    grid-column:1; grid-row:1; }
-  .lecture-scene[data-active-layout="compare"] .scene-canvas [data-visual][data-scene-slot="1"] {
-    grid-column:1; grid-row:2; }
-  .lecture-scene[data-active-layout="compare"] .scene-canvas [data-scene-label-for][data-scene-slot="2"] {
-    grid-column:1; grid-row:3; }
-  .lecture-scene[data-active-layout="compare"] .scene-canvas [data-visual][data-scene-slot="2"] {
-    grid-column:1; grid-row:4; }
   .lecture-scene[data-active-layout="compare"] .scene-canvas pre { height:clamp(7rem,17vh,9rem); padding:.75rem;
     font-size:.7rem; line-height:1.5; }
   .lecture-scene[data-layout="code"] .scene-canvas pre { white-space:pre-wrap; overflow-wrap:anywhere; }
@@ -1041,8 +1095,15 @@ const LECTURE_SCRIPT = `
     const active = new Set(frame?.targets || []);
     const interacting = new Set(frame?.interaction || []);
     const compare = frame?.compare || [];
+    const composition = frame?.composition || [];
+    const arrangement = compare.length === 2
+      ? "compare"
+      : composition.length === 2 && (scene.dataset.layout === "pair" || scene.dataset.layout === "lead")
+        ? scene.dataset.layout
+        : "";
+    const slots = compare.length === 2 ? compare : composition;
     const cue = scene.querySelector("[data-scene-cue]");
-    flag(scene, "activeLayout", compare.length === 2, "compare");
+    flag(scene, "activeLayout", Boolean(arrangement), arrangement);
     flag(scene, "sceneEffect", Boolean(frame), frame?.effect || "");
     if (cue) cue.textContent = frame?.cue || "";
     allVisuals(scene).forEach((visual) => {
@@ -1055,7 +1116,7 @@ const LECTURE_SCRIPT = `
       flag(visual, "sceneDim", focused.size > 0 && isVisible && !focused.has(id));
       flag(visual, "sceneLive", interacting.has(id));
       flag(visual, "sceneEffect", isActive, frame?.effect || "");
-      const slot = compare.indexOf(id);
+      const slot = slots.indexOf(id);
       flag(visual, "sceneSlot", slot >= 0, String(slot + 1));
     });
     const callout = scene.querySelector("[data-scene-callout]");

@@ -418,8 +418,8 @@ check("읽기 본문 하나를 장면과 비트 계약으로 투영한다", () =
   ];
   const lecture = renderLecture(body, scenes);
   assert.equal(lecture.ok, true);
-  // 4 는 발표자 노트를 걷어낸 PPT 구도 판이다. 첫 beat 가 자동으로 실행된 채 열린다.
-  assert.equal(COURSE_SCENE_RUNTIME, 4);
+  // 5 는 서로 다른 시각자산 둘을 한 프레임에 묶는 판이다.
+  assert.equal(COURSE_SCENE_RUNTIME, 5);
   assert.equal(lecture.html.match(/class="lecture-scene"/g)?.length, 2);
   assert.ok(lecture.html.includes('data-layout="stage"'));
   assert.ok(lecture.html.includes(`data-scene-runtime="${COURSE_SCENE_RUNTIME}"`));
@@ -476,6 +476,33 @@ check("계약 4 의 판단 문장은 아무 beat 의 note 로 실려 그 화면�
   assert.equal(frames[1].annotation, "실행과 함께 보이는 판단");
   // 화면을 바꾸는 beat 는 이전 판단 문장을 지운다
   assert.equal(frames[2].annotation, "");
+});
+
+check("계약 5 의 compose 는 pair 와 lead 구도에 쓸 두 대상을 보존한다", () => {
+  const frames = compileSceneTimeline({
+    id: "s1",
+    role: "open",
+    layout: "lead",
+    visualCount: 2,
+    beats: [
+      { effect: "compose", targets: [1, 2], note: "주자료와 근거를 함께 읽습니다" },
+      { effect: "focus", targets: [2] },
+    ],
+  });
+  assert.deepEqual(frames[0].visible, [1, 2]);
+  assert.deepEqual(frames[0].composition, [1, 2]);
+  assert.deepEqual(frames[0].compare, []);
+  assert.equal(frames[0].cue, "함께 보기");
+  assert.deepEqual(frames[1].composition, [1, 2]);
+  assert.deepEqual(frames[1].focus, [2]);
+
+  const lecture = renderLecture(
+    "## 조합 장면\n\n### 구조와 근거를 함께 읽습니다\n\n![구조도](https://example.com/a.png)\n\n| 부품 | 근거 |\n|---|---|\n| 도구 | 실행 결과 |",
+    [{ id: "s1", role: "open", layout: "lead", visualCount: 2, beats: [{ effect: "compose", targets: [1, 2] }] }],
+  );
+  assert.equal(lecture.ok, true);
+  assert.ok(lecture.html.includes('data-layout="lead"'));
+  assert.ok(lecture.html.includes("composition"));
 });
 
 check("효과를 클릭별 완성 프레임으로 한 번만 계산한다", () => {
