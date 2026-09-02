@@ -110,6 +110,12 @@
       "post": "01-ai-agent-scenes",
       "sha256": "06ce1cd65c077785a695cc6bd06b31e53575974bcb73cca1593c128d8129d55f"
     },
+    "01-excel-python-screens/excel-tool-choice": {
+      "assetKey": "excel-tool-choice",
+      "path": "objects/sha256/48/48997e28cb2089cba914c5d15a32587290cb402edcebb4449b467ce17d4d8c5f.png",
+      "post": "01-excel-python-screens",
+      "sha256": "48997e28cb2089cba914c5d15a32587290cb402edcebb4449b467ce17d4d8c5f"
+    },
     "01-instructor-introduction/automation-criteria": {
       "assetKey": "automation-criteria",
       "path": "objects/sha256/b7/b71c5c6932e145f3ce0a283b358ca130e0a65b0d5a787d25a4acad9e2d78e97c.png",
@@ -166,6 +172,12 @@
       "post": "01-instructor-introduction",
       "sha256": "d4bfad9ef9a4c0bba2d8d49d699f98f7574f58348ba2a6eb1fa3c37aa5e5cb8c"
     },
+    "01-merge-expense-files/merge-input-output-boundary": {
+      "assetKey": "merge-input-output-boundary",
+      "path": "objects/sha256/e0/e096b86c1503251401fc7073640c6fbbf1e0b8ccafeaf12f1c74e3a1d4f9803a.png",
+      "post": "01-merge-expense-files",
+      "sha256": "e096b86c1503251401fc7073640c6fbbf1e0b8ccafeaf12f1c74e3a1d4f9803a"
+    },
     "02-course-blueprint/ai-work-system": {
       "assetKey": "ai-work-system",
       "path": "objects/sha256/08/0817a48648a83c20f22f86b419c577ec2e3eac75d9792f1a8e1abac1e2a8396d.png",
@@ -200,6 +212,18 @@
       "post": "02-what-is-python",
       "sha256": "4cb92f14416032a364193bac4d1f4f2888a364bb24dc3a6fb720c2fa0d1fcb43"
     },
+    "03-department-summary/groupby-three-steps": {
+      "assetKey": "groupby-three-steps",
+      "path": "objects/sha256/6c/6cc548bf8e6209c71e075900a220224e8d9e9e660db8052419703b12a214d6e7.png",
+      "post": "03-department-summary",
+      "sha256": "6cc548bf8e6209c71e075900a220224e8d9e9e660db8052419703b12a214d6e7"
+    },
+    "03-python-outside-excel/xlsx-package-structure": {
+      "assetKey": "xlsx-package-structure",
+      "path": "objects/sha256/c8/c8416172e8bdae5d4e402d6b782700f9de8431dea56fc8c5b567aa3143ecf036.png",
+      "post": "03-python-outside-excel",
+      "sha256": "c8416172e8bdae5d4e402d6b782700f9de8431dea56fc8c5b567aa3143ecf036"
+    },
     "04-model-and-harness/model-context-lifetimes": {
       "assetKey": "model-context-lifetimes",
       "path": "objects/sha256/d8/d8cb4b13291caf89432c83370dc4f69b45e3cfd96b36ef6bbc32c3d4f1ee4bda.png",
@@ -212,11 +236,29 @@
       "post": "04-run-python-online",
       "sha256": "cbdeb8663b99217f0e54d3619e88073865101fb16b87d6cd08bfb8493fbbc4a7"
     },
+    "04-verify-numbers/verification-gates": {
+      "assetKey": "verification-gates",
+      "path": "objects/sha256/b3/b366ab3e8ed5377d9e33a791342e9578d030d35be95ba41fa9ffa925ce6e74da.png",
+      "post": "04-verify-numbers",
+      "sha256": "b366ab3e8ed5377d9e33a791342e9578d030d35be95ba41fa9ffa925ce6e74da"
+    },
+    "04-xlwings-lite-practice/lite-execution-loop": {
+      "assetKey": "lite-execution-loop",
+      "path": "objects/sha256/28/288d431ea35cfe138c987810d5cde0d14a683bd10b8a3ee5c0be0999c739217c.png",
+      "post": "04-xlwings-lite-practice",
+      "sha256": "288d431ea35cfe138c987810d5cde0d14a683bd10b8a3ee5c0be0999c739217c"
+    },
     "05-run-python-in-vscode/local-rerun-change": {
       "assetKey": "local-rerun-change",
       "path": "objects/sha256/fe/fe283e01c0128ef3230fc13890755a665b70c72461409e912e649845c57831d1.png",
       "post": "05-run-python-in-vscode",
       "sha256": "fe283e01c0128ef3230fc13890755a665b70c72461409e912e649845c57831d1"
+    },
+    "05-scheduled-run/scheduler-three-fields": {
+      "assetKey": "scheduler-three-fields",
+      "path": "objects/sha256/ef/ef5ccd1b0f9d98e41ed276199aebbc8342b4ccbc524c6bf3d28f856023554279.png",
+      "post": "05-scheduled-run",
+      "sha256": "ef5ccd1b0f9d98e41ed276199aebbc8342b4ccbc524c6bf3d28f856023554279"
     },
     "06-uv-virtual-environment/isolated-projects": {
       "assetKey": "isolated-projects",
@@ -874,6 +916,16 @@
       "visualSubject": "프로젝트 폴더 안 실행기 파일, 세 실행기 목록 화면, 상태 표시줄, 새 통합 터미널",
       "width": 1536
     },
+    "288d431ea35cfe138c987810d5cde0d14a683bd10b8a3ee5c0be0999c739217c": {
+      "alt": "웹 엑셀의 A1부터 B4 입력이 지출 분류 스크립트를 거쳐 C열 결과와 F열 합계로 돌아오고 기준금액을 바꿔 다시 실행하는 흐름",
+      "bytes": 518326,
+      "height": 900,
+      "mime": "image/png",
+      "path": "objects/sha256/28/288d431ea35cfe138c987810d5cde0d14a683bd10b8a3ee5c0be0999c739217c.png",
+      "sourcePost": "04-xlwings-lite-practice",
+      "visualSubject": "A1:B4 입력과 지출 분류 실행과 행별 판정과 C열 및 F열 결과가 이어지는 웹 엑셀 실행 흐름",
+      "width": 1600
+    },
     "2b8eeca609020fbeefa8d8ae7011457896829ad084140e4f1c3da19749b2ca71": {
       "alt": "부서별 금액 딕셔너리에서 키만, 값만, 키와 값 쌍이 각각 나오는 모습",
       "bytes": 1148045,
@@ -1204,6 +1256,16 @@
       "sourcePost": "020-python-functions",
       "visualSubject": "한 화면의 호출자 이름 포인터와 함수 매개변수 포인터 및 공유 딕셔너리 객체와 분리된 복사 딕셔너리",
       "width": 1536
+    },
+    "48997e28cb2089cba914c5d15a32587290cb402edcebb4449b467ce17d4d8c5f": {
+      "alt": "폴더의 xlsx와 데스크톱 Excel과 브라우저 Excel을 기준으로 openpyxl과 pandas, 로컬 xlwings, xlwings Lite를 고르는 세 갈래",
+      "bytes": 537078,
+      "height": 900,
+      "mime": "image/png",
+      "path": "objects/sha256/48/48997e28cb2089cba914c5d15a32587290cb402edcebb4449b467ce17d4d8c5f.png",
+      "sourcePost": "01-excel-python-screens",
+      "visualSubject": "폴더의 xlsx와 데스크톱 Excel과 브라우저 Excel에서 알맞은 파이썬 도구로 갈라지는 선택 지도",
+      "width": 1600
     },
     "48cdb7964af4c8dac7c37585daa6da46ab3ba0df272090fa65b5c418d42d5610": {
       "alt": "요청한 두 파일과 요청하지 않은 설정 파일이 Git diff에서 분리되어 보이는 모습",
@@ -1696,6 +1758,16 @@
       "sourcePost": "028-openpyxl-excel-output",
       "visualSubject": "네 탭 Excel 파일과 저장 디스크 및 다시 열린 통합문서와 시트 및 행 수와 금액과 틀 고정 검사 카드",
       "width": 1536
+    },
+    "6cc548bf8e6209c71e075900a220224e8d9e9e660db8052419703b12a214d6e7": {
+      "alt": "정상 8건을 부서 네 묶음으로 나누고 묶음마다 건수와 금액합계를 계산해 4행 요약표로 다시 모으는 세 단계",
+      "bytes": 455407,
+      "height": 900,
+      "mime": "image/png",
+      "path": "objects/sha256/6c/6cc548bf8e6209c71e075900a220224e8d9e9e660db8052419703b12a214d6e7.png",
+      "sourcePost": "03-department-summary",
+      "visualSubject": "정상 8행을 부서로 나누고 묶음마다 건수와 합계를 계산해 4행 요약표로 모으는 groupby 과정",
+      "width": 1600
     },
     "6cc78d178605421a17d6e744aed05c7f6825d72ded36f50bcd07bbf6915590d3": {
       "alt": "CSV 입력 파일의 세 행이 Python 코드에서 검사되고 합계 결과 파일로 저장되는 장면",
@@ -2664,6 +2736,16 @@
       "visualSubject": "거래 행과 취소 조건 및 고액 조건과 세 결과 상자",
       "width": 1536
     },
+    "b366ab3e8ed5377d9e33a791342e9578d030d35be95ba41fa9ffa925ce6e74da": {
+      "alt": "영업팀 사본이 섞인 입력 13건에서 보존 검사는 통과하지만 완전히 같은 줄 3건을 찾는 중복 검사는 실패하는 두 관문",
+      "bytes": 539990,
+      "height": 900,
+      "mime": "image/png",
+      "path": "objects/sha256/b3/b366ab3e8ed5377d9e33a791342e9578d030d35be95ba41fa9ffa925ce6e74da.png",
+      "sourcePost": "04-verify-numbers",
+      "visualSubject": "사본이 섞인 입력 13건이 보존 검사에서는 통과하고 중복 검사에서는 실패하는 두 검증 관문",
+      "width": 1600
+    },
     "b50cb1263d1ff5bae910df1aa235fe59a47f9fe0119390c1c6f57811cf4ac6e3": {
       "alt": "통합내역과 부서요약 및 확인필요와 실행정보를 나타내는 네 시트가 한 Excel 파일에 들어가는 모습",
       "bytes": 1238314,
@@ -2833,6 +2915,16 @@
       "sourcePost": "037-synthetic-data-security",
       "visualSubject": "잠긴 회사 원본 Excel 파일과 비밀 설정 화면 및 업무 규칙 카드와 합성 파일",
       "width": 1536
+    },
+    "c8416172e8bdae5d4e402d6b782700f9de8431dea56fc8c5b567aa3143ecf036": {
+      "alt": "겉에서는 expense.xlsx 파일 하나지만 안에서는 workbook.xml과 sheet1.xml과 styles.xml이 역할을 나누는 구조",
+      "bytes": 438726,
+      "height": 900,
+      "mime": "image/png",
+      "path": "objects/sha256/c8/c8416172e8bdae5d4e402d6b782700f9de8431dea56fc8c5b567aa3143ecf036.png",
+      "sourcePost": "03-python-outside-excel",
+      "visualSubject": "expense.xlsx 파일을 열었을 때 workbook.xml과 sheet1.xml과 styles.xml이 나타나는 패키지 구조",
+      "width": 1600
     },
     "c8cc29146575e718fda8329c35fb9d91c2db56d240cd9fcc753545d34990766a": {
       "alt": "명령의 입력과 출력 옵션이 서로 분리된 Excel 원본과 결과 파일에 정확히 연결된 모습",
@@ -3084,6 +3176,16 @@
       "visualSubject": "함수 정의 문서와 비활성 함수 객체 및 별도 호출 토큰과 활성 실행 경로와 결과 토큰",
       "width": 1536
     },
+    "e096b86c1503251401fc7073640c6fbbf1e0b8ccafeaf12f1c74e3a1d4f9803a": {
+      "alt": "통합 파일을 입력 폴더 안에 두면 다음 실행이 원본 7건과 통합 7건을 다시 읽지만 폴더 밖에 두면 입력 7건이 유지되는 비교",
+      "bytes": 392537,
+      "height": 900,
+      "mime": "image/png",
+      "path": "objects/sha256/e0/e096b86c1503251401fc7073640c6fbbf1e0b8ccafeaf12f1c74e3a1d4f9803a.png",
+      "sourcePost": "01-merge-expense-files",
+      "visualSubject": "통합 파일을 입력 폴더 안에 둔 14건 상태와 폴더 밖에 둔 7건 상태의 경계 비교",
+      "width": 1600
+    },
     "e1d55f556afa25f776007872caa38940de34d08182fbbc662ae22250653437e7": {
       "alt": "Python 소스가 문법 검사와 실행 단계를 지나며 첫 번째 처리되지 않은 오류에서 멈추는 흐름",
       "bytes": 1184917,
@@ -3253,6 +3355,16 @@
       "sourcePost": "004-dataframe-libraries",
       "visualSubject": "층층이 쌓인 두꺼운 종이 뭉치와 그 옆면에서 뽑혀 나온 얇은 종이 띠 두 장",
       "width": 1216
+    },
+    "ef5ccd1b0f9d98e41ed276199aebbc8342b4ccbc524c6bf3d28f856023554279": {
+      "alt": "작업 스케줄러의 프로그램과 인수와 시작 위치 세 칸이 consolidate.py 실행으로 이어지고 올바른 로그와 시작 위치 누락 오류로 갈라지는 흐름",
+      "bytes": 525657,
+      "height": 900,
+      "mime": "image/png",
+      "path": "objects/sha256/ef/ef5ccd1b0f9d98e41ed276199aebbc8342b4ccbc524c6bf3d28f856023554279.png",
+      "sourcePost": "05-scheduled-run",
+      "visualSubject": "작업 스케줄러의 세 입력칸과 예약 실행과 성공 로그 및 시작 위치 누락 실패의 흐름",
+      "width": 1600
     },
     "ef81136ea9888a1a0adbc3bbe58d50bcde31a6c912972bcedca944499d489431": {
       "alt": "공통 처리 함수가 두 개의 서로 다른 분류 함수 중 하나를 입력으로 받아 실행하는 모습",
