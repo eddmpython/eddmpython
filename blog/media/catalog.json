@@ -156,6 +156,14 @@
       "post": "01-instructor-introduction",
       "sha256": "b1f4f789ffbc18eca76dcff8a422e6f5f8c504ace0eb9b86263a528efa3a5fdc"
     },
+    "01-instructor-introduction/raised-hands": {
+      "assetKey": "raised-hands",
+      "masterPath": "objects/sha256/4b/4b82d65660971dc779fa90f39240480c91e5a729a11d1d97f4726608ce413f01.png",
+      "masterSha256": "4b82d65660971dc779fa90f39240480c91e5a729a11d1d97f4726608ce413f01",
+      "path": "objects/sha256/f5/f54cb3280aa41d43787ccaabd0a68d0299066b71a6ed86b1e44046795853e7e2.webp",
+      "post": "01-instructor-introduction",
+      "sha256": "f54cb3280aa41d43787ccaabd0a68d0299066b71a6ed86b1e44046795853e7e2"
+    },
     "01-instructor-introduction/two-experiences": {
       "assetKey": "two-experiences",
       "masterPath": "objects/sha256/fe/fe8b28fcd934728d0c3a4957bdfb290edc4648b828bbd8a5256d6e36a7018c6b.png",
@@ -1488,6 +1496,17 @@
       "role": "master",
       "sourcePost": "01-instructor-introduction",
       "visualSubject": "외장 저장장치, 작은 서버 상자, 노트북, 태블릿이 케이블 하나로 순서대로 이어진 장면",
+      "width": 1216
+    },
+    "4b82d65660971dc779fa90f39240480c91e5a729a11d1d97f4726608ce413f01": {
+      "alt": "강의실에 앉은 직장인 여럿 가운데 몇 명이 한 손을 든 모습",
+      "bytes": 713406,
+      "height": 832,
+      "mime": "image/png",
+      "path": "objects/sha256/4b/4b82d65660971dc779fa90f39240480c91e5a729a11d1d97f4726608ce413f01.png",
+      "role": "master",
+      "sourcePost": "01-instructor-introduction",
+      "visualSubject": "강의실에 앉은 직장인 여럿 가운데 몇 명이 한 손을 든 모습",
       "width": 1216
     },
     "4be7d4dc0a54f646705020e2110700c496e1409ae56d292598005411e7af6701": {
@@ -3678,6 +3697,16 @@
       "role": "master",
       "sourcePost": "004-dataframe-libraries",
       "visualSubject": "나란히 꽂힌 얇은 세로 판 다섯 개와 그중 위로 뽑혀 올라온 두 개",
+      "width": 1216
+    },
+    "f54cb3280aa41d43787ccaabd0a68d0299066b71a6ed86b1e44046795853e7e2": {
+      "alt": "강의실에 앉은 직장인 여럿 가운데 몇 명이 한 손을 든 모습",
+      "bytes": 110670,
+      "height": 832,
+      "mime": "image/webp",
+      "path": "objects/sha256/f5/f54cb3280aa41d43787ccaabd0a68d0299066b71a6ed86b1e44046795853e7e2.webp",
+      "sourcePost": "01-instructor-introduction",
+      "visualSubject": "강의실에 앉은 직장인 여럿 가운데 몇 명이 한 손을 든 모습",
       "width": 1216
     },
     "f612566f6fd7450d78a1f0d15f268ddfc2c14b5adf16ea0b2e097cb3bec23caa": {
