@@ -596,24 +596,45 @@ function stripVisualCaption(visual: string): string {
   return visual.replace(/<figcaption>[\s\S]*?<\/figcaption>/, "");
 }
 
+type ReadingCarouselGroup = {
+  label: string;
+  visual: string;
+  explanation: string[];
+};
+
+function carouselBand(items: string[], className: string): string {
+  if (!items.some((item) => item.trim())) return "";
+  const content = items.map((item, index) => {
+    const active = index === 0;
+    return `<div data-carousel-description="${index + 1}"${active ? ' data-carousel-description-active="true"' : ' hidden aria-hidden="true"'}>${item}</div>`;
+  }).join("");
+  return `<div class="${className}" data-carousel-support>${content}</div>`;
+}
+
 function visualCarousel(
   visuals: string[],
   fit: CourseScene["fit"] = "contain",
   label = "시각물",
-  captionBelow = false,
+  readingGroups: ReadingCarouselGroup[] | null = null,
 ): string {
   if (!visuals.length) return "";
   const items = visuals.map((item, index) => carouselItem(
-    captionBelow ? stripVisualCaption(item) : item,
+    readingGroups ? stripVisualCaption(item) : item,
     index + 1,
   )).join("");
   const controls = visuals.length > 1
     ? `<div class="visual-carousel-controls"><button type="button" data-carousel-prev aria-label="이전 시각물">←</button><span data-carousel-status aria-live="polite">1 / ${visuals.length}</span><button type="button" data-carousel-next aria-label="다음 시각물">→</button></div>`
     : "";
-  const support = captionBelow ? visualSupport(visuals, "visual-carousel-caption") : "";
+  const readingLabel = readingGroups
+    ? carouselBand(readingGroups.map((group) => group.label), "visual-carousel-label")
+    : "";
+  const support = readingGroups ? visualSupport(visuals, "visual-carousel-caption") : "";
+  const explanation = readingGroups
+    ? carouselBand(readingGroups.map((group) => group.explanation.join("\n")), "visual-carousel-explanation")
+    : "";
   return `<div class="visual-carousel" data-visual-carousel data-carousel-count="${visuals.length}" data-fit="${esc(
     fit || "contain",
-  )}" aria-label="${esc(label)} 캐러셀"><div class="visual-carousel-frame"><div class="visual-carousel-track">${items}</div>${controls}</div>${support}</div>`;
+  )}" aria-label="${esc(label)} 캐러셀">${readingLabel}<div class="visual-carousel-frame"><div class="visual-carousel-track">${items}</div>${controls}</div>${support}${explanation}</div>`;
 }
 
 function visualSupport(visuals: string[], className = "scene-support"): string {
@@ -637,15 +658,33 @@ function groupReadingCarousels(parts: string[], scenes: CourseScene[]): string {
       section = [];
       return;
     }
-    const visuals = section.filter((part) => TOP_VISUAL.test(part));
-    const content = section.filter((part) => !TOP_VISUAL.test(part));
-    if (visuals.length) {
-      const title = content.find((part) => part.startsWith("<h2 "))?.replace(/<[^>]+>/g, "") || "시각물";
-      const firstVisualAt = section.findIndex((part) => TOP_VISUAL.test(part));
-      const insertAt = section.slice(0, firstVisualAt).filter((part) => !TOP_VISUAL.test(part)).length;
-      content.splice(insertAt, 0, visualCarousel(visuals, scenes[sceneIndex]?.fit, title, true));
+    const visualPositions = section
+      .map((part, index) => TOP_VISUAL.test(part) ? index : -1)
+      .filter((index) => index >= 0);
+    if (!visualPositions.length) {
+      out.push(...section);
+      section = [];
+      return;
     }
-    out.push(...content);
+    const labelPositions = visualPositions.map((position) => (
+      position > 0 && section[position - 1].startsWith('<p class="lb">') ? position - 1 : -1
+    ));
+    const groups = visualPositions.map((position, index): ReadingCarouselGroup => {
+      const nextPosition = visualPositions[index + 1] ?? section.length;
+      const nextLabelPosition = labelPositions[index + 1];
+      const explanationEnd = nextLabelPosition >= 0 ? nextLabelPosition : nextPosition;
+      return {
+        label: labelPositions[index] >= 0 ? section[labelPositions[index]] : "",
+        visual: section[position],
+        explanation: section.slice(position + 1, explanationEnd),
+      };
+    });
+    const firstGroupAt = labelPositions[0] >= 0 ? labelPositions[0] : visualPositions[0];
+    const title = section.find((part) => part.startsWith("<h2 "))?.replace(/<[^>]+>/g, "") || "시각물";
+    out.push(
+      ...section.slice(0, firstGroupAt),
+      visualCarousel(groups.map((group) => group.visual), scenes[sceneIndex]?.fit, title, groups),
+    );
     section = [];
   };
   for (const part of parts) {

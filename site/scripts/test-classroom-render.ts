@@ -85,13 +85,19 @@ check("읽기 모드는 H2의 모든 시각물을 하나의 16대9 캐러셀로 
     "",
     "### 같은 자리에서 순서대로 봅니다",
     "",
-    "첫 일반 문단은 원래 읽기 본문입니다.",
+    "첫 일반 문단은 캐러셀 앞의 도입입니다.",
+    "",
+    "**첫 사례**",
     "",
     '![첫 시각물](a.png "첫 시각물 보조설명")',
     "",
-    "나머지 본문입니다.",
+    "첫 시각물의 자세한 설명입니다.",
+    "",
+    "**둘째 사례**",
     "",
     '![둘째 시각물](b.png "둘째 시각물 보조설명")',
+    "",
+    "둘째 시각물의 자세한 설명입니다.",
   ].join("\n");
   const scene = { id: "s1", role: "open", layout: "sequence", fit: "cover", visualCount: 2,
     beats: [{ effect: "enter", targets: [1, 2] }] } as CourseScene;
@@ -109,9 +115,14 @@ check("읽기 모드는 H2의 모든 시각물을 하나의 16대9 캐러셀로 
   assert.ok(html.includes('data-carousel-description="2" hidden aria-hidden="true">둘째 시각물 보조설명'));
   assert.ok(html.indexOf("visual-carousel-frame") < html.indexOf("visual-carousel-caption"));
   assert.ok(!html.includes("<figcaption>첫 시각물 보조설명</figcaption>"));
-  assert.ok(html.includes("<p>첫 일반 문단은 원래 읽기 본문입니다.</p>"));
-  assert.ok(html.indexOf("첫 일반 문단은 원래 읽기 본문입니다.") < html.indexOf("visual-carousel"));
-  assert.ok(html.indexOf("visual-carousel") < html.indexOf("나머지 본문입니다."));
+  assert.ok(html.includes('class="visual-carousel-label"'));
+  assert.ok(html.includes('class="visual-carousel-explanation"'));
+  assert.ok(html.includes('<p class="lb"><strong>첫 사례</strong></p>'));
+  assert.ok(html.includes('<p class="lb"><strong>둘째 사례</strong></p>'));
+  assert.ok(html.includes("<p>첫 일반 문단은 캐러셀 앞의 도입입니다.</p>"));
+  assert.ok(html.indexOf("첫 일반 문단은 캐러셀 앞의 도입입니다.") < html.indexOf("visual-carousel"));
+  assert.ok(html.indexOf("visual-carousel-frame") < html.indexOf("첫 시각물의 자세한 설명입니다."));
+  assert.ok(html.includes('data-carousel-description="2" hidden aria-hidden="true"><p>둘째 시각물의 자세한 설명입니다.</p>'));
 });
 
 check("시각물이 하나여도 읽기와 강의가 같은 16대9 프레임 구조를 쓴다", () => {

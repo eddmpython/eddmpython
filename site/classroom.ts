@@ -221,9 +221,14 @@ article tbody tr:last-child td { border-bottom:0; }
   width:auto; margin:0; padding:.45rem .6rem; border-radius:.4rem;
   background:color-mix(in srgb,var(--eddm-carbon) 82%,transparent); color:var(--eddm-ivory);
   font-size:.78rem; line-height:1.45; }
+.visual-carousel-label { margin:1.6rem 0 .55rem; }
+.visual-carousel-label p.lb { margin:0; }
 .visual-carousel-caption { margin:.65rem 0 0; color:var(--eddm-text-muted); }
 .visual-carousel-caption p { margin:0; font-size:.88rem; line-height:1.65; }
 .visual-carousel-caption[hidden], .visual-carousel-caption p[hidden] { display:none; }
+.visual-carousel-explanation { margin:.85rem 0 0; }
+.visual-carousel-explanation [data-carousel-description] > :first-child { margin-top:0; }
+.visual-carousel-explanation [data-carousel-description] > :last-child { margin-bottom:0; }
 .visual-carousel .yt .frame { width:100%; height:100%; max-width:none; padding:0; aspect-ratio:16/9; }
 .visual-carousel .yt.tall .frame { width:100%; height:100%; aspect-ratio:16/9; }
 .visual-carousel .course-embed iframe { display:block; width:100%; height:100%; max-width:100%; max-height:100%;
@@ -372,7 +377,7 @@ body.lecture-on { overflow:hidden; }
 .lecture-stage > .lecture-scene { grid-column:1; grid-row:1; min-height:0; }
 /* 장표는 제목, 부제, 가로줄, 보조설명, 규격화된 16:9 시각물 무대를 위에서 아래로 쌓는다. */
 .lecture-scene, .lecture-map-thumb-scene { display:none; position:relative; width:100%; height:100%; min-width:0; min-height:0;
-  --scene-content-width:min(94%,116rem); --scene-block-space:clamp(3rem,5.5vh,5rem);
+  --scene-content-width:min(90%,108rem); --scene-block-space:clamp(3.5rem,6.5vh,6rem);
   box-sizing:border-box; padding:var(--scene-block-space) clamp(1.2rem,3.4vw,4rem); contain:layout style;
   grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(0,1fr);
   grid-template-areas:"head" "canvas"; gap:clamp(.55rem,.9vh,.8rem); }
@@ -691,9 +696,10 @@ const CAROUSEL_SCRIPT = `
     const previous = root.querySelector("[data-carousel-prev]");
     const next = root.querySelector("[data-carousel-next]");
     const status = root.querySelector("[data-carousel-status]");
-    const support = root.querySelector(":scope > [data-carousel-support]")
-      || root.closest(".lecture-scene")?.querySelector(":scope > .scene-head > [data-carousel-support]");
-    const descriptions = support ? [...support.querySelectorAll("[data-carousel-description]")] : [];
+    const supports = [...root.querySelectorAll(":scope > [data-carousel-support]")];
+    const lectureSupport = root.closest(".lecture-scene")?.querySelector(":scope > .scene-head > [data-carousel-support]");
+    if (lectureSupport) supports.push(lectureSupport);
+    const descriptions = supports.flatMap((support) => [...support.querySelectorAll("[data-carousel-description]")]);
     let at = 0;
     const show = (nextAt, notify = true) => {
       at = Math.max(0, Math.min(items.length - 1, Number(nextAt) || 0));
@@ -709,8 +715,8 @@ const CAROUSEL_SCRIPT = `
       if (status) status.textContent = String(at + 1) + " / " + String(items.length);
       if (previous) previous.disabled = at === 0;
       if (next) next.disabled = at === items.length - 1;
-      descriptions.forEach((description, index) => {
-        const active = index === at;
+      descriptions.forEach((description) => {
+        const active = Number(description.dataset.carouselDescription) === at + 1;
         description.hidden = !active;
         description.setAttribute("aria-hidden", active ? "false" : "true");
         if (active) description.dataset.carouselDescriptionActive = "true";

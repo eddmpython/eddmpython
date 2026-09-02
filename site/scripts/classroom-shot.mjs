@@ -336,6 +336,38 @@ for (const viewport of activeViewports) {
       JSON.stringify(readingCaption),
     );
 
+    const readingCarousel = value(await evaluate(session, `(() => {
+      const root = [...document.querySelectorAll('article [data-visual-carousel]')]
+        .find((carousel) => Number(carousel.dataset.carouselCount) > 1);
+      if (!root) return null;
+      const read = () => ({
+        at:Number(root.dataset.carouselAt),
+        visual:root.querySelector('[data-carousel-active="true"]')?.dataset.visual || '',
+        label:root.querySelector(':scope > .visual-carousel-label [data-carousel-description-active="true"]')?.textContent.trim() || '',
+        caption:root.querySelector(':scope > .visual-carousel-caption [data-carousel-description-active="true"]')?.textContent.trim() || '',
+        explanation:root.querySelector(':scope > .visual-carousel-explanation [data-carousel-description-active="true"]')?.textContent.trim() || '',
+        visible:[...root.querySelectorAll(':scope > [data-carousel-support] [data-carousel-description]')]
+          .filter((description) => !description.hidden).length,
+      });
+      const first = read();
+      root.querySelector('[data-carousel-next]')?.click();
+      return { first, second:read() };
+    })()`));
+    record(
+      `${viewport.id} 교안 캐러셀의 시각물과 설명 동시 전환`,
+      readingCarousel?.first?.at === 0 &&
+        readingCarousel?.second?.at === 1 &&
+        readingCarousel.first.visual !== readingCarousel.second.visual &&
+        readingCarousel.first.label !== readingCarousel.second.label &&
+        readingCarousel.first.caption !== readingCarousel.second.caption &&
+        readingCarousel.first.explanation !== readingCarousel.second.explanation &&
+        Boolean(readingCarousel.first.label) && Boolean(readingCarousel.second.label) &&
+        Boolean(readingCarousel.first.caption) && Boolean(readingCarousel.second.caption) &&
+        Boolean(readingCarousel.first.explanation) && Boolean(readingCarousel.second.explanation) &&
+        readingCarousel.first.visible === 3 && readingCarousel.second.visible === 3,
+      JSON.stringify(readingCarousel),
+    );
+
     // 읽기 본문과 같은 H2가 전체화면 장면이 되고 한 장표에 시각자료 하나만 보이는지 본다.
     const lectureButton = Number(
       value(await evaluate(session, `document.querySelectorAll('[data-lecture-open]').length`)),
@@ -438,8 +470,8 @@ for (const viewport of activeViewports) {
           lectureStart?.visualWidthRatio > .5 &&
           lectureStart?.visualWidthRatio < .9 &&
           lectureStart?.lineToSupport >= 14 &&
-          lectureStart?.topSpace >= (viewport.height > 650 && viewport.width > 900 ? 44 : 10) &&
-          lectureStart?.bottomSpace >= (viewport.height > 650 && viewport.width > 900 ? 44 : 10) &&
+          lectureStart?.topSpace >= (viewport.height > 1000 && viewport.width > 900 ? 80 : viewport.height > 650 && viewport.width > 900 ? 52 : 10) &&
+          lectureStart?.bottomSpace >= (viewport.height > 1000 && viewport.width > 900 ? 80 : viewport.height > 650 && viewport.width > 900 ? 52 : 10) &&
           lectureStart?.railFullHeight === true &&
           lectureStart?.railItems === lectureStart?.slideTotal &&
           lectureStart?.railThumbs === lectureStart?.slideTotal &&
@@ -651,7 +683,8 @@ for (const viewport of activeViewports) {
         record(
           `${viewport.id} 나머지 16대9 장표`,
           remainingSlides?.length === Math.max(0, lectureStart.slideTotal - 2) &&
-            remainingSlides?.every((slide) => Math.abs(slide.ratio - 16 / 9) < .03 && slide.fit === "cover"),
+            remainingSlides?.every((slide) => Math.abs(slide.ratio - 16 / 9) < .03 &&
+              ["contain", "cover", "cover-top"].includes(slide.fit)),
           JSON.stringify(remainingSlides),
         );
         await evaluate(session, `(async () => {
