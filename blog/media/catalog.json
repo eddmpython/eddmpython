@@ -136,6 +136,14 @@
       "post": "01-instructor-introduction",
       "sha256": "e612a79635b1dde35055a76c2530567b1d6bc48df0bde4bc96feac81056e50ef"
     },
+    "01-instructor-introduction/contact-channels": {
+      "assetKey": "contact-channels",
+      "masterPath": "objects/sha256/b4/b40c9701f4bb24bd94b5b5fed9f9eecdbdf91c4e4a21f547a8335fff91feec49.png",
+      "masterSha256": "b40c9701f4bb24bd94b5b5fed9f9eecdbdf91c4e4a21f547a8335fff91feec49",
+      "path": "objects/sha256/5a/5afa622b90edfb581c18e1bbe4c5b44604ecd275d6bc9b7800c4ea7c46b3fc8d.webp",
+      "post": "01-instructor-introduction",
+      "sha256": "5afa622b90edfb581c18e1bbe4c5b44604ecd275d6bc9b7800c4ea7c46b3fc8d"
+    },
     "01-instructor-introduction/course-outcome": {
       "assetKey": "course-outcome",
       "path": "objects/sha256/69/693700d6e6aa5799914205e08b35dcbcbb15b73a92a2507c1c81f91de454e2e4.png",
@@ -1680,6 +1688,16 @@
       "visualSubject": "같은 거래 토큰 네 개를 순서 칸으로 정리한 목록과 이름표 연결로 정리한 기록 상자",
       "width": 1536
     },
+    "5afa622b90edfb581c18e1bbe4c5b44604ecd275d6bc9b7800c4ea7c46b3fc8d": {
+      "alt": "말풍선, 재생 버튼, 깃 가지, 전화기, 봉투, 폴더가 든 구름 아이콘 여섯 개가 두 줄로 놓인 모습",
+      "bytes": 80682,
+      "height": 832,
+      "mime": "image/webp",
+      "path": "objects/sha256/5a/5afa622b90edfb581c18e1bbe4c5b44604ecd275d6bc9b7800c4ea7c46b3fc8d.webp",
+      "sourcePost": "01-instructor-introduction",
+      "visualSubject": "말풍선, 재생 버튼, 깃 가지가 윗줄에, 전화기, 봉투, 폴더가 든 구름이 아랫줄에 놓인 아이콘 여섯 개",
+      "width": 1216
+    },
     "5b147cfff2b937f6ec69165c7d43e5a97c96d8febc2e782ff0507fc4fff00673": {
       "alt": "저장소의 README와 lockfile 및 CI 파일이 실제 설치 명령과 테스트 명령으로 모이는 조사 장면",
       "bytes": 2205859,
@@ -2956,6 +2974,17 @@
       "sourcePost": "04-verify-numbers",
       "visualSubject": "사본이 섞인 입력 13건이 보존 검사에서는 통과하고 중복 검사에서는 실패하는 두 검증 관문",
       "width": 1600
+    },
+    "b40c9701f4bb24bd94b5b5fed9f9eecdbdf91c4e4a21f547a8335fff91feec49": {
+      "alt": "말풍선, 재생 버튼, 깃 가지, 전화기, 봉투, 폴더가 든 구름 아이콘 여섯 개가 두 줄로 놓인 모습",
+      "bytes": 521311,
+      "height": 832,
+      "mime": "image/png",
+      "path": "objects/sha256/b4/b40c9701f4bb24bd94b5b5fed9f9eecdbdf91c4e4a21f547a8335fff91feec49.png",
+      "role": "master",
+      "sourcePost": "01-instructor-introduction",
+      "visualSubject": "말풍선, 재생 버튼, 깃 가지가 윗줄에, 전화기, 봉투, 폴더가 든 구름이 아랫줄에 놓인 아이콘 여섯 개",
+      "width": 1216
     },
     "b50cb1263d1ff5bae910df1aa235fe59a47f9fe0119390c1c6f57811cf4ac6e3": {
       "alt": "통합내역과 부서요약 및 확인필요와 실행정보를 나타내는 네 시트가 한 Excel 파일에 들어가는 모습",
