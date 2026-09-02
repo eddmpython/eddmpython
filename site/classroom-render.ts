@@ -215,7 +215,7 @@ export type Glossary = Record<string, string>;
  *   2. 용어 앞이 한글, 영문, 숫자면 감싸지 않는다. 종속변수 안의 변수를 잡지 않는다.
  *      뒤는 제한하지 않는다. 한국어 조사는 뒤에 붙는다 (변수를, 변수가)
  *   3. 긴 용어가 먼저다. "가상 환경" 이 "환경" 보다 먼저 잡힌다
- *   4. H2 섹션마다 용어당 한 번만 감싼다. 문장마다 밑줄이 깔리면 본문이 시끄러워진다
+ *   4. 글마다 용어당 한 번만 감싼다. 용어집이 늘어도 점선 밑줄이 본문을 덮지 않게 한다
  */
 const TERM_SKIP_LINE = [
   /^#{1,6}\s/, // 제목은 목차와 장면 머리다
@@ -261,7 +261,7 @@ export function markGlossaryTerms(body: string, glossary: Glossary): string {
   if (!sortedTerms.length) return body;
   const lines = body.replace(/\r\n/g, "\n").split("\n");
   let fenced = false;
-  let marked = new Set<string>();
+  const marked = new Set<string>();
   return lines
     .map((line) => {
       if (/^```/.test(line)) {
@@ -270,7 +270,6 @@ export function markGlossaryTerms(body: string, glossary: Glossary): string {
       }
       if (fenced) return line;
       const trimmed = line.trim();
-      if (/^##\s/.test(trimmed)) marked = new Set(); // 새 섹션에서는 다시 한 번 감싼다
       if (!trimmed || TERM_SKIP_LINE.some((rule) => rule.test(trimmed))) return line;
       return line
         .split(TERM_PROTECTED)

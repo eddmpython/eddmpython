@@ -104,6 +104,18 @@
       "post": "005-python-history",
       "sha256": "dd263228b071495adb445023a0ceb12bbabdb1c6f58eb5479d2adf5e8475af91"
     },
+    "01-instructor-introduction/automation-criteria": {
+      "assetKey": "automation-criteria",
+      "path": "objects/sha256/b7/b71c5c6932e145f3ce0a283b358ca130e0a65b0d5a787d25a4acad9e2d78e97c.png",
+      "post": "01-instructor-introduction",
+      "sha256": "b71c5c6932e145f3ce0a283b358ca130e0a65b0d5a787d25a4acad9e2d78e97c"
+    },
+    "01-instructor-introduction/automation-lifecycle": {
+      "assetKey": "automation-lifecycle",
+      "path": "objects/sha256/ec/ecc927f5d0fa9237df3e9b7544611751ca921122ae370071c0261066da3ad63d.png",
+      "post": "01-instructor-introduction",
+      "sha256": "ecc927f5d0fa9237df3e9b7544611751ca921122ae370071c0261066da3ad63d"
+    },
     "01-instructor-introduction/connected-tools": {
       "assetKey": "connected-tools",
       "masterPath": "objects/sha256/4b/4b672233ce730da3c6797dd06f52cc5fbb14c417610824cbc1ace0eb99dea666.png",
@@ -112,13 +124,17 @@
       "post": "01-instructor-introduction",
       "sha256": "e612a79635b1dde35055a76c2530567b1d6bc48df0bde4bc96feac81056e50ef"
     },
-    "01-instructor-introduction/instructor-workflow": {
-      "assetKey": "instructor-workflow",
-      "masterPath": "objects/sha256/83/8393c14fe50c18f31d0a56e1f494590ab1aa434b3bf0c697a599f30e001700db.png",
-      "masterSha256": "8393c14fe50c18f31d0a56e1f494590ab1aa434b3bf0c697a599f30e001700db",
-      "path": "objects/sha256/30/3052628399dd87c94701b5c977cfb697945cd639c349e42aae3fc21c15fd3913.webp",
+    "01-instructor-introduction/course-outcome": {
+      "assetKey": "course-outcome",
+      "path": "objects/sha256/69/693700d6e6aa5799914205e08b35dcbcbb15b73a92a2507c1c81f91de454e2e4.png",
       "post": "01-instructor-introduction",
-      "sha256": "3052628399dd87c94701b5c977cfb697945cd639c349e42aae3fc21c15fd3913"
+      "sha256": "693700d6e6aa5799914205e08b35dcbcbb15b73a92a2507c1c81f91de454e2e4"
+    },
+    "01-instructor-introduction/learning-paths": {
+      "assetKey": "learning-paths",
+      "path": "objects/sha256/af/af78c424b6c62c74efba913a5e0c1fc29d1baabfb55ceb6109ecf54a0e222fc4.png",
+      "post": "01-instructor-introduction",
+      "sha256": "af78c424b6c62c74efba913a5e0c1fc29d1baabfb55ceb6109ecf54a0e222fc4"
     },
     "01-instructor-introduction/product-pipeline": {
       "assetKey": "product-pipeline",
@@ -143,6 +159,22 @@
       "path": "objects/sha256/d4/d4bfad9ef9a4c0bba2d8d49d699f98f7574f58348ba2a6eb1fa3c37aa5e5cb8c.webp",
       "post": "01-instructor-introduction",
       "sha256": "d4bfad9ef9a4c0bba2d8d49d699f98f7574f58348ba2a6eb1fa3c37aa5e5cb8c"
+    },
+    "02-course-blueprint/foundation-layers": {
+      "assetKey": "foundation-layers",
+      "masterPath": "objects/sha256/8b/8b1ea44f1b104455dc14fe6733828fc5c8649329d4d14d4015f671df692d3507.png",
+      "masterSha256": "8b1ea44f1b104455dc14fe6733828fc5c8649329d4d14d4015f671df692d3507",
+      "path": "objects/sha256/8b/8b1ea44f1b104455dc14fe6733828fc5c8649329d4d14d4015f671df692d3507.png",
+      "post": "02-course-blueprint",
+      "sha256": "8b1ea44f1b104455dc14fe6733828fc5c8649329d4d14d4015f671df692d3507"
+    },
+    "02-course-blueprint/paired-learning-paths": {
+      "assetKey": "paired-learning-paths",
+      "masterPath": "objects/sha256/fc/fccc9d5483911e31eb35e18b446c600489f6b24a40918683aec92398c8415115.png",
+      "masterSha256": "fccc9d5483911e31eb35e18b446c600489f6b24a40918683aec92398c8415115",
+      "path": "objects/sha256/fc/fccc9d5483911e31eb35e18b446c600489f6b24a40918683aec92398c8415115.png",
+      "post": "02-course-blueprint",
+      "sha256": "fccc9d5483911e31eb35e18b446c600489f6b24a40918683aec92398c8415115"
     }
   },
   "objectPrefix": "objects/sha256",
@@ -1501,6 +1533,16 @@
       "visualSubject": "여덟 행 입력 표와 다섯 행 정상 표 및 세 행 확인필요 표와 행 수 및 금액 균형 저울",
       "width": 1536
     },
+    "693700d6e6aa5799914205e08b35dcbcbb15b73a92a2507c1c81f91de454e2e4": {
+      "alt": "반복 업무 발견에서 자동화 도구 만들기와 결과 검증을 거쳐 다시 실행하고 수정하기까지 이어지는 네 단계",
+      "bytes": 1357164,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/69/693700d6e6aa5799914205e08b35dcbcbb15b73a92a2507c1c81f91de454e2e4.png",
+      "sourcePost": "01-instructor-introduction",
+      "visualSubject": "반복 업무 발견, 자동화 도구 만들기, 결과 검증, 다시 실행하고 수정하기의 네 단계",
+      "width": 1672
+    },
     "694b3d85f92ba37a57c3c6c1df00fc1fb9873b419d6de14c6c638f102256c494": {
       "alt": "주문 입력을 가진 main 파일이 계산 함수가 있는 별도 모듈을 불러와 할인 금액과 최종 금액을 출력하는 모습",
       "bytes": 1238728,
@@ -1922,6 +1964,17 @@
       "sourcePost": "010-python-errors",
       "visualSubject": "Python 실행 결과 화면의 실제 출력과 프로세스 종료 상태 및 기대값 비교와 특정 파일 오류만 통과시키는 예외 처리",
       "width": 1536
+    },
+    "8b1ea44f1b104455dc14fe6733828fc5c8649329d4d14d4015f671df692d3507": {
+      "alt": "작업 공간과 실행 환경과 변경 기록과 AI 작업과 완료 증거에 속한 핵심 개념을 다섯 줄로 연결한 구조도",
+      "bytes": 1279982,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/8b/8b1ea44f1b104455dc14fe6733828fc5c8649329d4d14d4015f671df692d3507.png",
+      "role": "master",
+      "sourcePost": "02-course-blueprint",
+      "visualSubject": "작업 공간, 실행 환경, 변경 기록, AI 작업과 완료 증거에 속한 핵심 개념의 다섯 층",
+      "width": 1672
     },
     "8c16837b7c7642e2ca8d1cda1140a497ec78e39d542b31f349bf587a54309c8e": {
       "alt": "그래프 대시보드, 막대 지표, 문서 양식 표, 거래 목록 화면을 띄운 모니터 네 대가 두 줄로 걸린 어두운 작업 공간",
@@ -2447,6 +2500,16 @@
       "visualSubject": "나스닥 시세 표, 예측 모델 설정, 30일 예측 선 그래프",
       "width": 1128
     },
+    "af78c424b6c62c74efba913a5e0c1fc29d1baabfb55ceb6109ecf54a0e222fc4": {
+      "alt": "과정 안내에서 직접 만드는 길과 AI와 함께 만드는 길로 갈라져 각 프로젝트까지 이어지는 학습 경로 지도",
+      "bytes": 1389053,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/af/af78c424b6c62c74efba913a5e0c1fc29d1baabfb55ceb6109ecf54a0e222fc4.png",
+      "sourcePost": "01-instructor-introduction",
+      "visualSubject": "00 과정 안내에서 01부터 03까지의 직접 개발 경로와 04부터 06까지의 AI 개발 경로로 갈라지는 지도",
+      "width": 1672
+    },
     "b01fe0f63c7b375c048cf5c01f13834545398f7a4bfad00aadf7200be57adb8d": {
       "alt": "딕셔너리 거래 카드 세 장이 리스트에 순서대로 들어가고 같은 키들이 표의 같은 열로 정렬된 모습",
       "bytes": 1166299,
@@ -2536,6 +2599,16 @@
       "sourcePost": "029-pytest-excel-automation",
       "visualSubject": "서로 다른 금액 입력 카드 네 개와 하나의 공통 pytest 함수 화면 및 기대 결과 카드 네 개",
       "width": 1536
+    },
+    "b71c5c6932e145f3ce0a283b358ca130e0a65b0d5a787d25a4acad9e2d78e97c": {
+      "alt": "계속 쓰는 자동화를 중심으로 입력과 처리와 연결과 결과와 검증과 운영과 유지보수가 순환하는 구조",
+      "bytes": 1524294,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/b7/b71c5c6932e145f3ce0a283b358ca130e0a65b0d5a787d25a4acad9e2d78e97c.png",
+      "sourcePost": "01-instructor-introduction",
+      "visualSubject": "계속 쓰는 자동화를 중심으로 입력, 처리와 연결, 결과, 검증, 운영, 유지보수가 연결된 순환 구조",
+      "width": 1672
     },
     "b89cb28dc6f655fef9087c3e650d771ea26d1c148b3cf5384a5d92ce33702668": {
       "alt": "거래 금액 비교식이 참과 거짓 중 하나를 만들고 실행할 코드 묶음 하나를 고르는 모습",
@@ -3007,6 +3080,16 @@
       "visualSubject": "소스 파일 카드와 Excel 입력 표와 잠금 버전 격자와 터미널 명령 띠와 테스트 검사표 및 결과 Excel",
       "width": 1536
     },
+    "ecc927f5d0fa9237df3e9b7544611751ca921122ae370071c0261066da3ad63d": {
+      "alt": "업무 분석과 자동화 설계와 맞춤 개발과 시스템 연동을 거쳐 운영 정착과 유지보수로 이어지는 여섯 단계",
+      "bytes": 1282016,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/ec/ecc927f5d0fa9237df3e9b7544611751ca921122ae370071c0261066da3ad63d.png",
+      "sourcePost": "01-instructor-introduction",
+      "visualSubject": "업무 분석, 자동화 설계, 맞춤 개발, 시스템 연동, 운영 정착, 유지보수의 여섯 단계",
+      "width": 1672
+    },
     "edf68eba6adf2e16fda996a4b3c99f1e638f7e44e2638dec6b0f516153aeffba": {
       "alt": "Python 자동화 30일 실행 계획의 1주차에 재실행 세 번과 기준선 기록이 배치된 달력",
       "bytes": 1607635,
@@ -3137,6 +3220,17 @@
       "sourcePost": "016-work-automation-plan",
       "visualSubject": "Excel 입력 계약의 input 폴더와 파일 세 개와 시트 표와 필수 열 다섯 개와 자료형 셀과 고유 행 키",
       "width": 1536
+    },
+    "fccc9d5483911e31eb35e18b446c600489f6b24a40918683aec92398c8415115": {
+      "alt": "00 과정 안내에서 직접 개발과 AI 개발이 시작과 기본기와 독립 완주의 세 단계로 나란히 이어지는 과정 청사진",
+      "bytes": 1402762,
+      "height": 941,
+      "mime": "image/png",
+      "path": "objects/sha256/fc/fccc9d5483911e31eb35e18b446c600489f6b24a40918683aec92398c8415115.png",
+      "role": "master",
+      "sourcePost": "02-course-blueprint",
+      "visualSubject": "00 과정 안내에서 직접 개발과 AI 개발이 세 단계로 갈라져 같은 완성 지점으로 모이는 과정 청사진",
+      "width": 1672
     },
     "fd080ff8f8074593dcd5177f5ac50dbfee6f45b7777be64aa0a2d14eb097cae1": {
       "alt": "공백이 있는 연습 프로젝트 안의 src와 hello.py가 존재 검사 및 전체 경로 확인을 거쳐 Python 성공 출력으로 이어지는 모습",

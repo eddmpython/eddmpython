@@ -206,7 +206,7 @@ article tbody tr:last-child td { border-bottom:0; }
 article a { color:var(--eddm-accent); text-decoration:none; border-bottom:1px solid var(--eddm-accent-line); }
 article a:hover { border-bottom-color:var(--eddm-accent); }
 
-/* 용어 툴팁. 발행이 심은 term:// 마커가 이 모양으로 나온다. 호버, 키보드 포커스, 탭으로 연다. */
+/* 용어 툴팁. 렌더러가 심은 term:// 마커가 이 모양으로 나온다. 호버, 키보드 포커스, 탭으로 연다. */
 .term { position:relative; cursor:help; border-bottom:1px dashed var(--eddm-accent-dim); }
 .term:focus { outline:none; border-bottom-style:solid; border-bottom-color:var(--eddm-accent); }
 .term-pop { position:absolute; left:50%; bottom:calc(100% + .6rem); transform:translateX(-50%);

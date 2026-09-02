@@ -564,13 +564,13 @@ check("앞에 글자가 붙은 합성어는 감싸지 않는다", () => {
   assert.ok(!html.includes('class="term"'));
 });
 
-check("H2 섹션마다 용어당 한 번만 감싼다", () => {
+check("글마다 용어당 한 번만 감싼다", () => {
   const { html } = renderPost(
     "## 첫 절\n\n변수가 있습니다. 변수를 또 씁니다.\n\n## 둘째 절\n\n변수가 다시 나옵니다.",
     {},
     GLOSSARY,
   );
-  assert.equal(html.match(/class="term"/g)?.length, 2);
+  assert.equal(html.match(/class="term"/g)?.length, 1);
 });
 
 check("코드와 제목과 인라인 코드의 용어는 감싸지 않는다", () => {
