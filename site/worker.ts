@@ -38,14 +38,6 @@ const LEGACY_BLOG: Record<string, string> = {
   "/blog/python-basic-syntax": "/blog",
 };
 
-const SECURITY_HEADERS: Record<string, string> = {
-  "strict-transport-security": "max-age=31536000; includeSubDomains",
-  "x-content-type-options": "nosniff",
-  "referrer-policy": "strict-origin-when-cross-origin",
-  "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=()",
-  "cross-origin-opener-policy": "same-origin-allow-popups",
-};
-
 // 프레임 조상 차단과 리소스 출처 제한. pyodide 는 CDN 에서 받고 WASM 을 컴파일한다.
 // 프록시하는 제품 문서에는 적용하지 않는다. 각 제품이 자기 출처를 따로 쓴다.
 const CSP = [
@@ -92,7 +84,7 @@ function isAdSenseArticle(pathname: string): boolean {
 
 function withHeaders(res: Response, isHtml: boolean, adsense = false): Response {
   const headers = new Headers(res.headers);
-  for (const [k, v] of Object.entries(SECURITY_HEADERS)) headers.set(k, v);
+  for (const [k, v] of Object.entries(securityHeaders)) headers.set(k, v);
   // 응답이 자기 CSP 를 이미 달고 왔으면 덮어쓰지 않는다. 강의장은 인라인 스크립트에
   // nonce 를 붙여 자기 정책을 낸다. 여기서 덮으면 확대와 실시간 동기화가 죽는다.
   if (isHtml && !headers.has("content-security-policy")) {
@@ -129,7 +121,7 @@ async function proxy(request: Request, url: URL, origin: string) {
     }
   }
 
-  for (const [k, v] of Object.entries(SECURITY_HEADERS)) headers.set(k, v);
+  for (const [k, v] of Object.entries(securityHeaders)) headers.set(k, v);
   // 원본이 어디서 왔는지 남긴다. 디버깅과 감사용이다.
   headers.set("x-eddm-proxy", origin.replace("https://", ""));
 
@@ -148,7 +140,7 @@ function redirect(to: string, requestUrl: URL): Response {
     status: 301,
     headers: {
       location: target.toString(),
-      ...SECURITY_HEADERS,
+      ...securityHeaders,
     },
   });
 }
@@ -157,6 +149,7 @@ import { handleRoom } from "./classroom";
 import { handleAdmin } from "./admin";
 import { giscusThemeCss } from "./src/design";
 import type { Env as SiteEnv } from "./env";
+import { securityHeaders } from "./securityHeaders";
 
 // Durable Object 는 저장소 모듈이 든다. 운영장과 강의방이 같은 것을 본다.
 export { Classroom } from "./rooms";

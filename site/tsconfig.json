@@ -17,5 +17,5 @@
     "noEmit": true,
     "types": ["vite/client", "@cloudflare/workers-types", "node"]
   },
-  "include": ["src", "vite.config.ts", "worker.ts"]
+  "include": ["src", "vite.config.ts", "worker.ts", "classroomWorker.ts", "classroomWorkerEnv.d.ts"]
 }

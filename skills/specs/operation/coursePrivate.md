@@ -42,7 +42,8 @@ sideProject/
 교안은 Cloudflare KV 에 있고 강의장 Worker 가 요청마다 읽는다. 비공개 저장소가 KV 로 발행한다.
 
 ```text
-eddmpython-course  ──npm run publish:course──▶  KV  ──▶  강의장 /cr
+eddmpython-course  ──npm run publish:course──▶  KV
+eddmpython-course  ──npm run deploy:classroom──▶  course Worker  ──▶  /admin, /room
 ```
 
 이렇게 한 이유가 둘이다.
@@ -50,6 +51,16 @@ eddmpython-course  ──npm run publish:course──▶  KV  ──▶  강의�
 - **새어 나갈 경로가 구조적으로 없다.** 빌드가 교안을 읽지 않으므로 공개 번들에 들어갈 수 없다
 - **교안 발행이 사이트 배포를 기다리지 않는다.** 교안은 강의 준비 때마다 고치는데 공개 사이트의
   배포 의식(테스트, 시각 승인)을 매번 통과할 이유가 없다
+
+일반 교안 수정은 KV만 발행한다. 장면 계약이나 강의 화면 코드가 바뀐 날에는
+`eddmpython-course`에서 `npm run publish:runtime`을 실행한다. 이 명령은 `/admin`과 `/room`만
+맡는 `eddmpython-classroom` Worker를 먼저 배포하고 KV를 뒤이어 발행한다. 공개 사이트 전체
+`npm run deploy`를 호출하지 않으며 블로그 빌드, 승인, 시각 검사를 실행하지 않는다.
+
+course Worker의 배포 정본은 `site/wrangler.classroom.jsonc`다. 이 Worker는 교안 KV를 직접 읽고,
+방 상태는 기존 `eddmpython-site` Worker가 소유한 Durable Object를 외부 바인딩으로 그대로 쓴다.
+교안과 방 상태를 복제하지 않는다. 경로 route가 같은 호스트의 공개 사이트 Worker보다 먼저
+실행되므로 강의장과 공개 사이트는 서로 다른 배포 주기를 가진다.
 
 묶음의 모양은 두 저장소 사이의 계약이다. 바꾸면 `schema` 를 올리고 양쪽을 같은 날 같이 고친다.
 읽는 쪽은 `site/classroom.ts`, 쓰는 쪽은 `eddmpython-course/scripts/publish.mjs` 다.
@@ -59,7 +70,7 @@ eddmpython-course  ──npm run publish:course──▶  KV  ──▶  강의�
 교안 제목, 설명, 장면별 시각물 주소를 복사하지 않는다. 강의장은 로그인하고 열린 카테고리의
 본문을 받은 요청에서만 장면 HTML을 만든다.
 
-장면 계약 번호를 올릴 때는 새 번호와 이전 번호를 함께 읽는 강의장 Worker를 먼저 배포하고,
+장면 계약 번호를 올릴 때는 새 번호와 이전 번호를 함께 읽는 course Worker를 먼저 배포하고,
 새 계약 번호를 쓰는 교안 묶음을 나중에 발행한다. 순서를 바꾸면 배포 사이에 강의 모드 버튼이
 사라질 수 있다. 장면의 클릭별 완성 프레임은 공개 Worker가 로그인한 요청 안에서 계산하며 KV나
 공개 저장소에 교안별 화면 상태를 복사하지 않는다.

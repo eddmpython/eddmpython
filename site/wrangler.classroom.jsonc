@@ -1,0 +1,35 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "eddmpython-classroom",
+  "main": "classroomWorker.ts",
+  "compatibility_date": "2026-09-02",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "routes": [
+    { "pattern": "eddmpython.com/admin", "zone_name": "eddmpython.com" },
+    { "pattern": "eddmpython.com/admin/*", "zone_name": "eddmpython.com" },
+    { "pattern": "eddmpython.com/room", "zone_name": "eddmpython.com" },
+    { "pattern": "eddmpython.com/room/*", "zone_name": "eddmpython.com" },
+    { "pattern": "www.eddmpython.com/admin", "zone_name": "eddmpython.com" },
+    { "pattern": "www.eddmpython.com/admin/*", "zone_name": "eddmpython.com" },
+    { "pattern": "www.eddmpython.com/room", "zone_name": "eddmpython.com" },
+    { "pattern": "www.eddmpython.com/room/*", "zone_name": "eddmpython.com" }
+  ],
+  "kv_namespaces": [
+    { "binding": "COURSE", "id": "4ff8960b8706499cba4e05069b74c532" }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "CLASSROOM",
+        "class_name": "Classroom",
+        "script_name": "eddmpython-site"
+      }
+    ]
+  },
+  "observability": {
+    "enabled": true,
+    "logs": { "head_sampling_rate": 1 },
+    "traces": { "enabled": true, "head_sampling_rate": 0.01 }
+  }
+}
