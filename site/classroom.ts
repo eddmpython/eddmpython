@@ -394,7 +394,7 @@ body.lecture-on { overflow:hidden; }
 /* 장표는 제목, 부제, 가로줄, 보조설명, 규격화된 16:9 시각물 무대를 위에서 아래로 쌓는다. */
 .lecture-scene { display:none; position:relative; width:100%; height:100%; min-width:0; min-height:0;
   --scene-content-width:96rem;
-  box-sizing:border-box; padding:clamp(1.15rem,2.6vw,3rem) clamp(1.2rem,3.4vw,4rem); contain:layout style;
+  box-sizing:border-box; padding:clamp(1.15rem,2.6vw,3rem) clamp(1.2rem,3.4vw,4rem) clamp(.75rem,1.1vw,1.15rem); contain:layout style;
   grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(0,1fr);
   grid-template-areas:"head" "canvas"; gap:clamp(.45rem,.75vh,.65rem); }
 .lecture-scene.on { display:grid; }
@@ -414,7 +414,7 @@ body.lecture-on { overflow:hidden; }
   letter-spacing:-.05em; text-wrap:balance; }
 .scene-subtitle { max-width:92rem; margin:clamp(.4rem,1vh,.7rem) 0 0; color:var(--eddm-text-muted);
   font-size:clamp(1.15rem,1.45vw,1.65rem); line-height:1.38; text-wrap:balance; }
-.scene-head > .scene-support { min-height:1.5em; margin:clamp(.22rem,.45vh,.35rem) 0 0; color:var(--eddm-text); }
+.scene-head > .scene-support { min-height:1.5em; margin:clamp(.5rem,.8vh,.7rem) 0 0; color:var(--eddm-text); }
 .scene-head > .scene-support > p { margin:0; font-size:clamp(1rem,1.15vw,1.25rem); line-height:1.45; }
 .scene-head > .scene-support[hidden], .scene-head > .scene-support > p[hidden] { display:none; }
 .scene-canvas { grid-area:canvas; align-self:stretch; min-width:0; min-height:0; overflow:hidden;
