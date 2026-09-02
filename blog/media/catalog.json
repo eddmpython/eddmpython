@@ -184,6 +184,14 @@
       "post": "01-verify-ai-project-reading",
       "sha256": "66587f0ea8353788b8619750bfee93328369f0002f869212eaa1ac7d79ba6ea8"
     },
+    "01-what-automation-does/three-actions": {
+      "assetKey": "three-actions",
+      "masterPath": "objects/sha256/f0/f0f9a300b851f3d950b8b6b969aaac282d70637b6619cd93878fbfc8f27b2ef7.png",
+      "masterSha256": "f0f9a300b851f3d950b8b6b969aaac282d70637b6619cd93878fbfc8f27b2ef7",
+      "path": "objects/sha256/52/52e42824b35cca6422e43b853bccb2a87c712e3e7c895776d1ddfcb15cbf8a09.webp",
+      "post": "01-what-automation-does",
+      "sha256": "52e42824b35cca6422e43b853bccb2a87c712e3e7c895776d1ddfcb15cbf8a09"
+    },
     "01-why-ai-automation/rule-ai-escalation": {
       "assetKey": "rule-ai-escalation",
       "path": "objects/sha256/40/40632ebbb8f1b179bbc09b85d7a541666136538b630249f7a4d479260544b19f.png",
@@ -1580,6 +1588,16 @@
       "path": "objects/sha256/52/529e7d7cb675862be6442f9ecbbb691da4a5ff7dc7c387f1837c9f44533eaf45.webp",
       "sourcePost": "003-python-qr",
       "visualSubject": "사각 타일 격자로 덮인 휴대폰 화면과 그 위로 들려 올라오는 가는 리본 한 줄",
+      "width": 1216
+    },
+    "52e42824b35cca6422e43b853bccb2a87c712e3e7c895776d1ddfcb15cbf8a09": {
+      "alt": "손가락 커서가 버튼을 누르는 아이콘, 종이 세 장이 한 표로 모이는 아이콘, 계산기에서 새 숫자가 나오는 아이콘이 나란히 놓인 세 칸",
+      "bytes": 97314,
+      "height": 832,
+      "mime": "image/webp",
+      "path": "objects/sha256/52/52e42824b35cca6422e43b853bccb2a87c712e3e7c895776d1ddfcb15cbf8a09.webp",
+      "sourcePost": "01-what-automation-does",
+      "visualSubject": "손가락 커서가 버튼을 누르는 아이콘, 종이 세 장이 한 표로 모이는 아이콘, 계산기에서 새 숫자가 나오는 아이콘이 나란히 놓인 세 칸",
       "width": 1216
     },
     "55a220cf9be84a9c621ad2d28487d6d5bfeb0fa504f355905e7398fb27427dc7": {
@@ -3609,6 +3627,17 @@
       "sourcePost": "002-what-is-python",
       "visualSubject": "들여쓰기가 일정한 짧은 코드 카드와 기호가 많은 긴 코드 카드 및 같은 계산 결과",
       "width": 1536
+    },
+    "f0f9a300b851f3d950b8b6b969aaac282d70637b6619cd93878fbfc8f27b2ef7": {
+      "alt": "손가락 커서가 버튼을 누르는 아이콘, 종이 세 장이 한 표로 모이는 아이콘, 계산기에서 새 숫자가 나오는 아이콘이 나란히 놓인 세 칸",
+      "bytes": 501690,
+      "height": 832,
+      "mime": "image/png",
+      "path": "objects/sha256/f0/f0f9a300b851f3d950b8b6b969aaac282d70637b6619cd93878fbfc8f27b2ef7.png",
+      "role": "master",
+      "sourcePost": "01-what-automation-does",
+      "visualSubject": "손가락 커서가 버튼을 누르는 아이콘, 종이 세 장이 한 표로 모이는 아이콘, 계산기에서 새 숫자가 나오는 아이콘이 나란히 놓인 세 칸",
+      "width": 1216
     },
     "f15864138a8d5e7925127d7db0537d360f2ee691e73ba994e4eb469397573368": {
       "alt": "Git에 남는 소스와 설정 및 잠금 파일과 제외되는 가상환경과 입력 및 출력 파일이 분리된 모습",
