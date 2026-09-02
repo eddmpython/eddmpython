@@ -326,43 +326,19 @@ body.lecture-on { overflow:hidden; }
 .lecture-map-item[aria-current="step"] .lecture-map-no { color:var(--eddm-accent); }
 .lecture-map-thumb { grid-column:2; grid-row:1; position:relative; width:100%;
   aspect-ratio:var(--lecture-stage-ratio,16/9);
-  box-sizing:border-box; overflow:hidden; display:grid; grid-template-rows:2rem minmax(0,1fr);
-  gap:.2rem; padding:.38rem;
+  box-sizing:border-box; overflow:hidden; display:block;
   border:1px solid var(--eddm-line-base); border-radius:.38rem;
   background:var(--eddm-carbon); transition:border-color .15s ease,box-shadow .15s ease; }
 .lecture-map-item:hover .lecture-map-thumb { border-color:var(--eddm-accent-line); }
 .lecture-map-item[aria-current="step"] .lecture-map-thumb { border-color:var(--eddm-accent);
   box-shadow:0 0 0 1px var(--eddm-accent); }
-.lecture-map-thumb-copy { width:100%; max-width:var(--thumb-frame-width,100%); min-width:0; min-height:0;
-  justify-self:center; align-self:stretch; overflow:hidden; padding-bottom:.18rem;
-  border-bottom:1px solid var(--eddm-line-base); }
-.lecture-map-thumb-title { display:block; overflow:hidden; color:var(--eddm-ivory); font-size:.48rem;
-  font-weight:720; line-height:1.05; letter-spacing:-.025em; white-space:nowrap; text-overflow:ellipsis; }
-.lecture-map-thumb-subtitle { display:block; overflow:hidden; margin-top:.12rem; color:var(--eddm-text-faint);
-  font-size:.32rem; font-style:normal; line-height:1.1; white-space:nowrap; text-overflow:ellipsis; }
-.lecture-map-thumb-visual { width:100%; height:100%; min-width:0; min-height:0; overflow:hidden;
-  display:grid; place-items:center; }
-.lecture-map-thumb-frame { display:grid; place-items:center; width:var(--thumb-frame-width,100%);
-  height:var(--thumb-frame-height,auto); max-width:100%; aspect-ratio:16/9;
-  min-width:0; min-height:0; overflow:hidden; background:var(--eddm-paper); }
-.lecture-map-thumb-frame > * { min-width:0; min-height:0; max-width:100%; max-height:100%; margin:0; }
-.lecture-map-thumb-frame figure { display:grid; place-items:center; width:100%; height:100%; }
-.lecture-map-thumb-frame img, .lecture-map-thumb-frame video { display:block; width:100%; height:100%; object-fit:contain; }
-.lecture-map-thumb[data-fit="cover"] img, .lecture-map-thumb[data-fit="cover"] video,
-.lecture-map-thumb[data-fit="cover-top"] img, .lecture-map-thumb[data-fit="cover-top"] video { object-fit:cover; }
-.lecture-map-thumb[data-fit="cover-top"] img, .lecture-map-thumb[data-fit="cover-top"] video { object-position:center top; }
-.lecture-map-thumb[data-fit="cover-top"] img, .lecture-map-thumb[data-fit="cover-top"] video {
-  clip-path:inset(0 0 8% 0); }
-.lecture-map-media { display:block; width:100%; height:100%; background-position:center; background-size:cover;
-  background-repeat:no-repeat; }
-.lecture-map-thumb-frame figcaption, .lecture-map-thumb-frame .scene-media-status { display:none; }
-.lecture-map-thumb-frame pre { width:100%; height:100%; box-sizing:border-box; overflow:hidden; padding:.25rem;
-  border:0; background:var(--eddm-ink); color:var(--eddm-text-muted); font-family:${DESIGN.font.mono};
-  font-size:.28rem; line-height:1.2; white-space:pre-wrap; }
-.lecture-map-thumb-frame[data-kind="embed"], .lecture-map-thumb-frame[data-kind="cell"] {
-  background:color-mix(in srgb,var(--eddm-ink) 92%,var(--eddm-accent)); }
-.lecture-map-thumb-frame[data-kind="embed"]::after, .lecture-map-thumb-frame[data-kind="cell"]::after {
-  content:"</>"; color:var(--eddm-text-faint); font-family:${DESIGN.font.mono}; font-size:.65rem; }
+.lecture-map-thumb-stage { position:absolute; inset:0; overflow:hidden; pointer-events:none; }
+/* 축소판은 별도로 다시 그리지 않는다. 실제 강의 장표 전체를 같은 좌표계로 축소한다. */
+.lecture-map-thumb-scene { position:absolute !important; top:0; left:0; display:grid !important;
+  transform-origin:top left; pointer-events:none; animation:none !important; }
+.lecture-map-thumb-scene *, .lecture-map-thumb-scene .scene-head {
+  pointer-events:none !important; animation:none !important; transition:none !important; }
+.lecture-map-item:focus-visible { outline:2px solid var(--eddm-accent); outline-offset:2px; }
 .lecture-rail-foot { min-width:0; padding:.75rem .1rem 0; }
 .lecture-progress { position:relative; display:block; overflow:hidden; margin:0 0 .65rem; padding-bottom:.55rem;
   color:var(--eddm-accent); font-size:.68rem; font-weight:650; letter-spacing:.08em; text-align:center;
@@ -392,7 +368,7 @@ body.lecture-on { overflow:hidden; }
   touch-action:pan-y; }
 .lecture-stage > .lecture-scene { grid-column:1; grid-row:1; min-height:0; }
 /* 장표는 제목, 부제, 가로줄, 보조설명, 규격화된 16:9 시각물 무대를 위에서 아래로 쌓는다. */
-.lecture-scene { display:none; position:relative; width:100%; height:100%; min-width:0; min-height:0;
+.lecture-scene, .lecture-map-thumb-scene { display:none; position:relative; width:100%; height:100%; min-width:0; min-height:0;
   --scene-content-width:100%;
   box-sizing:border-box; padding:clamp(3rem,4.5vh,4rem) clamp(1.2rem,3.4vw,4rem); contain:layout style;
   grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(0,1fr);
@@ -497,13 +473,10 @@ body.lecture-on { overflow:hidden; }
   .lecture-brand { padding-bottom:.55rem; }
   .lecture-map-list { padding:.45rem 0; }
   .lecture-rail .lecture-map-item { grid-template-columns:.9rem minmax(0,1fr); gap:.25rem; padding:.3rem .05rem; }
-  .lecture-map-thumb { grid-template-rows:1.1rem minmax(0,1fr); gap:.1rem; padding:.2rem; }
-  .lecture-map-thumb-title { font-size:.3rem; }
-  .lecture-map-thumb-subtitle { margin-top:.05rem; font-size:.2rem; }
   .lecture-rail-foot { padding-top:.5rem; }
   .lecture-progress { margin-bottom:.4rem; padding-bottom:.4rem; }
   .lecture-rail-foot button, .lecture-rail .theme-toggle { height:1.8rem; }
-  .lecture-scene { padding:clamp(.8rem,3.5vw,1.25rem); gap:.65rem; }
+  .lecture-scene, .lecture-map-thumb-scene { padding:clamp(.8rem,3.5vw,1.25rem); gap:.65rem; }
   .scene-meta { margin-bottom:.25rem; }
   .scene-index::after { width:1.4rem; }
   .scene-head h2 { font-size:clamp(1.5rem,7vw,2.35rem); }
@@ -523,7 +496,7 @@ body.lecture-on { overflow:hidden; }
   .lecture-rail-foot { padding-top:.45rem; }
   .lecture-progress { margin-bottom:.4rem; padding-bottom:.35rem; }
   .lecture-rail-foot button, .lecture-rail .theme-toggle { height:1.8rem; }
-  .lecture-scene { padding:.75rem 1.25rem; gap:.5rem; }
+  .lecture-scene, .lecture-map-thumb-scene { padding:.75rem 1.25rem; gap:.5rem; }
   .scene-meta { margin-bottom:.25rem; }
   .scene-head h2 { font-size:clamp(1.75rem,3.1vw,2.8rem); }
   .scene-subtitle { margin-top:.2rem; font-size:.95rem; }
@@ -824,74 +797,78 @@ const LECTURE_SCRIPT = `
   const mapScenes = scenes.map((scene, sceneIndex) => ({
     scene,
     sceneIndex,
-    frame:{ visible: [1] },
+    frame:framesOf(scene)[0] || { visible:[1] },
   }));
-  const previewVisual = (source, host) => {
-    const image = source?.querySelector("img");
-    const video = source?.querySelector("video");
-    const play = source?.querySelector(".ytplay");
-    const code = source?.matches("pre") ? source : source?.querySelector("pre");
-    const cell = source?.querySelector(".cell textarea");
-    if (image) {
-      const preview = image.cloneNode(false);
-      preview.alt = "";
-      preview.loading = "lazy";
-      preview.decoding = "async";
-      host.append(preview);
-    } else if (video) {
-      const preview = video.cloneNode(false);
-      preview.muted = true;
-      preview.preload = "metadata";
-      preview.removeAttribute("controls");
-      preview.removeAttribute("autoplay");
-      preview.tabIndex = -1;
-      host.append(preview);
-    } else if (play) {
-      const preview = document.createElement("span");
-      preview.className = "lecture-map-media";
-      preview.style.backgroundImage = play.style.backgroundImage;
-      host.append(preview);
-    } else if (code || cell) {
-      const preview = document.createElement("pre");
-      preview.textContent = code?.textContent || cell?.value || "";
-      host.append(preview);
-    } else {
-      host.dataset.kind = source?.querySelector("iframe") ? "embed" : source?.querySelector(".cell") ? "cell" : "blank";
-    }
+  const replicaOf = (scene, frame) => {
+    const replica = scene.cloneNode(true);
+    replica.classList.add("lecture-map-thumb-scene");
+    replica.classList.remove("lecture-scene", "on");
+    replica.setAttribute("aria-hidden", "true");
+    replica.setAttribute("inert", "");
+    replica.querySelectorAll("[id]").forEach((node) => node.removeAttribute("id"));
+    replica.querySelectorAll("[aria-labelledby], [aria-describedby]").forEach((node) => {
+      node.removeAttribute("aria-labelledby");
+      node.removeAttribute("aria-describedby");
+    });
+    replica.querySelectorAll("a, button, input, textarea, select, video, iframe, [contenteditable]").forEach((node) => {
+      node.tabIndex = -1;
+      if (node.matches("video")) {
+        node.muted = true;
+        node.removeAttribute("autoplay");
+      }
+      if (node.matches("iframe")) node.loading = "lazy";
+    });
+    const cue = replica.querySelector("[data-scene-cue]");
+    if (cue) cue.textContent = frame?.cue || "";
+    const items = [...replica.querySelectorAll("[data-visual-carousel] [data-carousel-item]")];
+    const visibleId = Number(frame?.visible?.[0]);
+    let activeAt = items.findIndex((item) => Number(item.dataset.visual) === visibleId);
+    if (activeAt < 0) activeAt = 0;
+    items.forEach((item, itemIndex) => {
+      const active = itemIndex === activeAt;
+      item.hidden = !active;
+      item.setAttribute("aria-hidden", active ? "false" : "true");
+      item.toggleAttribute("inert", !active);
+      if (active) item.dataset.carouselActive = "true";
+      else delete item.dataset.carouselActive;
+    });
+    replica.querySelectorAll("[data-carousel-description]").forEach((description, descriptionIndex) => {
+      const active = descriptionIndex === activeAt;
+      description.hidden = !active;
+      description.setAttribute("aria-hidden", active ? "false" : "true");
+      if (active) description.dataset.carouselDescriptionActive = "true";
+      else delete description.dataset.carouselDescriptionActive;
+    });
+    return replica;
   };
   const mapItems = mapScenes.map(({ scene, sceneIndex, frame }, index) => {
-    const button = document.createElement("button");
+    const button = document.createElement("div");
     const number = document.createElement("span");
     const thumb = document.createElement("span");
-    const copy = document.createElement("span");
-    const title = document.createElement("b");
-    const subtitle = document.createElement("i");
-    const visual = document.createElement("span");
-    const visualFrame = document.createElement("span");
-    button.type = "button";
+    const stage = document.createElement("span");
+    const replica = replicaOf(scene, frame);
     button.className = "lecture-map-item";
     button.dataset.lectureMapScene = String(sceneIndex);
+    button.setAttribute("role", "button");
+    button.tabIndex = 0;
     number.className = "lecture-map-no";
     number.textContent = String(index + 1).padStart(2, "0");
     thumb.className = "lecture-map-thumb";
-    thumb.dataset.fit = scene.dataset.fit || "contain";
-    copy.className = "lecture-map-thumb-copy";
-    title.className = "lecture-map-thumb-title";
-    title.textContent = scene.querySelector("h2")?.textContent.trim() || "강의 장면";
-    subtitle.className = "lecture-map-thumb-subtitle";
-    subtitle.textContent = scene.querySelector(".scene-subtitle")?.textContent.trim() || "";
-    visual.className = "lecture-map-thumb-visual";
-    visualFrame.className = "lecture-map-thumb-frame";
-    const visibleId = frame.visible?.[0];
-    previewVisual(scene.querySelector('[data-visual="' + visibleId + '"]'), visualFrame);
-    visual.append(visualFrame);
-    copy.append(title, subtitle);
-    thumb.append(copy, visual);
-    button.setAttribute("aria-label", number.textContent + " " + title.textContent);
+    stage.className = "lecture-map-thumb-stage";
+    stage.append(replica);
+    thumb.append(stage);
+    const title = scene.querySelector("h2")?.textContent.trim() || "강의 장면";
+    button.setAttribute("aria-label", number.textContent + " " + title);
     button.append(number, thumb);
-    button.addEventListener("click", () => {
+    const activate = () => {
       showScene(sceneIndex);
       deck.focus({ preventScroll:true });
+    };
+    button.addEventListener("click", activate);
+    button.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      activate();
     });
     mapList.append(button);
     return button;
@@ -921,15 +898,20 @@ const LECTURE_SCRIPT = `
     }
     mapItems.forEach((item) => {
       const thumb = item.querySelector(".lecture-map-thumb");
-      const visual = item.querySelector(".lecture-map-thumb-visual");
+      const replica = item.querySelector(".lecture-map-thumb-scene");
+      if (!thumb || !replica || !stageBox?.width || !stageBox?.height) return;
       const thumbWidth = thumb?.getBoundingClientRect().width || 0;
       if (thumbWidth > 0) thumb.style.height = Math.round(thumbWidth / stageRatio) + "px";
-      const box = visual?.getBoundingClientRect();
-      const width = Math.min(box?.width || 0, (box?.height || 0) * 16 / 9);
-      if (width > 0) {
-        thumb.style.setProperty("--thumb-frame-width", Math.round(width) + "px");
-        thumb.style.setProperty("--thumb-frame-height", Math.round(width * 9 / 16) + "px");
-      }
+      replica.style.width = Math.round(stageBox.width) + "px";
+      replica.style.height = Math.round(stageBox.height) + "px";
+      replica.style.transform = "none";
+      replica.style.removeProperty("--scene-frame-width");
+      const canvas = replica.querySelector(".scene-canvas");
+      const visual = replica.querySelector(".visual-carousel");
+      const width = Math.min(canvas?.clientWidth || 0, visual?.clientWidth || 0, (canvas?.clientHeight || 0) * 16 / 9);
+      if (width > 0) replica.style.setProperty("--scene-frame-width", Math.round(width) + "px");
+      const scale = Math.min(thumb.clientWidth / stageBox.width, thumb.clientHeight / stageBox.height);
+      if (scale > 0) replica.style.transform = "scale(" + scale + ")";
     });
   };
   const syncSceneWidth = () => {

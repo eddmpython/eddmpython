@@ -437,30 +437,50 @@ for (const viewport of activeViewports) {
         const stageBox = deck?.querySelector('.lecture-stage')?.getBoundingClientRect();
         const items = [...(rail?.querySelectorAll('[data-lecture-map-scene]') ?? [])];
         const currentItem = items.find((item) => item.getAttribute('aria-current') === 'step');
-        const currentNumber = currentItem?.querySelector('span');
+        const currentNumber = currentItem?.querySelector('.lecture-map-no');
         const rect = rail?.getBoundingClientRect();
         const thumbs = items.map((item) => item.querySelector('.lecture-map-thumb'));
+        const sources = [...(deck?.querySelectorAll('.lecture-stage > .lecture-scene') ?? [])];
+        const currentSource = sources[Number(currentItem?.dataset.lectureMapScene ?? 0)];
+        const currentReplica = currentItem?.querySelector('.lecture-map-thumb-scene');
+        const normalized = (node, root) => {
+          const box = node?.getBoundingClientRect();
+          const rootBox = root?.getBoundingClientRect();
+          if (!box || !rootBox || rootBox.width <= 0 || rootBox.height <= 0) return null;
+          return {
+            x:(box.left - rootBox.left) / rootBox.width,
+            y:(box.top - rootBox.top) / rootBox.height,
+            width:box.width / rootBox.width,
+            height:box.height / rootBox.height,
+          };
+        };
+        const sameGeometry = (selector) => {
+          const source = normalized(currentSource?.querySelector(selector), currentSource);
+          const replica = normalized(currentReplica?.querySelector(selector), currentReplica);
+          return source && replica && Object.keys(source).every((key) => Math.abs(source[key] - replica[key]) < .012);
+        };
         return {
           items:items.length,
           thumbs:thumbs.filter(Boolean).length,
-          thumbsPopulated:thumbs.every((thumb) => {
-            const visual = thumb?.querySelector('.lecture-map-thumb-visual');
-            return Boolean(visual?.firstElementChild || visual?.dataset.kind);
-          }),
+          thumbsPopulated:thumbs.every((thumb) => Boolean(
+            thumb?.querySelector('.lecture-map-thumb-scene .scene-head') &&
+            thumb?.querySelector('.lecture-map-thumb-scene .scene-canvas') &&
+            thumb?.querySelector('.lecture-map-thumb-scene .visual-carousel')
+          )),
           thumbsRatio:thumbs.every((thumb) => {
             const box = thumb?.getBoundingClientRect();
             return box && stageBox && Math.abs(box.width / box.height - stageBox.width / stageBox.height) < .03;
           }),
           framesRatio:thumbs.every((thumb) => {
-            const box = thumb?.querySelector('.lecture-map-thumb-frame')?.getBoundingClientRect();
+            const box = thumb?.querySelector('.lecture-map-thumb-scene .visual-carousel-frame')?.getBoundingClientRect();
             return box && Math.abs(box.width / box.height - 16 / 9) < .03;
           }),
           frameBoxes:thumbs.map((thumb) => {
-            const box = thumb?.querySelector('.lecture-map-thumb-frame')?.getBoundingClientRect();
+            const box = thumb?.querySelector('.lecture-map-thumb-scene .visual-carousel-frame')?.getBoundingClientRect();
             return box ? { width:Math.round(box.width), height:Math.round(box.height) } : null;
           }),
           visualBoxes:thumbs.map((thumb) => {
-            const box = thumb?.querySelector('.lecture-map-thumb-visual')?.getBoundingClientRect();
+            const box = thumb?.querySelector('.lecture-map-thumb-scene .scene-canvas')?.getBoundingClientRect();
             return box ? { width:Math.round(box.width), height:Math.round(box.height) } : null;
           }),
           previewMedia:thumbs.map((thumb) => {
@@ -482,19 +502,30 @@ for (const viewport of activeViewports) {
           }),
           previewMediaReady:thumbs.every((thumb) => {
             const media = thumb?.querySelector('img, video');
-            const frame = thumb?.querySelector('.lecture-map-thumb-frame');
-            if (!media) return Boolean(frame?.firstElementChild || frame?.dataset.kind);
+            const frame = thumb?.querySelector('.lecture-map-thumb-scene .visual-carousel-frame');
+            if (!media) return Boolean(frame?.firstElementChild);
             const box = media?.getBoundingClientRect();
             if (!box || box.width <= 0 || box.height <= 0) return false;
             return media.matches('img') ? media.complete && media.naturalWidth > 0 : media.readyState >= 1 && media.videoWidth > 0;
           }),
-          copyAligned:thumbs.every((thumb) => {
-            const copyBox = thumb?.querySelector('.lecture-map-thumb-copy')?.getBoundingClientRect();
-            const frameBox = thumb?.querySelector('.lecture-map-thumb-frame')?.getBoundingClientRect();
-            return copyBox && frameBox && Math.abs(copyBox.width - frameBox.width) <= 2;
+          mirrorsScene:thumbs.every((thumb, index) => {
+            const source = sources[index];
+            const replica = thumb?.querySelector('.lecture-map-thumb-scene');
+            if (!source || !replica) return false;
+            const text = (root, selector) => root.querySelector(selector)?.textContent.trim() ?? '';
+            return text(source, 'h2') === text(replica, 'h2') &&
+              text(source, '.scene-subtitle') === text(replica, '.scene-subtitle') &&
+              text(source, '.scene-support') === text(replica, '.scene-support') &&
+              source.querySelectorAll('[data-visual]').length === replica.querySelectorAll('[data-visual]').length;
           }),
+          replicaMatchesStage:thumbs.every((thumb) => {
+            const replica = thumb?.querySelector('.lecture-map-thumb-scene');
+            return replica && stageBox && Math.abs(replica.offsetWidth - stageBox.width) <= 1 &&
+              Math.abs(replica.offsetHeight - stageBox.height) <= 1;
+          }),
+          currentGeometryMatches:sameGeometry('.scene-head') && sameGeometry('.visual-carousel'),
           current:items.filter((item) => item.getAttribute('aria-current') === 'step').length,
-          currentTitle:currentItem?.querySelector('b')?.textContent.trim(),
+          currentTitle:currentItem?.querySelector('.lecture-map-thumb-scene h2')?.textContent.trim(),
           currentNumber:currentNumber?.textContent.trim(),
           currentNumberVisible:Boolean(currentNumber?.getClientRects().length),
           fullHeight:rect ? Math.abs(rect.top) <= 1 && Math.abs(rect.bottom - innerHeight) <= 1 : false,
@@ -509,7 +540,9 @@ for (const viewport of activeViewports) {
           railState?.thumbsPopulated === true &&
           railState?.thumbsRatio === true &&
           railState?.framesRatio === true &&
-          railState?.copyAligned === true &&
+          railState?.mirrorsScene === true &&
+          railState?.replicaMatchesStage === true &&
+          railState?.currentGeometryMatches === true &&
           railState?.previewMediaReady === true &&
           railState?.current === 1 &&
           railState?.currentTitle === lectureStart?.title &&
