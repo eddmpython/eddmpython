@@ -396,7 +396,7 @@ body.lecture-on { overflow:hidden; }
   --scene-content-width:96rem;
   box-sizing:border-box; padding:clamp(1.15rem,2.6vw,3rem) clamp(1.2rem,3.4vw,4rem); contain:layout style;
   grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(0,1fr);
-  grid-template-areas:"head" "canvas"; gap:clamp(.2rem,.45vh,.38rem); }
+  grid-template-areas:"head" "canvas"; gap:clamp(.45rem,.75vh,.65rem); }
 .lecture-scene.on { display:grid; }
 .lecture-scene.on .scene-head { animation:scene-head var(--lecture-motion) ease both; }
 .scene-head { grid-area:head; position:relative; z-index:2; width:100%;
@@ -413,9 +413,9 @@ body.lecture-on { overflow:hidden; }
 .scene-head h2 { margin:0; font-size:clamp(2.2rem,3.8vw,4.1rem); line-height:1.02;
   letter-spacing:-.05em; text-wrap:balance; }
 .scene-subtitle { max-width:92rem; margin:clamp(.4rem,1vh,.7rem) 0 0; color:var(--eddm-text-muted);
-  font-size:clamp(.98rem,1.25vw,1.4rem); line-height:1.4; text-wrap:balance; }
+  font-size:clamp(1.15rem,1.45vw,1.65rem); line-height:1.38; text-wrap:balance; }
 .scene-head > .scene-support { min-height:1.5em; margin:clamp(.22rem,.45vh,.35rem) 0 0; color:var(--eddm-text); }
-.scene-head > .scene-support > p { margin:0; font-size:clamp(.82rem,1vw,1rem); line-height:1.5; }
+.scene-head > .scene-support > p { margin:0; font-size:clamp(1rem,1.15vw,1.25rem); line-height:1.45; }
 .scene-head > .scene-support[hidden], .scene-head > .scene-support > p[hidden] { display:none; }
 .scene-canvas { grid-area:canvas; align-self:stretch; min-width:0; min-height:0; overflow:hidden;
   display:grid; place-items:start center; contain:layout style; }
@@ -507,7 +507,8 @@ body.lecture-on { overflow:hidden; }
   .scene-meta { margin-bottom:.25rem; }
   .scene-index::after { width:1.4rem; }
   .scene-head h2 { font-size:clamp(1.5rem,7vw,2.35rem); }
-  .scene-subtitle { margin-top:.3rem; font-size:.86rem; line-height:1.35; }
+  .scene-subtitle { margin-top:.3rem; font-size:1rem; line-height:1.35; }
+  .scene-head > .scene-support > p { font-size:.9rem; }
   .scene-canvas { place-items:start stretch; }
   .scene-canvas figure.media[data-scene-visible="true"],
   .scene-canvas figure.yt[data-scene-visible="true"],
@@ -525,7 +526,8 @@ body.lecture-on { overflow:hidden; }
   .lecture-scene { padding:.75rem 1.25rem; gap:.5rem; }
   .scene-meta { margin-bottom:.25rem; }
   .scene-head h2 { font-size:clamp(1.75rem,3.1vw,2.8rem); }
-  .scene-subtitle { margin-top:.2rem; font-size:.82rem; }
+  .scene-subtitle { margin-top:.2rem; font-size:.95rem; }
+  .scene-head > .scene-support > p { font-size:.88rem; }
 }
 @media (prefers-reduced-motion:reduce) {
   .scene-canvas [data-visual][data-scene-visible="true"], .scene-head { animation:none; }
