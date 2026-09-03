@@ -286,6 +286,31 @@ check("링크와 굵게와 인라인 코드", () => {
  * 2026-09-03 운영자 지시. 열거형은 줄바꿈 목록으로 그리고 설명글은 줄바꿈 없는 서술형으로 쓴다.
  * 번호 목록을 모르던 렌더는 `1. 2. 3.` 을 한 문단으로 이어 붙여 실습 순서를 지웠다.
  */
+/*
+ * 출처로 이어지는 시각물.
+ *
+ * 2026-09-03 운영자 지시. 제품 화면은 눌러서 그 제품으로 갈 수 있어야 한다.
+ * 그림과 캡션을 같은 주소로 감싸고 새 탭에서 연다.
+ */
+check("출처 링크가 붙은 시각물은 그림과 캡션이 모두 링크다", () => {
+  const html = renderMarkdown('[![코랩 화면](a.webp "Colab 공식 화면")](https://colab.research.google.com/)');
+  assert.ok(html.includes('<a class="media-src" href="https://colab.research.google.com/" target="_blank" rel="noopener noreferrer"><img src="a.webp"'));
+  assert.ok(html.includes('<figcaption><a href="https://colab.research.google.com/" target="_blank" rel="noopener noreferrer">Colab 공식 화면</a></figcaption>'));
+  assert.ok(html.includes('alt="코랩 화면"'));
+});
+
+check("출처 링크가 붙어도 시각물 번호를 받는다", () => {
+  const html = renderMarkdown('[![화면](a.webp "캡션")](https://example.com/)');
+  assert.ok(html.includes('data-visual="1"'));
+  assert.ok(!html.includes("<p>"));
+});
+
+check("출처 링크가 없는 시각물은 예전 그대로다", () => {
+  const html = renderMarkdown('![화면](a.webp "캡션")');
+  assert.ok(html.includes('<figcaption>캡션</figcaption>'));
+  assert.ok(!html.includes("media-src"));
+});
+
 check("번호 목록은 ol 로 그린다", () => {
   const html = renderMarkdown(["1. 화면을 엽니다", "2. Python을 누릅니다", "3. 결과를 확인합니다"].join("\n"));
   assert.equal(

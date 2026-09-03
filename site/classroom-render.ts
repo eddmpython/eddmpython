@@ -53,6 +53,18 @@ export function inline(text: string): string {
 }
 
 const IMAGE = /^!\[([^\]]*)\]\(([^\s)]+)(?:\s+"([^"]*)")?\)$/;
+/**
+ * 출처로 이어지는 시각물. 제품 화면을 캡처해 실었을 때 그 제품의 공식 주소를 붙인다.
+ *
+ * 2026-09-03 운영자 지시. 제품 화면은 그림으로 끝나지 않고 눌러서 그 제품으로 갈 수 있어야
+ * 한다. 그림과 캡션을 같은 주소로 감싸고 새 탭에서 연다. 캡션까지 링크로 만드는 이유는
+ * 그림만 링크면 읽어 주는 도구에서 무엇을 여는 링크인지 말할 글자가 없기 때문이다.
+ *
+ * **`eddmpython-course/scripts/lint.mjs` 와 `scripts/course-scene.mjs` 의 `LINKED_IMAGE` 와
+ * 같아야 한다.** 한쪽을 고치면 다른 쪽도 같은 날 고친다.
+ */
+const LINKED_IMAGE =
+  /^\[!\[([^\]]*)\]\(([^\s)]+)(?:\s+"([^"]*)")?\)\]\((https?:\/\/[^\s)]+)\)$/;
 const VIDEO = /\.(mp4|webm|mov)$/i;
 /** 링크 하나로만 이루어진 문단. 라벨을 캡션으로 쓴다. */
 const SOLO_LINK = /^\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)$/;
@@ -526,7 +538,10 @@ function blocks(text: string, headings: string[], cells: Cells, state: RenderSta
   for (const raw of text.split(/\n{2,}/)) {
     const b = raw.trim();
     if (!b) continue;
-    const img = b.match(IMAGE);
+    // 출처 링크가 붙은 시각물도 같은 자리에서 그린다. 링크만 벗겨 내면 나머지는 같은 그림이다.
+    const linked = b.match(LINKED_IMAGE);
+    const source = linked ? linked[4] : "";
+    const img = linked ? ([b, linked[1], linked[2], linked[3]] as unknown as RegExpMatchArray) : b.match(IMAGE);
     if (img) {
       const waiting = img[2].match(PENDING);
       if (waiting) {
@@ -551,7 +566,12 @@ function blocks(text: string, headings: string[], cells: Cells, state: RenderSta
       // 캡션(img[3])을 반드시 같이 그린다. 2026-08-21 까지 정규식은 캡션을 잡아 놓고
       // 여기서 버렸다. 교안 캡션 45개가 수강생 화면에 하나도 안 나갔다. 캡션은 그 장면을
       // 어떻게 읽을지 말하는 자리라 그게 없으면 도식만 덩그러니 뜬다.
-      const caption = img[3] ? `<figcaption>${esc(img[3])}</figcaption>` : "";
+      const captionText = img[3] ? esc(img[3]) : "";
+      const caption = captionText
+        ? `<figcaption>${
+          source ? `<a href="${esc(source)}"${NEW_TAB}>${captionText}</a>` : captionText
+        }</figcaption>`
+        : "";
       if (VIDEO.test(src)) {
         flush();
         out.push(visual(
@@ -559,8 +579,14 @@ function blocks(text: string, headings: string[], cells: Cells, state: RenderSta
           state,
         ));
       } else {
+        const picture = `<img src="${esc(src)}" alt="${esc(img[1])}" loading="lazy">`;
         images.push(
-          visual(`<figure class="media"><img src="${esc(src)}" alt="${esc(img[1])}" loading="lazy">${caption}</figure>`, state),
+          visual(
+            `<figure class="media">${
+              source ? `<a class="media-src" href="${esc(source)}"${NEW_TAB}>${picture}</a>` : picture
+            }${caption}</figure>`,
+            state,
+          ),
         );
       }
       continue;

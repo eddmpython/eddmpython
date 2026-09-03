@@ -506,11 +506,23 @@
       "post": "04-run-python-online",
       "sha256": "5bb73055cc100038ad8c1a8b21c84d260f72982a4847928b6629db7c672a8de4"
     },
+    "04-run-python-online/colab-screen": {
+      "assetKey": "colab-screen",
+      "path": "objects/sha256/44/4442e3c1bc40380774473cd0a8f47f374b40d50e82eb5023054976e2fbc4b54b.webp",
+      "post": "04-run-python-online",
+      "sha256": "4442e3c1bc40380774473cd0a8f47f374b40d50e82eb5023054976e2fbc4b54b"
+    },
     "04-run-python-online/jupyterlite-in-browser": {
       "assetKey": "jupyterlite-in-browser",
       "path": "objects/sha256/c7/c74fe3151234402354126856c77b06201ccf84bb5f45f90043ae27952b004d6a.webp",
       "post": "04-run-python-online",
       "sha256": "c74fe3151234402354126856c77b06201ccf84bb5f45f90043ae27952b004d6a"
+    },
+    "04-run-python-online/jupyterlite-screen": {
+      "assetKey": "jupyterlite-screen",
+      "path": "objects/sha256/25/25ef2e21ac9a77ab4488419f22b3607e5deb0c06c5fbdeab263e5bbef15085a7.webp",
+      "post": "04-run-python-online",
+      "sha256": "25ef2e21ac9a77ab4488419f22b3607e5deb0c06c5fbdeab263e5bbef15085a7"
     },
     "04-run-python-online/jupyterlite-storage": {
       "assetKey": "jupyterlite-storage",
@@ -523,6 +535,12 @@
       "path": "objects/sha256/49/4954cf4b0656e217313c1fe99ab9beef4a04f3e7694b46501fc1432f6aafc91f.webp",
       "post": "04-run-python-online",
       "sha256": "4954cf4b0656e217313c1fe99ab9beef4a04f3e7694b46501fc1432f6aafc91f"
+    },
+    "04-run-python-online/molab-screen": {
+      "assetKey": "molab-screen",
+      "path": "objects/sha256/93/9336fb4f0efb5e5cdb9d15b69cbaf6ae64d2ea3e4053cadb402e0914f6ebe3b1.webp",
+      "post": "04-run-python-online",
+      "sha256": "9336fb4f0efb5e5cdb9d15b69cbaf6ae64d2ea3e4053cadb402e0914f6ebe3b1"
     },
     "04-run-python-online/notebook-code-memory": {
       "assetKey": "notebook-code-memory",
@@ -1409,6 +1427,16 @@
       "visualSubject": "다섯 줄의 PowerShell 명령 패널과 프로젝트 루트 폴더와 소스 패키지와 설정 문서와 잠금 격자와 가상환경 상자",
       "width": 1536
     },
+    "25ef2e21ac9a77ab4488419f22b3607e5deb0c06c5fbdeab263e5bbef15085a7": {
+      "alt": "JupyterLite 공식 체험 화면의 Launcher에서 Notebook 아래 Python 항목과 왼쪽 파일 목록이 함께 보이는 모습",
+      "bytes": 47024,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/25/25ef2e21ac9a77ab4488419f22b3607e5deb0c06c5fbdeab263e5bbef15085a7.webp",
+      "sourcePost": "04-run-python-online",
+      "visualSubject": "JupyterLite Launcher 의 Notebook 과 Console 목록, 왼쪽 파일 목록, 상단 메뉴",
+      "width": 2048
+    },
     "26a61e5a395d39d010b201143df44ff76e3725c913d1c9a4399c314e8dbb288d": {
       "alt": "왼쪽 코드가 실행되는 동안 오른쪽 그림판에 사각 나선이 그려지는 화면",
       "bytes": 7422300,
@@ -1879,6 +1907,16 @@
       "sourcePost": "003-python-qr",
       "visualSubject": "사각 타일 격자로 덮인 휴대폰 화면과 그 위로 들려 올라오는 가는 리본 한 줄",
       "width": 1216
+    },
+    "4442e3c1bc40380774473cd0a8f47f374b40d50e82eb5023054976e2fbc4b54b": {
+      "alt": "Colab 공식 노트북 화면에서 파일과 런타임 메뉴, 코드와 텍스트 추가 단추, 모두 실행, 그리고 실제 코드 칸이 함께 보이는 모습",
+      "bytes": 75626,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/44/4442e3c1bc40380774473cd0a8f47f374b40d50e82eb5023054976e2fbc4b54b.webp",
+      "sourcePost": "04-run-python-online",
+      "visualSubject": "Colab 노트북 화면의 파일과 런타임 메뉴, 코드와 텍스트 추가 단추, 모두 실행, 코드 칸",
+      "width": 2048
     },
     "44e93ce6a606041b1110f7d58c8329619edb9777ac52dee5bc31e9d65ace1c6c": {
       "alt": "파이썬 파일 하나 안에서 입력과 처리와 출력과 화면 조작이 차례로 이어지고 단계마다 라이브러리 이름이 붙은 구조",
@@ -3208,6 +3246,16 @@
       "sourcePost": "005-python-history",
       "visualSubject": "넓은 판으로 갈라진 바닥과 그 사이를 멀리까지 지나는 좁은 통로 하나",
       "width": 1216
+    },
+    "9336fb4f0efb5e5cdb9d15b69cbaf6ae64d2ea3e4053cadb402e0914f6ebe3b1": {
+      "alt": "marimo Molab 공식 화면에서 New notebook 단추와 튜토리얼 목록과 예제 노트북 미리보기가 함께 보이는 모습",
+      "bytes": 423734,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/93/9336fb4f0efb5e5cdb9d15b69cbaf6ae64d2ea3e4053cadb402e0914f6ebe3b1.webp",
+      "sourcePost": "04-run-python-online",
+      "visualSubject": "Molab 화면의 New notebook 단추, 튜토리얼 목록, 예제 노트북 미리보기",
+      "width": 2048
     },
     "933b20300e6ec07810fe43925301191d8d55700de81fe06308dee3845bdb11fd": {
       "alt": "컨텍스트와 도구와 경계가 모델로 들어가 실행과 결과로 이어지고 검증이 다시 모델로 돌아오는 구조도",
