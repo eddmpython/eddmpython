@@ -344,11 +344,23 @@
       "post": "02-what-is-python",
       "sha256": "e379ba319a750c7f0820c0a6298fc365a50c0befc52ecf6452c0d6352d004e07"
     },
+    "02-what-is-python/java-vs-python": {
+      "assetKey": "java-vs-python",
+      "path": "objects/sha256/6c/6c67f346dc07280c4e7571455156e38a8962d660a29cd455b1d39e88bb3b6ce8.webp",
+      "post": "02-what-is-python",
+      "sha256": "6c67f346dc07280c4e7571455156e38a8962d660a29cd455b1d39e88bb3b6ce8"
+    },
     "02-what-is-python/language-fit": {
       "assetKey": "language-fit",
       "path": "objects/sha256/7d/7db0dda28389b5e6747c4f8345d4e78138943b64617b746a3565f20faaf6eee9.webp",
       "post": "02-what-is-python",
       "sha256": "7db0dda28389b5e6747c4f8345d4e78138943b64617b746a3565f20faaf6eee9"
+    },
+    "02-what-is-python/many-languages": {
+      "assetKey": "many-languages",
+      "path": "objects/sha256/dc/dc4a452d4063d0818af2d4352da432fef05a9d0fe7f7e9611ad3ea9384669d36.webp",
+      "post": "02-what-is-python",
+      "sha256": "dc4a452d4063d0818af2d4352da432fef05a9d0fe7f7e9611ad3ea9384669d36"
     },
     "02-what-is-python/py-file-connects": {
       "assetKey": "py-file-connects",
@@ -361,6 +373,18 @@
       "path": "objects/sha256/4c/4cb92f14416032a364193bac4d1f4f2888a364bb24dc3a6fb720c2fa0d1fcb43.png",
       "post": "02-what-is-python",
       "sha256": "4cb92f14416032a364193bac4d1f4f2888a364bb24dc3a6fb720c2fa0d1fcb43"
+    },
+    "02-what-is-python/python-history": {
+      "assetKey": "python-history",
+      "path": "objects/sha256/dc/dc0abd205ff5535888c7f7fd1594e2df387fdbaa189dbf65d5d2b18856286719.webp",
+      "post": "02-what-is-python",
+      "sha256": "dc0abd205ff5535888c7f7fd1594e2df387fdbaa189dbf65d5d2b18856286719"
+    },
+    "02-what-is-python/two-places-to-run": {
+      "assetKey": "two-places-to-run",
+      "path": "objects/sha256/28/284220fa589041ad108bb0751f6a69116f617551a507dbd1abebceb116b1e707.webp",
+      "post": "02-what-is-python",
+      "sha256": "284220fa589041ad108bb0751f6a69116f617551a507dbd1abebceb116b1e707"
     },
     "03-connect-codex-to-vscode/codex-install-login": {
       "assetKey": "codex-install-login",
@@ -698,17 +722,65 @@
       "post": "06-uv-virtual-environment",
       "sha256": "0c80902222a0ac10e5ba9a3ebf290d4cf674fe9a81290c4621b1a45bc66b9cd5"
     },
+    "06-uv-virtual-environment/two-projects-isolated": {
+      "assetKey": "two-projects-isolated",
+      "path": "objects/sha256/83/83b2838f68bfd12b31ed263ce740834bd6fbcf531e3509e89129d4622c988394.webp",
+      "post": "06-uv-virtual-environment",
+      "sha256": "83b2838f68bfd12b31ed263ce740834bd6fbcf531e3509e89129d4622c988394"
+    },
+    "06-uv-virtual-environment/uv-add-venv": {
+      "assetKey": "uv-add-venv",
+      "path": "objects/sha256/f6/f67b79d561d33b732dfc7832c028564c9b264bcf64eda7b9d32fc6cd2950dc50.webp",
+      "post": "06-uv-virtual-environment",
+      "sha256": "f67b79d561d33b732dfc7832c028564c9b264bcf64eda7b9d32fc6cd2950dc50"
+    },
     "06-uv-virtual-environment/uv-error-recovery": {
       "assetKey": "uv-error-recovery",
       "path": "objects/sha256/1c/1c28b1fe781112889fea5663a81250bd22bc4cd2a3c0e5d4a4f9eae2f2441237.webp",
       "post": "06-uv-virtual-environment",
       "sha256": "1c28b1fe781112889fea5663a81250bd22bc4cd2a3c0e5d4a4f9eae2f2441237"
     },
+    "06-uv-virtual-environment/uv-init-files": {
+      "assetKey": "uv-init-files",
+      "path": "objects/sha256/2b/2ba27a75ec91295faa69b0c15f5843805c104e4c2898fc1a0f961f61fedb4b7a.webp",
+      "post": "06-uv-virtual-environment",
+      "sha256": "2ba27a75ec91295faa69b0c15f5843805c104e4c2898fc1a0f961f61fedb4b7a"
+    },
+    "06-uv-virtual-environment/uv-install-check": {
+      "assetKey": "uv-install-check",
+      "path": "objects/sha256/36/3687fedc92d055252f48b9791b79400350a205641f80d1f6bcab802f7b459444.webp",
+      "post": "06-uv-virtual-environment",
+      "sha256": "3687fedc92d055252f48b9791b79400350a205641f80d1f6bcab802f7b459444"
+    },
+    "06-uv-virtual-environment/uv-run-checkpoints": {
+      "assetKey": "uv-run-checkpoints",
+      "path": "objects/sha256/bf/bf45066a3fb8e281e2fc9893a3fcc4a137c506bdd57d7089ea03af2b4515a001.webp",
+      "post": "06-uv-virtual-environment",
+      "sha256": "bf45066a3fb8e281e2fc9893a3fcc4a137c506bdd57d7089ea03af2b4515a001"
+    },
+    "06-uv-virtual-environment/uv-run-xlsx": {
+      "assetKey": "uv-run-xlsx",
+      "path": "objects/sha256/79/79120921f666a69bf93d7024a5738cc7cdf5bd67f2f56e80fd8fe34c48d9fac2.webp",
+      "post": "06-uv-virtual-environment",
+      "sha256": "79120921f666a69bf93d7024a5738cc7cdf5bd67f2f56e80fd8fe34c48d9fac2"
+    },
     "06-uv-virtual-environment/uv-sync-rebuild": {
       "assetKey": "uv-sync-rebuild",
       "path": "objects/sha256/dc/dcea317ea9a022c4bbcfa312c1fc092a1488033cfadd3bfb6002a1b198c699f5.png",
       "post": "06-uv-virtual-environment",
       "sha256": "dcea317ea9a022c4bbcfa312c1fc092a1488033cfadd3bfb6002a1b198c699f5"
+    },
+    "06-uv-virtual-environment/uv-three-commands": {
+      "assetKey": "uv-three-commands",
+      "path": "objects/sha256/1e/1ea2655dd80e31867eb7ead95e5e6838fbb4d503cac221092ff6613df253844c.webp",
+      "post": "06-uv-virtual-environment",
+      "sha256": "1ea2655dd80e31867eb7ead95e5e6838fbb4d503cac221092ff6613df253844c"
+    },
+    "06-uv-virtual-environment/venv-per-project": {
+      "assetKey": "venv-per-project",
+      "path": "objects/sha256/3c/3c1aebb924abeef86bc9ec81784604eb3fa406329e75f7be639bbb2f7a5a274f.webp",
+      "post": "06-uv-virtual-environment",
+      "sha256": "3c1aebb924abeef86bc9ec81784604eb3fa406329e75f7be639bbb2f7a5a274f"
     },
     "06-uv-virtual-environment/venv-vs-vm": {
       "assetKey": "venv-vs-vm",
@@ -1307,6 +1379,16 @@
       "visualSubject": "통합 Excel 표의 일자와 금액 원문 열 및 변환된 열과 변환 실패 셀과 확인필요 표",
       "width": 1536
     },
+    "1ea2655dd80e31867eb7ead95e5e6838fbb4d503cac221092ff6613df253844c": {
+      "alt": "uv init은 프로젝트 폴더를 만들고 uv add는 .venv와 라이브러리를 넣고 uv run은 그 .venv의 파이썬으로 코드를 실행한다는 세 명령과 각 결과",
+      "bytes": 37244,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/1e/1ea2655dd80e31867eb7ead95e5e6838fbb4d503cac221092ff6613df253844c.webp",
+      "sourcePost": "06-uv-virtual-environment",
+      "visualSubject": "uv init, uv add, uv run 세 카드와 각 카드 아래의 결과물",
+      "width": 2048
+    },
     "1f240a70942f0a8d9b8467bd1242c5ba03fada5cb84e8285a29f94b9388d86dc": {
       "alt": "정상 Excel은 모든 입력 검사를 통과하고 필수 열이 빠진 Excel은 이름이 있는 오류로 끝나는 모습",
       "bytes": 1241065,
@@ -1467,6 +1549,16 @@
       "visualSubject": "세 줄의 import 코드 카드와 모듈 상자 및 클래스 카드와 별칭 토큰",
       "width": 1536
     },
+    "284220fa589041ad108bb0751f6a69116f617551a507dbd1abebceb116b1e707": {
+      "alt": "왼쪽 브라우저는 설치 없이 코드를 실행하고 오른쪽 내 컴퓨터는 엑셀 파일과 결과 파일과 예약 실행까지 다루는 두 갈래 구조",
+      "bytes": 38258,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/28/284220fa589041ad108bb0751f6a69116f617551a507dbd1abebceb116b1e707.webp",
+      "sourcePost": "02-what-is-python",
+      "visualSubject": "설치 없이 Colab, JupyterLite, marimo, Codaro 로 실행하는 브라우저와 Python, VS Code, uv 로 엑셀 파일과 결과 파일과 예약 실행을 다루는 내 컴퓨터의 두 갈래",
+      "width": 2048
+    },
     "2849cbe71d3bfab2d809130f5269575ae5d441c1d26b1b98c791bdd99c96dfe3": {
       "alt": "프로젝트 안의 실행기 하나가 선택되어 상태 표시줄과 새 터미널 양쪽으로 연결된 장면",
       "bytes": 1157746,
@@ -1496,6 +1588,16 @@
       "sourcePost": "019-python-for-loop",
       "visualSubject": "키와 값이 있는 딕셔너리 표 및 키 결과 목록과 값 결과 목록과 키값 쌍 결과 목록",
       "width": 1536
+    },
+    "2ba27a75ec91295faa69b0c15f5843805c104e4c2898fc1a0f961f61fedb4b7a": {
+      "alt": "C 드라이브 python-work 아래에 생긴 expense-review 폴더와 그 안의 main.py, pyproject.toml, .python-version, README.md 파일 넷이 각자 맡은 일과 함께 놓인 그림",
+      "bytes": 26792,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/2b/2ba27a75ec91295faa69b0c15f5843805c104e4c2898fc1a0f961f61fedb4b7a.webp",
+      "sourcePost": "06-uv-virtual-environment",
+      "visualSubject": "C 드라이브에서 python-work를 거쳐 expense-review로 이어지는 경로 사슬과 그 아래 파일 넷의 역할 줄",
+      "width": 2048
     },
     "2c8c45d0cffc4623dec4eeebac08fe61d8d70230472993b3ee4b8ea519c8ee29": {
       "alt": "따옴표 없는 세 값은 + 80000 을 지나 200000 이 되고 따옴표 안의 두 값은 덧셈 앞에서 막히는 두 띠",
@@ -1667,6 +1769,16 @@
       "visualSubject": "지출내역 입력 코드와 여섯 문법 코드 블록 및 합계와 분류 결과표",
       "width": 1536
     },
+    "3687fedc92d055252f48b9791b79400350a205641f80d1f6bcab802f7b459444": {
+      "alt": "PowerShell 창에 winget install 한 줄을 치고 창을 닫았다 다시 연 뒤 uv --version이 판 번호를 찍는 세 단계",
+      "bytes": 30556,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/36/3687fedc92d055252f48b9791b79400350a205641f80d1f6bcab802f7b459444.webp",
+      "sourcePost": "06-uv-virtual-environment",
+      "visualSubject": "번호 1부터 3까지의 PowerShell 화면 칸과 가운데의 창 다시 열기 안내",
+      "width": 2048
+    },
     "36c687f492aac8d1f2909f53cf19d4b701c7326c965e8b51ffa96a7a178386cc": {
       "alt": "넓은 패키지 요구가 잠금 단계에서 정확한 버전 트리로 결정되고 동기화 단계에서 가상환경에 설치되는 장면",
       "bytes": 1393482,
@@ -1786,6 +1898,16 @@
       "sourcePost": "001-what-automation-does",
       "visualSubject": "중앙 Python 스크립트 파일과 연결된 표, 웹 응답, 예약 자동화, AI 모델 결과",
       "width": 1536
+    },
+    "3c1aebb924abeef86bc9ec81784604eb3fa406329e75f7be639bbb2f7a5a274f": {
+      "alt": "왼쪽은 라이브러리를 컴퓨터 한 자리에 모아 두 프로젝트가 같은 자리를 두고 부딪히는 모습이고 오른쪽은 두 프로젝트 폴더가 각자 .venv 안에 다른 openpyxl 판을 담아 서로 닿지 않는 모습",
+      "bytes": 34660,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/3c/3c1aebb924abeef86bc9ec81784604eb3fa406329e75f7be639bbb2f7a5a274f.webp",
+      "sourcePost": "06-uv-virtual-environment",
+      "visualSubject": "왼쪽은 두 자동화가 화살표로 모이는 파이썬 한 자리 상자이고 오른쪽은 각자 .venv를 품은 두 프로젝트 카드",
+      "width": 2048
     },
     "3cf96f7ac03b07501104c128a070b895117bc20f065fa425214c9fd0d9c9b8c8": {
       "alt": "오래된 잠금 파일과 잘못된 CSV 값과 프로젝트 밖 Python이 각각 잠금 갱신과 값 수정과 uv run으로 복구되는 장면",
@@ -2661,6 +2783,16 @@
       "visualSubject": "저장소 이름, 공개 범위, 파일 목록, 커밋 기록, 로컬 git status의 다섯 확인 카드와 그 아래의 판정 지점, 복구점 완성 카드와 업로드 중단 카드를 그렸다",
       "width": 2048
     },
+    "6c67f346dc07280c4e7571455156e38a8962d660a29cd455b1d39e88bb3b6ce8": {
+      "alt": "화면에 확인필요 한 줄을 찍는 같은 동작을 Java는 다섯 줄로, 파이썬은 한 줄로 적은 코드 비교",
+      "bytes": 28652,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/6c/6c67f346dc07280c4e7571455156e38a8962d660a29cd455b1d39e88bb3b6ce8.webp",
+      "sourcePost": "02-what-is-python",
+      "visualSubject": "확인필요 한 줄을 찍는 Java 다섯 줄과 Python 한 줄이 나란히 놓이고 Java 에서 실제로 찍는 한 줄만 강조된 코드 비교",
+      "width": 2048
+    },
     "6cc548bf8e6209c71e075900a220224e8d9e9e660db8052419703b12a214d6e7": {
       "alt": "정상 8건을 부서 네 묶음으로 나누고 묶음마다 건수와 금액합계를 계산해 4행 요약표로 다시 모으는 세 단계",
       "bytes": 455407,
@@ -2840,6 +2972,16 @@
       "sourcePost": "014-python-excel-merge",
       "visualSubject": "통합 표의 고유 ID 검사표와 제외된 중복 행 및 부서별 세 금액 묶음과 부서 미지정 금액과 대사 결과",
       "width": 1536
+    },
+    "79120921f666a69bf93d7024a5738cc7cdf5bd67f2f56e80fd8fe34c48d9fac2": {
+      "alt": "실행 뒤 expense-review 폴더에 생긴 expense_review.xlsx를 열었을 때 보이는 부서와 금액 세 줄과 마지막 합계 250000 줄",
+      "bytes": 20132,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/79/79120921f666a69bf93d7024a5738cc7cdf5bd67f2f56e80fd8fe34c48d9fac2.webp",
+      "sourcePost": "06-uv-virtual-environment",
+      "visualSubject": "expense_review.xlsx를 열었을 때의 부서와 금액 표와 강조된 합계 250000 줄",
+      "width": 2048
     },
     "79349c81900d130243394b66f6de28284c447aa5a24965261d57a69c9f72aa2e": {
       "alt": "거래 표의 행이 부서 색상별 세 묶음으로 갈라지는 모습",
@@ -3022,6 +3164,16 @@
       "sourcePost": "01-instructor-introduction",
       "visualSubject": "종이 증빙 묶음과 키보드에서 시작해 모니터 두 대의 업무 시스템 화면으로 이어지는 하나의 긴 책상",
       "width": 1216
+    },
+    "83b2838f68bfd12b31ed263ce740834bd6fbcf531e3509e89129d4622c988394": {
+      "alt": "openpyxl을 넣은 expense-review는 xlsx 파일을 만들고 넣지 않은 report-review는 같은 코드로 ModuleNotFoundError를 내는 두 폴더 대조",
+      "bytes": 27436,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/83/83b2838f68bfd12b31ed263ce740834bd6fbcf531e3509e89129d4622c988394.webp",
+      "sourcePost": "06-uv-virtual-environment",
+      "visualSubject": "openpyxl이 든 expense-review와 비어 있는 report-review의 .venv, 그리고 각각의 실행 결과",
+      "width": 2048
     },
     "83dbc4a19225e8afc2c8c14efa0daf4a51d11ce528fe920aaf1f782cec19b486": {
       "alt": "department 이름표가 붙은 상자에 영업팀이 들어가 print 두 줄이 영업팀을 찍고, 관리팀을 다시 넣자 그 뒤 print 가 관리팀을 찍는 두 줄",
@@ -3999,6 +4151,16 @@
       "visualSubject": "한 프로젝트에만 연결된 에이전트 설정 파일과 작은 병렬 한도",
       "width": 1536
     },
+    "bf45066a3fb8e281e2fc9893a3fcc4a137c506bdd57d7089ea03af2b4515a001": {
+      "alt": "uv를 찾는지, 지금 폴더가 expense-review인지, 이 프로젝트에 openpyxl을 넣었는지 세 지점을 위에서 아래로 잇고 각 지점에서 오른쪽으로 그때 나오는 메시지를 가리키는 그림",
+      "bytes": 34918,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/bf/bf45066a3fb8e281e2fc9893a3fcc4a137c506bdd57d7089ea03af2b4515a001.webp",
+      "sourcePost": "06-uv-virtual-environment",
+      "visualSubject": "번호 1부터 3까지의 확인 명령 카드와 각 카드 오른쪽에 놓인 그때 보이는 문제와 복구",
+      "width": 2048
+    },
     "bf5c8b44d4666afc4da74ec6de1f76821285a270c2a35cfd1661aef38fe7475e": {
       "alt": "쉼표와 통화 기호 및 공백이 섞인 금액 문자열 세 개가 정수 값 세 개로 바뀌는 모습",
       "bytes": 1259774,
@@ -4387,6 +4549,26 @@
       "path": "objects/sha256/db/dbd8ae93f67a718c2f6e66690e856302103fceafa8a168c4f47128f2e8d18dad.webp",
       "sourcePost": "03-python-basic-syntax",
       "visualSubject": "department = \"영업팀\" 이 department 이름표가 붙은 상자에 영업팀을 넣고 print 두 줄이 영업팀을 찍는 위 줄과, department = \"관리팀\" 이 같은 상자의 값을 관리팀으로 바꿔 그 뒤 print 가 관리팀을 찍는 아래 줄",
+      "width": 2048
+    },
+    "dc0abd205ff5535888c7f7fd1594e2df387fdbaa189dbf65d5d2b18856286719": {
+      "alt": "1989년 12월 개발 시작부터 1991년 2월 첫 공개, 2000년 2.0, 2008년 3.0을 지나 2026년 인기 1위까지 이어지는 파이썬 연표",
+      "bytes": 26472,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/dc/dc0abd205ff5535888c7f7fd1594e2df387fdbaa189dbf65d5d2b18856286719.webp",
+      "sourcePost": "02-what-is-python",
+      "visualSubject": "1989년 12월 취미로 시작, 1991년 2월 0.9.0 첫 공개, 2000년 10월 2.0, 2008년 12월 3.0, 2026년 인기 1위가 하나의 축에 놓인 연표",
+      "width": 2048
+    },
+    "dc4a452d4063d0818af2d4352da432fef05a9d0fe7f7e9611ad3ea9384669d36": {
+      "alt": "수십 개의 프로그래밍 언어 이름이 화면을 빽빽하게 채우고 그 가운데 Python 이 가장 크게 놓인 장면",
+      "bytes": 87848,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/dc/dc4a452d4063d0818af2d4352da432fef05a9d0fe7f7e9611ad3ea9384669d36.webp",
+      "sourcePost": "02-what-is-python",
+      "visualSubject": "수십 개의 실제 프로그래밍 언어 이름이 크기와 각도를 달리해 화면을 빽빽하게 채우고 그 가운데 Python 이 가장 크게 놓인 장면",
       "width": 2048
     },
     "dc7fc4cb85aea713ff43c2dbc40188ec3495aaf78bd0be5bf0df7c4c43b9cf05": {
@@ -4840,6 +5022,16 @@
       "sourcePost": "012-vscode-python-project",
       "visualSubject": "단일 코드 파일만 있는 편집기 화면과 입력 파일, 출력 파일, 코드 파일이 연결된 프로젝트 폴더 트리",
       "width": 1536
+    },
+    "f67b79d561d33b732dfc7832c028564c9b264bcf64eda7b9d32fc6cd2950dc50": {
+      "alt": "uv add openpyxl 전의 파일 넷과 실행 뒤에 .venv와 uv.lock이 늘어난 폴더를 나란히 놓고 pyproject.toml에 openpyxl 한 줄이 적히는 것을 보여 주는 그림",
+      "bytes": 38076,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/f6/f67b79d561d33b732dfc7832c028564c9b264bcf64eda7b9d32fc6cd2950dc50.webp",
+      "sourcePost": "06-uv-virtual-environment",
+      "visualSubject": "실행 전 파일 넷 목록과 실행 뒤 .venv와 uv.lock이 늘어난 목록, 그리고 pyproject.toml에 늘어난 한 줄",
+      "width": 2048
     },
     "f8cfe20051817877de23c035959dcf60be3e94fb8eb0a13e9f7cf6824cf94df9": {
       "alt": "전역 지침 안에 프로젝트 AGENTS.md가 있고 그 안에 하위 폴더 지침과 작업 파일이 차례로 포함된 범위 구조도",
