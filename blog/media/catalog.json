@@ -346,9 +346,9 @@
     },
     "02-what-is-python/java-vs-python": {
       "assetKey": "java-vs-python",
-      "path": "objects/sha256/6c/6c67f346dc07280c4e7571455156e38a8962d660a29cd455b1d39e88bb3b6ce8.webp",
+      "path": "objects/sha256/61/615bce11ad6ae3f84ec67c93cf884c162e6525face71253742f730341d47f670.webp",
       "post": "02-what-is-python",
-      "sha256": "6c67f346dc07280c4e7571455156e38a8962d660a29cd455b1d39e88bb3b6ce8"
+      "sha256": "615bce11ad6ae3f84ec67c93cf884c162e6525face71253742f730341d47f670"
     },
     "02-what-is-python/language-fit": {
       "assetKey": "language-fit",
@@ -358,9 +358,9 @@
     },
     "02-what-is-python/many-languages": {
       "assetKey": "many-languages",
-      "path": "objects/sha256/dc/dc4a452d4063d0818af2d4352da432fef05a9d0fe7f7e9611ad3ea9384669d36.webp",
+      "path": "objects/sha256/3d/3d01d47173b25d78c6ddfd6ed143e14daa39a18c4288227be701d8a7ad290220.webp",
       "post": "02-what-is-python",
-      "sha256": "dc4a452d4063d0818af2d4352da432fef05a9d0fe7f7e9611ad3ea9384669d36"
+      "sha256": "3d01d47173b25d78c6ddfd6ed143e14daa39a18c4288227be701d8a7ad290220"
     },
     "02-what-is-python/py-file-connects": {
       "assetKey": "py-file-connects",
@@ -376,15 +376,15 @@
     },
     "02-what-is-python/python-history": {
       "assetKey": "python-history",
-      "path": "objects/sha256/dc/dc0abd205ff5535888c7f7fd1594e2df387fdbaa189dbf65d5d2b18856286719.webp",
+      "path": "objects/sha256/9b/9b02ed87705f764b152aab7046b8a5357b00e477a5b4e0d52eefeaaa0f89cb01.webp",
       "post": "02-what-is-python",
-      "sha256": "dc0abd205ff5535888c7f7fd1594e2df387fdbaa189dbf65d5d2b18856286719"
+      "sha256": "9b02ed87705f764b152aab7046b8a5357b00e477a5b4e0d52eefeaaa0f89cb01"
     },
     "02-what-is-python/two-places-to-run": {
       "assetKey": "two-places-to-run",
-      "path": "objects/sha256/28/284220fa589041ad108bb0751f6a69116f617551a507dbd1abebceb116b1e707.webp",
+      "path": "objects/sha256/5f/5fd3b583581dd4b32a6716e53107bdc2d7ff4c228ed51a507229077af5bec80f.webp",
       "post": "02-what-is-python",
-      "sha256": "284220fa589041ad108bb0751f6a69116f617551a507dbd1abebceb116b1e707"
+      "sha256": "5fd3b583581dd4b32a6716e53107bdc2d7ff4c228ed51a507229077af5bec80f"
     },
     "03-connect-codex-to-vscode/codex-install-login": {
       "assetKey": "codex-install-login",
@@ -1469,6 +1469,16 @@
       "visualSubject": "Excel 표 안에서 서로 반대로 바뀐 두 지출 행과 그대로인 총액 저울 및 끊어진 행별 비교선",
       "width": 1536
     },
+    "241e2727679c82404d571afa9bd638203682a591c702bbbf27daa03ca8e97ba5": {
+      "alt": "1989년 12월 개발 시작부터 1991년 2월 첫 공개, 2000년 2.0, 2008년 3.0을 지나 2026년 인기 1위까지 이어지는 파이썬 연표",
+      "bytes": 30424,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/24/241e2727679c82404d571afa9bd638203682a591c702bbbf27daa03ca8e97ba5.webp",
+      "sourcePost": "02-what-is-python",
+      "visualSubject": "1989년 12월 취미로 시작, 1991년 2월 0.9.0 첫 공개, 2000년 10월 2.0, 2008년 12월 3.0, 2026년 인기 1위가 하나의 축에 놓인 연표",
+      "width": 2048
+    },
     "24874ecb29f6f2d522b76f91e1a3e5a6b98e690937bfcc38a0ab708e49e4f326": {
       "alt": "정상 변환 규칙과 오류 예외 흐름 및 수정 금지 경계가 세 영역으로 분리된 작업지시서",
       "bytes": 1398691,
@@ -1918,6 +1928,16 @@
       "sourcePost": "013-uv-python-environment",
       "visualSubject": "서로 다른 의존성 설정과 잠금 파일, 잘못된 CSV 셀, 프로젝트 밖 Python 경로, 각각 고쳐진 잠금 트리와 숫자 셀과 프로젝트 안 실행기",
       "width": 1536
+    },
+    "3d01d47173b25d78c6ddfd6ed143e14daa39a18c4288227be701d8a7ad290220": {
+      "alt": "수십 개의 프로그래밍 언어 이름이 화면을 빽빽하게 채우고 그 가운데 Python 이 가장 크게 놓인 장면",
+      "bytes": 87314,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/3d/3d01d47173b25d78c6ddfd6ed143e14daa39a18c4288227be701d8a7ad290220.webp",
+      "sourcePost": "02-what-is-python",
+      "visualSubject": "수십 개의 실제 프로그래밍 언어 이름이 크기와 각도를 달리해 화면을 빽빽하게 채우고 그 가운데 Python 이 가장 크게 놓인 장면",
+      "width": 2048
     },
     "3d1c8090039ea843d0329f7de96ec4ce0a8cc2c077797f02f6dfdcc33e771e4b": {
       "alt": "숫자 구간과 정확한 값 대응 및 두 선택이 각각 if와 대응표 및 짧은 선택식으로 나뉘는 모습",
@@ -2533,6 +2553,16 @@
       "visualSubject": "사업자등록번호 열, 보정 열, 사업상태 결과가 있는 표 화면",
       "width": 918
     },
+    "5fd3b583581dd4b32a6716e53107bdc2d7ff4c228ed51a507229077af5bec80f": {
+      "alt": "왼쪽 브라우저는 설치 없이 코드를 실행하고 오른쪽 내 컴퓨터는 엑셀 파일과 결과 파일과 예약 실행까지 다루는 두 갈래 구조",
+      "bytes": 38252,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/5f/5fd3b583581dd4b32a6716e53107bdc2d7ff4c228ed51a507229077af5bec80f.webp",
+      "sourcePost": "02-what-is-python",
+      "visualSubject": "설치 없이 Colab, JupyterLite, marimo, Codaro 로 실행하는 브라우저와 Python, VS Code, uv 로 엑셀 파일과 결과 파일과 예약 실행을 다루는 내 컴퓨터의 두 갈래",
+      "width": 2048
+    },
     "60ae3e534f05c0c553dc43a2491ea7319262065266fef9f503008e942a5ac5e4": {
       "alt": "부서별 거래 묶음에서 건수와 합계 및 평균이 계산되어 한 요약 행으로 합쳐지는 모습",
       "bytes": 1301402,
@@ -2542,6 +2572,16 @@
       "sourcePost": "027-pandas-groupby-summary",
       "visualSubject": "세 부서 거래 묶음과 건수 및 합계와 평균 계산 카드 및 세 행 요약표",
       "width": 1536
+    },
+    "615bce11ad6ae3f84ec67c93cf884c162e6525face71253742f730341d47f670": {
+      "alt": "화면에 확인필요 한 줄을 찍는 같은 동작을 Java는 다섯 줄로, 파이썬은 한 줄로 적은 코드 비교",
+      "bytes": 28642,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/61/615bce11ad6ae3f84ec67c93cf884c162e6525face71253742f730341d47f670.webp",
+      "sourcePost": "02-what-is-python",
+      "visualSubject": "확인필요 한 줄을 찍는 Java 다섯 줄과 Python 한 줄이 나란히 놓이고 Java 에서 실제로 찍는 한 줄만 강조된 코드 비교",
+      "width": 2048
     },
     "6193b52e2320940745e2097621608c6215b8091c6534113ac5dd967d9d3d5b34": {
       "alt": "정상과 경계 직전과 경계값과 취소 및 오류 조건을 한 행씩 담은 5행 합성 Excel",
@@ -3245,6 +3285,16 @@
       "visualSubject": "실행 프로그램 토큰과 매개변수 토큰 및 값 토큰과 스위치 토큰, 셸 해석 화면, 외부 프로그램과 결과 카드",
       "width": 1536
     },
+    "89449829372f465c43fb4ce9890e3262cf9b73b3ecf58eb38382f185c87dabb9": {
+      "alt": "수십 개의 프로그래밍 언어 이름이 화면을 빽빽하게 채우고 그 가운데 Python 이 가장 크게 놓인 장면",
+      "bytes": 86766,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/89/89449829372f465c43fb4ce9890e3262cf9b73b3ecf58eb38382f185c87dabb9.webp",
+      "sourcePost": "02-what-is-python",
+      "visualSubject": "수십 개의 실제 프로그래밍 언어 이름이 크기와 각도를 달리해 화면을 빽빽하게 채우고 그 가운데 Python 이 가장 크게 놓인 장면",
+      "width": 2048
+    },
     "8950ee48fdd6e5ba0e433bc74d89800cdc5246a9f20c84f3cba6bccae4d376ee": {
       "alt": "0원과 두 기준선이 숫자 축을 정상과 확인필요 및 승인필요 세 구간으로 나누는 모습",
       "bytes": 1118432,
@@ -3528,6 +3578,16 @@
       "sourcePost": "002-what-is-python",
       "visualSubject": "브라우저, 모바일 앱, 속도계가 있는 엔진, 서버, 데이터와 AI 작업 카드와 서로 다른 코드 경로",
       "width": 1536
+    },
+    "9b02ed87705f764b152aab7046b8a5357b00e477a5b4e0d52eefeaaa0f89cb01": {
+      "alt": "1989년 12월 개발 시작부터 1991년 2월 첫 공개, 2000년 2.0, 2008년 3.0을 지나 2026년 인기 1위까지 이어지는 연표와 파이썬 사용자들이 인용하는 원칙 두 줄",
+      "bytes": 32852,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/9b/9b02ed87705f764b152aab7046b8a5357b00e477a5b4e0d52eefeaaa0f89cb01.webp",
+      "sourcePost": "02-what-is-python",
+      "visualSubject": "1989년 12월 개발 시작, 1991년 2월 0.9.0 첫 공개, 2000년 10월 2.0, 2008년 12월 3.0, 2026년 인기 1위가 하나의 축에 놓인 연표와 그 아래 파이썬 사용자들이 인용하는 원칙 두 줄",
+      "width": 2048
     },
     "9b3c843cc214d9708408493e6ff8efd7dd4752429db95278276c600bcc8ef6d7": {
       "alt": "부서 누락과 고액 검사가 각각 실행되어 한 거래에 두 문제 카드가 함께 붙는 모습",

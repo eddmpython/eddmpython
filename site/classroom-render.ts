@@ -214,7 +214,7 @@ export type CourseScene = {
  * 표나 실행 칸을 시각물로 세던 옛 계약의 묶음은 장면의 시각물 수가 어긋나 강의 모드가 닫히므로,
  * 이 런타임을 배포한 직후 교안을 다시 발행한다.
  */
-export const COURSE_SCENE_RUNTIME = 11;
+export const COURSE_SCENE_RUNTIME = 12;
 
 export type CourseSceneFrame = {
   effect: CourseSceneBeat["effect"];
@@ -664,7 +664,18 @@ function renderMarkdownParts(
       const embed = courseEmbed(content);
       out.push(embed ? visual(embed, state) : `<div class="pending"><b>embed 계약 오류</b></div>`);
     } else if (language !== "course-scene") {
-      out.push(visual(`<pre>${esc(content)}</pre>`, state));
+      /**
+       * 코드 펜스는 강의 시각물이 아니다 (계약 12, 2026-09-03 운영자 지시).
+       *
+       * `Python 3.14.7` 같은 출력 한 줄이 16:9 무대를 차지하면 강의 화면이 글자판이 된다.
+       * 코드와 명령과 출력은 표, 실행 칸과 같이 읽기 본문의 설명 자료다. 시각물 번호를
+       * 주지 않으므로 무대에도 오르지 않고 beat 대상도 되지 않는다.
+       *
+       * **교안 정본 `eddmpython-course/scripts/course-scene.mjs` 의 `visualInventory` 와
+       * 같은 판정이어야 한다.** 한쪽만 코드를 세면 장면의 시각물 번호가 어긋나 무대에
+       * 엉뚱한 자료가 뜬다.
+       */
+      out.push(`<pre>${esc(content)}</pre>`);
     }
     at = m.index + m[0].length;
   }

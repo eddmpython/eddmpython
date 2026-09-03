@@ -30,7 +30,8 @@ check("코드 안의 빈 줄이 코드를 가르지 않는다", () => {
   const html = renderMarkdown(
     ["```python", "a = 1", "", "print(a)", "```"].join("\n"),
   );
-  assert.equal(html, '<pre data-visual="1">a = 1\n\nprint(a)</pre>');
+  // 코드 펜스는 강의 시각물이 아니다 (계약 12). 시각물 번호를 받지 않는다.
+  assert.equal(html, "<pre>a = 1\n\nprint(a)</pre>");
   // 갈라졌다면 pre 가 둘이거나 p 가 생긴다
   assert.equal(html.match(/<pre(?:\s|>)/g)?.length, 1);
   assert.ok(!html.includes("<p>"));
@@ -688,6 +689,9 @@ check("읽기 본문 하나를 장면과 비트 계약으로 투영한다", () =
     "",
     "### 코드 결과를 확인합니다",
     "",
+    // 계약 12 부터 무대는 이미지, 영상, 시뮬레이션이 맡는다. 코드는 읽기 본문의 설명 자료다.
+    "![결과 화면](https://example.com/b.svg)",
+    "",
     "```text",
     "결과 1",
     "```",
@@ -701,9 +705,9 @@ check("읽기 본문 하나를 장면과 비트 계약으로 투영한다", () =
   ];
   const lecture = renderLecture(body, scenes);
   assert.equal(lecture.ok, true);
-  // 강의 셸은 H2 하나를 장표 하나로 만들고 모든 시각물을 같은 캐러셀에 둔다. 11 은 절의 뼈대를
-  // 제목, 부제, 시각물, 서술형 설명으로 고정한 판이고 장면이 싣는 값의 모양은 10 과 같다.
-  assert.equal(COURSE_SCENE_RUNTIME, 11);
+  // 강의 셸은 H2 하나를 장표 하나로 만들고 모든 시각물을 같은 캐러셀에 둔다. 12 는 코드 펜스를
+  // 시각물에서 뺀 판이고, 무대에는 이미지와 영상과 시뮬레이션만 오른다.
+  assert.equal(COURSE_SCENE_RUNTIME, 12);
   assert.equal(lecture.html.match(/class="lecture-scene"/g)?.length, 2);
   assert.ok(lecture.html.includes('data-layout="stage"'));
   assert.ok(lecture.html.includes('data-fit="cover-top"'));
