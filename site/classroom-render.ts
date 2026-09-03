@@ -176,15 +176,17 @@ const PENDING = /^media:\/\/([a-z0-9-]+)$/i;
  * (2026-09-02 운영자 결정). Worker 는 방 세션이 있는 요청에만 준다. 교안은 방 이름을 모르므로
  * 렌더러가 `/room/<방>/media/<이름>` 으로 바꿔 그린다. 주소는 내용 해시라 추측할 수 없다.
  *
- * `xlsx` 는 시각물이 아니라 실습 파일이다 (2026-09-04). 교안은 이미지 문법이 아니라
- * `[파일이름.xlsx](room://...)` 링크로 적고 `inline` 이 내려받기 링크로 바꾼다.
+ * `xlsx`, `py`, `zip` 은 시각물이 아니라 실습 파일이다 (2026-09-04). 교안은 이미지 문법이 아니라
+ * `[파일이름.xlsx](room://...)` 링크로 적고 `inline` 이 내려받기 링크로 바꾼다. 완성 코드와 바로
+ * 도는 묶음까지 내주는 이유는 순서를 따라가다 실패한 사람도 결과물을 쓸 수 있어야 하기 때문이다
+ * (운영자 지시).
  *
  * **`eddmpython-course/scripts/roomMediaCatalog.mjs` 의 `ROOM_MEDIA` 와 같아야 한다.**
  * 한쪽을 고치면 다른 쪽도 같은 날 고친다.
  */
-export const ROOM_MEDIA = /^room:\/\/([a-f0-9]{64}\.(?:png|webp|jpg|gif|mp4|webm|xlsx))$/;
+export const ROOM_MEDIA = /^room:\/\/([a-f0-9]{64}\.(?:png|webp|jpg|gif|mp4|webm|xlsx|py|zip))$/;
 /** Worker 가 경로에서 받는 객체 이름. `..` 같은 것은 여기서 걸러진다. */
-export const ROOM_MEDIA_KEY = /^[a-f0-9]{64}\.(?:png|webp|jpg|gif|mp4|webm|xlsx)$/;
+export const ROOM_MEDIA_KEY = /^[a-f0-9]{64}\.(?:png|webp|jpg|gif|mp4|webm|xlsx|py|zip)$/;
 const MEDIA_TYPES: Record<string, string> = {
   png: "image/png",
   webp: "image/webp",
@@ -193,6 +195,8 @@ const MEDIA_TYPES: Record<string, string> = {
   mp4: "video/mp4",
   webm: "video/webm",
   xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  py: "text/x-python; charset=utf-8",
+  zip: "application/zip",
 };
 
 export function mediaContentType(key: string): string {
