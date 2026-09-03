@@ -74,8 +74,10 @@ const CLASSROOM_STYLE = `
   transition:width .1s linear; }
 /* 섹션을 닫는 질문. 본문에 묻히지 않게 한 단 밝게 둔다. */
 article .q { font-style:normal; color:var(--eddm-ivory); }
-.body h1 { margin:0 0 .7rem; font-size:1.75rem; letter-spacing:-.02em; line-height:1.3; }
-.body .sub { margin:0 0 2.5rem; color:var(--eddm-text-muted); line-height:1.7; }
+.body h1 { margin:0 0 .7rem; font-size:2.25rem; letter-spacing:-.02em; line-height:1.25; }
+/* 요약은 제목 줄 밖에 둔다. 제목 줄은 강의 모드 단추와 폭을 나누므로 요약까지 그 안에 두면
+   본문이나 시각물보다 이른 자리에서 줄이 바뀐다 (2026-09-03 운영자 지적). */
+.body .sub { margin:0 0 2.5rem; font-size:1.125rem; color:var(--eddm-text-muted); line-height:1.7; }
 .body-top { display:flex; align-items:flex-start; justify-content:space-between; gap:1.5rem; }
 .body-title { flex:1; min-width:0; }
 .lecture-open { flex:0 0 auto; display:inline-flex; align-items:center; gap:.5rem; margin-top:.15rem;
@@ -1696,12 +1698,12 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
            <div class="body-top"><div class="body-title">
              <p class="eyebrow">${esc(category.title)} · ${at + 1}편</p>
              <h1>${esc(post.title)}</h1>
-             <p class="sub">${esc(post.summary)}</p>
            </div>${
              lecture.ok
                ? `<button type="button" class="lecture-open" data-lecture-open><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="m9 21 3-4 3 4M8 9h8M8 12h5"/></svg>강의 모드</button>`
                : ""
            }</div>
+           <p class="sub">${esc(post.summary)}</p>
            <article>${html}</article>
            ${foot}
          </main>
