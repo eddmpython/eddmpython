@@ -334,9 +334,9 @@
     },
     "02-daily-scheduled-run/schedule-prompt-card": {
       "assetKey": "schedule-prompt-card",
-      "path": "objects/sha256/3a/3a532776f243e1848b0d3ddc1f4c917478dacc685e410a9862b3cdc04c659cef.webp",
+      "path": "objects/sha256/ee/ee269894ef37a9fb989ba37c932819f8c138109f7565db98d43456d2465dbfa3.webp",
       "post": "02-daily-scheduled-run",
-      "sha256": "3a532776f243e1848b0d3ddc1f4c917478dacc685e410a9862b3cdc04c659cef"
+      "sha256": "ee269894ef37a9fb989ba37c932819f8c138109f7565db98d43456d2465dbfa3"
     },
     "02-daily-scheduled-run/terminal-manual-run": {
       "assetKey": "terminal-manual-run",
@@ -5166,6 +5166,16 @@
       "sourcePost": "040-thirty-day-plan",
       "visualSubject": "주간 달력 화면과 세 번의 자동화 실행 명령 및 합성 Excel과 동일한 결과 카드와 기준선 문서",
       "width": 1536
+    },
+    "ee269894ef37a9fb989ba37c932819f8c138109f7565db98d43456d2465dbfa3": {
+      "alt": "지시문 카드에 실행 파일 run_check.cmd, 등록 파일 register_task.cmd, 확인과 지우기 명령 세 항목이 적힌 모습",
+      "bytes": 52438,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/ee/ee269894ef37a9fb989ba37c932819f8c138109f7565db98d43456d2465dbfa3.webp",
+      "sourcePost": "02-daily-scheduled-run",
+      "visualSubject": "실행 파일, 등록 파일, 확인과 지우기 명령 세 항목",
+      "width": 2048
     },
     "ee2838cfef2ca70fb1c161bd28a8ba63e80e4b4f217c4fe38b7e8a05ee9079eb": {
       "alt": "같은 Python 코드 파일이 패키지 목록이 다른 두 컴퓨터에서 성공과 실패로 나뉘는 장면",
