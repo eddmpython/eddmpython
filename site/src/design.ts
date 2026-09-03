@@ -85,6 +85,14 @@ export const DESIGN = {
     sectionTitle: {
       mobile: "1.375rem",
       desktop: "1.5rem",
+      /**
+       * 강의장은 한 단계 크다 (2026-09-03 운영자 지시).
+       *
+       * 블로그는 혼자 가까이서 읽지만 강의장은 강사가 띄워 놓고 여럿이 본다. 같은 24px 이
+       * 강의방에서는 작아서 섹션 경계가 눈에 안 들어온다. 랜딩과 블로그의 위계는 건드리지
+       * 않고 강의장 표면만 올린다.
+       */
+      desktopCourse: "1.75rem",
       lineHeight: "1.35",
       weight: "600",
       tracking: "-.015em",
@@ -162,6 +170,7 @@ function sharedDeclarations(): string {
     "--eddm-motion-easing": d.motion.easing,
     "--eddm-section-title-size-mobile": section.mobile,
     "--eddm-section-title-size-desktop": section.desktop,
+    "--eddm-section-title-size-desktop-course": section.desktopCourse,
     "--eddm-section-title-line-height": section.lineHeight,
     "--eddm-section-title-weight": section.weight,
     "--eddm-section-title-tracking": section.tracking,

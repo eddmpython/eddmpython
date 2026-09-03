@@ -144,7 +144,8 @@ article h2 { margin:4rem 0 .5rem; padding-top:1.75rem; border-top:1px solid var(
   letter-spacing:var(--eddm-section-title-tracking); line-height:var(--eddm-section-title-line-height);
   display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:1.25rem; align-items:center; }
 @media (min-width:768px) {
-  article h2 { font-size:var(--eddm-section-title-size-desktop); }
+  /* 강의장은 여럿이 띄워 놓고 보는 화면이라 블로그보다 한 단계 크다 (design.ts 의 desktopCourse) */
+  article h2 { font-size:var(--eddm-section-title-size-desktop-course); }
 }
 article h2:first-child { margin-top:0; padding-top:0; border-top:0; }
 /* 섹션 번호. 목차의 번호와 같아서 지금 몇 번째인지 세지 않고 안다. */
@@ -247,7 +248,8 @@ article tbody tr:last-child td { border-bottom:0; }
 .visual-carousel figure.course-embed figcaption { position:absolute; z-index:3; right:.65rem; bottom:.65rem; left:.65rem;
   width:auto; margin:0; padding:.45rem .6rem; border-radius:.4rem;
   background:color-mix(in srgb,var(--eddm-carbon) 82%,transparent); color:var(--eddm-ivory);
-  font-size:.78rem; line-height:1.45; }
+  /* 시각물 위에 얹히는 캡션. 12.5px 은 강의방에서 안 읽혀서 본문 캡션과 같은 15px 로 둔다 */
+  font-size:.9375rem; line-height:1.5; }
 .visual-carousel-label { margin:1.6rem 0 .55rem; }
 .visual-carousel-label p.lb { margin:0; }
 .visual-carousel-caption { margin:.65rem 0 0; color:var(--eddm-text-muted); }
