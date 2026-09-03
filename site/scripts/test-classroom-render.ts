@@ -827,4 +827,102 @@ check("용어가 여럿이면 id 가 이어 붙는다", () => {
   assert.ok(html.includes('id="term-r-2"'));
 });
 
+/*
+ * 읽기 모드의 실행 칸.
+ *
+ * 2026-09-03 운영자 지시다. 코드 실습은 비율을 지킬 이유가 없다. 16:9 무대에 가두면 안쪽
+ * 스크롤과 빈 자리만 생긴다. 읽기 모드에서는 codaro 셀처럼 본문 흐름에 놓고 내용만큼 자란다.
+ */
+check("읽기 모드는 실행 칸을 16대9 캐러셀에 넣지 않고 본문 흐름의 셀로 둔다", () => {
+  const body = [
+    "## 실습 장면",
+    "",
+    "### 값을 바꿔 실행합니다",
+    "",
+    "실행 전 설명입니다.",
+    "",
+    CELL_URL,
+    "",
+    "실행 뒤 설명입니다.",
+  ].join("\n");
+  const scene = { id: "s1", role: "explain", layout: "demo", visualCount: 1,
+    beats: [{ effect: "run", targets: [1] }] } as CourseScene;
+  const { html } = renderPost(body, CELLS, {}, { scenes: [scene] });
+  assert.ok(!html.includes("visual-carousel"));
+  assert.ok(!html.includes("data-carousel-item"));
+  assert.ok(html.includes('<section data-visual="1" class="cell" data-cell="expense-variables"'));
+  assert.ok(html.indexOf("<p>실행 전 설명입니다.</p>") < html.indexOf('data-cell="expense-variables"'));
+  assert.ok(html.indexOf('data-cell="expense-variables"') < html.indexOf("<p>실행 뒤 설명입니다.</p>"));
+});
+
+check("같은 H2의 이미지는 캐러셀에 남고 실행 칸은 라벨과 설명을 데리고 제자리에 남는다", () => {
+  const body = [
+    "## 섞인 장면",
+    "",
+    "### 화면을 본 뒤 직접 실행합니다",
+    "",
+    "**먼저 화면**",
+    "",
+    '![화면](https://a.b/1.png "화면 캡션")',
+    "",
+    "화면 설명입니다.",
+    "",
+    "**직접 실행**",
+    "",
+    CELL_URL,
+    "",
+    "실행 설명입니다.",
+    "",
+    "**결과 화면**",
+    "",
+    '![결과](https://a.b/2.png "결과 캡션")',
+    "",
+    "결과 설명입니다.",
+  ].join("\n");
+  const scene = { id: "s1", role: "explain", layout: "sequence", visualCount: 3,
+    beats: [{ effect: "enter", targets: [1] }, { effect: "run", targets: [2] }, { effect: "replace", targets: [3] }] } as CourseScene;
+  const { html } = renderPost(body, CELLS, {}, { scenes: [scene] });
+  // 실행 칸 앞뒤의 이미지는 각각 한 장짜리 캐러셀이 된다. 실행 칸을 건너뛰어 하나로 합치면 읽는 순서가 깨진다.
+  assert.equal(html.match(/class="visual-carousel"/g)?.length, 2);
+  assert.equal(html.match(/data-carousel-count="1"/g)?.length, 2);
+  assert.ok(!html.includes('data-carousel-item="2"'));
+  const cellAt = html.indexOf('data-cell="expense-variables"');
+  assert.ok(html.indexOf("화면 설명입니다.") < html.indexOf('<p class="lb"><strong>직접 실행</strong></p>'));
+  assert.ok(html.indexOf('<p class="lb"><strong>직접 실행</strong></p>') < cellAt);
+  assert.ok(cellAt < html.indexOf("<p>실행 설명입니다.</p>"));
+  assert.ok(html.indexOf("<p>실행 설명입니다.</p>") < html.indexOf("결과 캡션"));
+  assert.ok(html.indexOf("결과 캡션") < html.indexOf("결과 설명입니다."));
+});
+
+check("강의 모드는 실행 칸을 무대 캐러셀 항목으로 그대로 둔다", () => {
+  const body = ["## 실습 장면", "", "### 값을 바꿔 실행합니다", "", CELL_URL].join("\n");
+  const scene = { id: "s1", role: "explain", layout: "demo", visualCount: 1,
+    beats: [{ effect: "run", targets: [1] }] } as CourseScene;
+  const lecture = renderLecture(body, [scene], CELLS);
+  assert.equal(lecture.ok, true);
+  assert.equal(lecture.hasCells, true);
+  assert.ok(lecture.html.includes('<section data-carousel-item="1" data-visual="1" class="cell" data-cell="expense-variables"'));
+});
+
+check("실행 칸은 실행 전에 상태 글자와 자리 표시 출력을 두지 않는다", () => {
+  const html = renderMarkdown(CELL_URL, [], CELLS);
+  assert.ok(!html.includes("실행 준비됨"));
+  assert.ok(!html.includes("실행을 누르면"));
+  assert.ok(html.includes('<div class="cell-out" data-output hidden>'));
+  assert.ok(html.includes('<button type="button" class="cell-reset" data-reset hidden>처음으로</button>'));
+  assert.ok(html.includes('<button type="button" class="cell-run" data-run>'));
+  // 첫 높이는 줄 수와 같다. 스크립트가 맞춘 높이와 같아야 열릴 때 출렁이지 않는다.
+  assert.ok(html.includes('rows="2"'));
+  assert.ok(html.includes('aria-label="부서와 기준금액 바꾸기 실습"'));
+});
+
+check("제목이 없거나 비어 있는 실행 칸은 실습이라는 이름 하나만 쓴다", () => {
+  for (const cell of [{ code: "x = 1" }, { title: "  ", code: "x = 1" }]) {
+    const html = renderMarkdown(CELL_URL, [], { "expense-variables": cell });
+    assert.ok(html.includes('aria-label="실습"'));
+    assert.ok(html.includes('<span class="cell-t">실습</span>'));
+    assert.ok(!html.includes("실습 실습"));
+  }
+});
+
 console.log(`classroom render: 코드 분할과 escape 등 ${count} cases`);

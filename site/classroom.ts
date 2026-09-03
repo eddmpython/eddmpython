@@ -171,32 +171,46 @@ article th, article td { padding:.75rem .85rem; border-bottom:1px solid var(--ed
 article th { color:var(--eddm-ivory); background:var(--eddm-hover); font-size:.86rem; font-weight:500; }
 article td { color:var(--eddm-text); font-size:.88rem; }
 article tbody tr:last-child td { border-bottom:0; }
-.cell { margin:1.9rem 0; border:1px solid var(--eddm-accent-line); border-radius:.85rem; overflow:hidden;
-  background:var(--eddm-raise); }
-.cell.bad { border-color:var(--eddm-danger-line); }
-.cell-h { display:flex; align-items:center; gap:.5rem; padding:.7rem 1rem;
-  border-bottom:1px solid var(--eddm-line-base); background:var(--eddm-accent-bg); }
-.cell-dot { width:6px; height:6px; border-radius:50%; background:var(--eddm-accent); flex:0 0 auto; }
-.cell-k { font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--eddm-accent); }
-.cell-s { margin-left:auto; font-size:.78rem; color:var(--eddm-text-faint); }
-.cell-t { margin:.9rem 1rem .2rem; font-size:.98rem; color:var(--eddm-text); font-weight:500; }
-.cell-d { margin:.2rem 1rem .8rem; font-size:.88rem; line-height:1.7; color:var(--eddm-text-muted); }
-.cell-c { display:block; width:100%; box-sizing:border-box; resize:vertical; border:0; outline:0;
-  background:var(--eddm-code-surface); color:var(--eddm-text); padding:.9rem 1rem; line-height:1.65;
-  font-family:inherit; font-size:.86rem; white-space:pre; overflow-x:auto; }
+/* 실습 칸. 읽기 모드에서는 16:9 무대가 아니라 codaro 학습 셀처럼 내용만큼 자라는 카드다.
+   제목 줄과 실행 하나, 설명과 할 일, 코드 칸, 실행한 뒤에만 열리는 출력 상자를 위에서 아래로 둔다. */
+.cell { margin:1.75rem 0; padding:1rem 1.2rem 1.2rem; box-sizing:border-box; border:1px solid var(--eddm-line-base);
+  border-radius:.75rem; background:var(--eddm-raise); }
+.cell-h { display:flex; align-items:center; gap:.6rem; }
+.cell-t { flex:1 1 auto; min-width:0; font-size:.98rem; font-weight:600; line-height:1.5; color:var(--eddm-ivory); }
+.cell-h button { flex:0 0 auto; display:inline-flex; align-items:center; gap:.4rem; height:2rem; padding:0 .8rem;
+  border:1px solid var(--eddm-line-strong); border-radius:.5rem; background:transparent; color:var(--eddm-text);
+  font:inherit; font-size:.84rem; line-height:1; cursor:pointer; }
+.cell-h button:hover { border-color:var(--eddm-accent-line); background:var(--eddm-accent-bg); }
+.cell-h button[hidden] { display:none; }
+.cell-run { background:var(--eddm-ivory); color:var(--eddm-carbon); border-color:transparent; font-weight:500; }
+.cell-run:hover { background:var(--eddm-ivory); border-color:transparent; opacity:.88; }
+.cell-run svg { width:.65rem; height:.65rem; fill:currentColor; }
+.cell-run:disabled { opacity:.6; cursor:default; }
+.cell-d { margin:.6rem 0 0; font-size:.92rem; line-height:1.7; color:var(--eddm-text); }
+.cell-hint { margin:.3rem 0 0; font-size:.86rem; line-height:1.65; color:var(--eddm-text-muted); }
+.cell-f { margin-top:.85rem; overflow:hidden; border:1px solid var(--eddm-line-base); border-radius:.55rem;
+  transition:border-color var(--eddm-motion-fast) var(--eddm-motion-easing); }
+.cell-f:hover { border-color:var(--eddm-line-strong); }
+.cell-f:focus-within, .cell[data-cell-state="running"] .cell-f { border-color:var(--eddm-accent); }
+/* 코드 칸은 내용만큼 자란다. 세로 스크롤과 크기 조절 손잡이를 두지 않고 긴 줄만 가로로 민다. */
+.cell-c { display:block; width:100%; min-height:3.2rem; box-sizing:border-box; margin:0; padding:.85rem 1rem;
+  resize:none; border:0; outline:0; background:var(--eddm-code-surface); color:var(--eddm-text);
+  font-family:var(--eddm-font-mono); font-size:.86rem; line-height:1.65; tab-size:4; white-space:pre;
+  overflow-x:auto; overflow-y:hidden; }
 .cell-c:focus { background:var(--eddm-code-focus); }
-.cell-b { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem; padding:.75rem 1rem;
-  border-top:1px solid var(--eddm-line-base); }
-.cell-b button { border-radius:.5rem; padding:.4rem .9rem; font-size:.86rem; cursor:pointer;
-  border:1px solid var(--eddm-line-strong); background:transparent; color:var(--eddm-text); }
-.cell-b button[data-run] { background:var(--eddm-ivory); color:var(--eddm-carbon); border-color:transparent; font-weight:500; }
-.cell-b button:disabled { opacity:.5; cursor:default; }
-.cell-hint { font-size:.78rem; color:var(--eddm-text-faint); }
-.cell-o { margin:0; padding:.9rem 1rem; border-top:1px solid var(--eddm-line-base);
-  background:transparent; border-radius:0; max-height:18rem; overflow:auto; font-size:.82rem;
-  line-height:1.6; color:var(--eddm-text-muted); white-space:pre-wrap; word-break:break-word; }
+/* 출력 상자의 왼쪽 선은 결과 상태다. 정상은 색이 아니라 밝기로, 오류만 경고색으로 가른다. */
+.cell-out { margin-top:.75rem; border:1px solid var(--eddm-line-base); border-left:2px solid var(--eddm-ivory);
+  border-radius:.55rem; background:var(--eddm-code-surface); }
+.cell-out[hidden] { display:none; }
+.cell-out-h { display:flex; align-items:center; gap:.6rem; padding:.45rem .9rem; border-bottom:1px solid var(--eddm-line);
+  font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--eddm-text-faint); }
+.cell-s { margin-left:auto; font-size:.76rem; letter-spacing:0; text-transform:none; color:var(--eddm-text-faint); }
+.cell-o { margin:0; padding:.75rem .9rem; max-height:24rem; overflow:auto; background:transparent; border:0; border-radius:0;
+  font-family:var(--eddm-font-mono); font-size:.84rem; line-height:1.6; color:var(--eddm-text);
+  white-space:pre-wrap; word-break:break-word; }
+.cell.bad .cell-out { border-left-color:var(--eddm-danger); }
 .cell.bad .cell-o { color:var(--eddm-danger); }
-.cell-miss { padding:1rem; color:var(--eddm-danger); font-size:.88rem; }
+.cell-miss { color:var(--eddm-danger); font-size:.88rem; }
 .cell-miss i { display:block; margin-top:.3rem; font-style:normal; color:var(--eddm-text-faint); }
 .visual-carousel { width:100%; min-width:0; margin:.35rem 0 1.2rem; }
 .visual-carousel-frame { position:relative; width:100%; aspect-ratio:16/9; overflow:hidden;
@@ -235,6 +249,9 @@ article tbody tr:last-child td { border-bottom:0; }
   aspect-ratio:16/9; border:0; }
 .visual-carousel pre, .visual-carousel .cell, .visual-carousel .pending { width:100%; height:100%; max-width:100%;
   max-height:100%; box-sizing:border-box; margin:0; border-radius:0; }
+/* 강의 무대 안의 실행 칸은 프레임이 테두리를 맡는다. 무대 글자는 코드 장표와 같은 크기로 키운다. */
+.visual-carousel .cell { border:0; }
+.scene-canvas .cell-c, .scene-canvas .cell-o { font-size:clamp(.9rem,1.3vw,1.4rem); }
 .visual-carousel-controls { position:absolute; z-index:5; top:.65rem; right:.65rem; display:flex; align-items:center;
   gap:.3rem; padding:.25rem; border:1px solid var(--eddm-line-strong); border-radius:.5rem;
   background:color-mix(in srgb,var(--eddm-carbon) 86%,transparent); }
@@ -655,16 +672,29 @@ const CELL_SCRIPT = `
   cells.forEach((cell) => {
     const ta = cell.querySelector("[data-code]");
     const out = cell.querySelector("[data-out]");
+    const box = cell.querySelector("[data-output]");
     const st = cell.querySelector("[data-state]");
     const run = cell.querySelector("[data-run]");
     const reset = cell.querySelector("[data-reset]");
     if (!ta || !out || !st || !run) return;
     const first = ta.value;
-    if (reset) reset.addEventListener("click", () => { ta.value = first; ta.focus(); });
+    const fit = () => {
+      if (!ta.offsetWidth) return;
+      const bar = ta.offsetHeight - ta.clientHeight;
+      ta.style.height = "0px";
+      ta.style.height = (ta.scrollHeight + bar) + "px";
+    };
+    const changed = () => { if (reset) reset.hidden = ta.value === first; };
+    ta.addEventListener("input", () => { fit(); changed(); });
+    fit();
+    changed();
+    if (reset) reset.addEventListener("click", () => { ta.value = first; fit(); changed(); ta.focus(); });
     run.addEventListener("click", async () => {
       run.disabled = true;
       cell.classList.remove("bad");
+      cell.dataset.cellState = "running";
       out.textContent = "";
+      if (box) box.hidden = false;
       st.textContent = booting ? "실행 중" : "파이썬을 처음 받는 중입니다";
       try {
         const py = await boot();
@@ -676,10 +706,12 @@ const CELL_SCRIPT = `
         if (value !== undefined && value !== null) lines.push(String(value));
         out.textContent = lines.length ? lines.join("\\n") : "(나온 값이 없습니다)";
         st.textContent = "완료";
+        cell.dataset.cellState = "done";
       } catch (e) {
         out.textContent = e && e.message ? e.message : String(e);
         st.textContent = "오류";
         cell.classList.add("bad");
+        cell.dataset.cellState = "error";
       } finally {
         run.disabled = false;
       }

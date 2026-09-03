@@ -330,15 +330,25 @@ export function applyGlossary(html: string, glossary: Glossary, prefix: string):
  * 화면에는 바꿀 칸도 코드도 없었다. 여덟 곳이 그랬다.
  */
 function cellCard(id: string, cell: CourseCell): string {
-  const rows = Math.max(6, cell.code.split("\n").length + 1);
-  return `<div class="cell" data-cell="${esc(id)}">
-<div class="cell-h"><span class="cell-dot"></span><span class="cell-k">실습</span><span class="cell-s" data-state aria-live="polite">실행 준비됨</span></div>
-${cell.title ? `<p class="cell-t">${esc(cell.title)}</p>` : ""}
+  /**
+   * 모양은 codaro 의 학습 셀을 따른다. 제목 줄 오른쪽에 실행 하나, 그 아래 설명과 할 일,
+   * 내용만큼 자라는 코드 칸, 실행한 뒤에만 나타나는 출력 상자다. 상태 글자, 자리 표시
+   * 문장, 크기 조절 손잡이처럼 실행 전에는 뜻이 없는 것은 두지 않는다.
+   *
+   * rows 는 스크립트가 붙기 전의 첫 높이다. 줄 수와 같게 두면 스크립트가 맞춘 높이와
+   * 같아서 페이지가 열릴 때 칸이 출렁이지 않는다.
+   */
+  const rows = Math.max(2, cell.code.split("\n").length);
+  // 빈 제목도 없는 제목이다. 그때는 셀 이름이 곧 `실습` 이라 접근성 이름에 겹말을 만들지 않는다.
+  const title = cell.title?.trim() || "";
+  const label = title ? `${title} 실습` : "실습";
+  return `<section class="cell" data-cell="${esc(id)}" aria-label="${esc(label)}">
+<div class="cell-h"><span class="cell-t">${esc(title || "실습")}</span><button type="button" class="cell-reset" data-reset hidden>처음으로</button><button type="button" class="cell-run" data-run><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"/></svg><span>실행</span></button></div>
 ${cell.description ? `<p class="cell-d">${esc(cell.description)}</p>` : ""}
-<textarea class="cell-c" data-code spellcheck="false" wrap="off" rows="${rows}" aria-label="Python 코드">${esc(cell.code)}</textarea>
-<div class="cell-b"><button type="button" data-run>실행</button><button type="button" data-reset>처음으로</button><span class="cell-hint">${esc(cell.hint ?? "브라우저 안에서 실행됩니다")}</span></div>
-<pre class="cell-o" data-out>실행을 누르면 결과가 여기에 나옵니다</pre>
-</div>`;
+${cell.hint ? `<p class="cell-hint">${esc(cell.hint)}</p>` : ""}
+<div class="cell-f"><textarea class="cell-c" data-code spellcheck="false" wrap="off" rows="${rows}" aria-label="Python 코드">${esc(cell.code)}</textarea></div>
+<div class="cell-out" data-output hidden><div class="cell-out-h"><span>출력</span><span class="cell-s" data-state aria-live="polite"></span></div><pre class="cell-o" data-out></pre></div>
+</section>`;
 }
 
 /**
@@ -348,7 +358,7 @@ ${cell.description ? `<p class="cell-d">${esc(cell.description)}</p>` : ""}
  * 발행한 사람이 안다.
  */
 function missingCell(id: string): string {
-  return `<div class="cell cell-miss"><b>실행 칸을 묶음에서 찾지 못했습니다</b><i>${esc(id)}</i></div>`;
+  return `<section class="cell cell-miss"><b>실행 칸을 묶음에서 찾지 못했습니다</b><i>${esc(id)}</i></section>`;
 }
 const YOUTUBE =
   /^https?:\/\/(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)([\w-]{6,})|youtube\.com\/shorts\/([\w-]{6,})|youtu\.be\/([\w-]{6,}))(?:[&?#]\S*)?$/;
@@ -587,6 +597,14 @@ export function renderMarkdown(
 }
 
 const TOP_VISUAL = /^<([a-z]+)\s+(data-visual="\d+")/;
+/**
+ * 실행 칸은 읽기 모드에서 16:9 무대에 들어가지 않는다. 2026-09-03 운영자 지시다.
+ *
+ * 코드 실습은 비율을 지킬 이유가 없다. 무대에 가두면 내용은 안쪽에서 스크롤되고 남는 자리는
+ * 비어서 이상한 스크롤만 생겼다. 읽기 모드의 실행 칸은 codaro 셀처럼 본문 흐름에 놓이고
+ * 내용만큼 자란다. 강의 모드는 장표 한 장이 무대 하나라 그대로 무대 항목으로 둔다.
+ */
+const CELL_VISUAL = /^<section\s+data-visual="\d+"\s+class="cell[\s"]/;
 
 function carouselItem(html: string, index: number): string {
   return html.replace(TOP_VISUAL, `<$1 data-carousel-item="${index}" $2`);
@@ -681,10 +699,24 @@ function groupReadingCarousels(parts: string[], scenes: CourseScene[]): string {
     });
     const firstGroupAt = labelPositions[0] >= 0 ? labelPositions[0] : visualPositions[0];
     const title = section.find((part) => part.startsWith("<h2 "))?.replace(/<[^>]+>/g, "") || "시각물";
-    out.push(
-      ...section.slice(0, firstGroupAt),
-      visualCarousel(groups.map((group) => group.visual), scenes[sceneIndex]?.fit, title, groups),
-    );
+    out.push(...section.slice(0, firstGroupAt));
+    // 실행 칸 앞뒤의 시각물끼리만 캐러셀로 묶는다. 실행 칸은 라벨과 설명을 데리고 제자리에 남는다.
+    let run: ReadingCarouselGroup[] = [];
+    const flushRun = () => {
+      if (!run.length) return;
+      out.push(visualCarousel(run.map((group) => group.visual), scenes[sceneIndex]?.fit, title, run));
+      run = [];
+    };
+    for (const group of groups) {
+      if (!CELL_VISUAL.test(group.visual)) {
+        run.push(group);
+        continue;
+      }
+      flushRun();
+      if (group.label) out.push(group.label);
+      out.push(group.visual, ...group.explanation);
+    }
+    flushRun();
     section = [];
   };
   for (const part of parts) {

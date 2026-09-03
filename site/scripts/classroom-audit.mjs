@@ -15,6 +15,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { PyProcControlClient } from "pyproc/control";
 import { signIn } from "./admin-client.mjs";
+import { renderPost } from "../classroom-render.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SITE_ROOT = resolve(HERE, "..");
@@ -117,8 +118,14 @@ for (const post of postFiles) {
     return language !== "course-scene" && language !== "course-embed";
   }).length;
   const tables = (outside.match(/^\|(?:\s*:?-{3,}:?\s*\|){2,}/gm) ?? []).length;
-  // 현재 계약은 H2 하나가 캐러셀 하나다. 시각물이 하나여도 같은 16:9 프레임을 쓴다.
-  expected[id] = { captions, sections, cells, pending, codeBlocks, tables, carousels: sections };
+  /**
+   * 캐러셀 수는 H2 수가 아니다. 시각물이 없는 절은 0 이고, 실행 칸은 캐러셀에 들어가지
+   * 않으므로 (2026-09-03) 실행 칸 앞뒤의 시각물 묶음마다 하나다. 어느 줄이 시각물인지는
+   * 렌더러가 정본이라 여기서 다시 세지 않고 같은 렌더러로 원본을 그려 센다. 화면과 다르면
+   * 배포된 강의장이 옛 렌더러거나 묶음이 옛 판이라는 뜻이다.
+   */
+  const carousels = (renderPost(body).html.match(/class="visual-carousel"/g) ?? []).length;
+  expected[id] = { captions, sections, cells, pending, codeBlocks, tables, carousels };
 }
 
 const manifestPath = join(OUT, "pyproc-control.json");
