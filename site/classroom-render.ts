@@ -21,11 +21,35 @@ export function esc(text: string): string {
   return text.replace(/[&<>"']/g, (c) => ESCAPES[c]);
 }
 
+/**
+ * 본문 링크를 새 탭으로 보내는 속성. **이 값의 정본은 여기 하나다.**
+ *
+ * 강의 중에 학습자가 Colab 이나 공식 문서 링크를 누르면 같은 탭이 넘어가면서 읽던 절이
+ * 통째로 사라진다. 뒤로 가기로 돌아와도 실행 칸에 친 코드와 캐러셀 위치는 복구되지 않는다.
+ * 그래서 본문이 만든 링크는 전부 새 탭에서 연다 (2026-09-03 운영자 지시).
+ *
+ * `noopener` 는 새 탭이 `window.opener` 로 강의 화면을 되돌아 조작하지 못하게 막고,
+ * `noreferrer` 는 강의방 주소가 referrer 로 바깥에 새는 것을 막는다. 강의방은 비밀번호로
+ * 여는 비공개 표면이라 둘 다 필요하다.
+ *
+ * 강의방 안의 이동(카테고리 목록, 이전과 다음 글, 섹션 앵커, 뒤로)은 여기 해당하지 않는다.
+ * 그것은 본문 링크가 아니라 앱 이동이라 같은 탭에 머물러야 한다 (`classroom.ts`).
+ */
+export const NEW_TAB = ' target="_blank" rel="noopener noreferrer"';
+
 export function inline(text: string): string {
   return esc(text)
     .replace(/`([^`]+)`/g, "<code>$1</code>")
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+    .replace(
+      /\[([^\]]+)\]\(([^)]+)\)/g,
+      (_full: string, label: string, href: string) =>
+        // term:// 는 브라우저가 열 수 있는 주소가 아니라 applyGlossary 가 걷어 낼 마커다.
+        // 새 탭 속성을 붙이면 그 정규식이 안 맞아 용어가 전부 깨진 링크로 나간다.
+        href.startsWith("term://")
+          ? `<a href="${href}">${label}</a>`
+          : `<a href="${href}"${NEW_TAB}>${label}</a>`,
+    );
 }
 
 const IMAGE = /^!\[([^\]]*)\]\(([^\s)]+)(?:\s+"([^"]*)")?\)$/;
@@ -59,6 +83,39 @@ function markdownTable(block: string): string | null {
     .join("")}</tr></thead><tbody>${rows
     .map((row) => `<tr>${row.map((cell) => `<td>${inline(cell)}</td>`).join("")}</tr>`)
     .join("")}</tbody></table></div>`;
+}
+
+const BULLET_ITEM = /^[-*]\s+(.*)$/;
+const ORDERED_ITEM = /^\d+\.\s+(.*)$/;
+
+/**
+ * 목록. 실습 절차는 번호 목록으로 적는다.
+ *
+ * 2026-09-03 까지 번호 목록을 몰랐다. `1. 연다` `2. 누른다` `3. 확인한다` 를 줄바꿈으로 적은
+ * 문단이 한 줄로 이어 붙은 산문으로 나가서 실습 순서가 화면에서 사라졌다. 교안은 실습 절차를
+ * 번호로 적으므로 `<ol>` 이 필요하다 (2026-09-03 운영자 지시. 열거형은 줄바꿈 목록으로,
+ * 설명글은 줄바꿈 없는 서술형으로).
+ *
+ * 모든 줄이 같은 종류의 항목일 때만 목록으로 만든다. 예전 불릿 처리는 한 줄이라도 `-` 로
+ * 시작하면 목록으로 보고 나머지 줄을 조용히 버렸다. 설명 한 줄이 소리 없이 사라지는 쪽이
+ * 순서를 잃는 것보다 나쁘다.
+ */
+function markdownList(block: string): string | null {
+  const lines = block
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+  if (lines.length < 1) return null;
+  for (const [pattern, tag] of [
+    [ORDERED_ITEM, "ol"],
+    [BULLET_ITEM, "ul"],
+  ] as const) {
+    const items = lines.map((line) => line.match(pattern));
+    if (items.every((item) => item !== null)) {
+      return `<${tag}>${items.map((item) => `<li>${inline(item![1])}</li>`).join("")}</${tag}>`;
+    }
+  }
+  return null;
 }
 
 /**
@@ -137,13 +194,15 @@ export type CourseScene = {
  * 5 는 서로 다른 시각자산 둘의 학습 관계를 기록한다. 6은 모든 관계를 같은 좌표의
  * 단일 시각자료 장표로 펼친다. 7 은 표를 시각물에서 빼고, 8 은 모든 무대를 16:9로 고정한다.
  * 10 은 실행 칸을 시각물에서 뺀다 (2026-09-03 운영자 지시. 강의 무대에는 시각물만 오르고
- * 코드 실습은 읽기 모드에서 설명 뒤에 한다). 교안 정본
+ * 코드 실습은 읽기 모드에서 설명 뒤에 한다). 11 은 절의 뼈대를 제목, 부제, 시각물, 서술형
+ * 설명으로 고정한다 (2026-09-03 운영자 지시). 11 이 좁힌 것은 교안을 쓸 때의 규칙이고 장면이
+ * 싣는 값의 모양은 10 과 같으므로 이 런타임은 두 판을 같은 코드로 그린다. 교안 정본
  * (`eddmpython-course/scripts/course-scene.mjs`) 과 같은 날 같이 움직인다.
  *
  * 표나 실행 칸을 시각물로 세던 옛 계약의 묶음은 장면의 시각물 수가 어긋나 강의 모드가 닫히므로,
  * 이 런타임을 배포한 직후 교안을 다시 발행한다.
  */
-export const COURSE_SCENE_RUNTIME = 10;
+export const COURSE_SCENE_RUNTIME = 11;
 
 export type CourseSceneFrame = {
   effect: CourseSceneBeat["effect"];
@@ -420,9 +479,7 @@ function youtubeFigure(
   )} 재생"><span></span></button></div><figcaption><span>${esc(label)}${
     // 어디서 시작하는지 미리 알려 준다. 긴 영상은 앞이 인사와 얼굴이라 시연 자리로 보낸다.
     video.start ? `<i class="at">${esc(clock(video.start))}부터</i>` : ""
-  }</span><a href="${esc(
-    watch,
-  )}" target="_blank" rel="noreferrer">YouTube에서 열기</a></figcaption></figure>`;
+  }</span><a href="${esc(watch)}"${NEW_TAB}>YouTube에서 열기</a></figcaption></figure>`;
 }
 
 function pendingMedia(key: string, alt: string, caption: string, label = "시각물 준비 중"): string {
@@ -510,6 +567,7 @@ function blocks(text: string, headings: string[], cells: Cells, state: RenderSta
     }
     flush();
     const table = markdownTable(b);
+    const list = markdownList(b);
     if (b.startsWith("## ")) {
       // 목차가 여기로 뛴다. 번호로 거는 이유는 제목이 한글이라 slug 를 만들면 깨지기 때문이다.
       const title = b.slice(3);
@@ -524,10 +582,8 @@ function blocks(text: string, headings: string[], cells: Cells, state: RenderSta
     // 표는 읽기 본문이지 강의 시각물이 아니다 (계약 7, 2026-09-02 운영자 지시). data-visual 을
     // 붙이지 않으므로 강의 무대 CSS 가 문단처럼 숨기고 시각물 수에도 들지 않는다.
     else if (table) out.push(table);
-    else if (/^[-*]\s/m.test(b)) {
-      const items = b.split("\n").filter((l) => /^[-*]\s/.test(l.trim()));
-      out.push(`<ul>${items.map((l) => `<li>${inline(l.trim().slice(2))}</li>`).join("")}</ul>`);
-    } else if (/^https?:\/\/\S+$/.test(b)) {
+    else if (list) out.push(list);
+    else if (/^https?:\/\/\S+$/.test(b)) {
       // 실행 칸이 먼저다. 못 알아보면 생 주소가 그대로 강의 화면에 찍힌다.
       const run = b.match(CODARO);
       if (run) {
@@ -537,7 +593,7 @@ function blocks(text: string, headings: string[], cells: Cells, state: RenderSta
         continue;
       }
       const video = youtube(b);
-      out.push(video ? visual(youtubeFigure(video, ""), state) : `<p><a href="${esc(b)}">${esc(b)}</a></p>`);
+      out.push(video ? visual(youtubeFigure(video, ""), state) : `<p><a href="${esc(b)}"${NEW_TAB}>${esc(b)}</a></p>`);
     } else {
       const solo = b.match(SOLO_LINK);
       const video = solo ? youtube(solo[2]) : null;

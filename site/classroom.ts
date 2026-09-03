@@ -140,11 +140,11 @@ figure.media figcaption { margin-top:.55rem; font-size:.9375rem; line-height:1.6
 /* 섹션과 섹션 사이를 벌리고 윗선으로 가른다. 스크롤할 때 경계가 눈에 보여야 한다.
    h3 는 h2 를 풀어 쓴 부제라 h2 에 붙여 두고 본문 색보다 흐리게 둔다. */
 article h2 { margin:4rem 0 .5rem; padding-top:1.75rem; border-top:1px solid var(--eddm-line);
-  font-size:1.5rem; font-weight:var(--eddm-section-title-weight);
+  font-size:var(--eddm-section-title-size-mobile); font-weight:var(--eddm-section-title-weight);
   letter-spacing:var(--eddm-section-title-tracking); line-height:var(--eddm-section-title-line-height);
   display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:1.25rem; align-items:center; }
 @media (min-width:768px) {
-  article h2 { font-size:1.75rem; }
+  article h2 { font-size:var(--eddm-section-title-size-desktop); }
 }
 article h2:first-child { margin-top:0; padding-top:0; border-top:0; }
 /* 섹션 번호. 목차의 번호와 같아서 지금 몇 번째인지 세지 않고 안다. */
@@ -165,6 +165,14 @@ article p.lb strong { font-weight:500; font-size:1rem; }
 article p.lb + figure.media, article p.lb + .visual-carousel, article p.lb + .yt,
 article p.lb + img, article p.lb + video, article p.lb + .pending { margin-top:0; }
 article ul, article ol { margin:1.25rem 0; padding-left:1.25rem; line-height:1.85; color:var(--eddm-text); }
+/* 번호 목록은 실습 절차다. 설명 뒤에 오는 보조설명이라 문단과 섞이지 않게 한 상자로 묶는다
+   (2026-09-03 운영자 지시). 불릿은 본문 안의 나열이라 상자를 씌우지 않는다.
+   data-visual 이 없으므로 강의 무대에는 오르지 않고 읽기 모드에만 남는다 (계약 11). */
+article ol { padding:1rem 1.2rem 1rem 2.6rem; box-sizing:border-box;
+  border:1px solid var(--eddm-line-base); border-radius:.75rem; background:var(--eddm-raise); }
+article ol li { margin:.55rem 0; }
+article ol li:first-child { margin-top:0; }
+article ol li:last-child { margin-bottom:0; }
 article li { margin:.5rem 0; }
 article li::marker { color:var(--eddm-accent-dim); }
 article pre { overflow-x:auto; margin:1.5rem 0; padding:1rem; border:1px solid var(--eddm-line-base);
@@ -658,6 +666,12 @@ const ENGINE = "https://cdn.jsdelivr.net/pyodide/v314.0.2/full/";
  *
  * 미리 부팅하지 않는 것도 일부러다. 수강생이 글만 읽고 지나가는 편이 훨씬 많은데
  * 페이지를 열자마자 수십 MB 를 받으면 강의장 전체가 느려진다.
+ *
+ * **머신이 하나이므로 실행도 한 번에 하나씩 한다.** `setStdout` 은 머신 전체에 걸리는
+ * 설정이라 두 칸이 겹쳐 돌면 나중에 건 칸이 앞 칸의 출력까지 가져간다. 앞 칸은 빈 출력이
+ * 되고 뒤 칸은 남의 줄이 섞인다. 첫 실행은 파이썬을 받느라 오래 걸려서 그동안 다음 칸을
+ * 누르는 일이 실제로 일어난다. 그래서 누른 순서대로 줄을 세우고 도는 동안에는 모든 칸의
+ * 실행 버튼을 잠근다. 기다리는 칸은 순서를 기다린다고 말해 눌린 것이 보이게 한다.
  */
 const CELL_SCRIPT = `
 (() => {
@@ -671,6 +685,20 @@ const CELL_SCRIPT = `
         .catch((e) => { booting = null; throw e; });
     }
     return booting;
+  };
+  let queue = Promise.resolve();
+  let pending = 0;
+  /**
+   * 누른 순서대로 하나씩 돌린다.
+   *
+   * 다른 칸의 버튼은 잠그지 않는다. 잠그면 도는 동안 누른 클릭이 아무 일도 없이 사라져서
+   * 수강생은 버튼이 고장 난 것으로 본다. 눌린 칸은 줄에 세우고 기다린다고 말해 준다.
+   */
+  const enqueue = (job) => {
+    pending += 1;
+    const done = () => { pending -= 1; };
+    queue = queue.then(job).then(done, done);
+    return queue;
   };
   cells.forEach((cell) => {
     const ta = cell.querySelector("[data-code]");
@@ -692,32 +720,36 @@ const CELL_SCRIPT = `
     fit();
     changed();
     if (reset) reset.addEventListener("click", () => { ta.value = first; fit(); changed(); ta.focus(); });
-    run.addEventListener("click", async () => {
+    run.addEventListener("click", () => {
       run.disabled = true;
       cell.classList.remove("bad");
-      cell.dataset.cellState = "running";
+      cell.dataset.cellState = "waiting";
       out.textContent = "";
       if (box) box.hidden = false;
-      st.textContent = booting ? "실행 중" : "파이썬을 처음 받는 중입니다";
-      try {
-        const py = await boot();
-        st.textContent = "실행 중";
-        const lines = [];
-        py.setStdout({ batched: (s) => lines.push(s) });
-        py.setStderr({ batched: (s) => lines.push(s) });
-        const value = await py.runPythonAsync(ta.value);
-        if (value !== undefined && value !== null) lines.push(String(value));
-        out.textContent = lines.length ? lines.join("\\n") : "(나온 값이 없습니다)";
-        st.textContent = "완료";
-        cell.dataset.cellState = "done";
-      } catch (e) {
-        out.textContent = e && e.message ? e.message : String(e);
-        st.textContent = "오류";
-        cell.classList.add("bad");
-        cell.dataset.cellState = "error";
-      } finally {
-        run.disabled = false;
-      }
+      st.textContent = pending ? "앞 칸이 끝나기를 기다립니다" : booting ? "실행 중" : "파이썬을 처음 받는 중입니다";
+      enqueue(async () => {
+        cell.dataset.cellState = "running";
+        st.textContent = booting ? "실행 중" : "파이썬을 처음 받는 중입니다";
+        try {
+          const py = await boot();
+          st.textContent = "실행 중";
+          const lines = [];
+          py.setStdout({ batched: (s) => lines.push(s) });
+          py.setStderr({ batched: (s) => lines.push(s) });
+          const value = await py.runPythonAsync(ta.value);
+          if (value !== undefined && value !== null) lines.push(String(value));
+          out.textContent = lines.length ? lines.join("\\n") : "(나온 값이 없습니다)";
+          st.textContent = "완료";
+          cell.dataset.cellState = "done";
+        } catch (e) {
+          out.textContent = e && e.message ? e.message : String(e);
+          st.textContent = "오류";
+          cell.classList.add("bad");
+          cell.dataset.cellState = "error";
+        } finally {
+          run.disabled = false;
+        }
+      });
     });
   });
 })();

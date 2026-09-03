@@ -340,6 +340,11 @@ for (const viewport of activeViewports) {
       const root = [...document.querySelectorAll('article [data-visual-carousel]')]
         .find((carousel) => Number(carousel.dataset.carouselCount) > 1);
       if (!root) return null;
+      const controls = [...document.querySelectorAll('[data-carousel-for]')]
+        .find((candidate) => candidate.dataset.carouselFor === root.id);
+      const frame = root.querySelector('.visual-carousel-frame');
+      const controlsBox = controls?.getBoundingClientRect();
+      const frameBox = frame?.getBoundingClientRect();
       const read = () => ({
         at:Number(root.dataset.carouselAt),
         visual:root.querySelector('[data-carousel-active="true"]')?.dataset.visual || '',
@@ -350,8 +355,13 @@ for (const viewport of activeViewports) {
           .filter((description) => !description.hidden).length,
       });
       const first = read();
-      root.querySelector('[data-carousel-next]')?.click();
-      return { first, second:read() };
+      controls?.querySelector('[data-carousel-next]')?.click();
+      return {
+        first,
+        second:read(),
+        controlsInHeader:controls?.parentElement?.tagName === 'H2',
+        controlsOutsideFrame:Boolean(controlsBox && frameBox && controlsBox.bottom < frameBox.top),
+      };
     })()`));
     record(
       `${viewport.id} 교안 캐러셀의 시각물과 설명 동시 전환`,
@@ -364,7 +374,8 @@ for (const viewport of activeViewports) {
         Boolean(readingCarousel.first.label) && Boolean(readingCarousel.second.label) &&
         Boolean(readingCarousel.first.caption) && Boolean(readingCarousel.second.caption) &&
         Boolean(readingCarousel.first.explanation) && Boolean(readingCarousel.second.explanation) &&
-        readingCarousel.first.visible === 3 && readingCarousel.second.visible === 3,
+        readingCarousel.first.visible === 3 && readingCarousel.second.visible === 3 &&
+        readingCarousel.controlsInHeader === true && readingCarousel.controlsOutsideFrame === true,
       JSON.stringify(readingCarousel),
     );
 

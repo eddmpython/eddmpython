@@ -265,9 +265,102 @@ check("열 수가 다른 표는 문단으로 안전하게 남긴다", () => {
 });
 
 check("링크와 굵게와 인라인 코드", () => {
-  assert.equal(inline("[가기](https://a.b)"), '<a href="https://a.b">가기</a>');
+  assert.equal(
+    inline("[가기](https://a.b)"),
+    '<a href="https://a.b" target="_blank" rel="noopener noreferrer">가기</a>',
+  );
   assert.equal(inline("**굵게**"), "<strong>굵게</strong>");
   assert.equal(inline("`code`"), "<code>code</code>");
+});
+
+/*
+ * 새 탭.
+ *
+ * 2026-09-03 운영자 지시. 강의 중에 본문 링크를 누르면 같은 탭이 넘어가면서 읽던 절과
+ * 실행 칸에 친 코드가 사라졌다. 본문이 만드는 링크는 세 자리에서 나오므로 (인라인 링크,
+ * 생 주소 문단, 유튜브 캡션) 세 자리를 다 잡는다. 앱 이동은 대상이 아니다.
+ */
+/*
+ * 목록.
+ *
+ * 2026-09-03 운영자 지시. 열거형은 줄바꿈 목록으로 그리고 설명글은 줄바꿈 없는 서술형으로 쓴다.
+ * 번호 목록을 모르던 렌더는 `1. 2. 3.` 을 한 문단으로 이어 붙여 실습 순서를 지웠다.
+ */
+check("번호 목록은 ol 로 그린다", () => {
+  const html = renderMarkdown(["1. 화면을 엽니다", "2. Python을 누릅니다", "3. 결과를 확인합니다"].join("\n"));
+  assert.equal(
+    html,
+    "<ol><li>화면을 엽니다</li><li>Python을 누릅니다</li><li>결과를 확인합니다</li></ol>",
+  );
+});
+
+check("번호 목록 안의 링크와 코드도 살아 있다", () => {
+  const html = renderMarkdown(["1. [열기](https://a.b) 를 누릅니다", "2. `Shift+Enter` 를 누릅니다"].join("\n"));
+  assert.ok(html.startsWith("<ol>"));
+  assert.ok(html.includes('<a href="https://a.b" target="_blank" rel="noopener noreferrer">열기</a>'));
+  assert.ok(html.includes("<code>Shift+Enter</code>"));
+});
+
+check("불릿 목록은 그대로 ul 이다", () => {
+  assert.equal(renderMarkdown(["- 하나", "- 둘"].join("\n")), "<ul><li>하나</li><li>둘</li></ul>");
+  assert.equal(renderMarkdown(["* 하나", "* 둘"].join("\n")), "<ul><li>하나</li><li>둘</li></ul>");
+});
+
+/**
+ * 예전 불릿 처리는 한 줄이라도 `-` 로 시작하면 나머지 줄을 조용히 버렸다.
+ * 섞인 문단은 목록이 아니라 문단으로 두고 모든 줄을 남긴다.
+ */
+check("항목과 설명이 섞인 문단은 줄을 버리지 않는다", () => {
+  const html = renderMarkdown(["설명 문장입니다", "- 항목 하나"].join("\n"));
+  assert.ok(html.includes("설명 문장입니다"));
+  assert.ok(html.includes("항목 하나"));
+  assert.ok(!html.includes("<ul>"));
+});
+
+check("번호가 하나뿐인 문단도 목록이다", () => {
+  assert.equal(renderMarkdown("1. 하나만 있습니다"), "<ol><li>하나만 있습니다</li></ol>");
+});
+
+check("본문 인라인 링크는 새 탭에서 연다", () => {
+  const html = renderMarkdown("[Colab](https://colab.research.google.com/) 을 엽니다.");
+  assert.ok(html.includes('target="_blank"'));
+  assert.ok(html.includes('rel="noopener noreferrer"'));
+});
+
+check("표 안의 링크도 새 탭에서 연다", () => {
+  const html = renderMarkdown("| 도구 | 주소 |\n|---|---|\n| Colab | [열기](https://a.b) |");
+  assert.ok(html.includes('<td><a href="https://a.b" target="_blank" rel="noopener noreferrer">열기</a></td>'));
+});
+
+check("codaro 가 아닌 생 주소 문단도 새 탭에서 연다", () => {
+  const html = renderMarkdown("https://example.com/a");
+  assert.equal(
+    html,
+    '<p><a href="https://example.com/a" target="_blank" rel="noopener noreferrer">https://example.com/a</a></p>',
+  );
+});
+
+check("유튜브 캡션의 열기 링크도 새 탭이다", () => {
+  const html = renderMarkdown("[영상](https://www.youtube.com/watch?v=abcdefghijk)");
+  assert.ok(html.includes("YouTube에서 열기"));
+  assert.match(html, /<a href="[^"]*youtube[^"]*" target="_blank" rel="noopener noreferrer">YouTube에서 열기<\/a>/);
+});
+
+/**
+ * term:// 는 브라우저가 열 수 있는 주소가 아니라 applyGlossary 가 걷어 낼 마커다.
+ * 여기에 새 탭 속성이 붙으면 그 정규식이 안 맞아 용어가 전부 깨진 링크로 나간다.
+ */
+check("용어 마커에는 새 탭 속성을 붙이지 않는다", () => {
+  assert.equal(inline("[변수](term://변수)"), '<a href="term://변수">변수</a>');
+  const html = applyGlossary(inline("[변수](term://변수)"), { 변수: "이름표" }, "term-t");
+  assert.ok(html.includes('<span class="term"'));
+  assert.ok(!html.includes("term://"));
+  assert.ok(!html.includes('target="_blank"'));
+});
+
+check("정의가 없는 용어 마커도 새 탭 속성 없이 맨글자로 돌아간다", () => {
+  const html = applyGlossary(inline("[없는말](term://없는말)"), {}, "term-t");
+  assert.equal(html, "없는말");
 });
 
 check("따옴표와 꺾쇠가 escape 된다", () => {
@@ -583,8 +676,9 @@ check("읽기 본문 하나를 장면과 비트 계약으로 투영한다", () =
   ];
   const lecture = renderLecture(body, scenes);
   assert.equal(lecture.ok, true);
-  // 강의 셸은 H2 하나를 장표 하나로 만들고 모든 시각물을 같은 캐러셀에 둔다. 10 은 실행 칸을 시각물에서 뺀 판이다.
-  assert.equal(COURSE_SCENE_RUNTIME, 10);
+  // 강의 셸은 H2 하나를 장표 하나로 만들고 모든 시각물을 같은 캐러셀에 둔다. 11 은 절의 뼈대를
+  // 제목, 부제, 시각물, 서술형 설명으로 고정한 판이고 장면이 싣는 값의 모양은 10 과 같다.
+  assert.equal(COURSE_SCENE_RUNTIME, 11);
   assert.equal(lecture.html.match(/class="lecture-scene"/g)?.length, 2);
   assert.ok(lecture.html.includes('data-layout="stage"'));
   assert.ok(lecture.html.includes('data-fit="cover-top"'));
