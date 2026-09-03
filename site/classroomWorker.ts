@@ -8,6 +8,7 @@
  */
 import { handleAdmin } from "./admin";
 import { handleRoom } from "./classroom";
+import { handleCoursePublish } from "./coursePublish";
 import type { Env } from "./env";
 import { securityHeaders } from "./securityHeaders";
 
@@ -26,6 +27,9 @@ export default {
     const url = new URL(request.url);
     const pathname = url.pathname.replace(/\/$/, "") || "/";
 
+    if (pathname === "/admin/course-publish") {
+      return withClassroomHeaders(await handleCoursePublish(request, env));
+    }
     if (pathname === "/admin" || pathname.startsWith("/admin/")) {
       return withClassroomHeaders(await handleAdmin(request, env, url));
     }

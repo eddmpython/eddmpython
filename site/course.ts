@@ -134,10 +134,9 @@ const isScene = (value: unknown): value is CourseScene => {
  * **무슨 일이 있어도 던지지 않는다.** 묶음이 깨졌을 때 던지면 강의장만이 아니라 운영
  * 화면까지 같이 죽는다. 그러면 강의 중에 운영자가 방 목록조차 못 본다.
  */
-export async function course(env: Env): Promise<CourseState> {
+export function parseCourseText(raw: string | null): CourseState {
   let bundle: CourseBundle | null = null;
   try {
-    const raw = await env.COURSE.get("bundle", { cacheTtl: 60 });
     if (raw === null) return { ok: true, categories: [], glossary: {} };
     bundle = JSON.parse(raw) as CourseBundle;
   } catch {
@@ -174,6 +173,14 @@ export async function course(env: Env): Promise<CourseState> {
     }))
     .sort((a, b) => a.order - b.order);
   return { ok: true, categories, glossary };
+}
+
+export async function course(env: Env): Promise<CourseState> {
+  try {
+    return parseCourseText(await env.COURSE.get("bundle", { cacheTtl: 60 }));
+  } catch {
+    return { ok: false, categories: [], glossary: {} };
+  }
 }
 
 /**

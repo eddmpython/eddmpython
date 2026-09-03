@@ -413,6 +413,12 @@ npm run classroom:audit
 함께 읽어 배포와 발행 사이에 강의 모드가 사라지지 않게 한다. 강의장 런타임만 바꾼 경우에는
 course 전용 Worker만 배포하고 교안 KV를 다시 발행하지 않는다.
 
+교안 저장소 `main`의 교안과 발행 코드 변경은 `.github/workflows/publishCourse.yml`이 자동으로
+검사하고 발행한다. GitHub가 실행 때마다 발급한 OIDC 증표를 course 전용 Worker가 저장소 ID,
+브랜치와 워크플로까지 확인한 뒤 묶음을 받는다. 장기 Cloudflare API 토큰은 GitHub에 저장하지
+않는다. Worker는 묶음의 모양과 SHA-256을 확인하고 KV에 쓴 뒤 판 번호를 바꾸며, 워크플로는
+원격 묶음과 판 번호를 되읽어 같은지 확인해야 성공한다.
+
 ```powershell
 npm run deploy:classroom
 ```
