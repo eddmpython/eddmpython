@@ -45,7 +45,10 @@ import type { Env } from "./env";
  */
 const CLASSROOM_STYLE = `
 /* 글 화면. 왼쪽 과정 이동, 가운데 본문, 오른쪽 목차 */
-.lay { display:grid; grid-template-columns:15rem minmax(0,1fr) 15rem; gap:3rem; align-items:start; }
+.wrap.wide { width:min(94vw,120rem); max-width:none; }
+.lay { display:grid;
+  grid-template-columns:clamp(13rem,14vw,17rem) minmax(0,1fr) clamp(13rem,14vw,17rem);
+  gap:clamp(2rem,3vw,4rem); align-items:start; }
 .side, .toc { position:sticky; top:2rem; max-height:calc(100vh - 4rem); overflow-y:auto;
   font-size:.85rem; scrollbar-width:thin; }
 .side-h, .toc-h { margin:1.25rem 0 .6rem; font-size:.72rem; letter-spacing:.12em;
@@ -74,7 +77,7 @@ article .q { font-style:normal; color:var(--eddm-ivory); }
 .body h1 { margin:0 0 .7rem; font-size:1.75rem; letter-spacing:-.02em; line-height:1.3; }
 .body .sub { margin:0 0 2.5rem; color:var(--eddm-text-muted); line-height:1.7; }
 .body-top { display:flex; align-items:flex-start; justify-content:space-between; gap:1.5rem; }
-.body-title { min-width:0; }
+.body-title { flex:1; min-width:0; }
 .lecture-open { flex:0 0 auto; display:inline-flex; align-items:center; gap:.5rem; margin-top:.15rem;
   padding:.55rem .8rem; border:1px solid var(--eddm-accent-line); border-radius:.6rem;
   background:var(--eddm-accent-bg); color:var(--eddm-accent); font-size:.82rem; font-weight:500; }
@@ -129,25 +132,27 @@ a.post:hover { color:var(--eddm-accent); }
 a.post:hover b { color:var(--eddm-accent-dim); }
 .wait { color:var(--eddm-text-dim); }
 article img, article video { max-width:100%; height:auto; border-radius:.6rem; display:block; margin:1.75rem 0; }
+article { font-size:1.0625rem; }
 article img { cursor:zoom-in; }
 figure.media { margin:1.75rem 0; }
 figure.media img, figure.media video { margin:0; }
-figure.media figcaption { margin-top:.55rem; font-size:.86rem; line-height:1.6; color:var(--eddm-text-muted); }
+figure.media figcaption { margin-top:.55rem; font-size:.9375rem; line-height:1.6; color:var(--eddm-text-muted); }
 /* 섹션과 섹션 사이를 벌리고 윗선으로 가른다. 스크롤할 때 경계가 눈에 보여야 한다.
    h3 는 h2 를 풀어 쓴 부제라 h2 에 붙여 두고 본문 색보다 흐리게 둔다. */
 article h2 { margin:4rem 0 .5rem; padding-top:1.75rem; border-top:1px solid var(--eddm-line);
-  font-size:var(--eddm-section-title-size-mobile); font-weight:var(--eddm-section-title-weight);
+  font-size:1.5rem; font-weight:var(--eddm-section-title-weight);
   letter-spacing:var(--eddm-section-title-tracking); line-height:var(--eddm-section-title-line-height);
-  display:flex; gap:1.25rem; align-items:baseline; }
+  display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:1.25rem; align-items:center; }
 @media (min-width:768px) {
-  article h2 { font-size:var(--eddm-section-title-size-desktop); }
+  article h2 { font-size:1.75rem; }
 }
 article h2:first-child { margin-top:0; padding-top:0; border-top:0; }
 /* 섹션 번호. 목차의 번호와 같아서 지금 몇 번째인지 세지 않고 안다. */
 article h2 .sn { flex:0 0 auto; font-size:.82rem; font-weight:500; letter-spacing:.04em;
   color:var(--eddm-accent-dim); font-variant-numeric:tabular-nums; }
+.section-title { min-width:0; }
 article h3 { margin:0 0 .55rem; padding:0; border:0;
-  font-size:.95rem; font-weight:400; line-height:1.65; color:var(--eddm-text-muted); }
+  font-size:1.0625rem; font-weight:400; line-height:1.65; color:var(--eddm-text-muted); }
 article h3 + figure.media, article h3 + .visual-carousel, article h3 + .yt,
 article h3 + img, article h3 + video, article h3 + .pending { margin-top:.7rem; }
 article p { margin:1.25rem 0; line-height:1.85; color:var(--eddm-text); }
@@ -156,7 +161,7 @@ article p.lb { display:flex; align-items:center; gap:.6rem; margin:2.4rem 0 .55r
   border-left:2px solid var(--eddm-accent); border-radius:0 .45rem .45rem 0;
   background:var(--eddm-raise); color:var(--eddm-ivory); }
 article p.lb::before { content:""; flex:0 0 auto; width:5px; height:5px; border-radius:50%; background:var(--eddm-accent); }
-article p.lb strong { font-weight:500; font-size:.95rem; }
+article p.lb strong { font-weight:500; font-size:1rem; }
 article p.lb + figure.media, article p.lb + .visual-carousel, article p.lb + .yt,
 article p.lb + img, article p.lb + video, article p.lb + .pending { margin-top:0; }
 article ul, article ol { margin:1.25rem 0; padding-left:1.25rem; line-height:1.85; color:var(--eddm-text); }
@@ -238,7 +243,7 @@ article tbody tr:last-child td { border-bottom:0; }
 .visual-carousel-label { margin:1.6rem 0 .55rem; }
 .visual-carousel-label p.lb { margin:0; }
 .visual-carousel-caption { margin:.65rem 0 0; color:var(--eddm-text-muted); }
-.visual-carousel-caption p { margin:0; font-size:.88rem; line-height:1.65; }
+.visual-carousel-caption p { margin:0; font-size:.9375rem; line-height:1.65; }
 .visual-carousel-caption[hidden], .visual-carousel-caption p[hidden] { display:none; }
 .visual-carousel-explanation { margin:.85rem 0 0; }
 .visual-carousel-explanation [data-carousel-description] > :first-child { margin-top:0; }
@@ -247,20 +252,17 @@ article tbody tr:last-child td { border-bottom:0; }
 .visual-carousel .yt.tall .frame { width:100%; height:100%; aspect-ratio:16/9; }
 .visual-carousel .course-embed iframe { display:block; width:100%; height:100%; max-width:100%; max-height:100%;
   aspect-ratio:16/9; border:0; }
-.visual-carousel pre, .visual-carousel .cell, .visual-carousel .pending { width:100%; height:100%; max-width:100%;
+.visual-carousel pre, .visual-carousel .pending { width:100%; height:100%; max-width:100%;
   max-height:100%; box-sizing:border-box; margin:0; border-radius:0; }
-/* 강의 무대 안의 실행 칸은 프레임이 테두리를 맡는다. 무대 글자는 코드 장표와 같은 크기로 키운다. */
-.visual-carousel .cell { border:0; }
-.scene-canvas .cell-c, .scene-canvas .cell-o { font-size:clamp(.9rem,1.3vw,1.4rem); }
-.visual-carousel-controls { position:absolute; z-index:5; top:.65rem; right:.65rem; display:flex; align-items:center;
+.visual-carousel-controls { display:flex; flex:0 0 auto; align-items:center;
   gap:.3rem; padding:.25rem; border:1px solid var(--eddm-line-strong); border-radius:.5rem;
-  background:color-mix(in srgb,var(--eddm-carbon) 86%,transparent); }
+  background:var(--eddm-paper); }
 .visual-carousel-controls button { display:grid; place-items:center; width:2rem; height:2rem; padding:0;
   border:1px solid var(--eddm-line-base); border-radius:.35rem; background:transparent;
-  color:var(--eddm-ivory); font-size:.95rem; cursor:pointer; }
+  color:var(--eddm-text); font-size:.95rem; cursor:pointer; }
 .visual-carousel-controls button:hover:not(:disabled) { border-color:var(--eddm-accent-line); background:var(--eddm-accent-bg); }
 .visual-carousel-controls button:disabled { opacity:.35; cursor:default; }
-.visual-carousel-controls span { min-width:3.2rem; color:var(--eddm-ivory); font-size:.7rem;
+.visual-carousel-controls span { min-width:3.2rem; color:var(--eddm-text); font-size:.7rem;
   font-variant-numeric:tabular-nums; text-align:center; }
 .zoom { position:fixed; inset:0; background:var(--eddm-overlay); display:none; align-items:center;
   justify-content:center; z-index:50; padding:1rem; cursor:zoom-out; }
@@ -394,7 +396,7 @@ body.lecture-on { overflow:hidden; }
 .lecture-stage > .lecture-scene { grid-column:1; grid-row:1; min-height:0; }
 /* 장표는 제목, 부제, 가로줄, 보조설명, 규격화된 16:9 시각물 무대를 위에서 아래로 쌓는다. */
 .lecture-scene, .lecture-map-thumb-scene { display:none; position:relative; width:100%; height:100%; min-width:0; min-height:0;
-  --scene-content-width:min(90%,108rem); --scene-block-space:clamp(3.5rem,6.5vh,6rem);
+  --scene-content-width:min(90%,108rem); --scene-visual-scale:.9; --scene-block-space:clamp(3.5rem,6.5vh,6rem);
   box-sizing:border-box; padding:var(--scene-block-space) clamp(1.2rem,3.4vw,4rem); contain:layout style;
   grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(0,1fr);
   grid-template-areas:"head" "canvas"; gap:clamp(.55rem,.9vh,.8rem); }
@@ -411,15 +413,16 @@ body.lecture-on { overflow:hidden; }
   letter-spacing:.08em; white-space:nowrap; opacity:.82; }
 .scene-copy { min-width:0; padding-bottom:clamp(.35rem,.65vh,.55rem);
   border-bottom:1px solid var(--eddm-line-base); opacity:1; transition:opacity var(--lecture-motion) ease; }
+.scene-title-row { display:flex; align-items:flex-start; gap:1rem; }
 .scene-head h2 { margin:0; font-size:clamp(2.2rem,3.8vw,4.1rem); line-height:1.02;
-  letter-spacing:-.05em; text-wrap:balance; }
+  min-width:0; flex:1; letter-spacing:-.05em; text-wrap:balance; }
 .scene-subtitle { max-width:92rem; margin:clamp(.4rem,1vh,.7rem) 0 0; color:var(--eddm-text-muted);
   font-size:clamp(1.15rem,1.45vw,1.65rem); line-height:1.38; text-wrap:balance; }
 .scene-head > .scene-support { min-height:1.5em; margin:clamp(1rem,1.55vh,1.4rem) 0 0; color:var(--eddm-text); }
 .scene-head > .scene-support > p { margin:0; font-size:clamp(1rem,1.15vw,1.25rem); line-height:1.45; }
 .scene-head > .scene-support[hidden], .scene-head > .scene-support > p[hidden] { display:none; }
 .scene-canvas { grid-area:canvas; align-self:stretch; min-width:0; min-height:0; overflow:hidden;
-  display:grid; place-items:start center; contain:layout style; }
+  display:grid; place-items:center; contain:layout style; }
 .scene-canvas > p:not(.lb), .scene-canvas > ul, .scene-canvas > ol, .scene-canvas > .table-wrap { display:none; }
 .scene-canvas .lb, .scene-canvas h4 { display:none; }
 .scene-canvas .visual-carousel { display:block; width:var(--scene-frame-width,100%); height:auto;
@@ -455,7 +458,7 @@ body.lecture-on { overflow:hidden; }
 .scene-canvas .visual-carousel .yt.tall .frame { width:100%; height:100%; aspect-ratio:16/9; }
 .scene-canvas .course-embed iframe { display:block; width:100%; max-width:100%; max-height:100%;
   aspect-ratio:var(--course-embed-ratio,16/9); border:0; border-radius:.65rem; background:var(--eddm-raise); }
-.scene-canvas pre, .scene-canvas .cell { width:100%; height:100%; max-width:100%;
+.scene-canvas pre { width:100%; height:100%; max-width:100%;
   max-height:100%; box-sizing:border-box; overflow:auto; margin:0; }
 .scene-canvas pre { padding:clamp(1.15rem,2.2vw,2.4rem); border:1px solid var(--eddm-line-strong);
   border-radius:.55rem; background:color-mix(in srgb,var(--eddm-ink) 94%,var(--eddm-accent));
@@ -521,7 +524,7 @@ body.lecture-on { overflow:hidden; }
   .lecture-rail-foot { padding-top:.45rem; }
   .lecture-progress { margin-bottom:.4rem; padding-bottom:.35rem; }
   .lecture-rail-foot button, .lecture-rail .theme-toggle { height:1.8rem; }
-  .lecture-scene, .lecture-map-thumb-scene { padding:.75rem 1.25rem; gap:.5rem; }
+  .lecture-scene, .lecture-map-thumb-scene { --scene-visual-scale:1; padding:.75rem 1.25rem; gap:.5rem; }
   .scene-meta { margin-bottom:.25rem; }
   .scene-head h2 { font-size:clamp(1.75rem,3.1vw,2.8rem); }
   .scene-subtitle { margin-top:.2rem; font-size:.95rem; }
@@ -725,9 +728,10 @@ const CAROUSEL_SCRIPT = `
   const mount = (root) => {
     const items = [...root.querySelectorAll(":scope > .visual-carousel-frame > .visual-carousel-track > [data-carousel-item]")];
     if (!items.length) return;
-    const previous = root.querySelector("[data-carousel-prev]");
-    const next = root.querySelector("[data-carousel-next]");
-    const status = root.querySelector("[data-carousel-status]");
+    const controls = [...document.querySelectorAll("[data-carousel-for]")].find((node) => node.dataset.carouselFor === root.id);
+    const previous = controls?.querySelector("[data-carousel-prev]");
+    const next = controls?.querySelector("[data-carousel-next]");
+    const status = controls?.querySelector("[data-carousel-status]");
     const supports = [...root.querySelectorAll(":scope > [data-carousel-support]")];
     const lectureSupport = root.closest(".lecture-scene")?.querySelector(":scope > .scene-head > [data-carousel-support]");
     if (lectureSupport) supports.push(lectureSupport);
@@ -932,6 +936,7 @@ const LECTURE_SCRIPT = `
   }));
   const targetsOf = (scene, beat) => beat.targets.map((n) => visualCatalog.get(scene)?.byId.get(n)).filter(Boolean);
   const allVisuals = (scene) => visualCatalog.get(scene)?.visuals || [];
+  const visualScaleOf = (scene) => Number.parseFloat(getComputedStyle(scene).getPropertyValue("--scene-visual-scale")) || 1;
   const syncThumbs = () => {
     const stageBox = deck.querySelector(".lecture-stage")?.getBoundingClientRect();
     const stageRatio = stageBox?.width > 0 && stageBox?.height > 0 ? stageBox.width / stageBox.height : 16 / 9;
@@ -950,7 +955,8 @@ const LECTURE_SCRIPT = `
       replica.style.removeProperty("--scene-frame-width");
       const canvas = replica.querySelector(".scene-canvas");
       const visual = replica.querySelector(".visual-carousel");
-      const width = Math.min(canvas?.clientWidth || 0, visual?.clientWidth || 0, (canvas?.clientHeight || 0) * 16 / 9);
+      const width = Math.min(canvas?.clientWidth || 0, visual?.clientWidth || 0, (canvas?.clientHeight || 0) * 16 / 9)
+        * visualScaleOf(replica);
       if (width > 0) replica.style.setProperty("--scene-frame-width", Math.round(width) + "px");
       const scale = Math.min(thumb.clientWidth / stageBox.width, thumb.clientHeight / stageBox.height);
       if (scale > 0) replica.style.transform = "scale(" + scale + ")";
@@ -964,7 +970,7 @@ const LECTURE_SCRIPT = `
     scene.style.removeProperty("--scene-frame-width");
     const canvasBox = canvas.getBoundingClientRect();
     const visualBox = visual.getBoundingClientRect();
-    const width = Math.min(canvasBox.width, visualBox.width, canvasBox.height * 16 / 9);
+    const width = Math.min(canvasBox.width, visualBox.width, canvasBox.height * 16 / 9) * visualScaleOf(scene);
     if (width > 0) scene.style.setProperty("--scene-frame-width", Math.round(width) + "px");
   };
   const syncLayout = () => {
@@ -1245,7 +1251,7 @@ const LECTURE_SCRIPT = `
       return;
     }
     if (event.target?.matches?.("input, textarea") && event.key !== "Escape") return;
-    if (event.target?.closest?.("[data-visual-carousel]") && ["ArrowLeft", "ArrowRight", " ", "Enter"].includes(event.key)) return;
+    if (event.target?.closest?.("[data-visual-carousel], [data-carousel-for]") && ["ArrowLeft", "ArrowRight", " ", "Enter"].includes(event.key)) return;
     if (["ArrowRight", "PageDown", " "].includes(event.key)) { event.preventDefault(); next(); }
     else if (["ArrowLeft", "PageUp"].includes(event.key)) { event.preventDefault(); prev(); }
     else if (event.key === "Home") { event.preventDefault(); showScene(0); }

@@ -95,9 +95,14 @@ def plan_entry(
     match = ASSET_ID_RE.fullmatch(asset_id)
     if not match:
         raise ValueError("asset id는 <post id>/<영문 kebab-case 키> 형식이어야 함")
+    prompt_contract = plan.get("promptContract")
+    valid_prompt_contract = prompt_contract == "section-grounded-v2" or (
+        prompt_contract == "course-visual-16x9-v1"
+        and plan.get("visualPlanContract") == 2
+    )
     if (
         plan.get("version") not in (1, 2)
-        or plan.get("promptContract") != "section-grounded-v2"
+        or not valid_prompt_contract
         or not isinstance(plan.get("assets"), dict)
     ):
         raise ValueError(f"{plan_label} 계약 위반")
@@ -149,10 +154,13 @@ def plan_entry(
                 f" (부제 {'있음' if hasSubtitle else '없음'})"
             )
     source_kind = str(entry["sourceKind"])
-    if source_kind not in {"imagegen", "screenshot", "official", "licensed", "recording"}:
+    if source_kind not in {"imagegen", "screenshot", "official", "licensed", "recording", "authored"}:
         raise ValueError(f"지원하지 않는 sourceKind: {asset_id}: {source_kind}")
     expected_profiles = {
         "imagegen": {"dark-editorial-v1", IMAGEGEN_V2},
+        # 손으로 그린 SVG 다이어그램. 교안 저장소의 SVG 가 정본이고 색은 design.ts 토큰을 직접 쓴다.
+        # 렌더는 eddmpython-course/scripts/renderDiagram.mjs 가 맡는다. 회색 원본과 칠하기가 없다.
+        "authored": {"design-token-svg-v1"},
         "screenshot": {"product-screen-v1"},
         "official": {"source-original-v1"},
         "licensed": {"source-original-v1"},
@@ -166,6 +174,8 @@ def plan_entry(
         raise ValueError(f"{IMAGEGEN_V2}에는 {IMAGEGEN_PALETTE}가 필요함: {asset_id}")
     if source_kind == "imagegen" and not str(entry.get("prompt") or "").strip():
         raise ValueError(f"ImageGen 계획에는 prompt가 필요함: {asset_id}")
+    if source_kind == "authored" and not str(entry.get("sourceSvg") or "").strip():
+        raise ValueError(f"authored 계획에는 정본 SVG 경로 sourceSvg 가 필요함: {asset_id}")
     if source_kind == "screenshot":
         for key in ("sourceUrl", "captureState"):
             if not str(entry.get(key) or "").strip():

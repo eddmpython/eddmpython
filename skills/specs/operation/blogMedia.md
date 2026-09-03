@@ -287,6 +287,7 @@ python -X utf8 blog/scripts/publish_media.py --verify
 | 개념 장면, 전후 차이, 사진이 없는 설명 | `imagegen` | `eddmpython-dark-v2` | 위 색상 계약 |
 | 실제 제품 화면 | `screenshot` | `product-screen-v1` | `sourceUrl`, `captureState` |
 | 화면 녹화 | `recording` | `source-original-v1` | `captureState`, `credit` |
+| 정확한 값, 기호, 관계가 학습 대상인 다이어그램 (교안) | `authored` | `design-token-svg-v1` | `sourceSvg`. 교안 저장소 `curriculum/<카테고리>/diagrams/<키>.svg` 가 정본이고 `scripts/renderDiagram.mjs` 가 2048x1152 로 렌더한다. 색은 SVG 가 `design.ts` 토큰 값을 직접 쓰므로 회색 원본과 칠하기가 없다 |
 | 인물, 행사, 장소 | `official` 또는 `licensed` | `source-original-v1` | `sourceUrl`, `credit`, `license` |
 
 **제품 화면, 코드 내용, 실제 문서 모양이 중요하면 생성 이미지로 흉내 내지 않는다.** 확인된

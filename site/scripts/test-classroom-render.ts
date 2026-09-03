@@ -109,6 +109,9 @@ check("읽기 모드는 H2의 모든 시각물을 하나의 16대9 캐러셀로 
   assert.ok(html.includes('data-visual="1"'));
   assert.ok(html.includes('data-visual="2"'));
   assert.ok(html.includes("data-carousel-prev"));
+  assert.ok(html.includes('data-carousel-for="reading-carousel-1-1"'));
+  assert.ok(html.indexOf("data-carousel-for") < html.indexOf('class="visual-carousel"'));
+  assert.ok(!html.match(/visual-carousel-frame[\s\S]*?data-carousel-prev/));
   assert.ok(!html.includes("scene-support"));
   assert.ok(html.includes('class="visual-carousel-caption"'));
   assert.ok(html.includes('data-carousel-description="1" data-carousel-description-active="true">첫 시각물 보조설명'));
@@ -120,7 +123,7 @@ check("읽기 모드는 H2의 모든 시각물을 하나의 16대9 캐러셀로 
   assert.ok(html.includes('<p class="lb"><strong>첫 사례</strong></p>'));
   assert.ok(html.includes('<p class="lb"><strong>둘째 사례</strong></p>'));
   assert.ok(html.includes("<p>첫 일반 문단은 캐러셀 앞의 도입입니다.</p>"));
-  assert.ok(html.indexOf("첫 일반 문단은 캐러셀 앞의 도입입니다.") < html.indexOf("visual-carousel"));
+  assert.ok(html.indexOf("첫 일반 문단은 캐러셀 앞의 도입입니다.") < html.indexOf('class="visual-carousel"'));
   assert.ok(html.indexOf("visual-carousel-frame") < html.indexOf("첫 시각물의 자세한 설명입니다."));
   assert.ok(html.includes('data-carousel-description="2" hidden aria-hidden="true"><p>둘째 시각물의 자세한 설명입니다.</p>'));
 });
@@ -133,6 +136,20 @@ check("시각물이 하나여도 읽기와 강의가 같은 16대9 프레임 구
   assert.ok(!html.includes("scene-support"));
   assert.ok(html.includes('class="visual-carousel-caption"'));
   assert.ok(html.indexOf("visual-carousel-frame") < html.indexOf("한 장의 캡션"));
+});
+
+check("강의 캐러셀 이동 버튼은 영상 위가 아니라 장면 제목 줄에 놓인다", () => {
+  const body = '## 두 시각물\n\n설명입니다.\n\n![첫 장](a.png "첫 설명")\n\n![둘째 장](b.png "둘째 설명")';
+  const scene = {
+    id: "s1", role: "explain", layout: "stage", visualCount: 2,
+    beats: [{ effect: "enter", targets: [1, 2] }],
+  } as CourseScene;
+  const { html, ok } = renderLecture(body, [scene]);
+  assert.equal(ok, true);
+  assert.ok(html.includes('class="scene-title-row"'));
+  assert.ok(html.includes('data-carousel-for="lecture-carousel-1"'));
+  assert.ok(html.indexOf("data-carousel-for") < html.indexOf('class="scene-subtitle"'));
+  assert.ok(html.indexOf("data-carousel-for") < html.indexOf('class="scene-canvas"'));
 });
 
 // 비공개 시각물. KV 의 media/<sha256>.<ext> 를 방 경로로 그리고, 방 밖에서는 자리만 보인다.
@@ -192,7 +209,7 @@ check("제목과 목록이 제 태그로 나간다", () => {
   const html = renderMarkdown(["## 큰 제목", "", "#### 작은 제목", "", "- 하나", "- 둘"].join("\n"));
   // 목차가 뛰어갈 자리라 h2 에는 번호 앵커가 붙고, 섹션 번호가 앞에 온다
   assert.ok(html.includes('<h2 id="s1">'));
-  assert.ok(html.includes('<span class="sn" aria-hidden="true">01</span>큰 제목</h2>'));
+  assert.ok(html.includes('<span class="sn" aria-hidden="true">01</span><span class="section-title">큰 제목</span></h2>'));
   assert.ok(html.includes("<h4>작은 제목</h4>"));
   assert.equal(html.match(/<li>/g)?.length, 2);
 });
@@ -339,8 +356,8 @@ check("코드 블록 안의 ## 은 목차에 오르지 않는다", () => {
 
 check("섹션 번호는 두 자리로 이어 붙는다", () => {
   const { html } = renderPost(["## 첫 절", "", "본문", "", "## 둘째 절", "", "본문"].join("\n"));
-  assert.ok(html.includes('class="sn" aria-hidden="true">01</span>첫 절'));
-  assert.ok(html.includes('class="sn" aria-hidden="true">02</span>둘째 절'));
+  assert.ok(html.includes('class="sn" aria-hidden="true">01</span><span class="section-title">첫 절</span>'));
+  assert.ok(html.includes('class="sn" aria-hidden="true">02</span><span class="section-title">둘째 절</span>'));
 });
 
 check("굵은 글씨 한 줄은 사례 라벨이 된다", () => {
@@ -566,8 +583,8 @@ check("읽기 본문 하나를 장면과 비트 계약으로 투영한다", () =
   ];
   const lecture = renderLecture(body, scenes);
   assert.equal(lecture.ok, true);
-  // 강의 셸은 H2 하나를 장표 하나로 만들고 모든 시각물을 같은 캐러셀에 둔다.
-  assert.equal(COURSE_SCENE_RUNTIME, 9);
+  // 강의 셸은 H2 하나를 장표 하나로 만들고 모든 시각물을 같은 캐러셀에 둔다. 10 은 실행 칸을 시각물에서 뺀 판이다.
+  assert.equal(COURSE_SCENE_RUNTIME, 10);
   assert.equal(lecture.html.match(/class="lecture-scene"/g)?.length, 2);
   assert.ok(lecture.html.includes('data-layout="stage"'));
   assert.ok(lecture.html.includes('data-fit="cover-top"'));
@@ -828,10 +845,10 @@ check("용어가 여럿이면 id 가 이어 붙는다", () => {
 });
 
 /*
- * 읽기 모드의 실행 칸.
+ * 실행 칸은 시각물이 아니다 (계약 10, 2026-09-03 운영자 지시).
  *
- * 2026-09-03 운영자 지시다. 코드 실습은 비율을 지킬 이유가 없다. 16:9 무대에 가두면 안쪽
- * 스크롤과 빈 자리만 생긴다. 읽기 모드에서는 codaro 셀처럼 본문 흐름에 놓고 내용만큼 자란다.
+ * 절은 제목, 부제, 시각물, 설명, 그다음 코드 실습이다. 읽기 모드에서는 codaro 셀처럼 본문
+ * 흐름에 놓고 내용만큼 자라며, 강의 무대에는 시각물만 오르고 실행 칸은 올리지 않는다.
  */
 check("읽기 모드는 실행 칸을 16대9 캐러셀에 넣지 않고 본문 흐름의 셀로 둔다", () => {
   const body = [
@@ -845,12 +862,12 @@ check("읽기 모드는 실행 칸을 16대9 캐러셀에 넣지 않고 본문 �
     "",
     "실행 뒤 설명입니다.",
   ].join("\n");
-  const scene = { id: "s1", role: "explain", layout: "demo", visualCount: 1,
-    beats: [{ effect: "run", targets: [1] }] } as CourseScene;
-  const { html } = renderPost(body, CELLS, {}, { scenes: [scene] });
+  const { html, visuals } = renderPost(body, CELLS, {}, { scenes: [] });
   assert.ok(!html.includes("visual-carousel"));
   assert.ok(!html.includes("data-carousel-item"));
-  assert.ok(html.includes('<section data-visual="1" class="cell" data-cell="expense-variables"'));
+  // 실행 칸은 시각물 번호를 받지 않는다
+  assert.equal(visuals, 0);
+  assert.ok(html.includes('<section class="cell" data-cell="expense-variables"'));
   assert.ok(html.indexOf("<p>실행 전 설명입니다.</p>") < html.indexOf('data-cell="expense-variables"'));
   assert.ok(html.indexOf('data-cell="expense-variables"') < html.indexOf("<p>실행 뒤 설명입니다.</p>"));
 });
@@ -879,9 +896,10 @@ check("같은 H2의 이미지는 캐러셀에 남고 실행 칸은 라벨과 설
     "",
     "결과 설명입니다.",
   ].join("\n");
-  const scene = { id: "s1", role: "explain", layout: "sequence", visualCount: 3,
-    beats: [{ effect: "enter", targets: [1] }, { effect: "run", targets: [2] }, { effect: "replace", targets: [3] }] } as CourseScene;
-  const { html } = renderPost(body, CELLS, {}, { scenes: [scene] });
+  const scene = { id: "s1", role: "explain", layout: "sequence", visualCount: 2,
+    beats: [{ effect: "enter", targets: [1] }, { effect: "replace", targets: [2] }] } as CourseScene;
+  const { html, visuals } = renderPost(body, CELLS, {}, { scenes: [scene] });
+  assert.equal(visuals, 2);
   // 실행 칸 앞뒤의 이미지는 각각 한 장짜리 캐러셀이 된다. 실행 칸을 건너뛰어 하나로 합치면 읽는 순서가 깨진다.
   assert.equal(html.match(/class="visual-carousel"/g)?.length, 2);
   assert.equal(html.match(/data-carousel-count="1"/g)?.length, 2);
@@ -894,14 +912,55 @@ check("같은 H2의 이미지는 캐러셀에 남고 실행 칸은 라벨과 설
   assert.ok(html.indexOf("결과 캡션") < html.indexOf("결과 설명입니다."));
 });
 
-check("강의 모드는 실행 칸을 무대 캐러셀 항목으로 그대로 둔다", () => {
-  const body = ["## 실습 장면", "", "### 값을 바꿔 실행합니다", "", CELL_URL].join("\n");
-  const scene = { id: "s1", role: "explain", layout: "demo", visualCount: 1,
-    beats: [{ effect: "run", targets: [1] }] } as CourseScene;
+check("강의 모드는 실행 칸을 무대에 올리지 않고 시각물만 센다", () => {
+  const body = [
+    "## 실습 장면",
+    "",
+    "### 그림을 보고 직접 실행합니다",
+    "",
+    '![그림](https://a.b/1.png "그림 캡션")',
+    "",
+    "설명 문단입니다.",
+    "",
+    CELL_URL,
+    "",
+    "실행 뒤 설명입니다.",
+  ].join("\n");
+  const scene = { id: "s1", role: "explain", layout: "stage", visualCount: 1,
+    beats: [{ effect: "enter", targets: [1] }] } as CourseScene;
   const lecture = renderLecture(body, [scene], CELLS);
   assert.equal(lecture.ok, true);
-  assert.equal(lecture.hasCells, true);
-  assert.ok(lecture.html.includes('<section data-carousel-item="1" data-visual="1" class="cell" data-cell="expense-variables"'));
+  assert.equal(lecture.hasCells, false);
+  assert.ok(!lecture.html.includes("data-cell="));
+  assert.ok(!lecture.html.includes("expense-variables"));
+  assert.equal(lecture.html.match(/data-carousel-item=/g)?.length, 1);
+  // 실행 칸을 시각물로 세던 옛 묶음은 수가 어긋나 강의 모드가 닫힌다
+  const stale = renderLecture(body, [{ ...scene, visualCount: 2 }], CELLS);
+  assert.equal(stale.ok, false);
+});
+
+check("라벨 없이 이어진 시각물의 설명은 항목별 띠가 아니라 캐러셀 아래 본문에 남는다", () => {
+  const body = [
+    "## 그림 두 장",
+    "",
+    "### 두 그림을 본 뒤 설명을 읽습니다",
+    "",
+    '![첫 그림](https://a.b/1.png "첫 캡션")',
+    "",
+    '![둘째 그림](https://a.b/2.png "둘째 캡션")',
+    "",
+    "두 그림에 함께 붙는 설명입니다.",
+    "",
+    "실무 설명입니다.",
+  ].join("\n");
+  const { html } = renderPost(body);
+  assert.equal(html.match(/class="visual-carousel"/g)?.length, 1);
+  assert.ok(html.includes('data-carousel-count="2"'));
+  assert.ok(html.includes('class="visual-carousel-caption"'));
+  assert.ok(!html.includes('class="visual-carousel-explanation"'));
+  assert.ok(html.indexOf("visual-carousel-caption") < html.indexOf("<p>두 그림에 함께 붙는 설명입니다.</p>"));
+  assert.ok(html.indexOf("<p>두 그림에 함께 붙는 설명입니다.</p>") < html.indexOf("<p>실무 설명입니다.</p>"));
+  assert.ok(!html.includes("<p>두 그림에 함께 붙는 설명입니다.</p></div>"));
 });
 
 check("실행 칸은 실행 전에 상태 글자와 자리 표시 출력을 두지 않는다", () => {

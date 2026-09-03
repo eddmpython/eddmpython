@@ -30,6 +30,10 @@ from media_paths import MASTER_SUFFIX, REPO_ROOT, STAGING_ROOT  # noqa: E402
 POSTS_ROOT = REPO_ROOT / "blog" / "posts"
 API = "https://api.replicate.com/v1/predictions"
 MODEL = "black-forest-labs/flux-1.1-pro"
+# 교안 시각물은 강의 무대 프로필의 최소 원본 1600x900 을 넘겨야 한다. flux-1.1-pro 는 긴 변이 1440 까지라
+# 교안 plan 은 ultra 로 만들고 정확한 16:9 캔버스로 잘라 맞춘다 (정본: course-scene.mjs generationGuide.canvas).
+COURSE_MODEL = "black-forest-labs/flux-1.1-pro-ultra"
+COURSE_CANVAS = (2048, 1152)
 GEN_INTERVAL_SEC = 12
 COLOR_PROFILE = "eddmpython-dark-v2"
 PALETTE_POLICY = "eddmpython-gray-master-v1"
@@ -88,6 +92,29 @@ def composePrompt(asset: dict[str, object]) -> str:
     return "\n".join(lines)
 
 
+def fitCourseCanvas(raw: bytes, dest: Path) -> None:
+    """ultra 의 16:9 근사 출력을 정확한 2048x1152 로 맞춘다. 가운데를 16:9 로 자르고 줄인다. 키우지 않는다."""
+    from io import BytesIO
+    from PIL import Image
+
+    image = Image.open(BytesIO(raw)).convert("RGB")
+    width, height = image.size
+    targetWidth, targetHeight = COURSE_CANVAS
+    if width < targetWidth or height < targetHeight:
+        sys.exit(f"{dest.name}: 생성 원본 {width}x{height} 이 교안 캔버스 {targetWidth}x{targetHeight} 보다 작다.")
+    ratio = targetWidth / targetHeight
+    if width / height > ratio:
+        cropWidth = round(height * ratio)
+        left = (width - cropWidth) // 2
+        image = image.crop((left, 0, left + cropWidth, height))
+    elif width / height < ratio:
+        cropHeight = round(width / ratio)
+        top = (height - cropHeight) // 2
+        image = image.crop((0, top, width, top + cropHeight))
+    image = image.resize(COURSE_CANVAS, Image.LANCZOS)
+    image.save(dest, format="PNG", optimize=True)
+
+
 def loadToken() -> str:
     load_project_env()
     token = os.getenv("REPLICATE_API_TOKEN", "")
@@ -96,12 +123,13 @@ def loadToken() -> str:
     return token
 
 
-def create(headers: dict[str, str], prompt: str) -> str:
+def create(headers: dict[str, str], prompt: str, aspectRatio: str = "3:2", model: str = MODEL) -> str:
     payload = {
-        "version": MODEL,
+        "version": model,
         "input": {
             "prompt": prompt,
-            "aspect_ratio": "3:2",
+            "aspect_ratio": aspectRatio,
+            **({"raw": False} if model == COURSE_MODEL else {}),
             # 원본은 무손실 PNG 다. 강조색을 바꿀 때마다 다시 칠하므로 여기서 손실을
             # 먹으면 칠할 때마다 조금씩 더 나빠진다. 발행본만 WebP 로 줄인다.
             "output_format": "png",
@@ -145,9 +173,19 @@ def main() -> None:
     if not plan_path.exists():
         sys.exit(f"plan 을 찾을 수 없다: {plan_path}")
     plan = json.loads(plan_path.read_text(encoding="utf-8"))
-    # 글 폴더의 media.json 은 1, 교안 plan 은 2 다.
-    if plan.get("version") not in (1, 2) or plan.get("promptContract") != "section-grounded-v2":
-        sys.exit("media.json의 section-grounded-v2 계약이 필요하다.")
+    # 글 폴더의 media.json 은 1, 교안 plan 은 2 다. 교안 plan 의 promptContract 는
+    # course-scene.mjs 가 정하며 publish_media.py 와 같은 조건으로 받는다.
+    promptContract = plan.get("promptContract")
+    validPromptContract = promptContract == "section-grounded-v2" or (
+        promptContract == "course-visual-16x9-v1" and plan.get("visualPlanContract") == 2
+    )
+    if plan.get("version") not in (1, 2) or not validPromptContract:
+        sys.exit("media.json 의 section-grounded-v2 계약이나 교안 plan 의 course-visual-16x9-v1 계약이 필요하다.")
+    # 블로그 글은 3:2 로 만들고, 교안 시각물은 강의 무대와 같은 16:9 로 만든다
+    # (정본: eddmpython-course/scripts/course-scene.mjs 의 generationGuide.canvas).
+    coursePlan = plan.get("visualPlanContract") == 2
+    aspectRatio = "16:9" if coursePlan else "3:2"
+    model = COURSE_MODEL if coursePlan else MODEL
     assets = plan.get("assets", {})
     onlyKeys = {k.strip() for k in args.only.split(",") if k.strip()}
     # 글 폴더의 media.json 은 자기 글 것만 들고 있어 키가 곧 assetKey 다. 교안 plan 은 여러
@@ -175,12 +213,15 @@ def main() -> None:
             continue
         prompt = composePrompt(asset)
         print(f"generate {key} ...")
-        pid = create(headers, prompt)
+        pid = create(headers, prompt, aspectRatio, model)
         url = poll(headers, pid)
         r = requests.get(url, timeout=120)
         r.raise_for_status()
-        dest.write_bytes(r.content)
-        print(f"  -> {dest} ({len(r.content) // 1024} KB)")
+        if coursePlan:
+            fitCourseCanvas(r.content, dest)
+        else:
+            dest.write_bytes(r.content)
+        print(f"  -> {dest} ({dest.stat().st_size // 1024} KB)")
         done += 1
         time.sleep(GEN_INTERVAL_SEC)
     print(f"완료: {done}건 생성, 경로 {outDir}")

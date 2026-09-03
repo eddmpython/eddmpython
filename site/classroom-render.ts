@@ -135,13 +135,15 @@ export type CourseScene = {
 
 /**
  * 5 는 서로 다른 시각자산 둘의 학습 관계를 기록한다. 6은 모든 관계를 같은 좌표의
- * 단일 시각자료 장표로 펼친다. 7 은 표를 시각물에서 빼고, 8 은 모든 무대를 16:9로 고정한다. 교안 정본
+ * 단일 시각자료 장표로 펼친다. 7 은 표를 시각물에서 빼고, 8 은 모든 무대를 16:9로 고정한다.
+ * 10 은 실행 칸을 시각물에서 뺀다 (2026-09-03 운영자 지시. 강의 무대에는 시각물만 오르고
+ * 코드 실습은 읽기 모드에서 설명 뒤에 한다). 교안 정본
  * (`eddmpython-course/scripts/course-scene.mjs`) 과 같은 날 같이 움직인다.
  *
- * 표를 시각물로 세던 계약 6 이하의 묶음은 장면의 시각물 수가 어긋나 강의 모드가 닫히므로,
+ * 표나 실행 칸을 시각물로 세던 옛 계약의 묶음은 장면의 시각물 수가 어긋나 강의 모드가 닫히므로,
  * 이 런타임을 배포한 직후 교안을 다시 발행한다.
  */
-export const COURSE_SCENE_RUNTIME = 9;
+export const COURSE_SCENE_RUNTIME = 10;
 
 export type CourseSceneFrame = {
   effect: CourseSceneBeat["effect"];
@@ -515,7 +517,7 @@ function blocks(text: string, headings: string[], cells: Cells, state: RenderSta
       const n = String(headings.length).padStart(2, "0");
       // 번호는 목차의 번호와 같다. 지금 몇 번째를 보는지 세지 않고 알 수 있다.
       out.push(
-        `<h2 id="s${headings.length}"><span class="sn" aria-hidden="true">${n}</span>${esc(title)}</h2>`,
+        `<h2 id="s${headings.length}"><span class="sn" aria-hidden="true">${n}</span><span class="section-title">${esc(title)}</span></h2>`,
       );
     } else if (b.startsWith("### ")) out.push(`<h3>${esc(b.slice(4))}</h3>`);
     else if (b.startsWith("#### ")) out.push(`<h4>${esc(b.slice(5))}</h4>`);
@@ -529,8 +531,9 @@ function blocks(text: string, headings: string[], cells: Cells, state: RenderSta
       // 실행 칸이 먼저다. 못 알아보면 생 주소가 그대로 강의 화면에 찍힌다.
       const run = b.match(CODARO);
       if (run) {
+        // 실행 칸은 시각물이 아니다 (계약 10). 번호를 매기지 않고 읽기 본문의 코드 실습으로 둔다.
         const cell = cells[run[1]];
-        out.push(visual(cell && typeof cell.code === "string" ? cellCard(run[1], cell) : missingCell(run[1]), state));
+        out.push(cell && typeof cell.code === "string" ? cellCard(run[1], cell) : missingCell(run[1]));
         continue;
       }
       const video = youtube(b);
@@ -598,13 +601,11 @@ export function renderMarkdown(
 
 const TOP_VISUAL = /^<([a-z]+)\s+(data-visual="\d+")/;
 /**
- * 실행 칸은 읽기 모드에서 16:9 무대에 들어가지 않는다. 2026-09-03 운영자 지시다.
- *
- * 코드 실습은 비율을 지킬 이유가 없다. 무대에 가두면 내용은 안쪽에서 스크롤되고 남는 자리는
- * 비어서 이상한 스크롤만 생겼다. 읽기 모드의 실행 칸은 codaro 셀처럼 본문 흐름에 놓이고
- * 내용만큼 자란다. 강의 모드는 장표 한 장이 무대 하나라 그대로 무대 항목으로 둔다.
+ * 실행 칸은 시각물이 아니다 (계약 10, 2026-09-03 운영자 지시). 절은 제목, 부제, 시각물, 설명,
+ * 그다음 코드 실습이다. 읽기 모드에서 실행 칸은 codaro 셀처럼 본문 흐름에 놓여 내용만큼
+ * 자라고, 강의 모드에는 아예 올리지 않는다. 무대에는 시각물만 오른다.
  */
-const CELL_VISUAL = /^<section\s+data-visual="\d+"\s+class="cell[\s"]/;
+const CELL_PART = /^<section\s+class="cell[\s"]/;
 
 function carouselItem(html: string, index: number): string {
   return html.replace(TOP_VISUAL, `<$1 data-carousel-item="${index}" $2`);
@@ -629,20 +630,23 @@ function carouselBand(items: string[], className: string): string {
   return `<div class="${className}" data-carousel-support>${content}</div>`;
 }
 
+function carouselControls(count: number, carouselId: string): string {
+  if (count < 2) return "";
+  return `<div class="visual-carousel-controls" data-carousel-for="${esc(carouselId)}"><button type="button" data-carousel-prev aria-label="이전 시각물">←</button><span data-carousel-status aria-live="polite">1 / ${count}</span><button type="button" data-carousel-next aria-label="다음 시각물">→</button></div>`;
+}
+
 function visualCarousel(
   visuals: string[],
   fit: CourseScene["fit"] = "contain",
   label = "시각물",
   readingGroups: ReadingCarouselGroup[] | null = null,
+  carouselId = "",
 ): string {
   if (!visuals.length) return "";
   const items = visuals.map((item, index) => carouselItem(
     readingGroups ? stripVisualCaption(item) : item,
     index + 1,
   )).join("");
-  const controls = visuals.length > 1
-    ? `<div class="visual-carousel-controls"><button type="button" data-carousel-prev aria-label="이전 시각물">←</button><span data-carousel-status aria-live="polite">1 / ${visuals.length}</span><button type="button" data-carousel-next aria-label="다음 시각물">→</button></div>`
-    : "";
   const readingLabel = readingGroups
     ? carouselBand(readingGroups.map((group) => group.label), "visual-carousel-label")
     : "";
@@ -650,9 +654,9 @@ function visualCarousel(
   const explanation = readingGroups
     ? carouselBand(readingGroups.map((group) => group.explanation.join("\n")), "visual-carousel-explanation")
     : "";
-  return `<div class="visual-carousel" data-visual-carousel data-carousel-count="${visuals.length}" data-fit="${esc(
+  return `<div${carouselId ? ` id="${esc(carouselId)}"` : ""} class="visual-carousel" data-visual-carousel data-carousel-count="${visuals.length}" data-fit="${esc(
     fit || "contain",
-  )}" aria-label="${esc(label)} 캐러셀">${readingLabel}<div class="visual-carousel-frame"><div class="visual-carousel-track">${items}</div>${controls}</div>${support}${explanation}</div>`;
+  )}" aria-label="${esc(label)} 캐러셀">${readingLabel}<div class="visual-carousel-frame"><div class="visual-carousel-track">${items}</div></div>${support}${explanation}</div>`;
 }
 
 function visualSupport(visuals: string[], className = "scene-support"): string {
@@ -667,66 +671,81 @@ function visualSupport(visuals: string[], className = "scene-support"): string {
 
 function groupReadingCarousels(parts: string[], scenes: CourseScene[]): string {
   const out: string[] = [];
-  let section: string[] = [];
   let sceneIndex = -1;
-  const flush = () => {
-    if (!section.length) return;
-    if (sceneIndex < 0) {
-      out.push(...section);
-      section = [];
-      return;
+  let title = "시각물";
+  let run: ReadingCarouselGroup[] = [];
+  let pendingLabel = "";
+  let headingAt = -1;
+  let carouselIndex = 0;
+  /**
+   * 사례 라벨이 있는 묶음은 라벨, 시각물, 설명이 한 항목이라 캐러셀을 넘길 때 설명도 같이
+   * 바뀐다. 라벨 없이 시각물만 이어지고 설명이 그 뒤에 오는 절은 설명이 특정 시각물이 아니라
+   * 절 전체의 것이므로 캐러셀 아래 본문 흐름에 그대로 둔다. 항목마다 나눠 붙이면 마지막 시각물을
+   * 열기 전에는 설명이 하나도 안 보인다.
+   */
+  const flushRun = () => {
+    if (!run.length) return;
+    const visuals = run.map((group) => group.visual);
+    const carouselId = `reading-carousel-${sceneIndex + 1}-${carouselIndex + 1}`;
+    const controls = carouselControls(visuals.length, carouselId);
+    carouselIndex += 1;
+    if (controls && headingAt >= 0) out[headingAt] = out[headingAt].replace("</h2>", `${controls}</h2>`);
+    if (run.some((group) => group.label)) {
+      out.push(visualCarousel(visuals, scenes[sceneIndex]?.fit, title, run, carouselId));
+    } else {
+      out.push(
+        visualCarousel(visuals, scenes[sceneIndex]?.fit, title, run.map((group) => ({ ...group, explanation: [] })), carouselId),
+        ...run.flatMap((group) => group.explanation),
+      );
     }
-    const visualPositions = section
-      .map((part, index) => TOP_VISUAL.test(part) ? index : -1)
-      .filter((index) => index >= 0);
-    if (!visualPositions.length) {
-      out.push(...section);
-      section = [];
-      return;
-    }
-    const labelPositions = visualPositions.map((position) => (
-      position > 0 && section[position - 1].startsWith('<p class="lb">') ? position - 1 : -1
-    ));
-    const groups = visualPositions.map((position, index): ReadingCarouselGroup => {
-      const nextPosition = visualPositions[index + 1] ?? section.length;
-      const nextLabelPosition = labelPositions[index + 1];
-      const explanationEnd = nextLabelPosition >= 0 ? nextLabelPosition : nextPosition;
-      return {
-        label: labelPositions[index] >= 0 ? section[labelPositions[index]] : "",
-        visual: section[position],
-        explanation: section.slice(position + 1, explanationEnd),
-      };
-    });
-    const firstGroupAt = labelPositions[0] >= 0 ? labelPositions[0] : visualPositions[0];
-    const title = section.find((part) => part.startsWith("<h2 "))?.replace(/<[^>]+>/g, "") || "시각물";
-    out.push(...section.slice(0, firstGroupAt));
-    // 실행 칸 앞뒤의 시각물끼리만 캐러셀로 묶는다. 실행 칸은 라벨과 설명을 데리고 제자리에 남는다.
-    let run: ReadingCarouselGroup[] = [];
-    const flushRun = () => {
-      if (!run.length) return;
-      out.push(visualCarousel(run.map((group) => group.visual), scenes[sceneIndex]?.fit, title, run));
-      run = [];
-    };
-    for (const group of groups) {
-      if (!CELL_VISUAL.test(group.visual)) {
-        run.push(group);
-        continue;
-      }
-      flushRun();
-      if (group.label) out.push(group.label);
-      out.push(group.visual, ...group.explanation);
-    }
-    flushRun();
-    section = [];
+    run = [];
+  };
+  const flushLabel = () => {
+    if (!pendingLabel) return;
+    // 시각물이 따라오지 않은 라벨은 본문 문단이다
+    if (run.length) run[run.length - 1].explanation.push(pendingLabel);
+    else out.push(pendingLabel);
+    pendingLabel = "";
   };
   for (const part of parts) {
     if (part.startsWith("<h2 ")) {
-      flush();
+      flushLabel();
+      flushRun();
       sceneIndex += 1;
+      title = part.replace(/<[^>]+>/g, "") || "시각물";
+      headingAt = out.length;
+      carouselIndex = 0;
+      out.push(part);
+      continue;
     }
-    section.push(part);
+    if (sceneIndex < 0) {
+      out.push(part);
+      continue;
+    }
+    if (part.startsWith('<p class="lb">')) {
+      flushLabel();
+      pendingLabel = part;
+      continue;
+    }
+    if (TOP_VISUAL.test(part)) {
+      run.push({ label: pendingLabel, visual: part, explanation: [] });
+      pendingLabel = "";
+      continue;
+    }
+    if (CELL_PART.test(part)) {
+      // 실행 칸은 시각물 묶음을 끊고 라벨과 함께 제자리에 남는다. 그 뒤 설명은 실행 칸의 설명이다.
+      flushRun();
+      if (pendingLabel) out.push(pendingLabel);
+      pendingLabel = "";
+      out.push(part);
+      continue;
+    }
+    flushLabel();
+    if (run.length) run[run.length - 1].explanation.push(part);
+    else out.push(part);
   }
-  flush();
+  flushLabel();
+  flushRun();
   return out.join("\n");
 }
 
@@ -806,18 +825,21 @@ export function renderLecture(
     const parts = renderMarkdownParts(section.content, [], cells, state);
     if (state.visual !== scene.visualCount) return { html: "", hasCells: false, ok: false };
     const visuals = parts.filter((part) => TOP_VISUAL.test(part));
-    const content = parts.filter((part) => !TOP_VISUAL.test(part));
+    // 강의 무대에는 시각물만 오른다. 실행 칸은 읽기 모드의 코드 실습이라 장표에 싣지 않는다 (계약 10).
+    const content = parts.filter((part) => !TOP_VISUAL.test(part) && !CELL_PART.test(part));
     const support = visualSupport(visuals);
-    const html = [visualCarousel(visuals, scene.fit, section.title), ...content].join("\n");
+    const carouselId = `lecture-carousel-${index + 1}`;
+    const controls = carouselControls(visuals.length, carouselId);
+    const html = [visualCarousel(visuals, scene.fit, section.title, null, carouselId), ...content].join("\n");
     hasCells ||= html.includes('data-cell="');
     const timeline = compileSceneTimeline(scene).slice(0, 1);
     const titleId = `lecture-${scene.id}-title`;
     rendered.push(`<section class="lecture-scene" data-scene-runtime="${COURSE_SCENE_RUNTIME}" data-scene="${esc(scene.id)}" data-role="${esc(
       scene.role,
     )}" data-layout="${esc(scene.layout)}" data-fit="${esc(scene.fit || "contain")}" data-timeline="${esc(JSON.stringify(timeline))}" role="group" aria-roledescription="슬라이드" aria-labelledby="${esc(titleId)}" aria-hidden="true" inert>
-  <header class="scene-head"><div class="scene-meta"><span class="scene-index">${String(index + 1).padStart(2, "0")}</span><span class="scene-cue" data-scene-cue></span></div><div class="scene-copy"><h2 id="${esc(titleId)}" tabindex="-1">${esc(
+  <header class="scene-head"><div class="scene-meta"><span class="scene-index">${String(index + 1).padStart(2, "0")}</span><span class="scene-cue" data-scene-cue></span></div><div class="scene-copy"><div class="scene-title-row"><h2 id="${esc(titleId)}" tabindex="-1">${esc(
     section.title,
-  )}</h2><p class="scene-subtitle">${esc(section.subtitle)}</p></div>${support}</header>
+  )}</h2>${controls}</div><p class="scene-subtitle">${esc(section.subtitle)}</p></div>${support}</header>
   <div class="scene-canvas">${html}</div>
 </section>`);
   }

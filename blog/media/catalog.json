@@ -202,11 +202,11 @@
     },
     "01-what-automation-does/three-actions": {
       "assetKey": "three-actions",
-      "masterPath": "objects/sha256/f0/f0f9a300b851f3d950b8b6b969aaac282d70637b6619cd93878fbfc8f27b2ef7.png",
-      "masterSha256": "f0f9a300b851f3d950b8b6b969aaac282d70637b6619cd93878fbfc8f27b2ef7",
-      "path": "objects/sha256/52/52e42824b35cca6422e43b853bccb2a87c712e3e7c895776d1ddfcb15cbf8a09.webp",
+      "masterPath": "objects/sha256/06/060337709cde8bbe612f477dbfa28fd170e51228a8fbc18ae34c069ea1c71f6d.png",
+      "masterSha256": "060337709cde8bbe612f477dbfa28fd170e51228a8fbc18ae34c069ea1c71f6d",
+      "path": "objects/sha256/4e/4e87c637125373d8912b45278e9aed6a5eecfd92a078fc891cb45131f164bc07.webp",
       "post": "01-what-automation-does",
-      "sha256": "52e42824b35cca6422e43b853bccb2a87c712e3e7c895776d1ddfcb15cbf8a09"
+      "sha256": "4e87c637125373d8912b45278e9aed6a5eecfd92a078fc891cb45131f164bc07"
     },
     "01-why-ai-automation/rule-ai-escalation": {
       "assetKey": "rule-ai-escalation",
@@ -260,6 +260,12 @@
       "post": "02-frontier-ai-accounts",
       "sha256": "0928cfc635ad87a9711aa9f10c587c64ad84fda42a8c171b437745755056d8a6"
     },
+    "02-python-inside-excel/cell-address": {
+      "assetKey": "cell-address",
+      "path": "objects/sha256/1a/1a96f203e82b2ce75ac19745d5ca33739438f0b15c864ebb004bd0bfb96ec289.webp",
+      "post": "02-python-inside-excel",
+      "sha256": "1a96f203e82b2ce75ac19745d5ca33739438f0b15c864ebb004bd0bfb96ec289"
+    },
     "02-what-is-python/python-fit-decision": {
       "assetKey": "python-fit-decision",
       "path": "objects/sha256/4c/4cb92f14416032a364193bac4d1f4f2888a364bb24dc3a6fb720c2fa0d1fcb43.png",
@@ -277,6 +283,24 @@
       "path": "objects/sha256/6c/6cc548bf8e6209c71e075900a220224e8d9e9e660db8052419703b12a214d6e7.png",
       "post": "03-department-summary",
       "sha256": "6cc548bf8e6209c71e075900a220224e8d9e9e660db8052419703b12a214d6e7"
+    },
+    "03-python-basic-syntax/assign-vs-compare": {
+      "assetKey": "assign-vs-compare",
+      "path": "objects/sha256/b2/b2099438fb033d513bdffec1e9ba6df1ea0496c7fd727980b6147e51757751f8.webp",
+      "post": "03-python-basic-syntax",
+      "sha256": "b2099438fb033d513bdffec1e9ba6df1ea0496c7fd727980b6147e51757751f8"
+    },
+    "03-python-basic-syntax/print-text": {
+      "assetKey": "print-text",
+      "path": "objects/sha256/ea/ea2f6c10a826fa60d5bae3408c808ca6d545ec32218fd0861139500552184920.webp",
+      "post": "03-python-basic-syntax",
+      "sha256": "ea2f6c10a826fa60d5bae3408c808ca6d545ec32218fd0861139500552184920"
+    },
+    "03-python-basic-syntax/value-kinds": {
+      "assetKey": "value-kinds",
+      "path": "objects/sha256/c2/c2ffecfb64eea86450cd384631bddbf6965dbc32f46e627ca9a0c0ff406c4b9f.webp",
+      "post": "03-python-basic-syntax",
+      "sha256": "c2ffecfb64eea86450cd384631bddbf6965dbc32f46e627ca9a0c0ff406c4b9f"
     },
     "03-python-outside-excel/xlsx-package-structure": {
       "assetKey": "xlsx-package-structure",
@@ -452,6 +476,17 @@
       "sourcePost": "015-excel-automation-validation",
       "visualSubject": "정상 Excel 자동화 결과 화면과 격리된 상쇄 금액 및 중복 행 및 누락 시트 및 원본 지문 변경 테스트 상자",
       "width": 1536
+    },
+    "060337709cde8bbe612f477dbfa28fd170e51228a8fbc18ae34c069ea1c71f6d": {
+      "alt": "버튼 입력이 완료 상태로 바뀌고, 문서와 표가 하나의 표로 모이며, 기존 수치가 계산을 거쳐 새 값과 예측선으로 바뀌는 세 가지 자동화 흐름",
+      "bytes": 557888,
+      "height": 1152,
+      "mime": "image/png",
+      "path": "objects/sha256/06/060337709cde8bbe612f477dbfa28fd170e51228a8fbc18ae34c069ea1c71f6d.png",
+      "role": "master",
+      "sourcePost": "01-what-automation-does",
+      "visualSubject": "버튼을 눌러 완료 상태를 만드는 화면, 흩어진 문서와 표를 한 표로 모으는 흐름, 기존 수치를 계산해 새 값과 예측선을 만드는 흐름이 나란히 놓인 세 칸",
+      "width": 2048
     },
     "060a3bed476791504f4641d3e22bb25f2a243f4172e55cb4499301dbceb841a9": {
       "alt": "요구에서 계획과 승인과 수정과 실행과 검증과 diff와 커밋을 거쳐 다시 요구로 돌아오는 작업 루프",
@@ -853,6 +888,16 @@
       "sourcePost": "014-python-excel-merge",
       "visualSubject": "같은 열을 가진 단순 Excel 표 묶음과 수식 및 매크로와 차트 및 병합 셀이 있는 복잡한 통합문서",
       "width": 1536
+    },
+    "1a96f203e82b2ce75ac19745d5ca33739438f0b15c864ebb004bd0bfb96ec289": {
+      "alt": "열린 통합문서 창의 시트 탭과 C2, C3, C4 칸에 book, sheet, 칸 주소 이름표가 붙고 행 번호 2, 3, 4 로 세 주소를 만드는 모습",
+      "bytes": 31912,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/1a/1a96f203e82b2ce75ac19745d5ca33739438f0b15c864ebb004bd0bfb96ec289.webp",
+      "sourcePost": "02-python-inside-excel",
+      "visualSubject": "expense.xlsx 통합문서 창에 book 이름표, Sheet1 탭에 book.sheets.active 이름표가 붙고, 판정 열의 C2, C3, C4 칸이 강조되어 오른쪽의 sheet[\"C2\"], sheet[\"C3\"], sheet[\"C4\"] 코드와 화살표로 이어지며 위에 row = 2, 3, 4 와 f\"C{row}\" 가 적힌 모습",
+      "width": 2048
     },
     "1af5971f72c627a61442d4f3c485c184d2a1a2992c7b9719efafca5127148bd8": {
       "alt": "새 자료를 위치와 이름 및 중복과 변경 질문에 통과시켜 알맞은 자료형을 고르는 확인표",
@@ -1566,6 +1611,16 @@
       "sourcePost": "010-python-errors",
       "visualSubject": "Python 코드 화면의 변수 정의 토큰과 이름 공간 및 불일치한 사용 토큰과 수정 결과",
       "width": 1536
+    },
+    "4e87c637125373d8912b45278e9aed6a5eecfd92a078fc891cb45131f164bc07": {
+      "alt": "버튼 입력이 완료 상태로 바뀌고, 문서와 표가 하나의 표로 모이며, 기존 수치가 계산을 거쳐 새 값과 예측선으로 바뀌는 세 가지 자동화 흐름",
+      "bytes": 104332,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/4e/4e87c637125373d8912b45278e9aed6a5eecfd92a078fc891cb45131f164bc07.webp",
+      "sourcePost": "01-what-automation-does",
+      "visualSubject": "버튼을 눌러 완료 상태를 만드는 화면, 흩어진 문서와 표를 한 표로 모으는 흐름, 기존 수치를 계산해 새 값과 예측선을 만드는 흐름이 나란히 놓인 세 칸",
+      "width": 2048
     },
     "4f5fe6f157cd765be92a249db561306138f38321370b8e512629ed46c7310149": {
       "alt": "다섯 행의 합성 지출 데이터가 정해진 시트와 세 열을 가진 Excel 입력 파일로 만들어지는 모습",
@@ -2945,6 +3000,16 @@
       "visualSubject": "작은 불빛이 켜진 데이터 저장 랙에서 굵은 케이블 하나가 이어져 결과 표가 뜬 모니터로 연결된 어두운 방",
       "width": 1216
     },
+    "b2099438fb033d513bdffec1e9ba6df1ea0496c7fd727980b6147e51757751f8": {
+      "alt": "등호 하나 옆에서 값 카드가 amount 상자에 들어가는 위 줄과 등호 둘 옆에서 두 값이 저울에 올라 False 가 나오는 아래 줄",
+      "bytes": 26444,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/b2/b2099438fb033d513bdffec1e9ba6df1ea0496c7fd727980b6147e51757751f8.webp",
+      "sourcePost": "03-python-basic-syntax",
+      "visualSubject": "등호 하나 옆에서 120000 카드가 화살표를 따라 amount 이름표가 붙은 상자에 들어가는 위 줄과, 등호 둘 옆에서 amount 120000 과 review_limit 100000 두 카드가 저울에 올라 False 결과 카드로 이어지는 아래 줄",
+      "width": 2048
+    },
     "b2767037cd1de4ac1cf10555c55fdc23b40905c3ef2c2edc939e7096af328a2c": {
       "alt": "거래 ID와 금액으로 묶인 세 쌍이 두 반복 변수로 나뉘는 모습",
       "bytes": 1194703,
@@ -3105,6 +3170,16 @@
       "sourcePost": "025-excel-data-normalization",
       "visualSubject": "장식이 섞인 금액 문자열 카드 세 개와 공백 및 기호 제거 필터와 숫자 변환 카드 및 오류 행",
       "width": 1536
+    },
+    "c2ffecfb64eea86450cd384631bddbf6965dbc32f46e627ca9a0c0ff406c4b9f": {
+      "alt": "따옴표 없는 120000 과 0.1 과 True 는 정수, 실수, 불리언으로 통과하고 따옴표 안의 \"120000\" 과 \"True\" 는 텍스트라 계산 앞에서 막히는 두 띠",
+      "bytes": 29880,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/c2/c2ffecfb64eea86450cd384631bddbf6965dbc32f46e627ca9a0c0ff406c4b9f.webp",
+      "sourcePost": "03-python-basic-syntax",
+      "visualSubject": "따옴표 없는 120000, 0.1, True 세 카드가 정수, 실수, 불리언 이름표를 달고 확인 표시로 이어지는 위 띠와, 따옴표 안의 \"120000\" 과 \"True\" 가 텍스트 이름표를 달고 + 80000 계산 앞의 막대에서 멈추는 아래 띠",
+      "width": 2048
     },
     "c4731b24c9f18d94b299fa54ff29fb218395dc31c322c4cc5fb5b5e93d50bdb7": {
       "alt": "기대 결과에서 실패 테스트와 최소 수정을 거쳐 전체 통과로 이어지는 테스트 주도 개발 흐름",
@@ -3595,6 +3670,16 @@
       "sourcePost": "021-python-project-runbook",
       "visualSubject": "소스 파일 카드와 Excel 입력 표와 잠금 버전 격자와 터미널 명령 띠와 테스트 검사표 및 결과 Excel",
       "width": 1536
+    },
+    "ea2f6c10a826fa60d5bae3408c808ca6d545ec32218fd0861139500552184920": {
+      "alt": "따옴표 안의 \"0012\" 는 print 를 지나 0012 로 그대로 찍히고 따옴표 없는 0012 는 print 앞에서 멈추는 두 줄",
+      "bytes": 21476,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/ea/ea2f6c10a826fa60d5bae3408c808ca6d545ec32218fd0861139500552184920.webp",
+      "sourcePost": "03-python-basic-syntax",
+      "visualSubject": "따옴표 안에 넣은 \"0012\" 가 print 를 지나 출력 띠에 0012 로 그대로 찍히는 위 줄과, 따옴표 없는 0012 가 print 앞에서 멈춰 경고 표시가 붙는 아래 줄",
+      "width": 2048
     },
     "ecc927f5d0fa9237df3e9b7544611751ca921122ae370071c0261066da3ad63d": {
       "alt": "업무 분석과 자동화 설계와 맞춤 개발과 시스템 연동을 거쳐 운영 정착과 유지보수로 이어지는 여섯 단계",
