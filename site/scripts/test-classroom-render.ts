@@ -254,8 +254,10 @@ check("완성 코드와 묶음도 실습 파일이다", () => {
   // 순서를 따라가다 실패한 사람도 결과물을 쓸 수 있어야 한다 (2026-09-04 운영자 지시)
   const py = `${"d".repeat(64)}.py`;
   const zip = `${"e".repeat(64)}.zip`;
-  assert.ok(ROOM_MEDIA_KEY.test(py) && ROOM_MEDIA_KEY.test(zip));
+  const pdf = `${"f".repeat(64)}.pdf`;
+  assert.ok(ROOM_MEDIA_KEY.test(py) && ROOM_MEDIA_KEY.test(zip) && ROOM_MEDIA_KEY.test(pdf));
   assert.equal(mediaContentType(zip), "application/zip");
+  assert.equal(mediaContentType(pdf), "application/pdf");
   assert.ok(mediaContentType(py).startsWith("text/x-python"));
   const html = renderMarkdown(`[biz-check.zip](room://${zip})`, [], {}, { ...IN_ROOM });
   assert.ok(html.includes(`href="/room/x/media/${zip}" download="biz-check.zip"`));

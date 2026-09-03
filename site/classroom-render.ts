@@ -184,9 +184,9 @@ const PENDING = /^media:\/\/([a-z0-9-]+)$/i;
  * **`eddmpython-course/scripts/roomMediaCatalog.mjs` 의 `ROOM_MEDIA` 와 같아야 한다.**
  * 한쪽을 고치면 다른 쪽도 같은 날 고친다.
  */
-export const ROOM_MEDIA = /^room:\/\/([a-f0-9]{64}\.(?:png|webp|jpg|gif|mp4|webm|xlsx|py|zip))$/;
+export const ROOM_MEDIA = /^room:\/\/([a-f0-9]{64}\.(?:png|webp|jpg|gif|mp4|webm|xlsx|py|zip|pdf))$/;
 /** Worker 가 경로에서 받는 객체 이름. `..` 같은 것은 여기서 걸러진다. */
-export const ROOM_MEDIA_KEY = /^[a-f0-9]{64}\.(?:png|webp|jpg|gif|mp4|webm|xlsx|py|zip)$/;
+export const ROOM_MEDIA_KEY = /^[a-f0-9]{64}\.(?:png|webp|jpg|gif|mp4|webm|xlsx|py|zip|pdf)$/;
 const MEDIA_TYPES: Record<string, string> = {
   png: "image/png",
   webp: "image/webp",
@@ -197,6 +197,7 @@ const MEDIA_TYPES: Record<string, string> = {
   xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   py: "text/x-python; charset=utf-8",
   zip: "application/zip",
+  pdf: "application/pdf",
 };
 
 export function mediaContentType(key: string): string {

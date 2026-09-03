@@ -142,9 +142,9 @@
     },
     "01-business-status-check/prompt-card": {
       "assetKey": "prompt-card",
-      "path": "objects/sha256/09/09c74b15f15b6cd8799036fd8a221ce85979c71afd3ea605f7c9551743c8cc2c.webp",
+      "path": "objects/sha256/44/4481acb5cb69350a5e93ef2b836c40d34120eb13be0cf6a17a6e872edfd61f35.webp",
       "post": "01-business-status-check",
-      "sha256": "09c74b15f15b6cd8799036fd8a221ce85979c71afd3ea605f7c9551743c8cc2c"
+      "sha256": "4481acb5cb69350a5e93ef2b836c40d34120eb13be0cf6a17a6e872edfd61f35"
     },
     "01-business-status-check/result-excel": {
       "assetKey": "result-excel",
@@ -374,9 +374,9 @@
     },
     "02-daily-scheduled-run/schedule-prompt-card": {
       "assetKey": "schedule-prompt-card",
-      "path": "objects/sha256/ee/ee269894ef37a9fb989ba37c932819f8c138109f7565db98d43456d2465dbfa3.webp",
+      "path": "objects/sha256/31/31a0cbb2bafe4313d643449fe7d8bc08b4930564eca0a8b351ab83151b80f972.webp",
       "post": "02-daily-scheduled-run",
-      "sha256": "ee269894ef37a9fb989ba37c932819f8c138109f7565db98d43456d2465dbfa3"
+      "sha256": "31a0cbb2bafe4313d643449fe7d8bc08b4930564eca0a8b351ab83151b80f972"
     },
     "02-daily-scheduled-run/terminal-manual-run": {
       "assetKey": "terminal-manual-run",
@@ -565,6 +565,36 @@
       "path": "objects/sha256/6c/6cc548bf8e6209c71e075900a220224e8d9e9e660db8052419703b12a214d6e7.png",
       "post": "03-department-summary",
       "sha256": "6cc548bf8e6209c71e075900a220224e8d9e9e660db8052419703b12a214d6e7"
+    },
+    "03-pdf-pick-pages/edge-picked": {
+      "assetKey": "edge-picked",
+      "path": "objects/sha256/85/8564e650595d605604e75cdb32064d2ca74b34c48f0d0630780b310a00bff241.webp",
+      "post": "03-pdf-pick-pages",
+      "sha256": "8564e650595d605604e75cdb32064d2ca74b34c48f0d0630780b310a00bff241"
+    },
+    "03-pdf-pick-pages/edge-source": {
+      "assetKey": "edge-source",
+      "path": "objects/sha256/17/1711a85c7455165cf8f52d35b26124daf4a56562b551d5459b2cb59937b15358.webp",
+      "post": "03-pdf-pick-pages",
+      "sha256": "1711a85c7455165cf8f52d35b26124daf4a56562b551d5459b2cb59937b15358"
+    },
+    "03-pdf-pick-pages/split-prompt-card": {
+      "assetKey": "split-prompt-card",
+      "path": "objects/sha256/09/0904c8b612144a0402519ecd980324886919e49c6a00099f20978b7ed468f675.webp",
+      "post": "03-pdf-pick-pages",
+      "sha256": "0904c8b612144a0402519ecd980324886919e49c6a00099f20978b7ed468f675"
+    },
+    "03-pdf-pick-pages/terminal-rerun": {
+      "assetKey": "terminal-rerun",
+      "path": "objects/sha256/9d/9da4b5b884376168f72f3de8aa8f66a8a8b42edf74442f664c9b11c8a7760217.webp",
+      "post": "03-pdf-pick-pages",
+      "sha256": "9da4b5b884376168f72f3de8aa8f66a8a8b42edf74442f664c9b11c8a7760217"
+    },
+    "03-pdf-pick-pages/terminal-run": {
+      "assetKey": "terminal-run",
+      "path": "objects/sha256/91/918ffba8aabe55612ba02e387194a927483fd6d72621fbb8d71965c9d69f3e45.webp",
+      "post": "03-pdf-pick-pages",
+      "sha256": "918ffba8aabe55612ba02e387194a927483fd6d72621fbb8d71965c9d69f3e45"
     },
     "03-python-basic-syntax/assign-vs-compare": {
       "assetKey": "assign-vs-compare",
@@ -1214,6 +1244,16 @@
       "visualSubject": "기존 파일 회귀 테스트와 변형 파일 테스트 및 균형 잡힌 결과 비교판",
       "width": 1536
     },
+    "0904c8b612144a0402519ecd980324886919e49c6a00099f20978b7ed468f675": {
+      "alt": "지시문 카드에 낱장 저장 규칙, 골라 모을 쪽, 멈출 때와 끝났을 때, Codex가 할 일 네 항목이 적힌 모습",
+      "bytes": 41576,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/09/0904c8b612144a0402519ecd980324886919e49c6a00099f20978b7ed468f675.webp",
+      "sourcePost": "03-pdf-pick-pages",
+      "visualSubject": "낱장 저장 규칙, 골라 모을 쪽, 멈출 때와 끝났을 때, Codex가 할 일 네 항목",
+      "width": 2048
+    },
     "091c85722640076686511b5d1cdbad1b0c331f7b85aaf683d4084701f8416df8": {
       "alt": "내 브라우저에서 보낸 코드가 구글 쪽 가상 컴퓨터에서 실행되어 결과만 화면으로 돌아오고 노트북 파일은 내 Google Drive 폴더에 쌓이는 세 자리",
       "bytes": 31430,
@@ -1474,6 +1514,16 @@
       "sourcePost": "021-python-project-runbook",
       "visualSubject": "중앙 프로그램 모듈과 서로 분리된 임시 폴더 여러 개와 각 폴더의 합성 Excel과 결과 또는 오류 모양 및 여덟 검사 표식과 연결되지 않은 실제 입력 폴더",
       "width": 1536
+    },
+    "1711a85c7455165cf8f52d35b26124daf4a56562b551d5459b2cb59937b15358": {
+      "alt": "Edge로 연 계약서.pdf에 거래처 물품 공급 계약서 표지가 보이고 도구 막대에 1 / 10 이 표시된 모습",
+      "bytes": 35008,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/17/1711a85c7455165cf8f52d35b26124daf4a56562b551d5459b2cb59937b15358.webp",
+      "sourcePost": "03-pdf-pick-pages",
+      "visualSubject": "표본 계약서의 표지와 쪽수 표시",
+      "width": 2048
     },
     "173328edd0643b6f3dfb11f34660f4626c290ab711ebdf087c2dbbfbfa24347d": {
       "alt": "Python 모듈 파일이 여러 모듈을 담은 import 패키지와 설치 파일 묶음 안에 단계별로 포함된 모습",
@@ -2036,6 +2086,16 @@
       "visualSubject": "Windows 큰 카드 안에 놓인 강조색 .venv 상자와 그 안의 두 항목, 그리고 상자 밖 Windows 쪽에 남은 네 항목 카드",
       "width": 2048
     },
+    "31a0cbb2bafe4313d643449fe7d8bc08b4930564eca0a8b351ab83151b80f972": {
+      "alt": "지시문 카드에 실행 파일 run_check.cmd, 등록 파일 register_task.cmd, Codex가 할 일 세 항목이 적힌 모습",
+      "bytes": 53630,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/31/31a0cbb2bafe4313d643449fe7d8bc08b4930564eca0a8b351ab83151b80f972.webp",
+      "sourcePost": "02-daily-scheduled-run",
+      "visualSubject": "실행 파일, 등록 파일, Codex가 할 일 세 항목",
+      "width": 2048
+    },
     "3354d0a19e03b14749d7b71c672590c7db87b62f142dbc4a6f7d50f61d4994f7": {
       "alt": "Python 명령 확인에서 시작해 현재 위치와 파일 종류 및 실제 전체 경로를 차례로 검사하고 성공 실행에 도착하는 복구 순서",
       "bytes": 1299036,
@@ -2415,6 +2475,16 @@
       "path": "objects/sha256/44/4442e3c1bc40380774473cd0a8f47f374b40d50e82eb5023054976e2fbc4b54b.webp",
       "sourcePost": "04-run-python-online",
       "visualSubject": "Colab 노트북 화면의 파일과 런타임 메뉴, 코드와 텍스트 추가 단추, 모두 실행, 코드 칸",
+      "width": 2048
+    },
+    "4481acb5cb69350a5e93ef2b836c40d34120eb13be0cf6a17a6e872edfd61f35": {
+      "alt": "지시문 카드에 읽을 파일, 창구 주소와 보내는 모양, 인증키를 읽는 자리, 결과를 적을 열, Codex가 할 일 다섯 항목이 적힌 모습",
+      "bytes": 55690,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/44/4481acb5cb69350a5e93ef2b836c40d34120eb13be0cf6a17a6e872edfd61f35.webp",
+      "sourcePost": "01-business-status-check",
+      "visualSubject": "읽을 파일, 창구와 보내는 모양, 인증키 자리, 결과 열, 실행 방법 다섯 항목",
       "width": 2048
     },
     "44e93ce6a606041b1110f7d58c8329619edb9777ac52dee5bc31e9d65ace1c6c": {
@@ -3673,6 +3743,16 @@
       "visualSubject": "숫자선 위의 50000, 80000, 100000, 120000 이 기준 100000 을 두고 갈라져 if amount < 100000 은 정상, elif amount > 100000 은 확인필요, else 는 기준과 같음 세 상자로 이어지는 모습",
       "width": 2048
     },
+    "8564e650595d605604e75cdb32064d2ca74b34c48f0d0630780b310a00bff241": {
+      "alt": "Edge로 연 계약서_골라낸쪽.pdf에 계약서 표지가 보이고 도구 막대에 1 / 3 이 표시된 모습",
+      "bytes": 25144,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/85/8564e650595d605604e75cdb32064d2ca74b34c48f0d0630780b310a00bff241.webp",
+      "sourcePost": "03-pdf-pick-pages",
+      "visualSubject": "골라낸 쪽 PDF 의 첫 쪽과 쪽수 표시",
+      "width": 2048
+    },
     "8581132c2780527c8a89a5aa8f297e1e7e334cf43290e46aef8bde08e6d27bb5": {
       "alt": "테스트 전용 임시 폴더의 원본 Excel은 그대로 남고 같은 결과 파일을 두 번 만들어도 행 수가 늘지 않는 모습",
       "bytes": 1265926,
@@ -3916,6 +3996,16 @@
       "sourcePost": "013-uv-python-environment",
       "visualSubject": "의존성 설정 파일, 패키지 트리가 있는 잠금 파일, 추가된 패키지 카드, 제거된 빈 자리, 한 가지만 바뀐 패키지 가지와 고정된 나머지 목록",
       "width": 1536
+    },
+    "918ffba8aabe55612ba02e387194a927483fd6d72621fbb8d71965c9d69f3e45": {
+      "alt": "PowerShell 창에서 uv run split_pdf.py 의 출력 두 줄과 dir 쪽 으로 나열된 계약서_01.pdf 부터 계약서_10.pdf 가 보이는 모습",
+      "bytes": 102472,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/91/918ffba8aabe55612ba02e387194a927483fd6d72621fbb8d71965c9d69f3e45.webp",
+      "sourcePost": "03-pdf-pick-pages",
+      "visualSubject": "실행 출력 두 줄과 계약서_01.pdf 부터 계약서_10.pdf 까지의 이름 목록",
+      "width": 2048
     },
     "91f7991b774fb432239e5e515afa7b37bea8a1fc5a15832a535aabf7811c574b": {
       "alt": "웹 Excel의 왼쪽 시트와 오른쪽 코드 편집기가 연결되어 한 셀이 밝아지는 모습",
@@ -4170,6 +4260,16 @@
       "sourcePost": "017-python-list-dictionary",
       "visualSubject": "두 이름의 같은 바깥 목록 참조와 두 바깥 목록의 같은 안쪽 거래 참조 및 완전히 분리된 두 거래",
       "width": 1536
+    },
+    "9da4b5b884376168f72f3de8aa8f66a8a8b42edf74442f664c9b11c8a7760217": {
+      "alt": "PowerShell 창에서 pick 을 2, 3 으로 바꿔 실행해 2, 3쪽을 모아 저장했다는 줄이 찍힌 모습",
+      "bytes": 53866,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/9d/9da4b5b884376168f72f3de8aa8f66a8a8b42edf74442f664c9b11c8a7760217.webp",
+      "sourcePost": "03-pdf-pick-pages",
+      "visualSubject": "바뀐 pick 목록으로 실행한 출력 두 줄",
+      "width": 2048
     },
     "9dd8a5af82fdb6e9515d3eed1d28bb4a82a0b83798e4c084016b4283b53d286b": {
       "alt": "같은 코드를 담은 브라우저 셀과 expense_review.py 파일을 놓고 파이썬을 누가 설치했는지와 코드가 어디 남는지를 대조한 두 열",
