@@ -198,6 +198,58 @@ check("비공개 영상은 재생기가 된다", () => {
   assert.ok(html.includes(`<video src="/room/x/media/${key}"`));
 });
 
+// 실습 파일. 표본과 결과 엑셀을 방 안에서 내려받는다 (2026-09-04). 라벨이 저장되는 파일 이름이다.
+const FILE_KEY = `${"c".repeat(64)}.xlsx`;
+check("실습 파일 링크는 방 경로의 내려받기 링크가 된다", () => {
+  const html = renderMarkdown(`표본은 [사업자명단.xlsx](room://${FILE_KEY}) 입니다.`, [], {}, { ...IN_ROOM });
+  assert.ok(
+    html.includes(`<a class="room-file" href="/room/x/media/${FILE_KEY}" download="사업자명단.xlsx">사업자명단.xlsx</a>`),
+  );
+  assert.ok(!html.includes("room://"));
+  // 내려받기에 새 탭을 붙이면 빈 탭이 남는다
+  assert.ok(!html.includes('target="_blank"'));
+});
+
+check("라벨이 파일 이름이 아니면 객체 이름으로 저장된다", () => {
+  const html = renderMarkdown(`[표본 명단](room://${FILE_KEY})`, [], {}, { ...IN_ROOM });
+  assert.ok(html.includes(`download="${FILE_KEY}"`));
+});
+
+check("번호 목록 안의 실습 파일 링크도 방 경로를 받는다", () => {
+  const html = renderMarkdown(`1. [사업자명단.xlsx](room://${FILE_KEY})를 내려받습니다`, [], {}, { ...IN_ROOM });
+  assert.ok(html.startsWith("<ol>"));
+  assert.ok(html.includes(`href="/room/x/media/${FILE_KEY}"`));
+});
+
+check("방 밖에서는 실습 파일 링크가 이름만 남는다", () => {
+  const html = renderMarkdown(`[사업자명단.xlsx](room://${FILE_KEY})`);
+  assert.ok(html.includes('<span class="room-file"'));
+  assert.ok(!html.includes("room://"));
+  assert.ok(!html.includes("<a "));
+});
+
+check("모양이 틀린 실습 파일 주소는 링크로 새지 않는다", () => {
+  // 캡션이 딸린 주소와 대문자 scheme. 2026-09-04 검증자가 방 안팎 모두에서 room:// 가 새는 것을 잡았다
+  for (const body of [`[명단.xlsx](room://${FILE_KEY} "표본")`, `[명단.xlsx](ROOM://${FILE_KEY})`]) {
+    for (const state of [{ ...IN_ROOM }, undefined]) {
+      const html = renderMarkdown(body, [], {}, state);
+      assert.ok(!/room:\/\//i.test(html));
+      assert.ok(html.includes("파일 주소 오류"));
+      assert.ok(!html.includes("<a "));
+    }
+  }
+});
+
+check("라벨의 확장자는 대소문자를 가리지 않는다", () => {
+  const html = renderMarkdown(`[명단.XLSX](room://${FILE_KEY})`, [], {}, { ...IN_ROOM });
+  assert.ok(html.includes('download="명단.XLSX"'));
+});
+
+check("엑셀 파일은 Worker 가 엑셀 형식으로 내준다", () => {
+  assert.ok(ROOM_MEDIA_KEY.test(FILE_KEY));
+  assert.equal(mediaContentType(FILE_KEY), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+});
+
 check("비공개 객체 이름과 content-type", () => {
   assert.equal(mediaContentType(ROOM_KEY), "image/webp");
   assert.equal(mediaContentType(`${"b".repeat(64)}.mp4`), "video/mp4");

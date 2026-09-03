@@ -122,6 +122,66 @@
       "post": "01-ai-agent-scenes",
       "sha256": "4c47bd8da60b70e100b5a1d244baeeb76886a0e473154dd89fed7daf6d70981c"
     },
+    "01-business-status-check/datagokr-apply": {
+      "assetKey": "datagokr-apply",
+      "path": "objects/sha256/43/43a962adc7b3bbdf2b9fc91dbac6189f4f64ce05cf0b0b4397fcb3c50adb35f7.webp",
+      "post": "01-business-status-check",
+      "sha256": "43a962adc7b3bbdf2b9fc91dbac6189f4f64ce05cf0b0b4397fcb3c50adb35f7"
+    },
+    "01-business-status-check/datagokr-dataset": {
+      "assetKey": "datagokr-dataset",
+      "path": "objects/sha256/4b/4beba9d130b44981b16262544095d2f74f73ea62d4298559632821d3de8b5352.webp",
+      "post": "01-business-status-check",
+      "sha256": "4beba9d130b44981b16262544095d2f74f73ea62d4298559632821d3de8b5352"
+    },
+    "01-business-status-check/datagokr-home": {
+      "assetKey": "datagokr-home",
+      "path": "objects/sha256/66/66609bec2359c452a6d44a7a64c9d5bdd0d46606304a54c7f38e8d7514eee158.webp",
+      "post": "01-business-status-check",
+      "sha256": "66609bec2359c452a6d44a7a64c9d5bdd0d46606304a54c7f38e8d7514eee158"
+    },
+    "01-business-status-check/prompt-card": {
+      "assetKey": "prompt-card",
+      "path": "objects/sha256/09/09c74b15f15b6cd8799036fd8a221ce85979c71afd3ea605f7c9551743c8cc2c.webp",
+      "post": "01-business-status-check",
+      "sha256": "09c74b15f15b6cd8799036fd8a221ce85979c71afd3ea605f7c9551743c8cc2c"
+    },
+    "01-business-status-check/result-excel": {
+      "assetKey": "result-excel",
+      "path": "objects/sha256/49/49c86f10dd1a94954338c832c630506417bf6efdfa23aa28cfa6cac10d3372e7.webp",
+      "post": "01-business-status-check",
+      "sha256": "49c86f10dd1a94954338c832c630506417bf6efdfa23aa28cfa6cac10d3372e7"
+    },
+    "01-business-status-check/result-own-list": {
+      "assetKey": "result-own-list",
+      "path": "objects/sha256/5c/5cd17bd6b75e95f96915348520c3fb38ac4d3fc1b9666eb20cda30e06c2ecdcd.webp",
+      "post": "01-business-status-check",
+      "sha256": "5cd17bd6b75e95f96915348520c3fb38ac4d3fc1b9666eb20cda30e06c2ecdcd"
+    },
+    "01-business-status-check/sample-list-excel": {
+      "assetKey": "sample-list-excel",
+      "path": "objects/sha256/00/009e284b6dbc75e1ac42056e8f1e7d82e929e9f3460a4c00e8b93b14449f45b6.webp",
+      "post": "01-business-status-check",
+      "sha256": "009e284b6dbc75e1ac42056e8f1e7d82e929e9f3460a4c00e8b93b14449f45b6"
+    },
+    "01-business-status-check/terminal-bad-key": {
+      "assetKey": "terminal-bad-key",
+      "path": "objects/sha256/e8/e83dd91f3e9c56bdbd5d7a8221011763a4e2a287ca5a3fd6aefb03848d87fb2d.webp",
+      "post": "01-business-status-check",
+      "sha256": "e83dd91f3e9c56bdbd5d7a8221011763a4e2a287ca5a3fd6aefb03848d87fb2d"
+    },
+    "01-business-status-check/terminal-no-key": {
+      "assetKey": "terminal-no-key",
+      "path": "objects/sha256/fc/fc9d6c9b8fdf588dfb9da6cb40fd4ca9e74d7f5ade9ff151801324b4b1ca960e.webp",
+      "post": "01-business-status-check",
+      "sha256": "fc9d6c9b8fdf588dfb9da6cb40fd4ca9e74d7f5ade9ff151801324b4b1ca960e"
+    },
+    "01-business-status-check/terminal-run": {
+      "assetKey": "terminal-run",
+      "path": "objects/sha256/8b/8bb255862cfe371ccd4516c2fc5aa191e8866c8a4f57d9bf3ed3104955b79a0b.webp",
+      "post": "01-business-status-check",
+      "sha256": "8bb255862cfe371ccd4516c2fc5aa191e8866c8a4f57d9bf3ed3104955b79a0b"
+    },
     "01-excel-python-screens/excel-tool-choice": {
       "assetKey": "excel-tool-choice",
       "path": "objects/sha256/48/48997e28cb2089cba914c5d15a32587290cb402edcebb4449b467ce17d4d8c5f.png",
@@ -797,6 +857,16 @@
   },
   "objectPrefix": "objects/sha256",
   "objects": {
+    "009e284b6dbc75e1ac42056e8f1e7d82e929e9f3460a4c00e8b93b14449f45b6": {
+      "alt": "Excel로 연 사업자명단.xlsx에 회사명 열과 사업자등록번호 열에 다섯 회사가 적힌 모습",
+      "bytes": 83864,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/00/009e284b6dbc75e1ac42056e8f1e7d82e929e9f3460a4c00e8b93b14449f45b6.webp",
+      "sourcePost": "01-business-status-check",
+      "visualSubject": "표본 명단의 두 열과 다섯 줄",
+      "width": 2048
+    },
     "020528bc20cee60f70fda075614478b8b0a538fecc60a685e2ecf70a0ddf1ab7": {
       "alt": "Excel 결과표의 머리글이 고정되고 필터 단추가 있으며 아래 행만 스크롤되는 모습",
       "bytes": 1164736,
@@ -1007,6 +1077,16 @@
       "sourcePost": "014-python-excel-merge",
       "visualSubject": "서로 다른 표 네 개와 임시 Excel 통합문서 및 재검사 표와 이전 및 새 최종 결과 파일",
       "width": 1536
+    },
+    "09c74b15f15b6cd8799036fd8a221ce85979c71afd3ea605f7c9551743c8cc2c": {
+      "alt": "지시문 카드에 읽을 파일, 창구 주소와 보내는 모양, 인증키를 읽는 자리, 결과를 적을 열, 실행 방법 다섯 항목이 적힌 모습",
+      "bytes": 57666,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/09/09c74b15f15b6cd8799036fd8a221ce85979c71afd3ea605f7c9551743c8cc2c.webp",
+      "sourcePost": "01-business-status-check",
+      "visualSubject": "읽을 파일, 창구와 보내는 모양, 인증키 자리, 결과 열, 실행 방법 다섯 항목",
+      "width": 2048
     },
     "09f955a54389759a8505a136952fc826f81956cccf9d13c23efcdffbbe071e82": {
       "alt": "서로 다른 금액 카드가 금액과 기준 입력칸이 있는 하나의 함수 코드 블록을 지나 분류 결과로 나오는 모습",
@@ -2050,6 +2130,16 @@
       "visualSubject": "사각 타일 격자로 덮인 휴대폰 화면과 그 위로 들려 올라오는 가는 리본 한 줄",
       "width": 1216
     },
+    "43a962adc7b3bbdf2b9fc91dbac6189f4f64ce05cf0b0b4397fcb3c50adb35f7": {
+      "alt": "같은 페이지를 조금 내려 활용신청 단추와 오픈API 정보가 보이는 모습",
+      "bytes": 85424,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/43/43a962adc7b3bbdf2b9fc91dbac6189f4f64ce05cf0b0b4397fcb3c50adb35f7.webp",
+      "sourcePost": "01-business-status-check",
+      "visualSubject": "활용신청 단추와 그 아래 오픈 API 정보",
+      "width": 2048
+    },
     "4442e3c1bc40380774473cd0a8f47f374b40d50e82eb5023054976e2fbc4b54b": {
       "alt": "Colab 공식 노트북 화면에서 파일과 런타임 메뉴, 코드와 텍스트 추가 단추, 모두 실행, 그리고 실제 코드 칸이 함께 보이는 모습",
       "bytes": 75626,
@@ -2150,6 +2240,16 @@
       "visualSubject": "Excel 통합문서 화면의 시트 탭 세 개와 선택된 표 및 같은 크기의 DataFrame 결과 표",
       "width": 1536
     },
+    "49c86f10dd1a94954338c832c630506417bf6efdfa23aa28cfa6cac10d3372e7": {
+      "alt": "Excel로 연 사업자명단_상태.xlsx에 회사명과 사업자등록번호 옆으로 상태와 과세유형과 폐업일 열이 채워진 모습",
+      "bytes": 111738,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/49/49c86f10dd1a94954338c832c630506417bf6efdfa23aa28cfa6cac10d3372e7.webp",
+      "sourcePost": "01-business-status-check",
+      "visualSubject": "결과 파일의 다섯 줄과 새로 채워진 세 열",
+      "width": 2048
+    },
     "49e18a3ca4686925e4a742c445710278adc407e6580dd3ec0ce7fb6b34469bc4": {
       "alt": "현재 폴더가 다른 두 터미널에서 같은 명령이 오류와 정상 결과로 갈리는 비교",
       "bytes": 33882,
@@ -2231,6 +2331,16 @@
       "sourcePost": "018-python-if-boundary",
       "visualSubject": "서로 다른 세 입력 토큰과 공통 거짓 결과 상태판 및 서로 분리된 세 업무 결과 상태함",
       "width": 1536
+    },
+    "4beba9d130b44981b16262544095d2f74f73ea62d4298559632821d3de8b5352": {
+      "alt": "공공데이터포털에서 국세청_사업자등록정보 진위확인 및 상태조회 서비스 페이지가 열려 제목과 요약이 보이는 모습",
+      "bytes": 93984,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/4b/4beba9d130b44981b16262544095d2f74f73ea62d4298559632821d3de8b5352.webp",
+      "sourcePost": "01-business-status-check",
+      "visualSubject": "서비스 페이지의 제목과 요약",
+      "width": 2048
     },
     "4c47bd8da60b70e100b5a1d244baeeb76886a0e473154dd89fed7daf6d70981c": {
       "alt": "2025년 1월부터 2026년 8월 9일까지의 시간축 위에 오퍼레이터와 아틀라스 막대가 놓여 각각 X 표시와 함께 끝나고, 그 아래 빨간 테두리 띠로 그린 브라우저를 조작하는 능력은 같은 기간 내내 끊기지 않고 이어져 오른쪽 ChatGPT와 Codex 상자로 화살표가 들어가는 그림",
@@ -2543,6 +2653,16 @@
       "visualSubject": "브라우저의 Codaro Web 레슨 화면과 코드 입력칸 아래 실행 버튼",
       "width": 1536
     },
+    "5cd17bd6b75e95f96915348520c3fb38ac4d3fc1b9666eb20cda30e06c2ecdcd": {
+      "alt": "Excel로 연 결과 파일에 여섯째 줄이 추가되어 없는 번호의 상태 칸에 국세청에 등록되지 않은 사업자등록번호라는 문장이 적힌 모습",
+      "bytes": 123602,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/5c/5cd17bd6b75e95f96915348520c3fb38ac4d3fc1b9666eb20cda30e06c2ecdcd.webp",
+      "sourcePost": "01-business-status-check",
+      "visualSubject": "여섯 줄로 늘어난 결과 파일과 여섯째 줄의 문장",
+      "width": 2048
+    },
     "5e4de925132c227ae7380d32d551c427793a4ff40006d02f321f4f06259c8b1d": {
       "alt": "사업자등록번호를 넣자 표에 계속사업자라는 상태가 채워지는 화면",
       "bytes": 5149707,
@@ -2702,6 +2822,16 @@
       "sourcePost": "01-verify-ai-project-reading",
       "visualSubject": "Codex 주장과 실행 파일, xlsx 대상, 라이브러리, 열 이름, 출력, 검증 및 코드 근거",
       "width": 1672
+    },
+    "66609bec2359c452a6d44a7a64c9d5bdd0d46606304a54c7f38e8d7514eee158": {
+      "alt": "공공데이터포털 첫 화면 오른쪽 위에 로그인과 회원가입 단추가 있고 가운데에 검색창이 있는 모습",
+      "bytes": 571648,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/66/66609bec2359c452a6d44a7a64c9d5bdd0d46606304a54c7f38e8d7514eee158.webp",
+      "sourcePost": "01-business-status-check",
+      "visualSubject": "공공데이터포털 첫 화면의 회원가입 단추와 검색창",
+      "width": 2048
     },
     "676a279344492625cf752619379fede637caf8aceff9d5baf766df2ef9b3d8fb": {
       "alt": "함수에 정상값과 경계값 및 실패값을 넣고 기대 결과와 실제 결과를 비교하는 테스트 모습",
@@ -3325,6 +3455,16 @@
       "sourcePost": "02-course-blueprint",
       "visualSubject": "작업 공간, 실행 환경, 변경 기록, AI 작업과 완료 증거에 속한 핵심 개념의 다섯 층",
       "width": 1672
+    },
+    "8bb255862cfe371ccd4516c2fc5aa191e8866c8a4f57d9bf3ed3104955b79a0b": {
+      "alt": "PowerShell 창에서 uv run --env-file .env check_status.py를 실행해 사업자명단_상태.xlsx 저장, 5 건 조회가 찍힌 모습",
+      "bytes": 52848,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/8b/8bb255862cfe371ccd4516c2fc5aa191e8866c8a4f57d9bf3ed3104955b79a0b.webp",
+      "sourcePost": "01-business-status-check",
+      "visualSubject": "실행 명령과 그 아래 저장 안내 한 줄",
+      "width": 2048
     },
     "8c16837b7c7642e2ca8d1cda1140a497ec78e39d542b31f349bf587a54309c8e": {
       "alt": "그래프 대시보드, 막대 지표, 문서 양식 표, 거래 목록 화면을 띄운 모니터 네 대가 두 줄로 걸린 어두운 작업 공간",
@@ -4821,6 +4961,16 @@
       "visualSubject": "빈 새 대화 화면, 두 지침 문서, 터미널 검사, 브라우저와 API 증거, 네 칸 완료 보고",
       "width": 1536
     },
+    "e83dd91f3e9c56bdbd5d7a8221011763a4e2a287ca5a3fd6aefb03848d87fb2d": {
+      "alt": "PowerShell 창에서 실행해 국세청 API 오류와 등록되지 않은 인증키 입니다라는 답이 찍힌 모습",
+      "bytes": 60318,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/e8/e83dd91f3e9c56bdbd5d7a8221011763a4e2a287ca5a3fd6aefb03848d87fb2d.webp",
+      "sourcePost": "01-business-status-check",
+      "visualSubject": "같은 명령과 국세청 API 오류 한 줄",
+      "width": 2048
+    },
     "e8879098091e7a0458756f85551f9a6ef0ca337af62a55b791a9cfa824e9f6df": {
       "alt": "입력 Excel 세 개의 실행 전후 바이트 지문이 각각 짝을 이루며 같은 상태로 보호되는 모습",
       "bytes": 1640163,
@@ -5112,6 +5262,16 @@
       "sourcePost": "016-work-automation-plan",
       "visualSubject": "Excel 입력 계약의 input 폴더와 파일 세 개와 시트 표와 필수 열 다섯 개와 자료형 셀과 고유 행 키",
       "width": 1536
+    },
+    "fc9d6c9b8fdf588dfb9da6cb40fd4ca9e74d7f5ade9ff151801324b4b1ca960e": {
+      "alt": "PowerShell 창에서 uv run check_status.py를 실행해 DATA_GO_KR_KEY 가 없습니다라는 안내가 찍힌 모습",
+      "bytes": 53374,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/fc/fc9d6c9b8fdf588dfb9da6cb40fd4ca9e74d7f5ade9ff151801324b4b1ca960e.webp",
+      "sourcePost": "01-business-status-check",
+      "visualSubject": "--env-file 을 뺀 명령과 안내 한 줄",
+      "width": 2048
     },
     "fccc9d5483911e31eb35e18b446c600489f6b24a40918683aec92398c8415115": {
       "alt": "00 과정 안내에서 직접 개발과 AI 개발이 시작과 기본기와 독립 완주의 세 단계로 나란히 이어지는 과정 청사진",

@@ -37,18 +37,38 @@ export function esc(text: string): string {
  */
 export const NEW_TAB = ' target="_blank" rel="noopener noreferrer"';
 
-export function inline(text: string): string {
+/**
+ * 문단 안의 코드, 굵은 글씨, 링크.
+ *
+ * `mediaBase` 는 실습 파일 링크(`[사업자명단.xlsx](room://<sha256>.xlsx)`)를 방 경로의 내려받기
+ * 링크로 바꿀 때 쓴다 (2026-09-04). 따라 하는 실습은 모두가 같은 표본 파일에서 시작해 같은
+ * 결과 파일과 대조해야 하고 자료는 강의장 밖으로 나가지 않는다. 방 밖(검사, 감사)에서는 주소가
+ * 없으므로 이름만 남긴다. 내려받는 파일 이름은 라벨이다. 객체 이름은 해시라 그대로 저장되면
+ * 수강생이 `a3f9....xlsx` 를 받고, 지시문이 부르는 `사업자명단.xlsx` 와 달라져 실습이 끊긴다.
+ */
+export function inline(text: string, mediaBase?: string): string {
   return esc(text)
     .replace(/`([^`]+)`/g, "<code>$1</code>")
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(
       /\[([^\]]+)\]\(([^)]+)\)/g,
-      (_full: string, label: string, href: string) =>
+      (_full: string, label: string, href: string) => {
         // term:// 는 브라우저가 열 수 있는 주소가 아니라 applyGlossary 가 걷어 낼 마커다.
         // 새 탭 속성을 붙이면 그 정규식이 안 맞아 용어가 전부 깨진 링크로 나간다.
-        href.startsWith("term://")
-          ? `<a href="${href}">${label}</a>`
-          : `<a href="${href}"${NEW_TAB}>${label}</a>`,
+        if (href.startsWith("term://")) return `<a href="${href}">${label}</a>`;
+        if (/^room:\/\//i.test(href)) {
+          const file = href.match(ROOM_MEDIA);
+          // 모양이 틀린 주소(대문자, 캡션이 딸린 주소)는 브라우저가 열 수 없다. 링크로 내보내면
+          // room:// 가 화면에 새고 수강생은 죽은 링크를 누른다. 깨진 사실을 글자로 드러낸다.
+          if (!file) return `<span class="room-file" title="실습 파일 주소 오류">${label} (파일 주소 오류)</span>`;
+          if (!mediaBase) return `<span class="room-file" title="강의방 안에서 내려받는 파일">${label}</span>`;
+          const ext = file[1].slice(file[1].lastIndexOf("."));
+          const name = label.toLowerCase().endsWith(ext) ? label : file[1];
+          // 내려받기는 새 탭이 아니다. target=_blank 를 붙이면 빈 탭이 하나 열린 채 남는다.
+          return `<a class="room-file" href="${mediaSrc(mediaBase, file[1])}" download="${name}">${label}</a>`;
+        }
+        return `<a href="${href}"${NEW_TAB}>${label}</a>`;
+      },
     );
 }
 
@@ -82,7 +102,7 @@ function tableCells(line: string): string[] {
 }
 
 /** 교안에서 쓰는 GFM 표. 셀 안의 코드와 링크도 문단과 같은 규칙으로 안전하게 그린다. */
-function markdownTable(block: string): string | null {
+function markdownTable(block: string, mediaBase?: string): string | null {
   const lines = block.split("\n").map((line) => line.trim());
   if (lines.length < 2 || !TABLE_DIVIDER.test(lines[1])) return null;
   const head = tableCells(lines[0]);
@@ -91,9 +111,9 @@ function markdownTable(block: string): string | null {
   const rows = lines.slice(2).map(tableCells);
   if (rows.some((row) => row.length !== head.length)) return null;
   return `<div class="table-wrap"><table><thead><tr>${head
-    .map((cell) => `<th scope="col">${inline(cell)}</th>`)
+    .map((cell) => `<th scope="col">${inline(cell, mediaBase)}</th>`)
     .join("")}</tr></thead><tbody>${rows
-    .map((row) => `<tr>${row.map((cell) => `<td>${inline(cell)}</td>`).join("")}</tr>`)
+    .map((row) => `<tr>${row.map((cell) => `<td>${inline(cell, mediaBase)}</td>`).join("")}</tr>`)
     .join("")}</tbody></table></div>`;
 }
 
@@ -112,7 +132,7 @@ const ORDERED_ITEM = /^\d+\.\s+(.*)$/;
  * 시작하면 목록으로 보고 나머지 줄을 조용히 버렸다. 설명 한 줄이 소리 없이 사라지는 쪽이
  * 순서를 잃는 것보다 나쁘다.
  */
-function markdownList(block: string): string | null {
+function markdownList(block: string, mediaBase?: string): string | null {
   const lines = block
     .split("\n")
     .map((line) => line.trim())
@@ -124,7 +144,7 @@ function markdownList(block: string): string | null {
   ] as const) {
     const items = lines.map((line) => line.match(pattern));
     if (items.every((item) => item !== null)) {
-      return `<${tag}>${items.map((item) => `<li>${inline(item![1])}</li>`).join("")}</${tag}>`;
+      return `<${tag}>${items.map((item) => `<li>${inline(item![1], mediaBase)}</li>`).join("")}</${tag}>`;
     }
   }
   return null;
@@ -156,12 +176,15 @@ const PENDING = /^media:\/\/([a-z0-9-]+)$/i;
  * (2026-09-02 운영자 결정). Worker 는 방 세션이 있는 요청에만 준다. 교안은 방 이름을 모르므로
  * 렌더러가 `/room/<방>/media/<이름>` 으로 바꿔 그린다. 주소는 내용 해시라 추측할 수 없다.
  *
+ * `xlsx` 는 시각물이 아니라 실습 파일이다 (2026-09-04). 교안은 이미지 문법이 아니라
+ * `[파일이름.xlsx](room://...)` 링크로 적고 `inline` 이 내려받기 링크로 바꾼다.
+ *
  * **`eddmpython-course/scripts/roomMediaCatalog.mjs` 의 `ROOM_MEDIA` 와 같아야 한다.**
  * 한쪽을 고치면 다른 쪽도 같은 날 고친다.
  */
-export const ROOM_MEDIA = /^room:\/\/([a-f0-9]{64}\.(?:png|webp|jpg|gif|mp4|webm))$/;
+export const ROOM_MEDIA = /^room:\/\/([a-f0-9]{64}\.(?:png|webp|jpg|gif|mp4|webm|xlsx))$/;
 /** Worker 가 경로에서 받는 객체 이름. `..` 같은 것은 여기서 걸러진다. */
-export const ROOM_MEDIA_KEY = /^[a-f0-9]{64}\.(?:png|webp|jpg|gif|mp4|webm)$/;
+export const ROOM_MEDIA_KEY = /^[a-f0-9]{64}\.(?:png|webp|jpg|gif|mp4|webm|xlsx)$/;
 const MEDIA_TYPES: Record<string, string> = {
   png: "image/png",
   webp: "image/webp",
@@ -169,6 +192,7 @@ const MEDIA_TYPES: Record<string, string> = {
   gif: "image/gif",
   mp4: "video/mp4",
   webm: "video/webm",
+  xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 };
 
 export function mediaContentType(key: string): string {
@@ -592,8 +616,8 @@ function blocks(text: string, headings: string[], cells: Cells, state: RenderSta
       continue;
     }
     flush();
-    const table = markdownTable(b);
-    const list = markdownList(b);
+    const table = markdownTable(b, state.mediaBase);
+    const list = markdownList(b, state.mediaBase);
     if (b.startsWith("## ")) {
       // 목차가 여기로 뛴다. 번호로 거는 이유는 제목이 한글이라 slug 를 만들면 깨지기 때문이다.
       const title = b.slice(3);
@@ -628,9 +652,9 @@ function blocks(text: string, headings: string[], cells: Cells, state: RenderSta
       } else if (LABEL.test(b)) {
         // 한 섹션에 화면이 여럿일 때 어느 화면 이야기인지 짚는 라벨이다.
         // 굵은 글씨만으로는 본문과 안 갈려서 자기 태그를 준다.
-        out.push(`<p class="lb">${inline(b)}</p>`);
+        out.push(`<p class="lb">${inline(b, state.mediaBase)}</p>`);
       } else {
-        out.push(`<p>${leadOut(inline(b))}</p>`);
+        out.push(`<p>${leadOut(inline(b, state.mediaBase))}</p>`);
       }
     }
   }
