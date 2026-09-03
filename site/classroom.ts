@@ -252,8 +252,15 @@ article tbody tr:last-child td { border-bottom:0; }
   font-size:.9375rem; line-height:1.5; }
 .visual-carousel-label { margin:1.6rem 0 .55rem; }
 .visual-carousel-label p.lb { margin:0; }
-.visual-carousel-caption { margin:.65rem 0 0; color:var(--eddm-text-muted); }
-.visual-carousel-caption p { margin:0; font-size:.9375rem; line-height:1.65; }
+/* 시각물 아래 캡션. 본문 문단과 섞이면 그림을 읽는 말인지 다음 설명인지 갈리지 않는다.
+   작은 상자에 담고 앞에 마름모를 찍어 이 그림을 읽는 한 줄임을 눈으로 못 박는다
+   (2026-09-03 운영자 지시). 캐러셀이 넘어가면 이 자리도 함께 바뀐다. */
+.visual-carousel-caption { margin:.7rem 0 0; color:var(--eddm-text); }
+.visual-carousel-caption p { display:flex; gap:.55rem; align-items:baseline;
+  margin:0; padding:.5rem .8rem; border:1px solid var(--eddm-line); border-radius:.45rem;
+  background:var(--eddm-raise); font-size:.9375rem; line-height:1.6; }
+.visual-carousel-caption p::before { content:"◆"; flex:0 0 auto;
+  color:var(--eddm-accent); font-size:.62rem; line-height:1.95; }
 .visual-carousel-caption[hidden], .visual-carousel-caption p[hidden] { display:none; }
 .visual-carousel-explanation { margin:.85rem 0 0; }
 .visual-carousel-explanation [data-carousel-description] > :first-child { margin-top:0; }
