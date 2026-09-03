@@ -414,8 +414,11 @@ def updated_post(
     used_as_og = bool(
         re.search(rf"^ogImage:\s*(?:{'|'.join(og_candidates)})\s*$", raw, re.MULTILINE)
     )
-    if placeholder in raw:
-        updated = raw.replace(placeholder, next_url)
+    # 자리표시자는 통째로만 바꾼다. 2026-09-04 에 `media://terminal-runlog` 를 바꾸면서
+    # `media://terminal-runlog-error` 의 앞부분까지 덮어써 뒤 자산의 발행이 막혔다.
+    whole = re.compile(rf"{re.escape(placeholder)}(?![a-z0-9-])")
+    if whole.search(raw):
+        updated = whole.sub(lambda _m: next_url, raw)
     elif old_url and old_url in raw:
         updated = raw.replace(old_url, next_url)
     else:

@@ -332,6 +332,42 @@
       "post": "02-course-blueprint",
       "sha256": "fccc9d5483911e31eb35e18b446c600489f6b24a40918683aec92398c8415115"
     },
+    "02-daily-scheduled-run/schedule-prompt-card": {
+      "assetKey": "schedule-prompt-card",
+      "path": "objects/sha256/3a/3a532776f243e1848b0d3ddc1f4c917478dacc685e410a9862b3cdc04c659cef.webp",
+      "post": "02-daily-scheduled-run",
+      "sha256": "3a532776f243e1848b0d3ddc1f4c917478dacc685e410a9862b3cdc04c659cef"
+    },
+    "02-daily-scheduled-run/terminal-manual-run": {
+      "assetKey": "terminal-manual-run",
+      "path": "objects/sha256/e9/e92d7d7336af5ce54d8cd836422b670e4208ad77095a6c4837ea442c63330c4a.webp",
+      "post": "02-daily-scheduled-run",
+      "sha256": "e92d7d7336af5ce54d8cd836422b670e4208ad77095a6c4837ea442c63330c4a"
+    },
+    "02-daily-scheduled-run/terminal-register": {
+      "assetKey": "terminal-register",
+      "path": "objects/sha256/aa/aa6c9692e3e3bec812ac8ccd7b8287b2a7b2e239f6385647770f45e3bb817b29.webp",
+      "post": "02-daily-scheduled-run",
+      "sha256": "aa6c9692e3e3bec812ac8ccd7b8287b2a7b2e239f6385647770f45e3bb817b29"
+    },
+    "02-daily-scheduled-run/terminal-run-now": {
+      "assetKey": "terminal-run-now",
+      "path": "objects/sha256/e1/e1cfab3856bb1f5b4f967d87edd2209157abdd3491159ef8ef8579fdaf3fafb2.webp",
+      "post": "02-daily-scheduled-run",
+      "sha256": "e1cfab3856bb1f5b4f967d87edd2209157abdd3491159ef8ef8579fdaf3fafb2"
+    },
+    "02-daily-scheduled-run/terminal-runlog": {
+      "assetKey": "terminal-runlog",
+      "path": "objects/sha256/0e/0e29cde5a39632046e5a62b32974b6b2b118b898abb63138c5016c0273640f47.webp",
+      "post": "02-daily-scheduled-run",
+      "sha256": "0e29cde5a39632046e5a62b32974b6b2b118b898abb63138c5016c0273640f47"
+    },
+    "02-daily-scheduled-run/terminal-runlog-error": {
+      "assetKey": "terminal-runlog-error",
+      "path": "objects/sha256/9c/9c70df46b3cbacaf3126d71de6f025f0fbde7e46277763e0e025eb61a49d8070.webp",
+      "post": "02-daily-scheduled-run",
+      "sha256": "9c70df46b3cbacaf3126d71de6f025f0fbde7e46277763e0e025eb61a49d8070"
+    },
     "02-first-codex-change/task-spec-eight": {
       "assetKey": "task-spec-eight",
       "path": "objects/sha256/bd/bd976e69b859c0d752304acae0765ee198665614669520a462e4f662856157d4.webp",
@@ -1157,6 +1193,16 @@
       "sourcePost": "009-powershell-paths",
       "visualSubject": "공백에서 갈라지는 경로와 따옴표 안에서 유지되는 경로 및 패턴 통로와 리터럴 통로를 지나는 대괄호 파일명",
       "width": 1536
+    },
+    "0e29cde5a39632046e5a62b32974b6b2b118b898abb63138c5016c0273640f47": {
+      "alt": "PowerShell 창에서 type run.log 로 본 기록에 실행 시각이 적힌 start 줄과 사업자명단_상태.xlsx 저장 안내가 두 번 쌓인 모습",
+      "bytes": 66886,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/0e/0e29cde5a39632046e5a62b32974b6b2b118b898abb63138c5016c0273640f47.webp",
+      "sourcePost": "02-daily-scheduled-run",
+      "visualSubject": "run.log 의 start 줄과 저장 안내 줄",
+      "width": 2048
     },
     "0e52c23b722c9244fcfbfb4cd5e8544007e603753f82005c54825f1003dadcfe": {
       "alt": "지출 금액과 배송비를 저장하는 코드 줄이 계산과 출력 줄로 차례로 이어지는 Python 실행 순서",
@@ -1988,6 +2034,16 @@
       "sourcePost": "001-what-automation-does",
       "visualSubject": "중앙 Python 스크립트 파일과 연결된 표, 웹 응답, 예약 자동화, AI 모델 결과",
       "width": 1536
+    },
+    "3a532776f243e1848b0d3ddc1f4c917478dacc685e410a9862b3cdc04c659cef": {
+      "alt": "지시문 카드에 실행 파일 run_check.cmd, 등록 파일 register_task.cmd, 확인과 지우기 명령 세 항목이 적힌 모습",
+      "bytes": 51428,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/3a/3a532776f243e1848b0d3ddc1f4c917478dacc685e410a9862b3cdc04c659cef.webp",
+      "sourcePost": "02-daily-scheduled-run",
+      "visualSubject": "실행 파일, 등록 파일, 확인과 지우기 명령 세 항목",
+      "width": 2048
     },
     "3c1aebb924abeef86bc9ec81784604eb3fa406329e75f7be639bbb2f7a5a274f": {
       "alt": "왼쪽은 라이브러리를 컴퓨터 한 자리에 모아 두 프로젝트가 같은 자리를 두고 부딪히는 모습이고 오른쪽은 두 프로젝트 폴더가 각자 .venv 안에 다른 openpyxl 판을 담아 서로 닿지 않는 모습",
@@ -3760,6 +3816,16 @@
       "visualSubject": "층층이 쌓인 두꺼운 종이 뭉치와 그 옆면에서 뽑혀 나온 얇은 종이 띠 두 장",
       "width": 1216
     },
+    "9c70df46b3cbacaf3126d71de6f025f0fbde7e46277763e0e025eb61a49d8070": {
+      "alt": "PowerShell 창에서 type run.log 로 본 기록의 마지막 start 줄 아래에 .env 파일을 찾을 수 없다는 오류가 적힌 모습",
+      "bytes": 116146,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/9c/9c70df46b3cbacaf3126d71de6f025f0fbde7e46277763e0e025eb61a49d8070.webp",
+      "sourcePost": "02-daily-scheduled-run",
+      "visualSubject": "start 줄 아래의 오류 줄",
+      "width": 2048
+    },
     "9cc5597e6b318dfc0b590d90b5ed3815c766df6513c9dde465bc5d2772c9bf2f": {
       "alt": "한 거래 목록을 두 이름이 함께 가리키고 얕은 복사에서도 안쪽 거래가 공유되는 모습",
       "bytes": 1165556,
@@ -4009,6 +4075,16 @@
       "sourcePost": "033-ai-variant-excel",
       "visualSubject": "네 가지 금액 셀과 정리 함수 및 정상 숫자 열과 확인필요 행",
       "width": 1536
+    },
+    "aa6c9692e3e3bec812ac8ccd7b8287b2a7b2e239f6385647770f45e3bb817b29": {
+      "alt": "PowerShell 창에서 register_task.cmd 를 실행해 예약된 작업을 만들었다는 안내와 다음 실행 시간 오전 9:00 이 찍힌 모습",
+      "bytes": 78656,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/aa/aa6c9692e3e3bec812ac8ccd7b8287b2a7b2e239f6385647770f45e3bb817b29.webp",
+      "sourcePost": "02-daily-scheduled-run",
+      "visualSubject": "성공 안내와 다음 실행 시간",
+      "width": 2048
     },
     "aa7b6764a98d802167f2e1ac9502af45d886cfadc235e9ee5f07dc901559af2d": {
       "alt": "정상과 오류 및 경계 입력이 반복 테스트 표의 각 행을 통과하는 모습",
@@ -4861,6 +4937,16 @@
       "visualSubject": "통합 파일을 입력 폴더 안에 둔 14건 상태와 폴더 밖에 둔 7건 상태의 경계 비교",
       "width": 1600
     },
+    "e1cfab3856bb1f5b4f967d87edd2209157abdd3491159ef8ef8579fdaf3fafb2": {
+      "alt": "PowerShell 창에서 schtasks /Run 으로 작업을 즉시 실행하고 type run.log 로 새로 쌓인 두 줄을 확인한 모습",
+      "bytes": 97860,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/e1/e1cfab3856bb1f5b4f967d87edd2209157abdd3491159ef8ef8579fdaf3fafb2.webp",
+      "sourcePost": "02-daily-scheduled-run",
+      "visualSubject": "즉시 실행 명령과 늘어난 run.log",
+      "width": 2048
+    },
     "e1d55f556afa25f776007872caa38940de34d08182fbbc662ae22250653437e7": {
       "alt": "Python 소스가 문법 검사와 실행 단계를 지나며 첫 번째 처리되지 않은 오류에서 멈추는 흐름",
       "bytes": 1184917,
@@ -4990,6 +5076,16 @@
       "sourcePost": "002-codaro-guide",
       "visualSubject": "브라우저의 Web 학습 화면과 컴퓨터 파일을 여는 Local 화면",
       "width": 1536
+    },
+    "e92d7d7336af5ce54d8cd836422b670e4208ad77095a6c4837ea442c63330c4a": {
+      "alt": "PowerShell 창에서 run_check.cmd 의 네 줄을 보고 실행한 뒤 type run.log 로 start 줄과 저장 안내 줄을 확인한 모습",
+      "bytes": 101776,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/e9/e92d7d7336af5ce54d8cd836422b670e4208ad77095a6c4837ea442c63330c4a.webp",
+      "sourcePost": "02-daily-scheduled-run",
+      "visualSubject": "네 줄짜리 실행 파일과 실행 뒤 run.log 의 두 줄",
+      "width": 2048
     },
     "e9850269647432bf2f6e97a1400c5a77ebabfa9eef038af5f1a1eeb0fb47c792": {
       "alt": "서로 연결된 코드 블록 가운데 필요한 두 블록에만 불이 들어온 모습",
