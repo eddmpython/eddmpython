@@ -18,6 +18,8 @@ export type CoursePost = { id: string; title: string; summary: string; body: str
 export type CourseCategory = {
   slug: string;
   order: number;
+  /** 화면에 보일 과정 번호. 하위 과정이면 04-01처럼 발행 묶음이 정한 값을 쓴다 */
+  displayNumber?: string;
   title: string;
   /** 이 카테고리를 덮을 때 독자의 일 하나가 무엇이 되는지. schema 2 부터 온다 */
   goal?: string;
@@ -161,6 +163,10 @@ export async function course(env: Env): Promise<CourseState> {
     .map((c) => ({
       ...c,
       order: Number(c.order) || 0,
+      displayNumber:
+        typeof c.displayNumber === "string" && /^\d{2}(?:-\d{2})?$/.test(c.displayNumber)
+          ? c.displayNumber
+          : undefined,
       posts: c.posts.filter(isPost).map((post) => ({
         ...post,
         scenes: Array.isArray(post.scenes) ? post.scenes.filter(isScene) : undefined,

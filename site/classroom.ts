@@ -1561,7 +1561,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     const cards = open.length
       ? open
           .map((c, i) => {
-            const n = String(i + 1).padStart(2, "0");
+            const n = c.displayNumber ?? String(i + 1).padStart(2, "0");
             const posts = c.posts
               .map(
                 (p, j) =>
@@ -1570,7 +1570,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
                   ).padStart(2, "0")}</b><span>${esc(p.title)}</span></a>`,
               )
               .join("");
-            return `<div class="cat"><div class="cat-h"><span class="cat-n">${n}</span>
+            return `<div class="cat"><div class="cat-h"><span class="cat-n">${esc(n)}</span>
               <h2>${esc(c.title)}</h2><span class="state on">열림</span></div>
               ${c.goal ? `<p class="goal">이 카테고리를 덮으면 ${esc(c.goal)} 것이 됩니다.</p>` : ""}
               ${posts}

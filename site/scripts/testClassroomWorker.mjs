@@ -37,6 +37,7 @@ assert.doesNotMatch(deploy, /LOCAL_PREVIEW_BYPASS/);
 assert.match(classroomWorker, /pathname === "\/room-test"/);
 assert.match(classroom, /String\(env\.LOCAL_PREVIEW_BYPASS\) === "1"/);
 assert.match(classroom, /unlocked: cachedCourse\.categories\.map/);
+assert.match(classroom, /c\.displayNumber \?\? String\(i \+ 1\)\.padStart\(2, "0"\)/);
 assert.doesNotMatch(JSON.stringify(config.routes), /room-test/);
 
 console.log("classroom worker: course 경로와 독립 배포 계약 통과");
