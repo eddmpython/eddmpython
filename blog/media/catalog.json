@@ -266,6 +266,26 @@
       "post": "01-merge-expense-files",
       "sha256": "e096b86c1503251401fc7073640c6fbbf1e0b8ccafeaf12f1c74e3a1d4f9803a"
     },
+    "01-open-practice-workbook/lesson-01-start-cells": {
+      "assetKey": "lesson-01-start-cells",
+      "path": "objects/sha256/37/37c25742fb8dbc4309ed26a9c8e04a031b2acc2c82344a5b27632b07672ef424.webp",
+      "post": "01-open-practice-workbook",
+      "sha256": "37c25742fb8dbc4309ed26a9c8e04a031b2acc2c82344a5b27632b07672ef424"
+    },
+    "01-open-practice-workbook/lesson-01-upload-path": {
+      "assetKey": "lesson-01-upload-path",
+      "path": "objects/sha256/95/95e2eaf63fccdd28862f73f8167a868009e180cd97c70192460a8f61eab96295.webp",
+      "post": "01-open-practice-workbook",
+      "sha256": "95e2eaf63fccdd28862f73f8167a868009e180cd97c70192460a8f61eab96295"
+    },
+    "01-open-practice-workbook/lesson-01-workbook-arrival": {
+      "assetKey": "lesson-01-workbook-arrival",
+      "masterPath": "objects/sha256/59/5953eee98820406e829a5475866e0f3f4340d6995bc4799b97d541616017db4d.png",
+      "masterSha256": "5953eee98820406e829a5475866e0f3f4340d6995bc4799b97d541616017db4d",
+      "path": "objects/sha256/29/2935d1f22c21819d47369c367d9cd574f1ea4f25f811092db821314d06f79c51.webp",
+      "post": "01-open-practice-workbook",
+      "sha256": "2935d1f22c21819d47369c367d9cd574f1ea4f25f811092db821314d06f79c51"
+    },
     "01-verify-ai-project-reading/claim-evidence-map": {
       "assetKey": "claim-evidence-map",
       "path": "objects/sha256/66/66587f0ea8353788b8619750bfee93328369f0002f869212eaa1ac7d79ba6ea8.png",
@@ -303,6 +323,26 @@
       "path": "objects/sha256/88/883b8ca9607443681fa3ea0a4683f026b4cb53cee49b03d27cc89162bada9272.webp",
       "post": "01-why-ai-automation",
       "sha256": "883b8ca9607443681fa3ea0a4683f026b4cb53cee49b03d27cc89162bada9272"
+    },
+    "02-connect-xlwings-lite/lesson-02-code-to-k1": {
+      "assetKey": "lesson-02-code-to-k1",
+      "path": "objects/sha256/96/962d4517df5c063d7ee3fde1479bc14e57b2bd30e89739404c1c8d57afc26745.webp",
+      "post": "02-connect-xlwings-lite",
+      "sha256": "962d4517df5c063d7ee3fde1479bc14e57b2bd30e89739404c1c8d57afc26745"
+    },
+    "02-connect-xlwings-lite/lesson-02-lite-connection": {
+      "assetKey": "lesson-02-lite-connection",
+      "masterPath": "objects/sha256/91/91f7991b774fb432239e5e515afa7b37bea8a1fc5a15832a535aabf7811c574b.png",
+      "masterSha256": "91f7991b774fb432239e5e515afa7b37bea8a1fc5a15832a535aabf7811c574b",
+      "path": "objects/sha256/b6/b61698a165f6707b7ca4814ff51461e9b3a00d2f083c4916b8cff9e966704d31.webp",
+      "post": "02-connect-xlwings-lite",
+      "sha256": "b61698a165f6707b7ca4814ff51461e9b3a00d2f083c4916b8cff9e966704d31"
+    },
+    "02-connect-xlwings-lite/lesson-02-run-result": {
+      "assetKey": "lesson-02-run-result",
+      "path": "objects/sha256/38/38c33add7bf8fc20eaf2337b23e860325e556ee77d779a04bb2675963059a29c.webp",
+      "post": "02-connect-xlwings-lite",
+      "sha256": "38c33add7bf8fc20eaf2337b23e860325e556ee77d779a04bb2675963059a29c"
     },
     "02-course-blueprint/ai-work-system": {
       "assetKey": "ai-work-system",
@@ -482,6 +522,26 @@
       "post": "02-what-is-python",
       "sha256": "5fd3b583581dd4b32a6716e53107bdc2d7ff4c228ed51a507229077af5bec80f"
     },
+    "03-calculate-first-row/lesson-03-code-map": {
+      "assetKey": "lesson-03-code-map",
+      "path": "objects/sha256/df/dfffd2dc70f1941d4f36cd692f1a7558db25c07c0346f450042b37eae5cdd2d1.webp",
+      "post": "03-calculate-first-row",
+      "sha256": "dfffd2dc70f1941d4f36cd692f1a7558db25c07c0346f450042b37eae5cdd2d1"
+    },
+    "03-calculate-first-row/lesson-03-first-row-flow": {
+      "assetKey": "lesson-03-first-row-flow",
+      "masterPath": "objects/sha256/90/90806bf7d61ad6b0f80f0caca24019461edb02c65c736e53e3bf2e9e255046ab.png",
+      "masterSha256": "90806bf7d61ad6b0f80f0caca24019461edb02c65c736e53e3bf2e9e255046ab",
+      "path": "objects/sha256/77/77d1f3efa43ab50e8832dc84fc8f7a6ffeee56ffa4a87c7eb82d3bddb9110d13.webp",
+      "post": "03-calculate-first-row",
+      "sha256": "77d1f3efa43ab50e8832dc84fc8f7a6ffeee56ffa4a87c7eb82d3bddb9110d13"
+    },
+    "03-calculate-first-row/lesson-03-result-cells": {
+      "assetKey": "lesson-03-result-cells",
+      "path": "objects/sha256/88/88b16d824c9056d37de1290a75d8b98f741b2f45918ecda28b4c6fae033a0b9d.webp",
+      "post": "03-calculate-first-row",
+      "sha256": "88b16d824c9056d37de1290a75d8b98f741b2f45918ecda28b4c6fae033a0b9d"
+    },
     "03-connect-codex-to-vscode/codex-install-login": {
       "assetKey": "codex-install-login",
       "path": "objects/sha256/d2/d22fc03ac6ad34315d0179d7c160f4df667274a82a5c9e2151baf2a40da44d01.webp",
@@ -590,6 +650,26 @@
       "post": "04-add-review-reason",
       "sha256": "c4731b24c9f18d94b299fa54ff29fb218395dc31c322c4cc5fb5b5e93d50bdb7"
     },
+    "04-calculate-all-rows/lesson-04-all-rows-flow": {
+      "assetKey": "lesson-04-all-rows-flow",
+      "masterPath": "objects/sha256/97/9765a06f5dd61b99c2d07dc1127eb85e8c41c5c80456858f290fb79a09fd26eb.png",
+      "masterSha256": "9765a06f5dd61b99c2d07dc1127eb85e8c41c5c80456858f290fb79a09fd26eb",
+      "path": "objects/sha256/9c/9ca60f658d89220c2a4ecc8339f4dc1f3692aa7dd4a0d46113e8fe7818a56ccc.webp",
+      "post": "04-calculate-all-rows",
+      "sha256": "9ca60f658d89220c2a4ecc8339f4dc1f3692aa7dd4a0d46113e8fe7818a56ccc"
+    },
+    "04-calculate-all-rows/lesson-04-result-grid": {
+      "assetKey": "lesson-04-result-grid",
+      "path": "objects/sha256/3a/3a3e8f3b9eb6e818e07fb18f3533522fa27bad528b82e3e39a883474936facd2.webp",
+      "post": "04-calculate-all-rows",
+      "sha256": "3a3e8f3b9eb6e818e07fb18f3533522fa27bad528b82e3e39a883474936facd2"
+    },
+    "04-calculate-all-rows/lesson-04-row-address-map": {
+      "assetKey": "lesson-04-row-address-map",
+      "path": "objects/sha256/0c/0c9a41a471d5bdcbafb06b0b9f353fe8ce5519b1e24f5f7a8c25f2ee5d8cb661.webp",
+      "post": "04-calculate-all-rows",
+      "sha256": "0c9a41a471d5bdcbafb06b0b9f353fe8ce5519b1e24f5f7a8c25f2ee5d8cb661"
+    },
     "04-model-and-harness/harness-six-parts": {
       "assetKey": "harness-six-parts",
       "path": "objects/sha256/9f/9f7299c9f843350f48c83210944cef947e031c2dc6d7c6340723005ca27b5aa1.webp",
@@ -697,6 +777,26 @@
       "path": "objects/sha256/42/42fd015f91fdfcd6694a37a8dee08775a6af301bbc7756da793f9edcdc2a7ca0.png",
       "post": "05-handle-payment-header",
       "sha256": "42fd015f91fdfcd6694a37a8dee08775a6af301bbc7756da793f9edcdc2a7ca0"
+    },
+    "05-mark-review-rows/lesson-05-condition-map": {
+      "assetKey": "lesson-05-condition-map",
+      "path": "objects/sha256/dc/dcf78b99d8564023ffe84be4707ab9565a97fb1cc50c8556de0e59a5b74d84b4.webp",
+      "post": "05-mark-review-rows",
+      "sha256": "dcf78b99d8564023ffe84be4707ab9565a97fb1cc50c8556de0e59a5b74d84b4"
+    },
+    "05-mark-review-rows/lesson-05-review-result": {
+      "assetKey": "lesson-05-review-result",
+      "path": "objects/sha256/a3/a379b10ef6c4152891603da2988ae22e6e638be6685d7c98efee8638624384bc.webp",
+      "post": "05-mark-review-rows",
+      "sha256": "a379b10ef6c4152891603da2988ae22e6e638be6685d7c98efee8638624384bc"
+    },
+    "05-mark-review-rows/lesson-05-review-threshold": {
+      "assetKey": "lesson-05-review-threshold",
+      "masterPath": "objects/sha256/16/16041a433613c90354ccfc31198ee0d3d5639e9b0f01a0b6e23c89bb10e80dd7.png",
+      "masterSha256": "16041a433613c90354ccfc31198ee0d3d5639e9b0f01a0b6e23c89bb10e80dd7",
+      "path": "objects/sha256/b7/b789edc73b6e8d49e1d0a0b2f1b3412542b49172ae4f1196aafff51d64c12821.webp",
+      "post": "05-mark-review-rows",
+      "sha256": "b789edc73b6e8d49e1d0a0b2f1b3412542b49172ae4f1196aafff51d64c12821"
     },
     "05-project-instructions-for-ai/instruction-scope": {
       "assetKey": "instruction-scope",
@@ -883,6 +983,46 @@
       "path": "objects/sha256/30/309756364a077418c4b6714f9b997acf81a3426c1a0db508665938ee8f514338.webp",
       "post": "06-uv-virtual-environment",
       "sha256": "309756364a077418c4b6714f9b997acf81a3426c1a0db508665938ee8f514338"
+    },
+    "06-write-summary/lesson-06-summary-fold": {
+      "assetKey": "lesson-06-summary-fold",
+      "masterPath": "objects/sha256/9f/9f58e6717d189d60fd9b65af99b3f9682ba2e7607bcab7331c9e7bcfa7bbe974.png",
+      "masterSha256": "9f58e6717d189d60fd9b65af99b3f9682ba2e7607bcab7331c9e7bcfa7bbe974",
+      "path": "objects/sha256/40/403f173ffef13c66855403e6611772938c30d9f8a0d5640f12d619e8a715873b.webp",
+      "post": "06-write-summary",
+      "sha256": "403f173ffef13c66855403e6611772938c30d9f8a0d5640f12d619e8a715873b"
+    },
+    "06-write-summary/lesson-06-summary-map": {
+      "assetKey": "lesson-06-summary-map",
+      "path": "objects/sha256/8e/8e5c86678a4354197442f56b4e74986738d362d841d878d55c1f459e8d95091b.webp",
+      "post": "06-write-summary",
+      "sha256": "8e5c86678a4354197442f56b4e74986738d362d841d878d55c1f459e8d95091b"
+    },
+    "06-write-summary/lesson-06-summary-result": {
+      "assetKey": "lesson-06-summary-result",
+      "path": "objects/sha256/5e/5e1f66990dc7378fa7fca4f93910a537dd8a0236aa98601cc2228fabb262e1f7.webp",
+      "post": "06-write-summary",
+      "sha256": "5e1f66990dc7378fa7fca4f93910a537dd8a0236aa98601cc2228fabb262e1f7"
+    },
+    "07-format-final-report/lesson-07-final-result": {
+      "assetKey": "lesson-07-final-result",
+      "path": "objects/sha256/53/53ce6e20cb9bbd1df8b22326f87b3b43e9f7ad50e71d45ad54e11d7077206ef9.webp",
+      "post": "07-format-final-report",
+      "sha256": "53ce6e20cb9bbd1df8b22326f87b3b43e9f7ad50e71d45ad54e11d7077206ef9"
+    },
+    "07-format-final-report/lesson-07-one-click-report": {
+      "assetKey": "lesson-07-one-click-report",
+      "masterPath": "objects/sha256/b0/b085a47c01441a9ccec68944eaffaf9eb7a64c905a09853f93bd6a8fdec1b865.png",
+      "masterSha256": "b085a47c01441a9ccec68944eaffaf9eb7a64c905a09853f93bd6a8fdec1b865",
+      "path": "objects/sha256/ad/add151cb60249efd4fce2e24affd8571e74041ba59c9e989d8632a6af3c1d611.webp",
+      "post": "07-format-final-report",
+      "sha256": "add151cb60249efd4fce2e24affd8571e74041ba59c9e989d8632a6af3c1d611"
+    },
+    "07-format-final-report/lesson-07-safe-flow": {
+      "assetKey": "lesson-07-safe-flow",
+      "path": "objects/sha256/dd/dd72ad66be6dea42609f1f7e4bdbee2f000316b1486fff80c08a892b52ae38be.webp",
+      "post": "07-format-final-report",
+      "sha256": "dd72ad66be6dea42609f1f7e4bdbee2f000316b1486fff80c08a892b52ae38be"
     },
     "07-solo-sales-automation/capstone-checkpoints": {
       "assetKey": "capstone-checkpoints",
@@ -1174,6 +1314,16 @@
       "visualSubject": "전역 Python의 공유 설치와 두 프로젝트 안에 분리된 .venv 환경 비교",
       "width": 1600
     },
+    "0c9a41a471d5bdcbafb06b0b9f353fe8ce5519b1e24f5f7a8c25f2ee5d8cb661": {
+      "alt": "rowNumber 2 3 4 5가 D열 읽기와 E열 F열 쓰기의 같은 행 번호로 연결되는 코드 주소 지도",
+      "bytes": 24848,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/0c/0c9a41a471d5bdcbafb06b0b9f353fe8ce5519b1e24f5f7a8c25f2ee5d8cb661.webp",
+      "sourcePost": "04-calculate-all-rows",
+      "visualSubject": "rowNumber 2 3 4 5가 D열 읽기와 E열 F열 쓰기의 같은 행 번호로 연결되는 코드 주소 지도",
+      "width": 2048
+    },
     "0cb894f0e56bdcbd8e7aad687ef54d82a70dcc9675e6031acce0b242419989fd": {
       "alt": "Python Excel 자동화 수행평가의 다섯 영역이 합계 100점으로 구성된 채점표",
       "bytes": 2020660,
@@ -1293,6 +1443,17 @@
       "sourcePost": "004-dataframe-libraries",
       "visualSubject": "나란히 꽂힌 얇은 세로 판 다섯 개와 그중 위로 뽑혀 올라온 두 개",
       "width": 1216
+    },
+    "16041a433613c90354ccfc31198ee0d3d5639e9b0f01a0b6e23c89bb10e80dd7": {
+      "alt": "네 행의 합계 위에 100000 기준선이 놓이고 기준을 넘은 한 행만 확인 대상으로 빠져나오는 모습",
+      "bytes": 1644139,
+      "height": 1152,
+      "mime": "image/png",
+      "path": "objects/sha256/16/16041a433613c90354ccfc31198ee0d3d5639e9b0f01a0b6e23c89bb10e80dd7.png",
+      "role": "master",
+      "sourcePost": "05-mark-review-rows",
+      "visualSubject": "네 행으로 된 표 위에 물리적인 기준자와 절단선이 놓이고 기준을 넘은 한 행만 검토 아이콘으로 빠지는 장면",
+      "width": 2048
     },
     "16066535c61a7e50cf7fd8729f0f7c24c1d6d46285a1765d0998085dc5eb024b": {
       "alt": "결과 Excel의 여섯 시트와 행 수 및 금액 합계가 인수인계서 기대값과 맞는 모습",
@@ -1715,6 +1876,16 @@
       "visualSubject": "A1:B4 입력과 지출 분류 실행과 행별 판정과 C열 및 F열 결과가 이어지는 웹 엑셀 실행 흐름",
       "width": 1600
     },
+    "2935d1f22c21819d47369c367d9cd574f1ea4f25f811092db821314d06f79c51": {
+      "alt": "지출 입력표가 웹 Excel로 들어가고 같은 표의 오른쪽 빈 칸이 자동화 결과 자리로 이어지는 모습",
+      "bytes": 231886,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/29/2935d1f22c21819d47369c367d9cd574f1ea4f25f811092db821314d06f79c51.webp",
+      "sourcePost": "01-open-practice-workbook",
+      "visualSubject": "종이 형태의 지출 입력표 파일이 브라우저의 표 격자로 들어가 같은 파일 안의 빈 결과 칸과 연결되는 장면",
+      "width": 2048
+    },
     "2b8eeca609020fbeefa8d8ae7011457896829ad084140e4f1c3da19749b2ca71": {
       "alt": "부서별 금액 딕셔너리에서 키만, 값만, 키와 값 쌍이 각각 나오는 모습",
       "bytes": 1148045,
@@ -1955,6 +2126,16 @@
       "visualSubject": "함수 두 개와 확인 코드가 있는 모듈 파일 및 직접 실행 경로와 import 경로와 조건문 게이트",
       "width": 1536
     },
+    "37c25742fb8dbc4309ed26a9c8e04a031b2acc2c82344a5b27632b07672ef424": {
+      "alt": "A1부터 K5까지의 시작 시트에서 D2부터 D5의 네 공급가액과 비어 있는 결과 범위를 구분한 셀 지도",
+      "bytes": 30590,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/37/37c25742fb8dbc4309ed26a9c8e04a031b2acc2c82344a5b27632b07672ef424.webp",
+      "sourcePost": "01-open-practice-workbook",
+      "visualSubject": "A1부터 K5까지의 시작 시트에서 D2부터 D5의 네 공급가액과 비어 있는 결과 범위를 구분한 셀 지도",
+      "width": 2048
+    },
     "38776876839b545dd887f8f8244d7d24ff1ffda3786dc68c04c8a809c7ca4fec": {
       "alt": "원문 문자열이 입력 검사함을 지나 정수 금액이 되고 별도 분류함에서 결과 등급으로 나가는 모습",
       "bytes": 1184293,
@@ -1964,6 +2145,16 @@
       "sourcePost": "018-python-if-boundary",
       "visualSubject": "원문 입력 카드와 입력 검사 프레임 및 정수 토큰과 업무 분류 프레임과 오류함 및 결과함",
       "width": 1536
+    },
+    "38c33add7bf8fc20eaf2337b23e860325e556ee77d779a04bb2675963059a29c": {
+      "alt": "xlwings Lite 실행 목록의 02 연결 확인과 실행 단추가 K1 연결 완료 결과로 이어지는 확인도",
+      "bytes": 14682,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/38/38c33add7bf8fc20eaf2337b23e860325e556ee77d779a04bb2675963059a29c.webp",
+      "sourcePost": "02-connect-xlwings-lite",
+      "visualSubject": "xlwings Lite 실행 목록의 02 연결 확인과 실행 단추가 K1 연결 완료 결과로 이어지는 확인도",
+      "width": 2048
     },
     "38d3f156aba3dc626ae473db7c57bc5c1d6f0564a13c7bcec42c491db7e0f529": {
       "alt": "날짜와 금액 변환을 통과한 행은 정상 표로 가고 실패한 행은 이유와 함께 확인필요 표로 가는 모습",
@@ -2034,6 +2225,16 @@
       "sourcePost": "001-what-automation-does",
       "visualSubject": "중앙 Python 스크립트 파일과 연결된 표, 웹 응답, 예약 자동화, AI 모델 결과",
       "width": 1536
+    },
+    "3a3e8f3b9eb6e818e07fb18f3533522fa27bad528b82e3e39a883474936facd2": {
+      "alt": "D2부터 D5의 공급가액과 E2부터 E5의 부가세와 F2부터 F5의 합계를 행별로 맞춘 결과 표",
+      "bytes": 14420,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/3a/3a3e8f3b9eb6e818e07fb18f3533522fa27bad528b82e3e39a883474936facd2.webp",
+      "sourcePost": "04-calculate-all-rows",
+      "visualSubject": "D2부터 D5의 공급가액과 E2부터 E5의 부가세와 F2부터 F5의 합계를 행별로 맞춘 결과 표",
+      "width": 2048
     },
     "3a532776f243e1848b0d3ddc1f4c917478dacc685e410a9862b3cdc04c659cef": {
       "alt": "지시문 카드에 실행 파일 run_check.cmd, 등록 파일 register_task.cmd, 확인과 지우기 명령 세 항목이 적힌 모습",
@@ -2114,6 +2315,16 @@
       "sourcePost": "019-python-for-loop",
       "visualSubject": "금액 목록과 합계 결과 막대 및 필터 결과 목록과 존재 검사 결과 프레임과 일반 반복 코드 프레임",
       "width": 1536
+    },
+    "403f173ffef13c66855403e6611772938c30d9f8a0d5640f12d619e8a715873b": {
+      "alt": "네 개의 상세 행이 구부러져 오른쪽의 네 칸짜리 요약 블록으로 모이는 모습",
+      "bytes": 188818,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/40/403f173ffef13c66855403e6611772938c30d9f8a0d5640f12d619e8a715873b.webp",
+      "sourcePost": "06-write-summary",
+      "visualSubject": "네 개의 긴 상세 행 띠가 부드럽게 모여 오른쪽의 작은 네 칸 요약 블록에 들어가는 장면",
+      "width": 2048
     },
     "40632ebbb8f1b179bbc09b85d7a541666136538b630249f7a4d479260544b19f": {
       "alt": "입력 열 건이 규칙을 지나 자동 처리 여덟 건과 AI 제안 두 건으로 갈리고 사람 승인을 거쳐 규칙으로 돌아오는 흐름도",
@@ -2558,6 +2769,16 @@
       "visualSubject": "손가락 커서가 버튼을 누르는 아이콘, 종이 세 장이 한 표로 모이는 아이콘, 계산기에서 새 숫자가 나오는 아이콘이 나란히 놓인 세 칸",
       "width": 1216
     },
+    "53ce6e20cb9bbd1df8b22326f87b3b43e9f7ad50e71d45ad54e11d7077206ef9": {
+      "alt": "D5를 45000에서 200000으로 바꾼 뒤 E5 20000 F5 220000 G5 확인필요 K5 2로 갱신된 결과 표",
+      "bytes": 27834,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/53/53ce6e20cb9bbd1df8b22326f87b3b43e9f7ad50e71d45ad54e11d7077206ef9.webp",
+      "sourcePost": "07-format-final-report",
+      "visualSubject": "D5를 45000에서 200000으로 바꾼 뒤 E5 20000 F5 220000 G5 확인필요 K5 2로 갱신된 결과 표",
+      "width": 2048
+    },
     "54c98c8cb05e67e9296786cc2f6c8d6d6bf8a2da824096ca743139f94c36fd7a": {
       "alt": "Visual Studio Marketplace 의 Python 확장 페이지에서 게시자 Microsoft 자리에 표시가 붙은 모습",
       "bytes": 141502,
@@ -2628,6 +2849,17 @@
       "sourcePost": "010-python-errors",
       "visualSubject": "파일 경로 화면의 프로젝트 밖 현재 폴더와 소스 파일이 있는 스크립트 폴더 및 input 대상 파일",
       "width": 1536
+    },
+    "5953eee98820406e829a5475866e0f3f4340d6995bc4799b97d541616017db4d": {
+      "alt": "지출 입력표가 웹 Excel로 들어가고 같은 표의 오른쪽 빈 칸이 자동화 결과 자리로 이어지는 모습",
+      "bytes": 1912231,
+      "height": 1152,
+      "mime": "image/png",
+      "path": "objects/sha256/59/5953eee98820406e829a5475866e0f3f4340d6995bc4799b97d541616017db4d.png",
+      "role": "master",
+      "sourcePost": "01-open-practice-workbook",
+      "visualSubject": "종이 형태의 지출 입력표 파일이 브라우저의 표 격자로 들어가 같은 파일 안의 빈 결과 칸과 연결되는 장면",
+      "width": 2048
     },
     "59718d62d283372e6b82e2ea89b78dac62b609d09410344bb9d9dcf38a6a8a61": {
       "alt": "순서로 찾는 리스트와 이름으로 찾는 딕셔너리가 같은 거래 자료를 서로 다르게 정리한 모습",
@@ -2717,6 +2949,16 @@
       "path": "objects/sha256/5c/5cd17bd6b75e95f96915348520c3fb38ac4d3fc1b9666eb20cda30e06c2ecdcd.webp",
       "sourcePost": "01-business-status-check",
       "visualSubject": "여섯 줄로 늘어난 결과 파일과 여섯째 줄의 문장",
+      "width": 2048
+    },
+    "5e1f66990dc7378fa7fca4f93910a537dd8a0236aa98601cc2228fabb262e1f7": {
+      "alt": "J1부터 K5까지의 요약 표에 공급가액 295000 부가세 29500 결제 324500 확인필요 1이 채워진 결과",
+      "bytes": 12792,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/5e/5e1f66990dc7378fa7fca4f93910a537dd8a0236aa98601cc2228fabb262e1f7.webp",
+      "sourcePost": "06-write-summary",
+      "visualSubject": "J1부터 K5까지의 요약 표에 공급가액 295000 부가세 29500 결제 324500 확인필요 1이 채워진 결과",
       "width": 2048
     },
     "5e4de925132c227ae7380d32d551c427793a4ff40006d02f321f4f06259c8b1d": {
@@ -3189,6 +3431,16 @@
       "visualSubject": "결과 Excel 통합문서와 입력 및 출력의 파일 수와 행 수와 금액 검증 카드",
       "width": 1536
     },
+    "77d1f3efa43ab50e8832dc84fc8f7a6ffeee56ffa4a87c7eb82d3bddb9110d13": {
+      "alt": "D2 입력 셀 하나가 계산 장치를 거쳐 E2와 F2 두 결과 셀로 나뉘는 모습",
+      "bytes": 224274,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/77/77d1f3efa43ab50e8832dc84fc8f7a6ffeee56ffa4a87c7eb82d3bddb9110d13.webp",
+      "sourcePost": "03-calculate-first-row",
+      "visualSubject": "하나의 입력 셀이 작은 기어 계산 장치를 지나 두 개의 결과 셀로 갈라지는 한 행 구조",
+      "width": 2048
+    },
     "78dad0b22ceefef352d97eee3d7ad6c10e1d1c7c32f32c16a6c97408c84e096b": {
       "alt": "고유 ID 검사를 통과한 금액이 부서별 합계와 미지정 금액으로 나뉘었다가 같은 전체 합계로 모이는 모습",
       "bytes": 1235138,
@@ -3471,6 +3723,16 @@
       "visualSubject": "실행 프로그램 토큰과 매개변수 토큰 및 값 토큰과 스위치 토큰, 셸 해석 화면, 외부 프로그램과 결과 카드",
       "width": 1536
     },
+    "88b16d824c9056d37de1290a75d8b98f741b2f45918ecda28b4c6fae033a0b9d": {
+      "alt": "D2 50000 옆의 빈 E2 F2가 실행 뒤 E2 5000 F2 55000으로 바뀌는 전후 셀 표",
+      "bytes": 19406,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/88/88b16d824c9056d37de1290a75d8b98f741b2f45918ecda28b4c6fae033a0b9d.webp",
+      "sourcePost": "03-calculate-first-row",
+      "visualSubject": "D2 50000 옆의 빈 E2 F2가 실행 뒤 E2 5000 F2 55000으로 바뀌는 전후 셀 표",
+      "width": 2048
+    },
     "89449829372f465c43fb4ce9890e3262cf9b73b3ecf58eb38382f185c87dabb9": {
       "alt": "수십 개의 프로그래밍 언어 이름이 화면을 빽빽하게 채우고 그 가운데 Python 이 가장 크게 놓인 장면",
       "bytes": 86766,
@@ -3583,6 +3845,16 @@
       "visualSubject": "종이 출력 전신 단말기, CRT 화면 단말기, 현대 노트북의 터미널 앱",
       "width": 1536
     },
+    "8e5c86678a4354197442f56b4e74986738d362d841d878d55c1f459e8d95091b": {
+      "alt": "D2:D5 E2:E5 F2:F5 G2:G5 범위가 합계 세 개와 개수 하나를 거쳐 J1:K5로 연결되는 주소 지도",
+      "bytes": 24410,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/8e/8e5c86678a4354197442f56b4e74986738d362d841d878d55c1f459e8d95091b.webp",
+      "sourcePost": "06-write-summary",
+      "visualSubject": "D2:D5 E2:E5 F2:F5 G2:G5 범위가 합계 세 개와 개수 하나를 거쳐 J1:K5로 연결되는 주소 지도",
+      "width": 2048
+    },
     "8ef469c6313f3dfc38d69f5f5292841742bdd9364c45053e1522f71902bbb71d": {
       "alt": "매끈한 판 하나를 가운데 두고 생김새가 서로 다른 공구 세 개가 각각 다른 방향에서 그 판의 같은 면에 닿아 있는 장면",
       "bytes": 2080512,
@@ -3603,6 +3875,17 @@
       "sourcePost": "002-codaro-guide",
       "visualSubject": "다운로드 폴더의 sales.csv 파일과 이 파일을 여는 Codaro Local 화면",
       "width": 1536
+    },
+    "90806bf7d61ad6b0f80f0caca24019461edb02c65c736e53e3bf2e9e255046ab": {
+      "alt": "D2 입력 셀 하나가 계산 장치를 거쳐 E2와 F2 두 결과 셀로 나뉘는 모습",
+      "bytes": 1654845,
+      "height": 1152,
+      "mime": "image/png",
+      "path": "objects/sha256/90/90806bf7d61ad6b0f80f0caca24019461edb02c65c736e53e3bf2e9e255046ab.png",
+      "role": "master",
+      "sourcePost": "03-calculate-first-row",
+      "visualSubject": "하나의 입력 셀이 작은 기어 계산 장치를 지나 두 개의 결과 셀로 갈라지는 한 행 구조",
+      "width": 2048
     },
     "90c9bb9977f83bdae5d68d0a7f2748b135efe1d202cf5154a2de2da9e1b62b34": {
       "alt": "AI 분석표의 경로와 함수 및 테스트 명령이 실제 저장소 파일과 하나씩 맞고 Git 변경 파일은 0개인 모습",
@@ -3633,6 +3916,17 @@
       "sourcePost": "013-uv-python-environment",
       "visualSubject": "의존성 설정 파일, 패키지 트리가 있는 잠금 파일, 추가된 패키지 카드, 제거된 빈 자리, 한 가지만 바뀐 패키지 가지와 고정된 나머지 목록",
       "width": 1536
+    },
+    "91f7991b774fb432239e5e515afa7b37bea8a1fc5a15832a535aabf7811c574b": {
+      "alt": "웹 Excel의 왼쪽 시트와 오른쪽 코드 편집기가 연결되어 한 셀이 밝아지는 모습",
+      "bytes": 1592322,
+      "height": 1152,
+      "mime": "image/png",
+      "path": "objects/sha256/91/91f7991b774fb432239e5e515afa7b37bea8a1fc5a15832a535aabf7811c574b.png",
+      "role": "master",
+      "sourcePost": "02-connect-xlwings-lite",
+      "visualSubject": "왼쪽의 넓은 표 격자와 오른쪽의 세로 코드 판이 짧은 연결선으로 한 셀에 연결된 한 화면",
+      "width": 2048
     },
     "9243de3c7e37eeabdeb67ecaf67c291591feba8353f4cf03aa411b924468d5b5": {
       "alt": "어두운 바닥이 넓은 판으로 갈라져 있고 그 사이를 지나는 아주 좁은 통로 하나만 멀리까지 이어지며 그 안에 작은 불빛이 켜진 장면",
@@ -3715,6 +4009,26 @@
       "visualSubject": "Visual Studio Marketplace 의 Python 확장 페이지 위쪽에 있는 Python 이름과 그 아래 Microsoft 게시자 표시와 설치 수와 Install 버튼",
       "width": 1920
     },
+    "95e2eaf63fccdd28862f73f8167a868009e180cd97c70192460a8f61eab96295": {
+      "alt": "Excel 홈의 업로드 및 열기에서 지출자동화.xlsx를 고르고 지출내역 시트가 열리는 세 단계",
+      "bytes": 18608,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/95/95e2eaf63fccdd28862f73f8167a868009e180cd97c70192460a8f61eab96295.webp",
+      "sourcePost": "01-open-practice-workbook",
+      "visualSubject": "Excel 홈의 업로드 및 열기에서 지출자동화.xlsx를 고르고 지출내역 시트가 열리는 세 단계",
+      "width": 2048
+    },
+    "962d4517df5c063d7ee3fde1479bc14e57b2bd30e89739404c1c8d57afc26745": {
+      "alt": "main.py의 02 연결 확인 스크립트가 지출내역 시트를 찾고 K1 셀에 연결 완료를 쓰는 코드와 셀의 대응",
+      "bytes": 14250,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/96/962d4517df5c063d7ee3fde1479bc14e57b2bd30e89739404c1c8d57afc26745.webp",
+      "sourcePost": "02-connect-xlwings-lite",
+      "visualSubject": "main.py의 02 연결 확인 스크립트가 지출내역 시트를 찾고 K1 셀에 연결 완료를 쓰는 코드와 셀의 대응",
+      "width": 2048
+    },
     "96aca7768b408fc5f4d264436f5c513e03c7fe4fb0469311fc973073afd63d54": {
       "alt": "금액 카드 세 장이 대괄호 모양 목록에 입력 순서대로 들어가고 건수와 합계 결과로 이어지는 모습",
       "bytes": 1256363,
@@ -3724,6 +4038,17 @@
       "sourcePost": "004-python-basic-syntax",
       "visualSubject": "금액 카드 세 장과 대괄호 목록 코드 및 거래 건수와 합계 결과",
       "width": 1536
+    },
+    "9765a06f5dd61b99c2d07dc1127eb85e8c41c5c80456858f290fb79a09fd26eb": {
+      "alt": "네 개의 D열 입력 행이 하나의 반복 장치를 지나 각 행의 E열과 F열 결과로 연결되는 모습",
+      "bytes": 2121746,
+      "height": 1152,
+      "mime": "image/png",
+      "path": "objects/sha256/97/9765a06f5dd61b99c2d07dc1127eb85e8c41c5c80456858f290fb79a09fd26eb.png",
+      "role": "master",
+      "sourcePost": "04-calculate-all-rows",
+      "visualSubject": "네 개 입력 행이 하나의 세로 계산 레일을 지나 각각 두 결과 셀을 얻는 반복 구조",
+      "width": 2048
     },
     "982ee01159566dd046a1580de27c4a69fbf9d69b9eb3e800db821b0380bd0257": {
       "alt": "항목 목록이 끝나면 멈추는 for와 조건이 거짓이 되면 멈추는 while의 비교",
@@ -3826,6 +4151,16 @@
       "visualSubject": "start 줄 아래의 오류 줄",
       "width": 2048
     },
+    "9ca60f658d89220c2a4ecc8339f4dc1f3692aa7dd4a0d46113e8fe7818a56ccc": {
+      "alt": "네 개의 D열 입력 행이 하나의 반복 장치를 지나 각 행의 E열과 F열 결과로 연결되는 모습",
+      "bytes": 230182,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/9c/9ca60f658d89220c2a4ecc8339f4dc1f3692aa7dd4a0d46113e8fe7818a56ccc.webp",
+      "sourcePost": "04-calculate-all-rows",
+      "visualSubject": "네 개 입력 행이 하나의 세로 계산 레일을 지나 각각 두 결과 셀을 얻는 반복 구조",
+      "width": 2048
+    },
     "9cc5597e6b318dfc0b590d90b5ed3815c766df6513c9dde465bc5d2772c9bf2f": {
       "alt": "한 거래 목록을 두 이름이 함께 가리키고 얕은 복사에서도 안쪽 거래가 공유되는 모습",
       "bytes": 1165556,
@@ -3875,6 +4210,17 @@
       "sourcePost": "004-ai-needs-an-environment",
       "visualSubject": "안전 규칙 판, 사용자 요청 카드, 기존 저장소 지침 문서, 빈칸만 채우는 블로그 링크 카드",
       "width": 1536
+    },
+    "9f58e6717d189d60fd9b65af99b3f9682ba2e7607bcab7331c9e7bcfa7bbe974": {
+      "alt": "네 개의 상세 행이 구부러져 오른쪽의 네 칸짜리 요약 블록으로 모이는 모습",
+      "bytes": 2020161,
+      "height": 1152,
+      "mime": "image/png",
+      "path": "objects/sha256/9f/9f58e6717d189d60fd9b65af99b3f9682ba2e7607bcab7331c9e7bcfa7bbe974.png",
+      "role": "master",
+      "sourcePost": "06-write-summary",
+      "visualSubject": "네 개의 긴 상세 행 띠가 부드럽게 모여 오른쪽의 작은 네 칸 요약 블록에 들어가는 장면",
+      "width": 2048
     },
     "9f7299c9f843350f48c83210944cef947e031c2dc6d7c6340723005ca27b5aa1": {
       "alt": "왼쪽에 둘째 답의 근거 세 칸을 두고 화살표로 오른쪽 여섯 부품 칸 가운데 컨텍스트, 도구, 모델에 연결했으며, 아직 명령을 실행하지 않았다는 근거만 빨간 선으로 검증 칸에 이어져 그 칸이 비어 있음을 표시한 구조도",
@@ -3995,6 +4341,16 @@
       "sourcePost": "021-python-project-runbook",
       "visualSubject": "프로젝트 루트 폴더와 입력 Excel 폴더와 Python 소스 폴더와 테스트 폴더와 결과 Excel 폴더 및 설정 문서",
       "width": 1536
+    },
+    "a379b10ef6c4152891603da2988ae22e6e638be6685d7c98efee8638624384bc": {
+      "alt": "H2 100000과 F열 네 합계를 비교해 G3만 확인필요로 강조한 결과 셀 표",
+      "bytes": 17590,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/a3/a379b10ef6c4152891603da2988ae22e6e638be6685d7c98efee8638624384bc.webp",
+      "sourcePost": "05-mark-review-rows",
+      "visualSubject": "H2 100000과 F열 네 합계를 비교해 G3만 확인필요로 강조한 결과 셀 표",
+      "width": 2048
     },
     "a46eb8a66f9e4b812c3965dba68c30d4b87f3f7a5660201420071f503fdbb800": {
       "alt": "Traceback의 맨 아래 예외 줄에서 가장 가까운 프로젝트 코드 줄과 위쪽 호출 순서로 읽어 가는 모습",
@@ -4146,6 +4502,16 @@
       "visualSubject": "목록 바깥을 가리키는 위치 포인터와 빈 키 슬롯 및 선택 누락을 채우는 기본값 타일",
       "width": 1536
     },
+    "add151cb60249efd4fce2e24affd8571e74041ba59c9e989d8632a6af3c1d611": {
+      "alt": "작은 원본 표가 하나의 큰 실행 단추를 거쳐 정돈된 완성 보고서로 확장되는 모습",
+      "bytes": 144990,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/ad/add151cb60249efd4fce2e24affd8571e74041ba59c9e989d8632a6af3c1d611.webp",
+      "sourcePost": "07-format-final-report",
+      "visualSubject": "작은 원본 표가 하나의 큰 실행 단추를 지나 넓고 정돈된 완성 보고서로 확장되는 장면",
+      "width": 2048
+    },
     "ae106aa16983b88a6e84d688759b9580f32a9a1978a9689857fc228314ce7470": {
       "alt": "부서별 Excel 파일 세 개가 처리와 판단을 지나 결과 통합문서와 숫자 검증표로 이어지는 자동화 다섯 단계",
       "bytes": 1190244,
@@ -4205,6 +4571,17 @@
       "sourcePost": "017-python-list-dictionary",
       "visualSubject": "네 필드 슬롯을 가진 거래 기록 세 장의 순서 목록과 같은 슬롯이 네 열로 정렬된 표",
       "width": 1536
+    },
+    "b085a47c01441a9ccec68944eaffaf9eb7a64c905a09853f93bd6a8fdec1b865": {
+      "alt": "작은 원본 표가 하나의 큰 실행 단추를 거쳐 정돈된 완성 보고서로 확장되는 모습",
+      "bytes": 1609688,
+      "height": 1152,
+      "mime": "image/png",
+      "path": "objects/sha256/b0/b085a47c01441a9ccec68944eaffaf9eb7a64c905a09853f93bd6a8fdec1b865.png",
+      "role": "master",
+      "sourcePost": "07-format-final-report",
+      "visualSubject": "작은 원본 표가 하나의 큰 실행 단추를 지나 넓고 정돈된 완성 보고서로 확장되는 장면",
+      "width": 2048
     },
     "b18ce14dfae24829b998b02008c1ce6586de424fae67a7ac1362308281c529c8": {
       "alt": "따옴표 유무가 다른 금액 두 개가 같은 type 검사 코드를 지나 int 모양과 str 모양 결과로 나뉘는 모습",
@@ -4317,6 +4694,16 @@
       "visualSubject": "여덟 칸 작업지시서와 AI 계획 화면 및 변경 파일과 위험과 테스트 패널과 사람 승인 문",
       "width": 1774
     },
+    "b61698a165f6707b7ca4814ff51461e9b3a00d2f083c4916b8cff9e966704d31": {
+      "alt": "웹 Excel의 왼쪽 시트와 오른쪽 코드 편집기가 연결되어 한 셀이 밝아지는 모습",
+      "bytes": 76334,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/b6/b61698a165f6707b7ca4814ff51461e9b3a00d2f083c4916b8cff9e966704d31.webp",
+      "sourcePost": "02-connect-xlwings-lite",
+      "visualSubject": "왼쪽의 넓은 표 격자와 오른쪽의 세로 코드 판이 짧은 연결선으로 한 셀에 연결된 한 화면",
+      "width": 2048
+    },
     "b6a2974bca5dff1168d07089c8d55159adeeff5369a97ff918ff94b90f0e7314": {
       "alt": "0원과 큰 금액 및 쉼표 통화 문자열 세 입력이 같은 pytest 함수로 들어가 각각 기대 숫자와 비교되는 모습",
       "bytes": 1243246,
@@ -4336,6 +4723,16 @@
       "sourcePost": "01-instructor-introduction",
       "visualSubject": "계속 쓰는 자동화를 중심으로 입력, 처리와 연결, 결과, 검증, 운영, 유지보수가 연결된 순환 구조",
       "width": 1672
+    },
+    "b789edc73b6e8d49e1d0a0b2f1b3412542b49172ae4f1196aafff51d64c12821": {
+      "alt": "네 행의 합계 위에 100000 기준선이 놓이고 기준을 넘은 한 행만 확인 대상으로 빠져나오는 모습",
+      "bytes": 151176,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/b7/b789edc73b6e8d49e1d0a0b2f1b3412542b49172ae4f1196aafff51d64c12821.webp",
+      "sourcePost": "05-mark-review-rows",
+      "visualSubject": "네 행으로 된 표 위에 물리적인 기준자와 절단선이 놓이고 기준을 넘은 한 행만 검토 아이콘으로 빠지는 장면",
+      "width": 2048
     },
     "b89cb28dc6f655fef9087c3e650d771ea26d1c148b3cf5384a5d92ce33702668": {
       "alt": "거래 금액 비교식이 참과 거짓 중 하나를 만들고 실행할 코드 묶음 하나를 고르는 모습",
@@ -4867,6 +5264,16 @@
       "visualSubject": "기존 PC의 프로젝트 기록에서 uv sync를 거쳐 새 PC의 .venv와 실행 결과가 만들어지는 과정",
       "width": 1600
     },
+    "dcf78b99d8564023ffe84be4707ab9565a97fb1cc50c8556de0e59a5b74d84b4": {
+      "alt": "H2 기준값 읽기와 F2부터 F5 비교와 G2부터 G5 판정 쓰기를 연결한 코드 셀 대응도",
+      "bytes": 33670,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/dc/dcf78b99d8564023ffe84be4707ab9565a97fb1cc50c8556de0e59a5b74d84b4.webp",
+      "sourcePost": "05-mark-review-rows",
+      "visualSubject": "H2 기준값 읽기와 F2부터 F5 비교와 G2부터 G5 판정 쓰기를 연결한 코드 셀 대응도",
+      "width": 2048
+    },
     "dd263228b071495adb445023a0ceb12bbabdb1c6f58eb5479d2adf5e8475af91": {
       "alt": "어두운 바닥에 놓인 넓은 판 하나가 가운데에서 갈라져 두 조각으로 벌어져 있고 그 틈을 가로질러 가는 다리 하나가 밝게 놓인 장면",
       "bytes": 182498,
@@ -4886,6 +5293,16 @@
       "sourcePost": "025-excel-data-normalization",
       "visualSubject": "부서 문자열 변형 카드 네 개와 표준 부서 카드 두 개 및 날짜 형식 카드 세 개와 표준 날짜 열",
       "width": 1536
+    },
+    "dd72ad66be6dea42609f1f7e4bdbee2f000316b1486fff80c08a892b52ae38be": {
+      "alt": "D2:D5와 H2 원본 셀을 읽어 Python 변수에서 계산과 판정과 요약을 만든 뒤 E2:G5와 J1:K5에 쓰고 서식을 적용하는 흐름",
+      "bytes": 30794,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/dd/dd72ad66be6dea42609f1f7e4bdbee2f000316b1486fff80c08a892b52ae38be.webp",
+      "sourcePost": "07-format-final-report",
+      "visualSubject": "D2:D5와 H2 원본 셀을 읽어 Python 변수에서 계산과 판정과 요약을 만든 뒤 E2:G5와 J1:K5에 쓰고 서식을 적용하는 흐름",
+      "width": 2048
     },
     "de95e92424b2df84c2d82b97103192c80447604e60c29dcc9f98512900781d1e": {
       "alt": "원본 목록에서 행을 지워 다음 행이 건너뛰어진 경우와 새 목록에 남긴 경우",
@@ -4916,6 +5333,16 @@
       "sourcePost": "030-ai-coding-baseline",
       "visualSubject": "터미널 테스트 결과 화면과 샘플 Excel 및 행 수와 금액이 있는 기준선 기록 카드",
       "width": 1536
+    },
+    "dfffd2dc70f1941d4f36cd692f1a7558db25c07c0346f450042b37eae5cdd2d1": {
+      "alt": "D2 읽기 코드와 tax 및 total 계산과 E2 F2 쓰기 코드가 실제 셀 주소에 연결된 대응도",
+      "bytes": 21148,
+      "height": 1152,
+      "mime": "image/webp",
+      "path": "objects/sha256/df/dfffd2dc70f1941d4f36cd692f1a7558db25c07c0346f450042b37eae5cdd2d1.webp",
+      "sourcePost": "03-calculate-first-row",
+      "visualSubject": "D2 읽기 코드와 tax 및 total 계산과 E2 F2 쓰기 코드가 실제 셀 주소에 연결된 대응도",
+      "width": 2048
     },
     "e062f6806cdd36faea17ef54f7671283863317c7164f6de1e6a615eef89176e5": {
       "alt": "def 문이 함수 객체를 만든 뒤 별도의 호출이 함수 본문을 실행하는 두 단계 모습",
