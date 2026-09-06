@@ -3,11 +3,7 @@ import { DESIGN } from "../../../../site/src/design";
 import { runtimeBase } from "./runtimePaths";
 import { openPdf, readPage } from "./pdf";
 
-const sampleRows = [
-  [["0012", "무선 마우스", "24", "19,000", "456,000"], ["0013", "키보드", "15", "45,000", "675,000"], ["0014", "USB 허브", "8", "32,000", "256,000"], ["0015", "모니터 받침대", "12", "28,000", "336,000"]],
-  [["0016", "노트북 거치대", "6", "48,000", "288,000"], ["0017", "웹캠", "10", "65,000", "650,000"], ["0018", "충전 케이블", "30", "8,000", "240,000"], ["0019", "마우스 패드", "20", "12,000", "240,000"]],
-  [["0020", "헤드셋", "8", "72,000", "576,000"], ["0021", "외장 SSD", "5", "120,000", "600,000"], ["0022", "멀티탭", "12", "21,000", "252,000"], ["0023", "케이블 정리함", "15", "16,000", "240,000"]],
-];
+import sampleData from "./sampleData.json";
 export async function sampleFiles(): Promise<File[]> {
   const [{ PDFDocument, rgb }, { default: fontkit }] = await Promise.all([loadPdfWriter(), loadPdfFont()]);
   const color = (hex: string) => rgb(...[1, 3, 5].map(start => parseInt(hex.slice(start, start + 2), 16) / 255) as [number, number, number]);
@@ -15,26 +11,26 @@ export async function sampleFiles(): Promise<File[]> {
   if (!response.ok) throw new Error("예제 글꼴을 읽지 못했습니다. 다시 시도해 주세요");
   const fontBytes = new Uint8Array(await response.arrayBuffer());
   const files: File[] = [];
-  for (const [part, pageIndices] of [[0, 1], [2]].entries()) {
+  for (const [part, document] of sampleData.documents.entries()) {
     const pdf = await PDFDocument.create(); pdf.registerFontkit(fontkit);
     const font = await pdf.embedFont(fontBytes, { subset: false });
     pdf.setTitle("사무용품 입고 내역 · 실습용 합성 자료"); pdf.setAuthor("eddmpython");
-    for (const [pageIndex, source] of pageIndices.entries()) {
+    for (const [pageIndex, sampleRows] of document.pages.entries()) {
       const page = pdf.addPage([595, 760]);
       const ink = color(DESIGN.palette.carbon), accent = color(DESIGN.palette.brandDeep);
       const text = (value: string, x: number, top: number, size = 11) => page.drawText(value, { x, y: 760 - top, font, size, color: ink });
       text("WAREHOUSE / OPERATIONS", 44, 54, 9);
       text("사무용품 입고 내역", 44, 96, 25);
-      text(`창고 ${part === 0 ? "A" : "B"} · ${pageIndex + 1} / ${pageIndices.length}`, 44, 124, 11);
+      text(`창고 ${part === 0 ? "A" : "B"} · ${pageIndex + 1} / ${document.pages.length}`, 44, 124, 11);
       text("실습용으로 만든 자료입니다. 실제 거래 내역이 아닙니다.", 44, 153, 9);
       const x = [44, 111, 292, 356, 440, 551], y = 213, rowHeight = 45;
       page.drawRectangle({ x: 44, y: 760 - y - 17, width: 507, height: rowHeight, color: color(DESIGN.palette.ivory) });
-      const rows = [["상품코드", "품목", "수량", "단가 (원)", "금액 (원)"], ...sampleRows[source]];
+      const rows = [sampleData.headers, ...sampleRows];
       rows.forEach((row, r) => {
         row.forEach((value, c) => text(value, x[c] + 9, y + r * rowHeight, r === 0 ? 10 : 11));
         page.drawLine({ start: { x: 44, y: 760 - y - r * rowHeight - 17 }, end: { x: 551, y: 760 - y - r * rowHeight - 17 }, thickness: 0.35, color: ink, opacity: 0.22 });
       });
-      const total = sampleRows[source].reduce((sum, row) => sum + Number(row[4].replaceAll(",", "")), 0);
+      const total = sampleRows.reduce((sum, row) => sum + Number(row[4].replaceAll(",", "")), 0);
       text("확인할 합계", 350, 477, 10);
       page.drawText(`${total.toLocaleString("en-US")} 원`, { x: 440, y: 760 - 477, size: 11, font, color: accent });
       text("상품코드의 앞자리 0은 유지합니다. 단위: 원 / 수량: 개", 44, 525, 9);
@@ -42,7 +38,7 @@ export async function sampleFiles(): Promise<File[]> {
       text("eddmpython  |  PDF 표 추출 예제", 44, 710, 9);
       text(String(pageIndex + 1), 540, 710, 9);
     }
-    files.push(new File([Uint8Array.from(await pdf.save()).buffer], `입고내역_창고${part === 0 ? "A" : "B"}.pdf`, { type: "application/pdf" }));
+    files.push(new File([Uint8Array.from(await pdf.save()).buffer], document.name, { type: "application/pdf" }));
   }
   return files;
 }
