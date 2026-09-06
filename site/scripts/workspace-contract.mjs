@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { executionRoot } from "./executionWorkspace.mjs";
 
 /*
  * 저장소 밖 산출물 폴더에 무엇이 있어도 되는지의 정본이다.
@@ -68,8 +69,8 @@ export const MASTER_SUFFIX = fromPython("MASTER_SUFFIX");
 /** 이미지 스테이징 폴더 이름 */
 export const STAGING_DIR = fromPython("STAGING_DIR");
 
-/** 저장소 밖 산출물 폴더. `site/vite.config.ts` 와 `site/wrangler.jsonc` 가 같은 곳을 가리킨다 */
-export const OUTPUT_ROOT = resolve(REPO, "..", fromPython("OUTPUT_DIR"));
+/** 현재 작업의 실행 공간. Vite, Wrangler, 이미지 발행이 함께 쓴다. */
+export const OUTPUT_ROOT = executionRoot();
 
 /** 이 폴더 전체가 이보다 커지면 아무도 안 보는 사이에 쌓인 것이다 */
 export const TOTAL_BUDGET_MB = 2048;
@@ -82,6 +83,10 @@ export const TOTAL_BUDGET_MB = 2048;
  * - `rebuild` 잃었을 때 다시 만드는 명령. 없으면 등록하지 않는다
  */
 export const ALLOWED = [
+  { name: "vite-cache", what: "현재 작업의 Vite 캐시", rebuild: "npm run dev" },
+  { name: "tmp", what: "현재 작업의 테스트와 도구 임시 파일", rebuild: "해당 검사 재실행" },
+  { name: "wrangler-bundle", what: "배포용 Worker 번들", rebuild: "npm run deploy" },
+  { name: "wrangler-logs", what: "Wrangler 진단 로그", rebuild: "해당 명령 재실행" },
   {
     name: "site-dist",
     what: "클라이언트 빌드. wrangler 가 여기서 올린다",
@@ -126,21 +131,6 @@ export const ALLOWED = [
     name: "classroom-audit",
     what: "강의장 점검 산출물",
     rebuild: "cd site && node scripts/classroom-audit.mjs",
-  },
-  {
-    name: "course",
-    what: "교안 발행 묶음. 비공개 저장소가 KV 로 올리기 전에 여기 굽는다",
-    rebuild: "cd ../eddmpython-course && npm run publish:dry",
-  },
-  {
-    /*
-     * 갈아엎기 전 이력이다. 블로그 이전 시대의 다른 앱이고 커밋 251개이며
-     * `refs/tags/v1.0-full` 과 `refs/codex/root-rewrite-candidate` 를 담는다.
-     * 지금 저장소 이력에 없으므로 이것만은 다시 만들 수 없다. 지우지 않는다.
-     */
-    name: "legacy-history-*.bundle",
-    what: "2026-08-08 갈아엎기 전 이력 번들",
-    rebuild: null,
   },
 ];
 

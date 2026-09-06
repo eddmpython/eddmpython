@@ -16,91 +16,79 @@ status: observed
 
 # 작업 산출물과 임시 파일
 
-## 저장소 안에 임시 파일을 만들지 않는다
+## 경계
 
-`.gitignore` 에 있다는 것은 면제 사유가 아니다. 추적되지 않아도 작업 트리는 더러워진다.
+2026-09-05 운영자 결정이다. `.out`과 `eddmpython.out` 같은 저장소별 외부 산출물 폴더는
+허용하지 않는다. 정식 산출물이나 보존 증거라는 이름으로 예외를 두지 않는다.
 
-빌드 산출물은 **저장소 밖 형제 폴더** `../eddmpython.out` 으로 나간다.
+의존성은 반드시 저장소 안에 설치한다. Node는 `site/node_modules`, Python은 루트 `.venv`를 쓴다.
+다른 저장소나 외부 실행 공간의 설치본을 빌리거나 링크로 연결하지 않는다. 의존 환경과 도구의
+전역 캐시는 임시 파일이 아니므로 작업 정리 대상으로 취급하지 않는다.
 
-경로는 `site/vite.config.ts` 와 `site/wrangler.jsonc` 두 곳이 같은 값을 가리킨다.
-한쪽만 고치면 배포가 옛 산출물을 올린다.
+빌드, 이미지 발행 대기 파일, 브라우저 프로필, 스크린샷, 진단 로그는 전역
+`$development-hygiene`의 공통 실행 공간 아래 작업별 고유 디렉터리에 둔다.
+소스와 추적하는 시험 입력은 저장소에 남긴다.
 
-## 그 폴더에 무엇이 있어도 되는지는 코드가 정한다
+## 작업 시작
 
-정본은 `site/scripts/workspace-contract.mjs` 의 `ALLOWED` 다. 여기에 목록을 다시 적지 않는다.
-`npm run check:workspace` 가 그 목록과 실제 폴더를 대조하고 `npm test` 가 매번 부른다.
+PowerShell에서 저장소 루트를 기준으로 한 번 지정한다. 빌드, 화면 확인, 이미지 발행과 배포를
+마칠 때까지 같은 셸 환경을 이어 쓴다. 새 작업마다 새 경로를 만들고 고정 경로로 재사용하지 않는다.
 
-새 산출물을 만들었다면 그 목록에 줄을 더한다. 줄마다 **`rebuild` 를 적어야 한다.**
-
-**`rebuild` 를 못 적겠다면 그것이 신호다.** 다시 만드는 법이 없는 것을 아무도 안 보는 폴더에
-두고 있다는 뜻이다. 그러면 목록에 등록할 게 아니라 발행 대상으로 만든다.
-
-## 왜 검사기가 생겼나
-
-2026-08-26 에 이 폴더가 **9.2GB, 최상위 67개, 파일 20,554개**까지 자란 것을 발견했다.
-안에는 상대 경로 실수로 생긴 3GB 중첩 사본, 비공개 교안 저장소의 통째 클론, 승인에 쓰지도
-않는 시각 검증 run 233개가 있었다. 그리고 **회색 원본 7개가 이 폴더에만 있었다.** 발행된
-webp 에서 원본을 되돌리는 것은 평균 11.3/255, 최대 82.2/255 차이로 실패한다. 잃으면 끝이었다.
-
-저장소 안은 `git status` 가 본다. 저장소 밖은 **아무도 본 적이 없었다.** 검사기가 그 사각지대를 맡는다.
-
-검사기가 보는 것은 넷이다.
-
-| 무엇 | 왜 |
-|---|---|
-| 발행 안 된 `.master.png` | 이 바이트를 잃으면 같은 이미지를 다시 못 만든다 |
-| 선언 안 된 최상위 항목 | 모르는 것이 쌓이는 통로다. 3GB 중첩 사본과 교안 클론이 이렇게 들어왔다 |
-| 링크 (junction, symlink) | 링크 뒤의 바이트는 크기에도 원본 찾기에도 안 잡혀 검사기 전체가 눈을 감는다 |
-| 폴더 총합 예산 | 선언된 항목이라도 아무도 안 보면 커진다 |
-
-**원본 찾기가 선언 검사보다 먼저다.** 첫 판은 원본을 `blog-media` 안에서만 찾았다. 그런데 이
-검사기가 막겠다는 사고 중 하나가 상대 경로 실수로 엉뚱한 이름의 폴더가 생기는 것이다. 그러면
-원본이 그 폴더로 떨어지고, 검사기는 그것을 선언 안 된 항목으로만 보고 첫 줄에
-`지울 것이면 지우고` 를 찍었다. **유일본이 든 폴더를 지우라고 안내한 것이다.** 지금은 폴더
-전체를 훑고, 원본이 든 항목에는 지우라고 말하지 않는다.
-
-경로와 이름의 정본은 `blog/scripts/media_paths.py` 하나다. `workspace-contract.mjs` 는 그
-파일을 읽어 값을 뽑고 복사하지 않는다. 복사하면 한쪽이 바뀔 때 검사기가 실패하지 않고
-**조용히 아무것도 안 보게 된다.** 원본 접미사가 갈라지면 원본을 하나도 못 찾은 채 초록불을
-띄운다. 그것이 가장 나쁜 실패다.
-
-시험은 `site/scripts/test-workspace-gate.mjs` 다. 위 우회로마다 부정 대조가 있고, 방어를
-하나씩 되돌려 전부 실패하는 것을 확인했다.
-
-## 그럼에도 생기는 것
-
-`wrangler` 는 `site/.wrangler` 를 만든다. 명령이 끝난 직후 같은 자리에서 지운다.
-다음 작업으로 넘어가지 않는다.
-
-```bash
-cd site && rm -rf .wrangler
+```powershell
+$taskRun = Join-Path $env:LOCALAPPDATA ('dev-workspace\work-' + [guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Path $taskRun
+$env:EDDMPYTHON_RUN_DIR = $taskRun
+$taskTemp = Join-Path $taskRun 'tmp'
+New-Item -ItemType Directory -Path $taskTemp
+$env:TEMP = $taskTemp
+$env:TMP = $taskTemp
+$env:TMPDIR = $taskTemp
+$env:PYTHONDONTWRITEBYTECODE = '1'
 ```
 
-**지워지지 않으면 프로세스가 파일을 물고 있는 것이다.** 실측한 순서다.
+`site/scripts/executionWorkspace.mjs`는 지정한 경로가 공통 실행 공간 바로 아래의 실제 디렉터리인지,
+고유 접미사가 있는지 확인한다. 경로가 없거나 잘못됐으면 명확한 오류로 멈추며 자동 대체 경로를
+만들지 않는다. 이미지 발행의 `blog/scripts/media_paths.py`도 같은 환경변수를 검증한다.
+`test-workspace-gate.mjs`가 두 언어의 실제 경로 일치를 확인한다.
 
-1. `workerd.exe` 를 전부 종료한다
-2. wrangler 나 miniflare 를 실행 중인 `node.exe` 를 종료한다
-3. 다시 지운다
+Python 의존성은 처음 한 번 저장소 루트에서 준비한다.
 
-`wrangler dev` 를 여러 번 띄웠다면 종료된 줄 알았던 프로세스가 남아 있는 경우가 많다.
-
-## 진단과 스크린샷
-
-일회성 probe와 비교 이미지는 저장소 안에 만들지 않고 임시 폴더에서 만든 뒤 같은 턴에 지운다.
-배포 승인에 쓰는 렌더 증거는 정식 경로인 `../eddmpython.out/visual/<run-id>`에 둔다. 구체적인 생성과
-승인 계약은 [`operation.visualVerification`](visualVerification.md)을 본다.
-
-## 파괴적 명령
-
-경로를 명시해서만 쓴다. `git clean -fdx` 같은 전역 명령은 쓰지 않는다.
-`rm -rf` 는 지울 경로가 위 목록에 해당하는지 확인하고 쓴다.
-
-## 확인
-
-작업을 끝낼 때 아래가 비어 있어야 한다.
-
-```bash
-git status --short
+```powershell
+uv venv .venv
+uv pip install --python .venv/Scripts/python.exe -r blog/requirements.txt
 ```
 
-무언가 남았다면 그것이 산출물인지 실제 변경인지 판단하고, 산출물이면 지운다.
+이미지 명령은 `.venv/Scripts/python.exe -B blog/scripts/publish_media.py`처럼 저장소 환경으로 실행한다.
+macOS와 Linux에서는 `.venv/bin/python`을 사용한다. 외부 임시 환경을 만드는 `uv run --with`를
+설치된 프로젝트 의존성 대신 쓰지 않는다.
+
+## 경로 연결
+
+Vite는 현재 실행 공간에 클라이언트와 SSR 빌드 및 캐시를 만든다. `siteWrangler.mjs`는 같은 빌드를
+공식 `--assets` 인수로 전달하고 로컬 상태와 배포 번들, 진단 로그도 현재 실행 공간으로 보낸다.
+`wrangler.jsonc`에는 기계별 고정 출력 경로를 적지 않는다.
+
+시각 검증과 SEO 및 누출 검사는 같은 빌드를 읽는다. 이미지 대기 파일은 현재 실행 공간의
+`blog-media/<post-id>/`에 두고 검수한 바이트를 Hugging Face에 발행한 뒤 제거한다.
+경로별 상세 계약은 [blogMedia.md](blogMedia.md)와 [visualVerification.md](visualVerification.md)를 따른다.
+
+`workspace-contract.mjs`의 `ALLOWED`는 현재 작업에서 식별한 출력 종류다. 영구 보존 허가가 아니다.
+새 출력 종류에는 무엇이며 어떻게 다시 만드는지 적는다. 원본이 아직 발행되지 않았거나 링크가
+들어 있거나 용량 예산을 넘으면 `npm run check:workspace`가 보고한다. 원본이 든 폴더를
+이름만 보고 지우라고 안내하지 않는다.
+
+## 작업 종료
+
+1. 시작 전 `git status --short`와 비교해 기존 파일과 이번 작업의 변경을 구분한다
+2. 이번 작업에서 시작한 프로세스만 종료한다. 같은 이름의 모든 프로세스를 종료하지 않는다
+3. 이미지 원본과 명시한 납품물을 먼저 정식 위치에 보존한다
+4. 이번 작업 폴더의 절대 경로와 소유 파일을 확인한 뒤 임시 산출물 및 빈 작업 폴더를 제거한다
+5. `site/.wrangler`처럼 도구가 저장소 안에 만든 이번 작업의 임시 파일도 확인하고 정리한다
+6. 잠긴 파일이나 설명하지 못한 잔여물이 없고, 기존 의존성과 사용자 변경이 유지됐는지 확인한다
+
+현재 작업의 화면 증거는 검수와 승인에만 사용한다. 배포와 확인이 끝나면 함께 정리한다.
+승인이 필요한 원고가 남아 있으면 원고와 발행된 이미지 주소는 보존하되 다시 만들 수 있는
+미리보기 빌드와 화면 캡처를 영구 보존 폴더로 바꾸지 않는다.
+
+`git status`가 비어야 한다고 판단하지 않는다. 정상적인 소스 변경은 남을 수 있다.
+저장소 루트, 공통 실행 공간 전체, 다른 작업 폴더와 기존 의존성은 삭제 대상이 아니다.

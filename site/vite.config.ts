@@ -5,11 +5,12 @@ import { build, defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { BRAND_ASSETS } from "./src/brand";
+import { executionRoot } from "./scripts/executionWorkspace.mjs";
+import { pdfAssets } from "../blog/posts/008-pdf-table/tool/assets";
 
-// 빌드 산출물은 저장소 밖에 둔다 (CLAUDE.md 작업 산출물 규칙).
-// site/ 기준 두 단계 위는 sideProject/ 이므로 저장소 형제 폴더에 떨어진다.
-const OUT_DIR = "../../eddmpython.out/site-dist";
-const SSR_DIR = "../../eddmpython.out/site-ssr";
+const runRoot = executionRoot();
+const OUT_DIR = join(runRoot, "site-dist");
+const SSR_DIR = join(runRoot, "site-ssr");
 const ORIGIN = "https://eddmpython.com";
 const ADSENSE_CLIENT = "ca-pub-6438440376456212";
 const ADSENSE_SCRIPT = `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}" crossorigin="anonymous"></script>`;
@@ -265,7 +266,9 @@ function prerender(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), brandAssets(), prerender()],
+  resolve: { dedupe: ["react", "react-dom", "xlsx"] },
+  cacheDir: join(runRoot, "vite-cache"),
+  plugins: [react(), tailwindcss(), brandAssets(), pdfAssets(), prerender()],
   // 글은 blog/posts/<글 폴더>/ 에 있다. dev 서버가 site/ 밖을 읽게 허용한다.
   server: { fs: { allow: [".."] } },
   build: {

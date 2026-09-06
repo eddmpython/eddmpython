@@ -51,7 +51,7 @@ export function Post() {
           <span aria-hidden="true"> · </span>
           <span>{post.section}</span>
         </p>
-        <div className="mt-10 text-[16px]">
+        <div data-article-body className="mt-10 text-[17px]">
           <Markdown>{post.body}</Markdown>
         </div>
         <Comments postId={post.id} />

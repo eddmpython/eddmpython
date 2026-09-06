@@ -24,6 +24,10 @@ try {
     console.log(`visual capture: ${report.status}, ${report.results.length}개 화면`);
     console.log(`run id: ${report.runId}`);
     console.log(`evidence: ${report.artifactDir}`);
+    for (const result of report.results) {
+      const advisories = result.metrics?.sectionAdvisories ?? [];
+      if (advisories.length) console.log(`${result.routeId}/${result.viewport}: 섹션 편집 권고 ${advisories.length}건 (visual-report.json)`);
+    }
     if (report.status !== "passed") {
       for (const result of report.results.filter((item) => item.status === "failed")) {
         console.error(`${result.routeId}/${result.viewport}: ${result.errors.join(" | ")}`);

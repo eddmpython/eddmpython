@@ -58,7 +58,9 @@ if (-not (Test-Path $vars) -or -not (Select-String -Path $vars -Pattern '^ADMIN_
     exit 1
 }
 
-$dist = Join-Path $repo '..\eddmpython.out\site-dist'
+$runRoot = node --input-type=module -e "import { executionRoot } from './scripts/executionWorkspace.mjs'; console.log(executionRoot())"
+if ($LASTEXITCODE -ne 0) { throw '작업 실행 공간을 먼저 지정하세요' }
+$dist = Join-Path $runRoot 'site-dist'
 if (-not (Test-Path $dist)) {
     Write-Host '  3/4  사이트 빌드가 없어 새로 만드는 중... (처음 한 번만 오래 걸립니다)' -ForegroundColor DarkGray
     npx vite build
@@ -79,7 +81,7 @@ Write-Host '  4/4  wrangler dev 시작' -ForegroundColor DarkGray
 # 여전히 site/.wrangler 에 생긴다. wrangler 가 그 경로를 바꾸는 방법을 주지 않으므로
 # 끝나는 자리에서 지운다.
 try {
-    npx wrangler dev --port 8787 --persist-to ../../eddmpython.out/wrangler-state
+    node scripts/siteWrangler.mjs dev --port 8787
 } finally {
     node scripts/clean-wrangler.mjs
 }

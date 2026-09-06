@@ -1,13 +1,15 @@
 /**
  * 강의장 교안 렌더. 아주 작은 마크다운만 다룬다.
  *
- * classroom.ts 에서 떼어 낸 이유는 검사할 수 있게 하려는 것이다. 이 파일은 아무것도
- * import 하지 않으므로 교안 번들 없이도 테스트가 돈다.
+ * classroom.ts 에서 떼어 낸 이유는 검사할 수 있게 하려는 것이다.
+ * 교안 번들을 import 하지 않으므로 비공개 자료 없이도 테스트가 돈다.
  *
  * 다루는 것은 교안이 실제로 쓰는 것뿐이다. h2, h4, 문단, 목록, 표, 링크, 코드, 이미지, 영상.
  * 연속된 이미지는 슬라이더가 되고 영상은 재생기가 된다. 바깥 영상은 유튜브 자리가 되고
  * 아직 발행하지 않은 시각물은 준비 중 자리가 된다.
  */
+
+import { CODE_CELL_KEYS } from "./src/codeCell.ts";
 
 const ESCAPES: Record<string, string> = {
   "&": "&amp;",
@@ -433,8 +435,8 @@ export function applyGlossary(html: string, glossary: Glossary, prefix: string):
  */
 function cellCard(id: string, cell: CourseCell): string {
   /**
-   * 모양은 codaro 의 학습 셀을 따른다. 제목 줄 오른쪽에 실행 하나, 그 아래 설명과 할 일,
-   * 내용만큼 자라는 코드 칸, 실행한 뒤에만 나타나는 출력 상자다. 상태 글자, 자리 표시
+   * 블로그와 같은 코드셀이다. 설명 아래 코드 왼쪽에 실행 버튼을 둔다.
+   * 내용만큼 자라는 코드 칸과 실행한 뒤에만 나타나는 출력이다. 상태 글자, 자리 표시
    * 문장, 크기 조절 손잡이처럼 실행 전에는 뜻이 없는 것은 두지 않는다.
    *
    * rows 는 스크립트가 붙기 전의 첫 높이다. 줄 수와 같게 두면 스크립트가 맞춘 높이와
@@ -444,11 +446,12 @@ function cellCard(id: string, cell: CourseCell): string {
   // 빈 제목도 없는 제목이다. 그때는 셀 이름이 곧 `실습` 이라 접근성 이름에 겹말을 만들지 않는다.
   const title = cell.title?.trim() || "";
   const label = title ? `${title} 실습` : "실습";
-  return `<section class="cell" data-cell="${esc(id)}" aria-label="${esc(label)}">
-<div class="cell-h"><span class="cell-t">${esc(title || "실습")}</span><button type="button" class="cell-reset" data-reset hidden>처음으로</button><button type="button" class="cell-run" data-run><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"/></svg><span>실행</span></button></div>
+  return `<section class="cell eddm-cell" data-cell="${esc(id)}" aria-label="${esc(label)}">
+<div class="cell-h"><span class="cell-t">${esc(title || "실습")}</span></div>
 ${cell.description ? `<p class="cell-d">${esc(cell.description)}</p>` : ""}
 ${cell.hint ? `<p class="cell-hint">${esc(cell.hint)}</p>` : ""}
-<div class="cell-f"><textarea class="cell-c" data-code spellcheck="false" wrap="off" rows="${rows}" aria-label="Python 코드">${esc(cell.code)}</textarea></div>
+<div class="cell-body"><div class="cell-gutter"><button type="button" class="cell-run" data-run aria-label="실행" title="실행 (Shift+Enter)" aria-keyshortcuts="Shift+Enter" aria-busy="false"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"/></svg></button></div><textarea class="cell-c" data-code spellcheck="false" wrap="off" rows="${rows}" aria-label="Python 코드" aria-describedby="${esc(id)}-keys">${esc(cell.code)}</textarea></div>
+<div class="cell-help"><p class="cell-keys" id="${esc(id)}-keys">${esc(CODE_CELL_KEYS)}</p><button type="button" class="cell-reset" data-reset hidden>처음으로</button></div>
 <div class="cell-out" data-output hidden><div class="cell-out-h"><span>출력</span><span class="cell-s" data-state aria-live="polite"></span></div><pre class="cell-o" data-out></pre></div>
 </section>`;
 }

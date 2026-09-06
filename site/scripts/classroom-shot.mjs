@@ -2,7 +2,7 @@
  * 강의장 화면을 찍고 실제로 도는지 본다. 로컬 wrangler dev 가 떠 있어야 한다.
  *
  * 사용: node scripts/classroom-shot.mjs [baseUrl]
- * 출력: ../../eddmpython.out/classroom-shots/
+ * 출력: 현재 작업 실행 공간의 classroom-shots/
  *
  * 강의장은 sitemap 에 없고 비밀번호 뒤에 있어서 verify:visual 이 못 본다. 그래서 따로 찍는다.
  * 그림만 보고 넘어가지 않는다. 확대와 실시간 동기화는 인라인 스크립트라서 CSP 가 막으면
@@ -20,7 +20,7 @@ const SITE_ROOT = resolve(HERE, "..");
 /** Runtime.evaluate 응답은 CDP 결과를 한 겹 더 감싸고 있다. 값만 꺼낸다. */
 const value = (res) => res?.output?.result?.result?.value;
 
-const OUT = resolve(SITE_ROOT, "../../eddmpython.out/classroom-shots");
+const OUT = resolve(executionRoot(), "classroom-shots");
 const base = (process.argv[2] ?? "http://localhost:8787").replace(/\/$/, "");
 
 const SOURCE_ROOM = "shot-source";
@@ -76,22 +76,24 @@ const first = process.argv[3] ?? null;
  * titleMin과 visualMin은 위쪽 정보와 아래쪽 단일 시각자료 무대의 실제 렌더 하한이다.
  */
 const VIEWPORTS = [
+  // 공용 무대의 최대 콘텐츠 폭 108rem에 시각물 배율 .9를 적용하면 약 1555px다.
+  // 1800px 하한은 실제 디자인의 최대 폭보다 커서 어떤 화면도 통과할 수 없었다.
   { id: "desktop-wide", width: 2560, height: 1440, dpr: 1, isMobile: false, hasTouch: false,
-    sectionTitle: "24px", titleMin: 64, visualMin: 1800, runPython: false },
+    titleMin: 64, visualMin: 1500, runPython: false },
   { id: "desktop", width: 1920, height: 900, dpr: 1, isMobile: false, hasTouch: false,
-    sectionTitle: "24px", titleMin: 56, visualMin: 700, runPython: true },
+    titleMin: 56, visualMin: 700, runPython: true },
   { id: "projector", width: 1366, height: 768, dpr: 1, isMobile: false, hasTouch: false,
-    sectionTitle: "24px", titleMin: 42, visualMin: 620, runPython: false },
+    titleMin: 42, visualMin: 620, runPython: false },
   // 1366x768 화면을 브라우저 125%로 쓸 때의 유효 CSS viewport다.
   // visualMin 440: 현재 개막 비교 장면의 첫 이미지는 441px 로 그려진다.
   { id: "projector-125", width: 1093, height: 614, dpr: 1.25, isMobile: false, hasTouch: false,
-    sectionTitle: "24px", titleMin: 28, visualMin: 440, runPython: false },
+    titleMin: 28, visualMin: 440, runPython: false },
   { id: "tablet-landscape", width: 1180, height: 820, dpr: 1, isMobile: true, hasTouch: true,
-    sectionTitle: "24px", titleMin: 36, visualMin: 540, runPython: false },
+    titleMin: 36, visualMin: 540, runPython: false },
   { id: "tablet-portrait", width: 820, height: 1180, dpr: 1, isMobile: true, hasTouch: true,
-    sectionTitle: "24px", titleMin: 30, visualMin: 620, runPython: false },
+    titleMin: 30, visualMin: 620, runPython: false },
   { id: "mobile", width: 390, height: 844, dpr: 1, isMobile: true, hasTouch: true,
-    sectionTitle: "22px", titleMin: 22, visualMin: 290, runPython: false },
+    titleMin: 22, visualMin: 290, runPython: false },
 ];
 const requestedViewports = new Set(
   String(process.env.CR_VIEWPORTS ?? "").split(",").map((id) => id.trim()).filter(Boolean),
@@ -173,13 +175,17 @@ for (const viewport of activeViewports) {
     shutdownTimeoutMs: 30000,
   });
 
-  const evaluate = async (sessionRef, expression, awaitPromise = true) =>
-    client.command(
+  const evaluate = async (sessionRef, expression, awaitPromise = true) => {
+    const result = await client.command(
       sessionRef,
       "Runtime.evaluate",
       { expression, awaitPromise, returnByValue: true },
       { expectedRisk: "externalEffect", timeoutMs: 120000 },
     );
+    const exception = result.output?.result?.exceptionDetails;
+    if (exception) throw new Error(exception.exception?.description || exception.text || "브라우저 평가 실패");
+    return result;
+  };
 
   /** lazy 이미지를 강제로 로드하고 다 뜰 때까지 기다린다. 안 하면 빈 자리로 찍힌다. */
   const hydrate = async (sessionRef) => {
@@ -281,18 +287,26 @@ for (const viewport of activeViewports) {
       const heading = document.querySelector('article h2');
       if (!heading) return null;
       const style = getComputedStyle(heading);
-      return { size: style.fontSize, weight: style.fontWeight };
+      const probe = document.createElement('span');
+      probe.style.fontSize = innerWidth >= 768
+        ? 'var(--eddm-section-title-size-desktop-course)'
+        : 'var(--eddm-section-title-size-mobile)';
+      document.body.append(probe);
+      const expectedSize = getComputedStyle(probe).fontSize;
+      probe.remove();
+      return { size: style.fontSize, expectedSize, weight: style.fontWeight };
     })()`));
     record(
       `${viewport.id} 섹션 제목 공용 위계`,
-      sectionTitle?.size === viewport.sectionTitle &&
+      sectionTitle?.size === sectionTitle?.expectedSize &&
         sectionTitle?.weight === "600",
       JSON.stringify(sectionTitle),
     );
 
     const visualGroup = value(await evaluate(session, `(() => {
       const label = document.querySelector('article .lb');
-      const visual = label?.nextElementSibling;
+      const labelGroup = label?.closest('.visual-carousel-label') ?? label;
+      const visual = labelGroup?.nextElementSibling;
       if (!label || !visual) return null;
       const labelBox = label.getBoundingClientRect();
       const visualBox = visual.getBoundingClientRect();
@@ -885,8 +899,24 @@ for (const viewport of activeViewports) {
         media?.dispatchEvent(new Event('error'));
         const host = media?.closest('[data-media-host]');
         const status = host?.querySelector('[data-media-status]');
+        const style = status ? getComputedStyle(status) : null;
+        const context = document.createElement('canvas').getContext('2d');
+        const rgba = (color) => {
+          context.clearRect(0, 0, 1, 1);
+          context.fillStyle = color;
+          context.fillRect(0, 0, 1, 1);
+          return [...context.getImageData(0, 0, 1, 1).data];
+        };
+        const luminance = (color) => color.slice(0, 3).map((value) => {
+          const channel = value / 255;
+          return channel <= .04045 ? channel / 12.92 : ((channel + .055) / 1.055) ** 2.4;
+        }).reduce((sum, channel, index) => sum + channel * [.2126, .7152, .0722][index], 0);
+        const background = rgba(style.backgroundColor);
+        const light = [luminance(background), luminance(rgba(style.color))].sort((a, b) => a - b);
         return {
           state: host?.dataset.mediaState,
+          opaque: background[3] === 255,
+          contrast: (light[1] + .05) / (light[0] + .05),
           message: status?.textContent.trim(),
           statusDisplay: status ? getComputedStyle(status).display : null,
           mediaDisplay: media ? getComputedStyle(media).display : null,
@@ -909,6 +939,8 @@ for (const viewport of activeViewports) {
       record(
         `${viewport.id} 미디어 실패와 복구`,
         mediaFailure?.state === "error" &&
+          mediaFailure?.opaque === true &&
+          mediaFailure?.contrast >= 4.5 &&
           mediaFailure?.message?.includes("불러오지 못했습니다") &&
           mediaFailure?.statusDisplay === "grid" &&
           mediaFailure?.mediaDisplay === "none" &&
@@ -1027,7 +1059,9 @@ for (const viewport of activeViewports) {
         const durations = [];
         const shifts = [];
         const longTasks = [];
+        const longFrames = [];
         const observers = [];
+        const measurementStart = performance.now();
         const domBefore = document.querySelectorAll('*').length;
         if (PerformanceObserver.supportedEntryTypes?.includes('layout-shift')) {
           const observer = new PerformanceObserver((list) => list.getEntries().forEach((entry) => shifts.push(entry.value)));
@@ -1035,7 +1069,7 @@ for (const viewport of activeViewports) {
           observers.push(observer);
         }
         if (PerformanceObserver.supportedEntryTypes?.includes('longtask')) {
-          const observer = new PerformanceObserver((list) => list.getEntries().forEach((entry) => longTasks.push(entry.duration)));
+          const observer = new PerformanceObserver((list) => list.getEntries().forEach((entry) => longTasks.push({ startTime:entry.startTime, duration:entry.duration })));
           observer.observe({ type:'longtask', buffered:false });
           observers.push(observer);
         }
@@ -1047,6 +1081,18 @@ for (const viewport of activeViewports) {
           }, { once:true });
           document.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles:true }));
         });
+        if (PerformanceObserver.supportedEntryTypes?.includes('long-animation-frame')) {
+          const observer = new PerformanceObserver((list) => list.getEntries().forEach((entry) => longFrames.push({
+            duration:entry.duration,
+            render:entry.renderStart ? entry.startTime + entry.duration - entry.renderStart : 0,
+            scripts:entry.scripts.map((script) => ({
+              duration:script.duration, forced:script.forcedStyleAndLayoutDuration,
+              invoker:script.invoker, function:script.sourceFunctionName, position:script.sourceCharPosition,
+            })),
+          })));
+          observer.observe({ type:'long-animation-frame', buffered:false });
+          observers.push(observer);
+        }
         for (let i = 0; i < ${SOAK_STEPS}; i += 1) {
           await step(i % 2 === 0 ? 'ArrowRight' : 'ArrowLeft');
         }
@@ -1059,6 +1105,8 @@ for (const viewport of activeViewports) {
           max: Math.round(Math.max(...durations) * 10) / 10,
           layoutShift: Math.round(shifts.reduce((sum, value) => sum + value, 0) * 10000) / 10000,
           longTasks: longTasks.length,
+          longTaskDetails: longTasks.map((entry) => ({start:entry.startTime - measurementStart,duration:entry.duration})),
+          longFrames,
           domBefore,
           domAfter: document.querySelectorAll('*').length,
           phase: deck.dataset.scenePhase,
@@ -1268,20 +1316,17 @@ for (const viewport of activeViewports) {
     if (zoomState === "on") await save(session, "04-zoom");
 
     // 가로가 넓고 세로가 낮은 강의 화면에서도 시각물은 부제 아래의 전체 무대를 써야 한다.
-    const comparePost = value(
-      await evaluate(
-        session,
-        `(() => [...document.querySelectorAll('a.nav-post')]
-          .find((link) => link.getAttribute('href')?.endsWith('-what-is-python'))
-          ?.getAttribute('href') ?? null)()`,
-      ),
-    );
-    if (!comparePost) throw new Error("what-is-python 비교 장면 글 링크를 못 찾았다");
-    await evaluate(
-      session,
-      `localStorage.setItem('eddmpython-classroom-theme', 'light'); location.href = ${JSON.stringify(`${base}${comparePost}#lecture=s2.1`)}`,
-      false,
-    );
+    // 앞에서 실제 캐러셀 전환을 확인한 교안을 그대로 쓴다. 다른 글의 내용 편집으로
+    // 비교 장면이 없어져도 렌더러 검사가 엉뚱한 표본을 찾지 않아야 한다.
+    const comparePost = first ?? href;
+    await evaluate(session, `localStorage.setItem('eddmpython-classroom-theme', 'light')`);
+    // 새 탭을 찾는 과정에서 fragment가 빠진 frame URL과 탭 URL이 갈라질 수 있다.
+    // 열린 탭의 공개 navigate 동작으로 같은 심화 링크와 초기 장표 복원을 검사한다.
+    await client.act(session, [{
+      kind: "navigate", url: `${base}${comparePost}?qa=stage#lecture=s2.1`,
+      expectedRisk: "externalEffect", waitUntil: "load", timeoutMs: 30000,
+    }], { timeoutMs: 60000 });
+    console.log('  비교 무대 진입', JSON.stringify(value(await evaluate(session, `({url:location.href, hidden:document.querySelector('[data-lecture-deck]')?.hidden, scenes:document.querySelectorAll('.lecture-scene').length, active:document.querySelector('.lecture-scene.on')?.dataset.scene, title:document.querySelector('h1')?.textContent})`))));
     await client.act(
       session,
       [{ kind: "waitFor", selector: ".lecture-scene.on [data-scene-visible=\"true\"]", timeoutMs: 15000, expectedRisk: "read" }],
@@ -1391,7 +1436,7 @@ for (const viewport of activeViewports) {
       const first = read();
       await new Promise((resolve) => {
         deck.addEventListener('lectureframe', resolve, { once:true });
-        carousel.querySelector('[data-carousel-next]').click();
+        scene.querySelector('[data-carousel-next]').click();
       });
       return { first, second:read() };
     })()`));
@@ -1510,7 +1555,7 @@ for (const viewport of activeViewports) {
       await save(session, "05-cell");
     }
   } finally {
-    await client.stop?.({ timeoutMs: 30000 });
+    await client.close();
   }
 }
 
@@ -1520,6 +1565,7 @@ for (const viewport of activeViewports) {
 
 console.log(`
 강의장 화면, ${OUT}`);
-if (local) console.log(`로컬 검수용 강의방은 남겨 둔다. 비밀번호 ${PASSWORD}`);
+if (local) console.log("로컬 검수용 강의방은 남겨 둔다. 다음 검수에서 다시 만든다.");
 // 브라우저를 붙들고 있는 핸들이 남아 프로세스가 안 끝나는 일이 있다. 명시적으로 끝낸다.
 process.exit(checks.every(Boolean) ? 0 : 1);
+import { executionRoot } from "./executionWorkspace.mjs";

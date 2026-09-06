@@ -1,0 +1,39 @@
+.excel-compare{margin:2rem 0 4rem;color:var(--eddm-foreground);font-size:14px;line-height:1.6;min-width:0}
+.excel-compare *{box-sizing:border-box}
+.excel-compare button,.excel-compare input,.excel-compare select{font:inherit}
+.excel-compare button{border:1px solid var(--eddm-line-strong);background:transparent;color:inherit;padding:.65rem 1rem;border-radius:6px;cursor:pointer;min-height:44px}
+.excel-compare button:hover:not(:disabled){background:var(--eddm-hover)}
+.excel-compare button:disabled{opacity:.4;cursor:default}
+.excel-compare :focus-visible{outline:2px solid var(--eddm-accent);outline-offset:3px}
+.excel-compare .xc-primary{background:var(--eddm-accent);border-color:var(--eddm-accent);color:var(--eddm-accent-contrast);font-weight:650}
+.excel-compare .xc-primary:hover:not(:disabled){background:var(--eddm-accent);filter:brightness(1.08)}
+.xc-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;border-bottom:1px solid var(--eddm-line-strong);padding-bottom:1.8rem}
+.xc-eyebrow{color:var(--eddm-accent);letter-spacing:.18em;font:11px var(--eddm-font-mono)}
+.excel-compare .xc-heading h2{font-size:clamp(30px,4vw,44px);font-weight:600;line-height:1.2;letter-spacing:-.045em;margin:.7rem 0 1rem;border:0;padding:0}
+.xc-heading p{color:var(--eddm-text);margin:0}
+.xc-private{font-size:12px;line-height:1.7;color:var(--eddm-text-muted);text-align:right;flex-shrink:0;padding-top:1rem}
+.xc-start{display:flex;gap:1rem;align-items:center;margin:1.4rem 0}.xc-start span{color:var(--eddm-text-muted);font-size:12px}
+.xc-files{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--eddm-line-base);border-bottom:1px solid var(--eddm-line-base)}
+.xc-file{min-width:0;padding:1.25rem 1.25rem 1.25rem 0}.xc-file+ .xc-file{padding-left:1.25rem;border-left:1px solid var(--eddm-line-base)}
+.xc-file-label{position:relative;display:flex;align-items:center;gap:.7rem;cursor:pointer;min-height:44px}
+.xc-file-label input{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}.xc-file-label:focus-within{outline:2px solid var(--eddm-accent);outline-offset:4px}
+.xc-file-label strong{font-weight:600;font-size:17px}.xc-number{font:12px var(--eddm-font-mono);color:var(--eddm-accent);margin-right:.3rem}
+.xc-filename{overflow-wrap:anywhere;margin:.5rem 0;color:var(--eddm-text);font-size:13px}
+.excel-compare .xc-link{border:0;padding:.4rem 0;color:var(--eddm-accent);font-size:12px;min-height:36px;text-align:left}
+.xc-sheet{display:flex;gap:.7rem;margin:.7rem 0}.xc-sheet label{min-width:0;display:grid;gap:.3rem;flex:1;color:var(--eddm-text-muted);font-size:12px}
+.excel-compare select,.xc-filters input{background:var(--eddm-canvas);color:var(--eddm-foreground);border:1px solid var(--eddm-line-strong);border-radius:5px;padding:.6rem;min-height:44px;min-width:0;width:100%}
+.xc-count{font:12px var(--eddm-font-mono);color:var(--eddm-text-muted);margin-bottom:0}
+.xc-note,.xc-footnote{font-size:12px;line-height:1.8;color:var(--eddm-text-muted);margin:.9rem 0}
+.xc-settings{padding:1.25rem 0}.xc-settings fieldset{border:0;padding:0;margin:0 0 1.5rem;min-width:0}.xc-settings legend{font-weight:600;font-size:15px;margin-bottom:.45rem}.xc-settings fieldset p{font-size:12px;color:var(--eddm-text-muted);margin:0 0 .65rem}
+.xc-options{display:flex;flex-wrap:wrap;gap:.5rem}.xc-options label{display:flex;align-items:center;gap:.5rem;border:1px solid var(--eddm-line-strong);border-radius:5px;padding:.5rem .7rem;cursor:pointer;min-height:44px}.xc-options label:has(input:checked){border-color:var(--eddm-accent-line);background:var(--eddm-accent-bg)}
+.excel-compare input[type=checkbox]{accent-color:var(--eddm-accent);width:16px;height:16px;flex-shrink:0}.xc-trim{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;min-height:44px}.xc-trim small{color:var(--eddm-text-muted)}
+.xc-preview{margin:1rem 0}.xc-preview summary{cursor:pointer;color:var(--eddm-text);padding:.5rem 0}.excel-compare .xc-preview h3{font-size:13px;margin:1rem 0 .5rem}
+.xc-actions{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1rem}.xc-actions .xc-primary{min-width:180px;display:flex;justify-content:space-between;gap:2rem}
+.xc-warning{background:var(--eddm-accent-bg);border-left:2px solid var(--eddm-accent);padding:1rem;overflow-wrap:anywhere;line-height:1.8}
+.xc-status{display:flex;align-items:center;gap:1rem;color:var(--eddm-text-muted)}.xc-live{margin:.5rem 0;color:var(--eddm-text);font-size:12px;min-height:1em}
+.xc-result{border-top:1px solid var(--eddm-line-strong);padding-top:1.4rem;outline:none}.xc-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}.xc-summary span{display:block;font-size:12px;color:var(--eddm-text-muted)}.xc-summary strong{font:500 clamp(28px,4vw,40px) var(--eddm-font-mono);line-height:1.7}.xc-summary div:first-child strong{color:var(--eddm-accent)}
+.xc-result-heading{display:flex;align-items:center;justify-content:space-between;gap:1rem}.excel-compare .xc-result-heading h3{font-size:18px;margin:0;letter-spacing:-.03em}.xc-result-heading button{font-size:12px}
+.xc-filters{display:flex;justify-content:space-between;gap:1rem;margin:1rem 0}.xc-filters>div{display:flex;flex-shrink:0}.xc-filters button{border:0;padding:.5rem .75rem;color:var(--eddm-text-muted)}.xc-filters button[aria-pressed=true]{color:var(--eddm-accent);background:var(--eddm-accent-bg)}.xc-filters input{max-width:280px;font-size:12px}
+.xc-scroll{overflow:auto;max-height:540px;overscroll-behavior:contain}.excel-compare table{border-collapse:collapse;width:100%;text-align:left;font-size:12px}.excel-compare th,.excel-compare td{padding:.75rem .65rem;border-bottom:1px solid var(--eddm-line-base);vertical-align:top;white-space:nowrap;max-width:300px}.excel-compare th{font-weight:550}.excel-compare thead th{position:sticky;top:0;background:var(--eddm-canvas);color:var(--eddm-text-muted);z-index:1;font-size:11px}.xc-value{display:block;white-space:pre-wrap;overflow-wrap:anywhere;min-width:44px}.excel-compare td small{display:block;font-size:10px;color:var(--eddm-text-faint);margin-top:.2rem}.xc-new .xc-value{color:var(--eddm-accent)}.xc-tag{font-size:11px;color:var(--eddm-text-muted)}.xc-changed{color:var(--eddm-accent)}
+.xc-pagination{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-top:1rem;font-size:12px;color:var(--eddm-text-muted)}.xc-pagination>div{display:flex;gap:.5rem}.xc-pagination button{padding:.4rem .75rem}.xc-empty{padding:2rem 0;text-align:center;color:var(--eddm-text-muted)}.xc-footnote{border-top:1px solid var(--eddm-line-base);padding-top:1rem;margin-top:2rem}
+@media(max-width:600px){.xc-private{display:none}.xc-start{align-items:flex-start;flex-direction:column;gap:.6rem}.xc-files{grid-template-columns:1fr}.xc-file{padding:1rem 0}.xc-file+ .xc-file{padding:1rem 0;border-left:0;border-top:1px solid var(--eddm-line-base)}.xc-result-heading,.xc-filters{align-items:stretch;flex-direction:column;gap:.6rem}.xc-filters input{max-width:none}.xc-summary{gap:.5rem}.xc-summary span{font-size:11px}.xc-pagination{align-items:flex-start}.xc-file-label{justify-content:flex-start}}

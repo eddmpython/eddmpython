@@ -108,7 +108,7 @@ head 에 직접 꽂기 때문이다. 아바타 이미지와 GitHub API 호출은
 
 ```powershell
 # Worker 를 띄운다. CSP 가 실제로 붙어야 하므로 vite preview 로는 성립하지 않는다
-npx wrangler dev --port 8788 --persist-to ../../eddmpython.out/wrangler-state
+node scripts/siteWrangler.mjs dev --port 8788
 
 npm run blog:shot                          # 로컬. 데스크톱과 모바일
 node scripts/blog-shot.mjs https://eddmpython.com   # 운영

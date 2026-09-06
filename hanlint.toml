@@ -1,0 +1,3 @@
+# 블로그 H3는 문장형 부제다. 섹션 형식은 skills/specs/operation/blogMedia.md가 소유한다.
+preset = "blog"
+headingSentenceMaxLevel = 2

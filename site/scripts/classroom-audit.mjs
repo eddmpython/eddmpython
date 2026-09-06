@@ -2,7 +2,7 @@
  * 강의장의 모든 글을 열어 교안이 약속한 것이 화면에 실제로 있는지 잰다.
  *
  * 사용: node scripts/classroom-audit.mjs [baseUrl]
- * 출력: ../../eddmpython.out/classroom-audit/
+ * 출력: 현재 작업 실행 공간의 classroom-audit/
  *
  * classroom-shot.mjs 는 첫 글과 마지막 글만 찍고 기능이 도는지 본다. 이 검수는 다르다.
  * 글쓰기 정본으로 관리하는 전체 교안이 수강생 화면에 실제로 도착했는지를 하나하나 센다.
@@ -21,7 +21,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const SITE_ROOT = resolve(HERE, "..");
 const value = (res) => res?.output?.result?.result?.value;
 
-const OUT = resolve(SITE_ROOT, "../../eddmpython.out/classroom-audit");
+const OUT = resolve(executionRoot(), "classroom-audit");
 const base = (process.argv[2] ?? "http://localhost:8787").replace(/\/$/, "");
 const ROOM = "audit";
 const PASSWORD = randomBytes(12).toString("base64url");
@@ -300,3 +300,4 @@ try {
 const failed = checks.filter((c) => !c).length;
 console.log(`\n강의장 정본 검수: ${checks.length}개 중 실패 ${failed}개, 화면은 ${OUT}`);
 process.exit(failed ? 1 : 0);
+import { executionRoot } from "./executionWorkspace.mjs";

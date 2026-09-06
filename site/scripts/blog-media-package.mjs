@@ -1,6 +1,11 @@
+import { imageStyle, imageBriefIssues } from "./imagePrompt.mjs";
+
+export { imageStyle };
 const SUBTITLE_LEAD = /^###[ \t]+([^\r\n]+)\r?\n\r?\n/u;
 const IMAGE_LEAD =
   /^!\[([^\]]+)\]\(\s*<?([^\s)>]+)>?\s+["']([^"']+)["']\s*\)\s*(?:\r?\n|$)/u;
+const LINKED_IMAGE_LEAD =
+  /^\[!\[([^\]]+)\]\(\s*<?([^\s)>]+)>?\s+["']([^"']+)["']\s*\)\]\(<?([^\s)>]+)>?\)\s*(?:\r?\n|$)/u;
 const IMAGEGEN_V2 = "eddmpython-dark-v2";
 export const IMAGEGEN_PALETTE = "eddmpython-gray-master-v1";
 /**
@@ -53,12 +58,13 @@ export function parseSectionParts(section) {
     subtitle = subtitleMatch[1].trim();
     rest = rest.slice(subtitleMatch[0].length);
   }
-  const imageMatch = rest.match(IMAGE_LEAD);
+  const imageMatch = rest.match(IMAGE_LEAD) ?? rest.match(LINKED_IMAGE_LEAD);
   if (imageMatch) {
     image = {
       alt: imageMatch[1].trim(),
       url: imageMatch[2].trim(),
       caption: imageMatch[3].trim(),
+      ...(imageMatch[4] ? { href: imageMatch[4] } : {}),
     };
     rest = rest.slice(imageMatch[0].length);
   }
@@ -96,6 +102,9 @@ export function lintImageBrief(entry, section, parsed) {
 
 export function lintImagePolicy(entry) {
   const issues = [];
+  if (entry.visualProfile === imageStyle.visualProfile) {
+    return imageBriefIssues(entry).map((message) => issue("imageStyle", message));
+  }
   if (entry.sourceKind !== "imagegen" || entry.visualProfile !== IMAGEGEN_V2) return issues;
   if (entry.palettePolicy !== IMAGEGEN_PALETTE && !LEGACY_IMAGEGEN_PALETTES.has(String(entry.palettePolicy))) {
     issues.push(
@@ -109,4 +118,8 @@ export function lintImagePolicy(entry) {
   const banned = String(entry.prompt ?? "").match(BANNED_IMAGEGEN_COLORS)?.[0];
   if (banned) issues.push(issue("prompt", "v2 생성 프롬프트에 브랜드 밖 색상 지시가 있습니다", banned));
   return issues;
+}
+/** 교안은 두 자리, 공개 글은 세 자리 순번을 쓰며 계획의 소유 저장소가 다르다. */
+export function isCourseAssetId(id) {
+  return /^\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id);
 }

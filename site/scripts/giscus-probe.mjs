@@ -13,7 +13,7 @@ import { fileURLToPath } from "node:url";
 import { PyProcControlClient } from "pyproc/control";
 
 const SITE = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const OUT = resolve(SITE, "../../eddmpython.out/blog-shot");
+const OUT = resolve(executionRoot(), "blog-shot");
 const base = (process.argv[2] ?? "http://localhost:8788").replace(/\/$/, "");
 const target = `${base}/blog/python-qr`;
 
@@ -139,3 +139,4 @@ try {
 } finally {
   await client.close().catch(() => {});
 }
+import { executionRoot } from "./executionWorkspace.mjs";

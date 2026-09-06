@@ -35,7 +35,6 @@ export const VISUAL_VIEWPORTS = [
 const VISIBLE = (selector) => ({ type: "visible", selector });
 const COUNT = (selector, expected) => ({ type: "count", selector, ...expected });
 const TEXT = (selector, includes) => ({ type: "text", selector, includes });
-const AT_MOST_COUNT = (left, right) => ({ type: "at-most-count", left, right });
 
 const ROUTE_RULES = [
   {
@@ -154,24 +153,41 @@ const ROUTE_RULES = [
       COUNT("article#content h1", { exact: 1 }),
       COUNT("article#content h2", { min: 1 }),
       COUNT('nav[aria-label="글 목차"]', { exact: 1 }),
-      // 이미지 없는 절을 허용한다. 이미지가 H2보다 많으면 여전히 실패한다.
+      COUNT('[data-blog-progress]', { exact: 1 }),
+      COUNT('[data-blog-toc-mobile]', { exact: 1 }),
+      COUNT('[data-blog-toc-desktop]', { exact: 1 }),
+      { type: "article-sections" },
+      COUNT('code.language-flow', { exact: 0 }),
+      // 섹션 구성은 article-sections가 따로 보고한다. 보조 이미지 수를 제한하지 않는다.
       COUNT("article#content img", { min: 1 }),
-      AT_MOST_COUNT("article#content img", "article#content h2"),
       COUNT(
         'script[src^="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]',
         { exact: 1 },
       ),
     ],
+    captures: [
+      { id: "article-flow", selector: '[data-article-body] [data-article-visual="flow"]', optional: true },
+      { id: "article-table", selector: '[data-article-body] [data-article-visual="table"]', optional: true },
+      { id: "article-image", selector: '[data-article-body] [data-article-visual="image"]' },
+    ],
     interactions: [
       {
         id: "toc-second-heading",
         type: "click-hash-target",
-        click: 'nav[aria-label="글 목차"] li:nth-child(2) a',
+        click: '[data-blog-toc-desktop] li:nth-child(2) a',
         viewports: ["desktop"],
         minTop: 80,
         maxTop: 112,
         captureAfter: true,
       },
+    ],
+  },
+  {
+    match: (path) => path === "/blog/python-qr",
+    id: "python-qr",
+    checks: [
+      COUNT("article#content h2 + h3", { min: 7 }),
+      COUNT("article#content ol[data-step-list]", { min: 4 }),
     ],
   },
   {
@@ -202,6 +218,47 @@ const ROUTE_RULES = [
         includes: "합계 150,000원",
         timeoutMs: 120_000,
       },
+    ],
+  },
+  {
+    match: (path) => path === "/blog/csv-parquet",
+    id: "csv-parquet",
+    checks: [
+      TEXT("article#content h1", "CSV와 Parquet"),
+      COUNT('aside[aria-label^="실습 셀:"]', { exact: 4 }),
+      VISIBLE('[data-file-comparison] select'),
+      VISIBLE('[data-compare-run]'),
+    ],
+    captures: [
+      { id: "file-comparison", selector: '[data-file-comparison]' },
+      { id: "compression-cell", selector: 'aside[aria-label="실습 셀: Parquet의 압축만 바꿔 비교"]' },
+      ...Array.from({ length: 12 }, (_, index) => ({
+        id: `concept-${index + 1}`,
+        selector: `[data-article-body] > h2:nth-of-type(${index + 1}) + h3 + figure`,
+      })),
+    ],
+    interactions: [
+      {
+        id: "compare-three-rows",
+        type: "click-until-text",
+        click: '[data-compare-run]',
+        target: '[data-compare-status]',
+        includes: "3행 비교 완료",
+        timeoutMs: 180_000,
+      },
+      ...[
+        ["csv-code", "CSV 코드의 앞자리 0 지키기", "['0012', '0013', '0014']"],
+        ["parquet-schema", "Parquet에 남은 자료형 확인", "code: string"],
+        ["qty-column", "Parquet에서 qty만 읽기", "{'qty': [3, 5, 2]}"],
+        ["compression", "Parquet의 압축만 바꿔 비교", "Snappy: 18,217바이트"],
+      ].map(([id, title, includes]) => ({
+        id: `run-${id}`,
+        type: "click-until-text",
+        click: `aside[aria-label="실습 셀: ${title}"] button`,
+        target: `aside[aria-label="실습 셀: ${title}"] output`,
+        includes,
+        timeoutMs: 180_000,
+      })),
     ],
   },
   {

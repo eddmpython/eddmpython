@@ -21,10 +21,11 @@
 import { readdir, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { lintText, version } from "hanlint";
+import { lintText, loadConfig, version } from "hanlint";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const postsDir = join(here, "..", "..", "blog", "posts");
+const config = loadConfig(null, postsDir);
 
 /** 글 하나가 폴더 하나이고 본문 이름은 index.md 로 고정이다. */
 export const bodyName = "index.md";
@@ -40,7 +41,7 @@ export const bodyName = "index.md";
  * @param {string} label  실패 메시지에 쓸 이름
  */
 export function lintProblems(body, label) {
-  return lintText(body)
+  return lintText(body, config)
     .filter((finding) => finding.severity === "error")
     .map((finding) => `${label}:${finding.line} [${finding.rule}] ${finding.why}`);
 }

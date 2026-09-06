@@ -15,7 +15,7 @@ import { PyProcControlClient } from "pyproc/control";
 import { adminPassword, signIn } from "./admin-client.mjs";
 
 const SITE = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const OUT = resolve(SITE, "../../eddmpython.out/admin-shot");
+const OUT = resolve(executionRoot(), "admin-shot");
 const base = (process.argv[2] ?? "http://localhost:8787").replace(/\/$/, "");
 const local = /^https?:\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(base);
 const ROOM = "admin-shot-check";
@@ -239,3 +239,4 @@ try {
 const failed = checks.filter((ok) => !ok).length;
 console.log(`\n강의 관리 검수: ${checks.length}건 중 ${failed}건 실패. 그림은 ${OUT}`);
 process.exit(failed ? 1 : 0);
+import { executionRoot } from "./executionWorkspace.mjs";

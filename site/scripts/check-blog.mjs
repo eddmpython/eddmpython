@@ -3,7 +3,9 @@ import { readdir, readFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 import {
   h2Sections,
+  isCourseAssetId,
   IMAGEGEN_PALETTE,
+  imageStyle,
   lintImageBrief,
   lintImagePolicy,
   parseSectionParts,
@@ -358,12 +360,14 @@ for (const [id, entry] of Object.entries(plan.assets)) {
   if (entry.role === "section" && !String(entry.sectionHeading ?? "").trim()) {
     fail(planLabel(id), `${id}의 sectionHeading이 비었습니다`);
   }
-  if (!["imagegen", "screenshot", "official", "licensed", "recording"].includes(entry.sourceKind)) {
+  if (!["imagegen", "screenshot", "official", "licensed", "recording", "authored"].includes(entry.sourceKind)) {
     fail(planLabel(id), `${id}의 sourceKind를 지원하지 않습니다`);
   }
   const expectedProfiles =
     entry.sourceKind === "imagegen"
-      ? new Set(["dark-editorial-v1", "eddmpython-dark-v2"])
+      ? new Set(["dark-editorial-v1", "eddmpython-dark-v2", imageStyle.visualProfile])
+      : entry.sourceKind === "authored"
+        ? new Set(["design-token-svg-v1"])
       : entry.sourceKind === "screenshot"
         ? new Set(["product-screen-v1"])
         : new Set(["source-original-v1"]);
@@ -372,6 +376,14 @@ for (const [id, entry] of Object.entries(plan.assets)) {
   }
   if (entry.sourceKind === "imagegen" && !String(entry.prompt ?? "").trim()) {
     fail(planLabel(id), `${id}의 ImageGen prompt가 비었습니다`);
+  }
+  if (entry.sourceKind === "authored") {
+    const source = String(entry.sourceModule ?? "");
+    const postRoot = resolve(postsDir, entry.post);
+    const sourcePath = resolve(postRoot, source);
+    if (!source.endsWith(".ts") || relative(postRoot, sourcePath).startsWith("..") || !existsSync(sourcePath)) {
+      fail(planLabel(id), `${id}의 sourceModule은 해당 글 폴더의 실제 TypeScript 소스여야 합니다`);
+    }
   }
   const imagePolicyIssues = lintImagePolicy(entry);
   if (imagePolicyIssues.length) {
@@ -412,7 +424,7 @@ for (const [id, record] of Object.entries(catalog.assets)) {
   if (!match || !record || typeof record !== "object") {
     fail("blog/media/catalog.json", `올바르지 않은 asset id: ${id}`);
   }
-  if (!plan.assets[id] && !coursePlans[id]) {
+  if (!plan.assets[id] && !coursePlans[id] && !isCourseAssetId(id)) {
     fail("blog/media/catalog.json", `${id}의 이미지 계획이 없습니다`);
   }
   if (record.post !== match[1] || record.assetKey !== match[2] || !sha256.test(record.sha256)) {
@@ -440,7 +452,7 @@ for (const [id, record] of Object.entries(catalog.assets)) {
   const url = `https://huggingface.co/datasets/${catalog.repo}/resolve/main/${record.path}`;
   assetUrlById.set(id, url);
   assetIdByPostUrl.set(`${record.post}|${url}`, id);
-  altByPostUrl.set(`${record.post}|${url}`, String((plan.assets[id] ?? coursePlans[id]).alt));
+  altByPostUrl.set(`${record.post}|${url}`, String((plan.assets[id] ?? coursePlans[id])?.alt ?? object.alt ?? ""));
   objectByPostUrl.set(`${record.post}|${url}`, object);
   if (!urlsByPost.has(record.post)) urlsByPost.set(record.post, new Set());
   urlsByPost.get(record.post).add(url);
@@ -820,7 +832,7 @@ if (!targetPost) {
 
   for (const [id, url] of assetUrlById) {
     // 교안 자산은 형제 비공개 저장소의 교안이 쓴다. 그쪽 게이트가 자기 자산을 본다.
-    if (coursePlans[id]) continue;
+    if (isCourseAssetId(id) || coursePlans[id]) continue;
     if (!referencedMedia.has(url)) {
       fail("blog/media/catalog.json", `${id}가 글 본문이나 ogImage에서 쓰이지 않습니다`);
     }

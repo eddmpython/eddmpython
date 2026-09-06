@@ -4,6 +4,7 @@ import remarkGfm from "remark-gfm";
 import { decodeHashId } from "../hashNavigation";
 import { CodaroCellEmbed } from "./CodaroCellEmbed";
 import { ToolEmbed } from "./ToolEmbed";
+import { ArticleFlow } from "./ArticleFlow";
 
 const THREADS = /^https?:\/\/(?:www\.)?threads\.(?:net|com)\/@[\w.]+\/post\/[\w-]+/;
 const IMAGE = /\.(png|jpe?g|gif|webp|avif|svg)(\?.*)?$/i;
@@ -35,25 +36,23 @@ function onlyLink(children: ReactNode): ParagraphLink | null {
   };
 }
 
-function onlyImage(node: unknown): { src: string; alt: string; title: string } | null {
-  const paragraph = node as {
-    children?: Array<{
-      type?: string;
-      tagName?: string;
-      value?: string;
-      properties?: { src?: unknown; alt?: unknown; title?: unknown };
-    }>;
-  };
+function onlyImage(node: unknown): { src: string; alt: string; title: string; href?: string } | null {
+  type ImageNode = { type?: string; tagName?: string; value?: string; properties?: { src?: unknown; alt?: unknown; title?: unknown; href?: unknown }; children?: ImageNode[] };
+  const paragraph = node as ImageNode;
   const children = (paragraph.children ?? []).filter(
     (child) => child.type !== "text" || child.value?.trim(),
   );
-  if (children.length !== 1 || children[0].tagName !== "img") return null;
-  const properties = children[0].properties ?? {};
+  if (children.length !== 1) return null;
+  const linked = children[0].tagName === "a" ? children[0] : null;
+  const picture = linked?.children?.length === 1 ? linked.children[0] : children[0];
+  if (picture.tagName !== "img") return null;
+  const properties = picture.properties ?? {};
   if (typeof properties.src !== "string") return null;
   return {
     src: properties.src,
     alt: typeof properties.alt === "string" ? properties.alt : "",
     title: typeof properties.title === "string" ? properties.title : "",
+    href: typeof linked?.properties?.href === "string" ? linked.properties.href : undefined,
   };
 }
 
@@ -69,7 +68,7 @@ function PendingMedia({
 }) {
   return (
     <span className="my-7 block overflow-hidden rounded-xl border border-dashed border-[var(--eddm-line-strong)] bg-[var(--eddm-raise)]">
-      <span className="flex aspect-[3/2] w-full flex-col items-center justify-center gap-2 px-6 text-center">
+      <span className="flex aspect-video w-full flex-col items-center justify-center gap-2 px-6 text-center">
         <span className="font-mono text-[11px] tracking-[0.14em] text-ivory/38 uppercase">
           시각물 준비 중
         </span>
@@ -95,22 +94,31 @@ function ArticleVideo({
   caption: string;
 }) {
   return (
-    <figure className="my-7 overflow-hidden rounded-xl border border-[var(--eddm-line-base)] bg-[var(--eddm-media)]">
+    <figure data-article-visual="video" className="my-7 overflow-hidden rounded-xl border border-[var(--eddm-line-base)] bg-[var(--eddm-media)]">
       <video
         controls
         playsInline
         preload="metadata"
         aria-label={alt}
-        className="block w-full bg-[var(--eddm-media)]"
+        className="block aspect-video w-full object-contain bg-[var(--eddm-media)]"
       >
         <source src={src} type="video/mp4" />
       </video>
       {caption && (
-        <figcaption className="border-t border-[var(--eddm-line)] bg-[var(--eddm-raise)] px-4 py-3 text-left text-sm leading-relaxed text-ivory/48">
-          {caption}
-        </figcaption>
+        <MediaCaption>{caption}</MediaCaption>
       )}
     </figure>
+  );
+}
+
+function MediaCaption({ children }: { children: ReactNode }) {
+  return (
+    <figcaption className="flex items-baseline gap-2 border-t border-[var(--eddm-line)] bg-[var(--eddm-raise)] px-4 py-3 text-left text-sm leading-relaxed text-ivory/55">
+      <span aria-hidden="true" className="shrink-0 text-[9px] text-accent">
+        ◆
+      </span>
+      <span>{children}</span>
+    </figcaption>
   );
 }
 
@@ -151,6 +159,7 @@ function YouTube({
   return (
     <span
       data-youtube-player={id}
+      data-article-visual="video"
       className={`my-7 block overflow-hidden rounded-xl border border-[var(--eddm-line-base)] ${
         vertical ? "mx-auto max-w-sm" : ""
       }`}
@@ -201,7 +210,7 @@ function YouTube({
   );
 }
 
-type ArticleHeading = { id: string; text: string };
+type ArticleHeading = { id: string; text: string; line: number };
 
 function headingText(markdown: string): string {
   return markdown
@@ -226,7 +235,7 @@ function articleHeadings(markdown: string): ArticleHeading[] {
   const headings: ArticleHeading[] = [];
   let fenced = false;
 
-  for (const line of markdown.split(/\r?\n/)) {
+  for (const [lineIndex, line] of markdown.split(/\r?\n/).entries()) {
     if (/^```/.test(line)) {
       fenced = !fenced;
       continue;
@@ -238,60 +247,147 @@ function articleHeadings(markdown: string): ArticleHeading[] {
     const base = headingBase(text);
     const count = (counts.get(base) ?? 0) + 1;
     counts.set(base, count);
-    headings.push({ id: count === 1 ? base : `${base}-${count}`, text });
+    headings.push({ id: count === 1 ? base : `${base}-${count}`, text, line: lineIndex + 1 });
   }
   return headings;
 }
 
 function ArticleToc({ headings }: { headings: ArticleHeading[] }) {
   const [activeId, setActiveId] = useState(headings[0]?.id ?? "");
+  const mobileToc = useRef<HTMLDetailsElement | null>(null);
 
   useEffect(() => {
     const hashId = decodeHashId(window.location.hash);
     setActiveId(headings.some((heading) => heading.id === hashId) ? hashId! : (headings[0]?.id ?? ""));
-    const elements = headings
-      .map((heading) => document.getElementById(heading.id))
-      .filter((element): element is HTMLElement => Boolean(element));
-    if (!elements.length || typeof IntersectionObserver === "undefined") return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-        if (visible?.target.id) setActiveId(visible.target.id);
-      },
-      { rootMargin: "-80px 0px -75% 0px", threshold: [0, 1] },
-    );
-    elements.forEach((element) => observer.observe(element));
-    return () => observer.disconnect();
+    if (!headings.length) return;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const elements = headings
+        .map((heading) => document.getElementById(heading.id))
+        .filter((element): element is HTMLElement => Boolean(element));
+      if (!elements.length) return;
+      let current = elements[0];
+      for (const element of elements) {
+        if (element.getBoundingClientRect().top > 160) break;
+        current = element;
+      }
+      setActiveId(current.id);
+    };
+    const requestUpdate = () => {
+      if (!frame) frame = window.requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+    return () => {
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
   }, [headings]);
 
   if (headings.length < 2) return null;
+  const links = (mobile: boolean) => (
+    <ol
+      className={
+        mobile
+          ? "mt-3 space-y-1 border-t border-[var(--eddm-line)] pt-3"
+          : "mt-4 space-y-3 border-l border-[var(--eddm-line-base)] pl-4"
+      }
+    >
+      {headings.map((heading, index) => (
+        <li key={heading.id}>
+          <a
+            href={`#${heading.id}`}
+            onClick={() => {
+              setActiveId(heading.id);
+              if (mobile) mobileToc.current?.removeAttribute("open");
+            }}
+            aria-current={activeId === heading.id ? "location" : undefined}
+            className={`flex gap-3 py-1.5 text-[13px] leading-relaxed transition-colors ${
+              activeId === heading.id ? "text-ivory" : "text-ivory/48 hover:text-ivory/75"
+            }`}
+          >
+            <span
+              aria-hidden="true"
+              className={`shrink-0 font-mono text-[11px] ${
+                activeId === heading.id ? "text-accent" : "text-ivory/32"
+              }`}
+            >
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <span>{heading.text}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  );
   return (
     <nav
       aria-label="글 목차"
-      className="fixed top-32 left-[calc(50%+26rem)] hidden max-h-[calc(100vh-10rem)] w-52 overflow-y-auto xl:block"
+      className="my-10 xl:fixed xl:top-32 xl:left-[calc(50%+26rem)] xl:my-0 xl:max-h-[calc(100vh-10rem)] xl:w-52 xl:overflow-y-auto"
     >
-      <p className="font-mono text-[11px] tracking-[0.14em] text-ivory/38 uppercase">
-        이 글의 순서
-      </p>
-      <ol className="mt-4 space-y-3 border-l border-[var(--eddm-line-base)] pl-4">
-        {headings.map((heading) => (
-          <li key={heading.id}>
-            <a
-              href={`#${heading.id}`}
-              onClick={() => setActiveId(heading.id)}
-              aria-current={activeId === heading.id ? "location" : undefined}
-              className={`block text-[13px] leading-relaxed transition-colors ${
-                activeId === heading.id ? "text-ivory" : "text-ivory/42 hover:text-ivory/72"
-              }`}
-            >
-              {heading.text}
-            </a>
-          </li>
-        ))}
-      </ol>
+      <details
+        ref={mobileToc}
+        data-blog-toc-mobile
+        className="rounded-xl border border-[var(--eddm-line-base)] bg-[var(--eddm-raise)] px-4 py-3 xl:hidden"
+      >
+        <summary className="flex cursor-pointer list-none items-baseline justify-between gap-4 text-sm text-ivory/70 [&::-webkit-details-marker]:hidden">
+          <span>이 글의 순서</span>
+          <span className="font-mono text-[11px] text-accent">
+            {String(headings.length).padStart(2, "0")}개 절
+          </span>
+        </summary>
+        {links(true)}
+      </details>
+      <div data-blog-toc-desktop className="hidden xl:block">
+        <p className="font-mono text-[11px] tracking-[0.14em] text-ivory/38 uppercase">
+          이 글의 순서
+        </p>
+        {links(false)}
+      </div>
     </nav>
+  );
+}
+
+function ArticleProgress() {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const article = document.getElementById("content");
+      if (!article) return;
+      const top = article.getBoundingClientRect().top + window.scrollY;
+      const distance = Math.max(article.offsetHeight - window.innerHeight, 1);
+      setProgress(Math.min(1, Math.max(0, (window.scrollY - top) / distance)));
+    };
+    const requestUpdate = () => {
+      if (!frame) frame = window.requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+    return () => {
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  return (
+    <span
+      data-blog-progress
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-x-0 top-0 z-50 h-0.5"
+    >
+      <span
+        className="block h-full origin-left bg-accent/70"
+        style={{ transform: `scaleX(${progress})` }}
+      />
+    </span>
   );
 }
 
@@ -347,11 +443,12 @@ function Threads({ url }: { url: string }) {
 /** 단독 URL 문단을 임베드로 바꾼다. 그 외에는 표준 마크다운. */
 export function Markdown({ children }: { children: string }) {
   const headings = useMemo(() => articleHeadings(children), [children]);
-  let h2Index = 0;
   return (
     <>
+      <ArticleProgress />
       <ArticleToc headings={headings} />
       <ReactMarkdown
+      skipHtml
       remarkPlugins={[remarkGfm]}
       urlTransform={(url) =>
         MEDIA_PENDING.test(url) ? url : defaultUrlTransform(url)
@@ -376,18 +473,18 @@ export function Markdown({ children }: { children: string }) {
               );
             }
             return (
-              <figure className="my-7 overflow-hidden rounded-xl border border-[var(--eddm-line-base)] bg-[var(--eddm-media)]">
+              <figure data-article-visual="image" className="my-7 overflow-hidden rounded-xl border border-[var(--eddm-line-base)] bg-[var(--eddm-media)]">
+                <a href={picture.href ?? picture.src} target="_blank" rel="noreferrer" className="block aspect-video" aria-label={picture.href ? `${picture.alt}, 연결된 페이지 열기` : `${picture.alt}, 원본 이미지 열기`}>
                 <img
                   src={picture.src}
                   alt={picture.alt}
                   loading="lazy"
                   decoding="async"
-                  className="aspect-[3/2] w-full object-cover saturate-[0.72]"
+                  className="block h-full w-full object-contain"
                 />
+                </a>
                 {picture.title && (
-                  <figcaption className="border-t border-[var(--eddm-line)] bg-[var(--eddm-raise)] px-4 py-3 text-left text-sm leading-relaxed text-ivory/48">
-                    {picture.title}
-                  </figcaption>
+                  <MediaCaption>{picture.title}</MediaCaption>
                 )}
               </figure>
             );
@@ -426,8 +523,9 @@ export function Markdown({ children }: { children: string }) {
           }
           return <p className="my-5 leading-[1.85] text-ivory/75">{kids}</p>;
         },
-        h2: ({ children: k }) => {
-          const index = h2Index++;
+        h2: ({ children: k, node }) => {
+          // 렌더 호출 횟수가 아닌 원문의 위치로 번호와 목차 연결을 고정한다.
+          const index = headings.findIndex((heading) => heading.line === node?.position?.start.line);
           const heading = headings[index];
           return (
             <h2
@@ -436,7 +534,7 @@ export function Markdown({ children }: { children: string }) {
             >
               <span
                 aria-hidden="true"
-                className="w-8 shrink-0 font-mono text-[11px] font-medium tracking-[0.08em] text-sand/70 md:w-9 md:text-xs"
+                className="w-8 shrink-0 font-mono text-[11px] font-medium tracking-[0.08em] text-accent/70 md:w-9 md:text-xs"
               >
                 {String(index + 1).padStart(2, "0")}
               </span>
@@ -445,7 +543,7 @@ export function Markdown({ children }: { children: string }) {
           );
         },
         h3: ({ children: k }) => (
-          <h3 className="mt-0 mb-7 pl-12 text-[15px] leading-relaxed font-normal text-ivory/55 md:pl-14 md:text-base">
+          <h3 className="mt-0 mb-7 text-[15px] leading-relaxed font-normal text-ivory/55 md:text-base">
             {k}
           </h3>
         ),
@@ -453,7 +551,12 @@ export function Markdown({ children }: { children: string }) {
           <ul className="my-5 space-y-2 pl-5 text-ivory/75 [&>li]:list-disc">{k}</ul>
         ),
         ol: ({ children: k }) => (
-          <ol className="my-5 space-y-2 pl-5 text-ivory/75 [&>li]:list-decimal">{k}</ol>
+          <ol
+            data-step-list
+            className="my-6 space-y-2 rounded-xl border border-[var(--eddm-line-base)] bg-[var(--eddm-raise)] py-4 pr-5 pl-10 text-ivory/75 [&>li]:list-decimal [&>li::marker]:text-[var(--eddm-accent-dim)]"
+          >
+            {k}
+          </ol>
         ),
         li: ({ children: k }) => <li className="leading-[1.8] pl-1">{k}</li>,
         a: ({ href, children: k }) => (
@@ -475,15 +578,17 @@ export function Markdown({ children }: { children: string }) {
           className ? (
             <code className="font-mono text-[13px]">{k}</code>
           ) : (
-            <code className="rounded border border-[var(--eddm-line-base)] bg-[var(--eddm-hover)] px-1.5 py-0.5 font-mono text-[0.9em]">
+            <code className="rounded border border-[var(--eddm-line-base)] bg-[var(--eddm-hover)] px-1.5 py-0.5 font-mono text-[0.9em] [overflow-wrap:anywhere]">
               {k}
             </code>
           ),
-        pre: ({ children: k }) => (
-          <pre className="my-6 overflow-x-auto rounded-xl border border-[var(--eddm-line-base)] bg-carbon px-5 py-4 leading-6 text-ivory/85">
-            {k}
-          </pre>
-        ),
+        pre: ({ children: k, node }) => {
+          const code = node?.children[0];
+          if (code?.type === "element" && code.tagName === "code" && Array.isArray(code.properties.className) && code.properties.className.includes("language-flow")) {
+            return <ArticleFlow text={code.children.map((child) => child.type === "text" ? child.value : "").join("")} />;
+          }
+          return <pre data-article-visual="code" className="my-6 overflow-x-auto rounded-xl border border-[var(--eddm-line-base)] bg-carbon px-5 py-4 leading-6 text-ivory/85">{k}</pre>;
+        },
         img: ({ src, alt, title }) =>
           typeof src === "string" && MEDIA_PENDING.test(src) ? (
             <PendingMedia
@@ -503,12 +608,12 @@ export function Markdown({ children }: { children: string }) {
           ),
         hr: () => <hr className="my-10 border-[var(--eddm-line-base)]" />,
         table: ({ children: k }) => (
-          <div className="my-6 overflow-x-auto">
-            <table className="w-full border-collapse text-sm">{k}</table>
+          <div className="my-6 overflow-x-auto rounded-xl border border-[var(--eddm-line-base)]">
+            <table data-article-visual="table" className="w-full border-collapse text-sm">{k}</table>
           </div>
         ),
         th: ({ children: k }) => (
-          <th className="border-b border-[var(--eddm-line-strong)] px-3 py-2 text-left font-medium">
+          <th className="border-b border-[var(--eddm-line-strong)] bg-[var(--eddm-hover)] px-3 py-2 text-left font-medium">
             {k}
           </th>
         ),

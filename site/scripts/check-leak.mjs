@@ -17,10 +17,11 @@
  */
 import { readdirSync, readFileSync, statSync, existsSync } from "node:fs";
 import { join, resolve, relative, extname } from "node:path";
+import { executionRoot } from "./executionWorkspace.mjs";
 
 const SITE = resolve(process.cwd());
 const REPO = resolve(SITE, "..");
-const DIST = resolve(REPO, "..", "eddmpython.out", "site-dist");
+const DIST = join(executionRoot(), "site-dist");
 
 /**
  * 교안 체크아웃이 없으면 검사할 원본이 없다. 그때 조용히 통과하면 이 게이트는 초록불만

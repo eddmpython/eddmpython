@@ -23,6 +23,8 @@ import {
   ROOM_MEDIA_KEY,
 } from "./classroom-render";
 import { SYMBOL, symbolMarkup } from "./src/brand";
+import { editCodeIndent } from "./src/codeIndent";
+import { codeKeyAction, CODE_CELL_STYLE } from "./src/codeCell";
 import { DESIGN } from "./src/design";
 import { checkToken, cookie, issueToken, hmac, readCookie } from "./auth";
 import { call, validSlug, type PublicRoom } from "./rooms";
@@ -44,6 +46,7 @@ import type { Env } from "./env";
  * 실행 칸, 강의 모드처럼 강의방에서만 쓰는 것만 둔다.
  */
 const CLASSROOM_STYLE = `
+${CODE_CELL_STYLE}
 /* 글 화면. 왼쪽 과정 이동, 가운데 본문, 오른쪽 목차 */
 .wrap.wide { width:min(94vw,120rem); max-width:none; }
 .lay { display:grid;
@@ -187,45 +190,7 @@ article th, article td { padding:.75rem .85rem; border-bottom:1px solid var(--ed
 article th { color:var(--eddm-ivory); background:var(--eddm-hover); font-size:.86rem; font-weight:500; }
 article td { color:var(--eddm-text); font-size:.88rem; }
 article tbody tr:last-child td { border-bottom:0; }
-/* 실습 칸. 읽기 모드에서는 16:9 무대가 아니라 codaro 학습 셀처럼 내용만큼 자라는 카드다.
-   제목 줄과 실행 하나, 설명과 할 일, 코드 칸, 실행한 뒤에만 열리는 출력 상자를 위에서 아래로 둔다. */
-.cell { margin:1.75rem 0; padding:1rem 1.2rem 1.2rem; box-sizing:border-box; border:1px solid var(--eddm-line-base);
-  border-radius:.75rem; background:var(--eddm-raise); }
-.cell-h { display:flex; align-items:center; gap:.6rem; }
-.cell-t { flex:1 1 auto; min-width:0; font-size:.98rem; font-weight:600; line-height:1.5; color:var(--eddm-ivory); }
-.cell-h button { flex:0 0 auto; display:inline-flex; align-items:center; gap:.4rem; height:2rem; padding:0 .8rem;
-  border:1px solid var(--eddm-line-strong); border-radius:.5rem; background:transparent; color:var(--eddm-text);
-  font:inherit; font-size:.84rem; line-height:1; cursor:pointer; }
-.cell-h button:hover { border-color:var(--eddm-accent-line); background:var(--eddm-accent-bg); }
-.cell-h button[hidden] { display:none; }
-.cell-run { background:var(--eddm-ivory); color:var(--eddm-carbon); border-color:transparent; font-weight:500; }
-.cell-run:hover { background:var(--eddm-ivory); border-color:transparent; opacity:.88; }
-.cell-run svg { width:.65rem; height:.65rem; fill:currentColor; }
-.cell-run:disabled { opacity:.6; cursor:default; }
-.cell-d { margin:.6rem 0 0; font-size:.92rem; line-height:1.7; color:var(--eddm-text); }
-.cell-hint { margin:.3rem 0 0; font-size:.86rem; line-height:1.65; color:var(--eddm-text-muted); }
-.cell-f { margin-top:.85rem; overflow:hidden; border:1px solid var(--eddm-line-base); border-radius:.55rem;
-  transition:border-color var(--eddm-motion-fast) var(--eddm-motion-easing); }
-.cell-f:hover { border-color:var(--eddm-line-strong); }
-.cell-f:focus-within, .cell[data-cell-state="running"] .cell-f { border-color:var(--eddm-accent); }
-/* 코드 칸은 내용만큼 자란다. 세로 스크롤과 크기 조절 손잡이를 두지 않고 긴 줄만 가로로 민다. */
-.cell-c { display:block; width:100%; min-height:3.2rem; box-sizing:border-box; margin:0; padding:.85rem 1rem;
-  resize:none; border:0; outline:0; background:var(--eddm-code-surface); color:var(--eddm-text);
-  font-family:var(--eddm-font-mono); font-size:.86rem; line-height:1.65; tab-size:4; white-space:pre;
-  overflow-x:auto; overflow-y:hidden; }
-.cell-c:focus { background:var(--eddm-code-focus); }
-/* 출력 상자의 왼쪽 선은 결과 상태다. 정상은 색이 아니라 밝기로, 오류만 경고색으로 가른다. */
-.cell-out { margin-top:.75rem; border:1px solid var(--eddm-line-base); border-left:2px solid var(--eddm-ivory);
-  border-radius:.55rem; background:var(--eddm-code-surface); }
-.cell-out[hidden] { display:none; }
-.cell-out-h { display:flex; align-items:center; gap:.6rem; padding:.45rem .9rem; border-bottom:1px solid var(--eddm-line);
-  font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--eddm-text-faint); }
-.cell-s { margin-left:auto; font-size:.76rem; letter-spacing:0; text-transform:none; color:var(--eddm-text-faint); }
-.cell-o { margin:0; padding:.75rem .9rem; max-height:24rem; overflow:auto; background:transparent; border:0; border-radius:0;
-  font-family:var(--eddm-font-mono); font-size:.84rem; line-height:1.6; color:var(--eddm-text);
-  white-space:pre-wrap; word-break:break-word; }
-.cell.bad .cell-out { border-left-color:var(--eddm-danger); }
-.cell.bad .cell-o { color:var(--eddm-danger); }
+/* 코드셀의 모양과 단축키 안내는 CODE_CELL_STYLE에서 함께 읽는다. */
 .cell-miss { color:var(--eddm-danger); font-size:.88rem; }
 .cell-miss i { display:block; margin-top:.3rem; font-style:normal; color:var(--eddm-text-faint); }
 .visual-carousel { width:100%; min-width:0; margin:.35rem 0 1.2rem; }
@@ -275,7 +240,7 @@ article tbody tr:last-child td { border-bottom:0; }
   max-height:100%; box-sizing:border-box; margin:0; border-radius:0; }
 .visual-carousel-controls { display:flex; flex:0 0 auto; align-items:center;
   gap:.3rem; padding:.25rem; border:1px solid var(--eddm-line-strong); border-radius:.5rem;
-  background:var(--eddm-paper); }
+  background:var(--eddm-raise); }
 .visual-carousel-controls button { display:grid; place-items:center; width:2rem; height:2rem; padding:0;
   border:1px solid var(--eddm-line-base); border-radius:.35rem; background:transparent;
   color:var(--eddm-text); font-size:.95rem; cursor:pointer; }
@@ -439,6 +404,7 @@ body.lecture-on { overflow:hidden; }
   font-size:clamp(1.15rem,1.45vw,1.65rem); line-height:1.38; text-wrap:balance; }
 .scene-head > .scene-support { min-height:1.5em; margin:clamp(1rem,1.55vh,1.4rem) 0 0; color:var(--eddm-text); }
 .scene-head > .scene-support > p { margin:0; font-size:clamp(1rem,1.15vw,1.25rem); line-height:1.45; }
+.scene-support a { color:var(--eddm-accent); text-underline-offset:.15em; }
 .scene-head > .scene-support[hidden], .scene-head > .scene-support > p[hidden] { display:none; }
 .scene-canvas { grid-area:canvas; align-self:stretch; min-width:0; min-height:0; overflow:hidden;
   display:grid; place-items:center; contain:layout style; }
@@ -486,7 +452,7 @@ body.lecture-on { overflow:hidden; }
 .scene-canvas [data-media-host] { position:relative; }
 .scene-media-status { display:none; place-items:center; width:100%; height:100%; min-height:12rem; padding:2rem;
   box-sizing:border-box; border:1px solid var(--eddm-line-strong); border-radius:.55rem;
-  background:var(--eddm-raise); color:var(--eddm-text-muted); text-align:center; }
+  background:var(--eddm-carbon); color:var(--eddm-text); text-align:center; }
 .scene-media-status span { display:block; max-width:32rem; font-size:clamp(.95rem,1.2vw,1.15rem); line-height:1.6; }
 .scene-media-status button { margin-top:1rem; padding:.55rem .9rem; border:1px solid var(--eddm-accent-line);
   border-radius:.45rem; background:transparent; color:var(--eddm-ivory); font:inherit; cursor:pointer; }
@@ -523,18 +489,29 @@ body.lecture-on { overflow:hidden; }
   .lecture-rail-foot { padding-top:.5rem; }
   .lecture-progress { margin-bottom:.4rem; padding-bottom:.4rem; }
   .lecture-rail-foot button, .lecture-rail .theme-toggle { height:1.8rem; }
-  .lecture-scene, .lecture-map-thumb-scene { padding:clamp(.8rem,3.5vw,1.25rem); gap:.65rem; }
+  .lecture-scene, .lecture-map-thumb-scene { --scene-content-width:100%; --scene-visual-scale:.95;
+    padding:clamp(.8rem,3.5vw,1.25rem); gap:.65rem; }
   .scene-meta { margin-bottom:.25rem; }
   .scene-index::after { width:1.4rem; }
   .scene-head h2 { font-size:clamp(1.5rem,7vw,2.35rem); }
   .scene-subtitle { margin-top:.3rem; font-size:1rem; line-height:1.35; }
   .scene-head > .scene-support > p { font-size:.9rem; }
-  .scene-canvas { place-items:start stretch; }
+  .scene-canvas { place-items:start center; }
   .scene-canvas figure.media[data-scene-visible="true"],
   .scene-canvas figure.yt[data-scene-visible="true"],
   .scene-canvas figure.course-embed[data-scene-visible="true"] { justify-content:flex-start; }
   .scene-canvas pre { padding:.85rem; font-size:.75rem; white-space:pre-wrap; overflow-wrap:anywhere; }
   .scene-canvas th, .scene-canvas td { padding:.5rem .55rem; font-size:.72rem; }
+}
+@media (max-width:600px) {
+  .lecture-deck { grid-template-columns:4rem minmax(0,1fr); }
+  .lecture-rail { padding-right:.0625rem; padding-left:max(.0625rem,env(safe-area-inset-left)); }
+  .lecture-map-list { padding-right:0; padding-left:0; }
+  .lecture-scene, .lecture-map-thumb-scene { --scene-visual-scale:.97; padding:.75rem; }
+  .lecture-rail .lecture-map-item { display:block; position:relative; padding-right:0; padding-left:0; }
+  .lecture-rail .lecture-map-no { position:absolute; z-index:1; top:.3rem; left:.15rem; font-size:.5rem; }
+  .lecture-rail-foot { min-width:0; }
+  .lecture-actions { grid-template-columns:1fr; }
 }
 @media (max-height:650px) and (min-width:901px) {
   .lecture-brand { padding-bottom:.45rem; }
@@ -681,13 +658,15 @@ const ENGINE = "https://cdn.jsdelivr.net/pyodide/v314.0.2/full/";
  * **머신이 하나이므로 실행도 한 번에 하나씩 한다.** `setStdout` 은 머신 전체에 걸리는
  * 설정이라 두 칸이 겹쳐 돌면 나중에 건 칸이 앞 칸의 출력까지 가져간다. 앞 칸은 빈 출력이
  * 되고 뒤 칸은 남의 줄이 섞인다. 첫 실행은 파이썬을 받느라 오래 걸려서 그동안 다음 칸을
- * 누르는 일이 실제로 일어난다. 그래서 누른 순서대로 줄을 세우고 도는 동안에는 모든 칸의
- * 실행 버튼을 잠근다. 기다리는 칸은 순서를 기다린다고 말해 눌린 것이 보이게 한다.
+ * 누르는 일이 실제로 일어난다. 그래서 누른 순서대로 줄을 세우고 눌린 칸의 실행 버튼을
+ * 잠근다. 기다리는 칸은 순서를 기다린다고 말해 눌린 것이 보이게 한다.
  */
 const CELL_SCRIPT = `
 (() => {
   const cells = document.querySelectorAll("[data-cell]");
   if (!cells.length) return;
+  const editCodeIndent = ${editCodeIndent.toString()};
+  const codeKeyAction = ${codeKeyAction.toString()};
   let booting = null;
   const boot = () => {
     if (!booting) {
@@ -720,19 +699,45 @@ const CELL_SCRIPT = `
     const reset = cell.querySelector("[data-reset]");
     if (!ta || !out || !st || !run) return;
     const first = ta.value;
+    let tabNavigation = false;
     const fit = () => {
       if (!ta.offsetWidth) return;
+      ta.rows = Math.max(2, ta.value.split("\\n").length);
+      ta.style.height = "auto";
       const bar = ta.offsetHeight - ta.clientHeight;
-      ta.style.height = "0px";
       ta.style.height = (ta.scrollHeight + bar) + "px";
     };
     const changed = () => { if (reset) reset.hidden = ta.value === first; };
+    ta.addEventListener("keydown", (event) => {
+      const action = codeKeyAction(event);
+      if (action === "release") {
+        tabNavigation = true;
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+      if (event.key === "Tab" && tabNavigation) { tabNavigation = false; return; }
+      tabNavigation = false;
+      if (!action) return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (action === "run") { if (!run.disabled && !event.repeat) run.click(); return; }
+      const edit = editCodeIndent(ta.value, ta.selectionStart, ta.selectionEnd, action === "outdent");
+      ta.value = edit.code;
+      ta.setSelectionRange(edit.selectionStart, edit.selectionEnd);
+      ta.dispatchEvent(new Event("input", { bubbles:true }));
+    });
+    ta.addEventListener("blur", () => { tabNavigation = false; });
     ta.addEventListener("input", () => { fit(); changed(); });
+    new ResizeObserver(fit).observe(ta.parentElement);
     fit();
     changed();
     if (reset) reset.addEventListener("click", () => { ta.value = first; fit(); changed(); ta.focus(); });
     run.addEventListener("click", () => {
+      if (run.disabled) return;
+      const submittedCode = ta.value;
       run.disabled = true;
+      run.setAttribute("aria-busy", "true");
       cell.classList.remove("bad");
       cell.dataset.cellState = "waiting";
       out.textContent = "";
@@ -747,7 +752,7 @@ const CELL_SCRIPT = `
           const lines = [];
           py.setStdout({ batched: (s) => lines.push(s) });
           py.setStderr({ batched: (s) => lines.push(s) });
-          const value = await py.runPythonAsync(ta.value);
+          const value = await py.runPythonAsync(submittedCode);
           if (value !== undefined && value !== null) lines.push(String(value));
           out.textContent = lines.length ? lines.join("\\n") : "(나온 값이 없습니다)";
           st.textContent = "완료";
@@ -759,6 +764,7 @@ const CELL_SCRIPT = `
           cell.dataset.cellState = "error";
         } finally {
           run.disabled = false;
+          run.setAttribute("aria-busy", "false");
         }
       });
     });
@@ -962,15 +968,14 @@ const LECTURE_SCRIPT = `
     mapList.append(button);
     return button;
   });
+  let currentMapItem = null;
   const syncMap = () => {
-    let current = null;
-    mapItems.forEach((item) => {
-      const active = Number(item.dataset.lectureMapScene) === sceneAt;
-      if (active) {
-        item.setAttribute("aria-current", "step");
-        current = item;
-      } else item.removeAttribute("aria-current");
-    });
+    const current = mapItems[sceneAt];
+    if (current !== currentMapItem) {
+      currentMapItem?.removeAttribute("aria-current");
+      current?.setAttribute("aria-current", "step");
+      currentMapItem = current;
+    }
     current?.scrollIntoView({ block:"nearest" });
   };
   const visualCatalog = new Map(scenes.map((scene) => {
@@ -980,8 +985,16 @@ const LECTURE_SCRIPT = `
   const targetsOf = (scene, beat) => beat.targets.map((n) => visualCatalog.get(scene)?.byId.get(n)).filter(Boolean);
   const allVisuals = (scene) => visualCatalog.get(scene)?.visuals || [];
   const visualScaleOf = (scene) => Number.parseFloat(getComputedStyle(scene).getPropertyValue("--scene-visual-scale")) || 1;
+  let thumbLayoutKey = "";
   const syncThumbs = () => {
     const stageBox = deck.querySelector(".lecture-stage")?.getBoundingClientRect();
+    if (!stageBox?.width || !stageBox?.height) return;
+    const thumbWidth = mapItems[0]?.querySelector(".lecture-map-thumb")?.clientWidth || 0;
+    const layoutKey = [stageBox.width, stageBox.height, thumbWidth].join(":");
+    // 축소판의 내용은 고정이다. 장표를 넘길 때마다 모든 복제본의 스타일을 지웠다
+    // 다시 재면 각 장표마다 동기 레이아웃이 생긴다. 실제 크기가 바뀔 때만 배치한다.
+    if (layoutKey === thumbLayoutKey) return;
+    thumbLayoutKey = layoutKey;
     const stageRatio = stageBox?.width > 0 && stageBox?.height > 0 ? stageBox.width / stageBox.height : 16 / 9;
     if (stageBox?.width > 0 && stageBox?.height > 0) {
       deck.style.setProperty("--lecture-stage-ratio", String(stageRatio));
@@ -1005,21 +1018,38 @@ const LECTURE_SCRIPT = `
       if (scale > 0) replica.style.transform = "scale(" + scale + ")";
     });
   };
+  const sceneWidthKeys = new Map();
   const syncSceneWidth = () => {
     const scene = scenes[sceneAt];
     const canvas = scene?.querySelector(".scene-canvas");
     const visual = scene?.querySelector(".visual-carousel");
     if (!scene || !canvas || !visual) return;
+    const stageBox = deck.querySelector(".lecture-stage")?.getBoundingClientRect();
+    if (!stageBox?.width || !stageBox?.height) return;
+    const scale = visualScaleOf(scene);
+    const headHeight = scene.querySelector(".scene-head")?.offsetHeight || 0;
+    const layoutKey = [stageBox.width, stageBox.height, headHeight, scale].join(":");
+    // 장표를 다시 열어도 무대 크기가 같으면 이미 측정한 프레임 폭을 재사용한다.
+    // 매 전환마다 폭을 지우고 다시 읽는 동기 레이아웃을 만들지 않는다.
+    if (sceneWidthKeys.get(scene) === layoutKey) return;
     scene.style.removeProperty("--scene-frame-width");
     const canvasBox = canvas.getBoundingClientRect();
     const visualBox = visual.getBoundingClientRect();
-    const width = Math.min(canvasBox.width, visualBox.width, canvasBox.height * 16 / 9) * visualScaleOf(scene);
-    if (width > 0) scene.style.setProperty("--scene-frame-width", Math.round(width) + "px");
+    const width = Math.min(canvasBox.width, visualBox.width, canvasBox.height * 16 / 9) * scale;
+    if (width > 0) {
+      scene.style.setProperty("--scene-frame-width", Math.round(width) + "px");
+      sceneWidthKeys.set(scene, layoutKey);
+    }
   };
   const syncLayout = () => {
     syncSceneWidth();
     syncThumbs();
   };
+  document.fonts.ready.then(() => {
+    thumbLayoutKey = "";
+    sceneWidthKeys.clear();
+    syncLayout();
+  });
   const flag = (node, name, on, value = "true") => {
     if (on) {
       if (node.dataset[name] !== value) node.dataset[name] = value;
@@ -1086,11 +1116,15 @@ const LECTURE_SCRIPT = `
     else loading();
   };
   scenes.forEach((scene) => scene.querySelectorAll("img, video, .course-embed > iframe").forEach(bindMedia));
+  const decodedSources = new WeakMap();
   const prime = (scene) => {
     if (!scene) return;
     scene.querySelectorAll("img").forEach((img) => {
+      const source = img.currentSrc || img.src;
+      if (decodedSources.get(img) === source) return;
       img.loading = "eager";
-      img.decode?.().catch(() => {});
+      decodedSources.set(img, source);
+      img.decode?.().catch(() => decodedSources.delete(img));
     });
   };
   let paintFrame = 0;
@@ -1158,7 +1192,7 @@ const LECTURE_SCRIPT = `
     }
     const current = globalSlide();
     const ratio = totalSlides > 1 ? (current - 1) / (totalSlides - 1) : 1;
-    deck.style.setProperty("--eddm-lecture-progress", (ratio * 100).toFixed(2) + "%");
+    progress.style.setProperty("--eddm-lecture-progress", (ratio * 100).toFixed(2) + "%");
     progress.textContent = String(current).padStart(2, "0") + " / " + String(totalSlides).padStart(2, "0");
     progress.setAttribute("aria-valuenow", String(Math.round(ratio * 100)));
     syncMap();
@@ -1171,10 +1205,12 @@ const LECTURE_SCRIPT = `
     sceneAt = Math.max(0, Math.min(scenes.length - 1, nextScene));
     frameAt = Math.max(0, Math.min(allVisuals(scenes[sceneAt]).length - 1, visualIndex));
     scenes.forEach((scene, index) => {
-      scene.classList.toggle("on", index === sceneAt);
-      scene.setAttribute("aria-hidden", index === sceneAt ? "false" : "true");
-      scene.toggleAttribute("inert", index !== sceneAt);
-      if (index !== sceneAt) hideAll(scene);
+      const active = index === sceneAt;
+      if (scene.classList.contains("on") === active && scene.getAttribute("aria-hidden") === String(!active)) return;
+      scene.classList.toggle("on", active);
+      scene.setAttribute("aria-hidden", String(!active));
+      scene.toggleAttribute("inert", !active);
+      if (!active) hideAll(scene);
     });
     prime(scenes[sceneAt]);
     prime(scenes[sceneAt + 1]);

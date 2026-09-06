@@ -1,185 +1,331 @@
 {
   "version": 1,
+  "date": "2026-09-05",
+  "scope": "한 절 한 개념으로 다섯 글의 제목·부제·시각물·설명을 맞춘 개정",
   "rounds": [
     {
+      "round": 1,
       "reviewers": [
         {
           "role": "첫 독자",
+          "agent": "five_first_reader",
           "findings": [
             {
-              "quote": "이 코드는 공식 API와 현재 설치 조건을 대조했지만 이 글을 검증한 Windows Python에서는 실행하지 않았습니다.",
-              "why": "실행하지 않았다는 설명보다 출력 블록을 먼저 만나 실제 실행 결과로 오해한다.",
-              "fix": "실행하지 않았다는 사실을 코드 앞에 밝히고 출력 블록을 뺀다"
+              "quote": "DataFusion DataFrame은 Rust와 Apache Arrow로 질의를 먼저 계획하므로 실제 계산은 마지막 동작에서 시작됩니다.",
+              "why": "구현 기술이 지연 실행의 원인처럼 연결됩니다.",
+              "fix": "계산할 내용을 계획하고 결과 요청 때 실행한다고 설명합니다."
             }
           ]
         },
         {
           "role": "구조 편집자",
-          "findings": [
-            {
-              "quote": "|수량|\\n+----+\\n|   5|",
-              "why": "PySpark를 실행하지 못했다는 문단과 실측처럼 보이는 출력이 한 절 안에서 충돌한다.",
-              "fix": "출력은 지우고 두 서울 행을 더하면 5가 되어야 한다는 검증 기준만 남긴다"
-            }
-          ]
+          "agent": "five_structure",
+          "findings": []
         },
         {
           "role": "문체 편집자",
+          "agent": "five_style",
           "findings": [
             {
-              "quote": "cuDF가 값을 합니다.",
-              "why": "도구가 값을 한다는 표현은 무엇이 좋아지는지 바로 읽히지 않는다.",
-              "fix": "큰 계산이 GPU 메모리에 머물 때 검토할 이유가 생긴다고 쓴다"
+              "quote": "이 예제는 API를 확인하기 위한 메모리 표이며, Vaex의 이유는 큰 HDF5나 Arrow 파일을 `open` 으로 열 때 드러납니다.",
+              "why": "Vaex의 이유가 무엇인지 빠졌습니다.",
+              "fix": "이 예제는 API를 확인하기 위한 메모리 표입니다. Vaex의 장점은 큰 HDF5나 Arrow 파일을 `open`으로 열 때 드러납니다."
+            },
+            {
+              "quote": "DataFusion DataFrame은 Rust와 Apache Arrow로 질의를 먼저 계획하므로 실제 계산은 마지막 동작에서 시작됩니다.",
+              "why": "구현 기술이 실행을 늦추는 이유처럼 읽힙니다.",
+              "fix": "실행할 질의를 계획해 두고 결과를 요구할 때 계산한다고 풉니다."
+            },
+            {
+              "quote": "DataFusion DataFrame은 셀을 직접 고치는 분석 노트보다 질의 기능을 프로그램 안에 넣을 때 맞습니다. SQL과 DataFrame 표현식을 같은 Arrow 실행기에 태울 수 있습니다. 다른 데이터 시스템에 질의 엔진을 넣으려는 개발자에게 맞습니다.",
+              "why": "첫 문장과 끝 문장이 결론을 반복하고 실행기에 태운다는 표현이 낯섭니다.",
+              "fix": "DataFusion DataFrame은 셀을 직접 고치는 분석 노트보다 질의 기능을 프로그램 안에 넣을 때 맞습니다. SQL과 DataFrame 표현식을 같은 Arrow 실행기로 처리할 수 있기 때문입니다."
+            },
+            {
+              "quote": "Narwhals DataFrame은 데이터를 직접 실행하는 새 엔진이 아니라 pandas, Polars, Modin, cuDF, PyArrow를 같은 표현식으로 다루는 호환 계층입니다.",
+              "why": "데이터를 실행한다는 목적어와 동사가 어긋납니다.",
+              "fix": "데이터를 직접 실행하는 대신 계산을 직접 수행하는으로 고칩니다."
+            },
+            {
+              "quote": "정렬과 조인처럼 파티션 사이에서 행을 옮기는 셔플은 비싸고, 한 번에 처리하는 파티션 수가 많으면 메모리도 함께 늘어납니다.",
+              "why": "어떤 비용인지 불분명합니다.",
+              "fix": "셔플은 시간과 메모리를 많이 쓴다고 구체화합니다."
+            },
+            {
+              "quote": "두 서울 행의 수량은 3과 2이므로 합계 식이 겨누는 답은 5입니다.",
+              "why": "결과 설명에 낯선 비유가 들어 있습니다.",
+              "fix": "두 서울 행의 수량은 3과 2이므로 이 코드에서 구하려는 합계는 5입니다."
             }
           ]
         },
         {
           "role": "빼기 심사자",
+          "agent": "five_subtraction",
           "findings": [
             {
-              "quote": "DataFrame\\n5",
-              "why": "실행하지 않은 cuDF 절의 예상 출력은 선택 기준을 이해하는 데 필요하지 않고 검증 범위만 흐린다.",
-              "fix": "출력 블록을 통째로 뺀다"
+              "quote": "각 파티션의 열 이름과 자료형을 빈 pandas 표인 메타데이터로 기억하고, 계산 순서는 작업 그래프로 쌓습니다.",
+              "why": "빈 표 메타데이터는 예제 실행이나 Dask 선택에 쓰이지 않는 내부 개념입니다.",
+              "fix": "계산 순서는 작업 그래프로 쌓습니다."
+            },
+            {
+              "quote": "작은 목록은 질의에 직접 들어갈 수 있고 큰 입력은 임시 BigQuery 표로 올라갑니다.",
+              "why": "독자가 조절하지 않는 내부 전달 방식입니다.",
+              "fix": "문장을 지웁니다."
+            },
+            {
+              "quote": "기존 pandas 코드를 그대로 두고 GPU 연산을 시도하는 `cudf.pandas` 가속기도 있습니다. 지원되는 연산은 cuDF로 보내고 나머지는 pandas로 되돌리므로, 실제 작업에서는 어느 연산이 GPU에서 돌았는지 프로파일로 확인해야 합니다.",
+              "why": "직접 cuDF를 쓰는 본문에 별도 가속 경로가 섞입니다.",
+              "fix": "더 해 볼 것에 가속기 소개와 공식 링크 한 줄로 옮깁니다."
             }
           ]
         },
         {
           "role": "검색 독자",
-          "findings": []
+          "agent": "five_search",
+          "findings": [
+            {
+              "quote": "파이썬 데이터프레임 라이브러리 12가지",
+              "why": "제목에 독자의 선택 질문이 드러나지 않습니다.",
+              "fix": "파이썬 데이터프레임 라이브러리 12가지, 내 표에는 무엇을 쓸까"
+            }
+          ]
         }
       ]
     },
     {
+      "round": 2,
       "reviewers": [
         {
           "role": "첫 독자",
+          "agent": "five_first_reader",
           "findings": []
         },
         {
           "role": "구조 편집자",
+          "agent": "five_structure",
           "findings": []
         },
         {
           "role": "문체 편집자",
+          "agent": "five_style",
           "findings": []
         },
         {
           "role": "빼기 심사자",
+          "agent": "five_subtraction",
           "findings": []
         },
         {
           "role": "검색 독자",
-          "findings": []
-        }
-      ]
-    },
-    {
-      "reviewers": [
-        {
-          "role": "첫 독자",
-          "findings": [
-            {
-              "quote": "DataFrame의 자료와 계산을 로컬 메모리로 내려받지 않고 Google BigQuery에 두는 것이 다른 열한 가지와 가장 큰 차이입니다.",
-              "why": "다른 열한 가지가 무엇인지 되짚어야 BigFrames의 실행 경계가 보인다.",
-              "fix": "로컬 메모리와 직접 관리하는 작업자를 이름으로 적어 차이를 바로 보인다"
-            }
-          ]
-        },
-        {
-          "role": "구조 편집자",
-          "findings": [
-            {
-              "quote": "GeoPandas의 `GeoDataFrame` 은 pandas DataFrame에 점, 선, 면을 담는 geometry 열과 좌표계를 더합니다.",
-              "why": "GeoDataFrame은 geometry 열이 핵심이고 좌표계는 비어 있을 수도 있는데 둘을 같은 필수 요소처럼 묶었다.",
-              "fix": "geometry 열은 더하고 좌표계는 함께 기록할 수 있다고 나눈다"
-            }
-          ]
-        },
-        {
-          "role": "문체 편집자",
-          "findings": [
-            {
-              "quote": "다른 열한 가지와 가장 큰 차이입니다.",
-              "why": "비교 대상을 숫자로 대신해 독자가 앞 절을 다시 세어야 한다.",
-              "fix": "계산이 머무는 자리를 직접 쓴다"
-            }
-          ]
-        },
-        {
-          "role": "빼기 심사자",
-          "findings": [
-            {
-              "quote": "전체 `vaex` 패키지는 시각화와 머신러닝 구성 요소도 함께 설치합니다.",
-              "why": "설치되는 구성요소 목록은 Vaex를 고를지 판단하거나 같은 합계 예제를 실행하는 데 필요하지 않다.",
-              "fix": "문장을 빼고 데이터 크기와 파일 형식이라는 선택 기준만 남긴다"
-            }
-          ]
-        },
-        {
-          "role": "검색 독자",
-          "findings": []
-        }
-      ]
-    },
-    {
-      "reviewers": [
-        {
-          "role": "첫 독자",
-          "findings": []
-        },
-        {
-          "role": "구조 편집자",
-          "findings": []
-        },
-        {
-          "role": "문체 편집자",
-          "findings": []
-        },
-        {
-          "role": "빼기 심사자",
-          "findings": []
-        },
-        {
-          "role": "검색 독자",
+          "agent": "five_search",
           "findings": []
         }
       ]
     }
   ],
-  "kept": [],
   "edits": [
+    "섹션마다 실제 대상에 맞는 설명 이미지나 공식 문서 캡처를 추가하고 추상적인 대표 이미지를 교체했다. 실제 캡처에는 원문 링크를 붙이고 생성 이미지는 캡션에서 구분했다. 기존 평가와 사실 확인 기록은 보존했다.",
+    "절 수를 제한하지 않고 개념·실행·확인을 분리했다. 의미가 넓은 절 이미지는 실제 이름이 보이는 표와 네이티브 흐름도로 바꾸고 대표 이미지는 보존했다.",
+    "첫 평가의 지적을 반영한 뒤 hanlint error 0을 확인하고 같은 평가자에게 수정본을 다시 읽혔다.",
+    "공식 화면마다 제공자와 확인한 사용 조건 링크를 붙였다. DataFusion 대체 텍스트와 지원표 출처 문장을 정리하고 기존 독립 평가 이력은 유지했다."
+  ],
+  "verification": [
+    "hanlint 0.0.8: 5편 error 0",
+    "check:blog: 5 posts",
+    "QR 코드 블록 4개 실행, PNG 8개 생성과 크기 확인",
+    "역사 실행 칸 3개 실행 및 문법 수정 뒤 통과 확인",
+    "DataFrame 예제는 문법 검사. 패키지별 전체 실행과 외부 서비스 호출은 반복하지 않음",
+    "원격 이미지 객체 890개와 원본 73개를 목록 2페이지에서 해시·크기로 확인",
+    "TypeScript 검사, Vite 프로덕션 번들 생성, 8개 페이지 SEO 확인",
+    "최종 시각 검증 20260905T021109255Z: 16개 화면, 105개 캡처 확인. 모바일 390px, 목차 이동·맨 위 복귀, 주석 비노출·이미지·절 구성 확인",
+    "공개 산출물의 비공개 교안 문장 누출 검사 통과",
+    "전체 테스트는 기존 외부 산출물 3건의 작업 공간 검사에서 실패. 작업 전 파일이어서 보존"
+  ],
+  "history": [
     {
-      "what": "앞선 수정에서 제목을 파이썬 데이터프레임 라이브러리 6가지로 고치고 H2 여섯 개를 pandas, Polars, Dask, Modin, cuDF, PySpark DataFrame 하나씩으로 다시 짰다"
-    },
-    {
-      "what": "DuckDB, PyArrow, Ibis를 독립 DataFrame 절에서 빼고 각각 데이터베이스, Table과 메모리 규격, 계산 표현식이라는 경계를 도입에서 밝혔다"
-    },
-    {
-      "what": "앞선 여섯 절에서 같은 판매 기록 네 줄과 서울 수량 합계 5를 사용해 문법과 실행 경계를 나란히 비교했다"
-    },
-    {
-      "what": "pandas, Polars, Dask는 현재 환경에서 실행했고 Modin은 pandas 3과 분리한 Python 3.12 환경에서 Ray로 실행했다. cuDF와 PySpark는 실행하지 못한 조건을 코드 앞에 밝히고 출력 블록을 싣지 않았다"
-    },
-    {
-      "what": "hanlint가 찾은 도입 이미지 수, 질문 부재, 긴 도입, cuDF 설치 누락, 관형격 누적을 고쳤다. 공식 패키지 이름 cudf-cu12와 import 이름 cudf를 연결하지 못한 installImport 한 건은 이유가 붙은 인라인 예외로 남겼다"
-    },
-    {
-      "what": "본문에 남은 DataFrame만 기준으로 cells.json, media.json, track.json을 함께 맞추고 기존 이미지 세 장의 역할과 앵커를 새 절에 연결했다"
-    },
-    {
-      "what": "Vaex, DataFusion, GeoPandas, Narwhals, Daft, BigFrames를 각각 독립 H2로 추가해 제목과 비교표를 12가지로 넓혔다"
-    },
-    {
-      "what": "Vaex 4.19.0, DataFusion 54.0.0, GeoPandas 1.1.4, Narwhals 2.25.0, Daft 0.7.24를 격리 환경에서 실행해 DataFrame 종류와 서울 수량 합계 5를 확인했다"
-    },
-    {
-      "what": "BigFrames 2.48.0은 패키지 import와 DataFrame 생성자 서명, Google Cloud의 프로젝트와 위치와 권한 문서까지 확인했다. 과금 프로젝트와 인증이 필요한 BigQuery 계산은 실행 출력으로 제시하지 않았다"
-    },
-    {
-      "what": "GeoDataFrame의 좌표계가 선택임을 바로잡고, Narwhals가 실행 엔진이 아닌 호환 계층이라는 경계와 여섯 새 DataFrame의 선택 조건을 각 절에 남겼다"
-    },
-    {
-      "what": "최종 확인에서 hanlint가 DataFusion 도입부의 같은 종결 반복을 notice로 짚어, 질의 계획과 실제 계산 시점을 인과로 잇고 error와 notice를 모두 0으로 만들었다"
+      "version": 1,
+      "rounds": [
+        {
+          "reviewers": [
+            {
+              "role": "첫 독자",
+              "findings": [
+                {
+                  "quote": "이 코드는 공식 API와 현재 설치 조건을 대조했지만 이 글을 검증한 Windows Python에서는 실행하지 않았습니다.",
+                  "why": "실행하지 않았다는 설명보다 출력 블록을 먼저 만나 실제 실행 결과로 오해한다.",
+                  "fix": "실행하지 않았다는 사실을 코드 앞에 밝히고 출력 블록을 뺀다"
+                }
+              ]
+            },
+            {
+              "role": "구조 편집자",
+              "findings": [
+                {
+                  "quote": "|수량|\\n+----+\\n|   5|",
+                  "why": "PySpark를 실행하지 못했다는 문단과 실측처럼 보이는 출력이 한 절 안에서 충돌한다.",
+                  "fix": "출력은 지우고 두 서울 행을 더하면 5가 되어야 한다는 검증 기준만 남긴다"
+                }
+              ]
+            },
+            {
+              "role": "문체 편집자",
+              "findings": [
+                {
+                  "quote": "cuDF가 값을 합니다.",
+                  "why": "도구가 값을 한다는 표현은 무엇이 좋아지는지 바로 읽히지 않는다.",
+                  "fix": "큰 계산이 GPU 메모리에 머물 때 검토할 이유가 생긴다고 쓴다"
+                }
+              ]
+            },
+            {
+              "role": "빼기 심사자",
+              "findings": [
+                {
+                  "quote": "DataFrame\\n5",
+                  "why": "실행하지 않은 cuDF 절의 예상 출력은 선택 기준을 이해하는 데 필요하지 않고 검증 범위만 흐린다.",
+                  "fix": "출력 블록을 통째로 뺀다"
+                }
+              ]
+            },
+            {
+              "role": "검색 독자",
+              "findings": []
+            }
+          ]
+        },
+        {
+          "reviewers": [
+            {
+              "role": "첫 독자",
+              "findings": []
+            },
+            {
+              "role": "구조 편집자",
+              "findings": []
+            },
+            {
+              "role": "문체 편집자",
+              "findings": []
+            },
+            {
+              "role": "빼기 심사자",
+              "findings": []
+            },
+            {
+              "role": "검색 독자",
+              "findings": []
+            }
+          ]
+        },
+        {
+          "reviewers": [
+            {
+              "role": "첫 독자",
+              "findings": [
+                {
+                  "quote": "DataFrame의 자료와 계산을 로컬 메모리로 내려받지 않고 Google BigQuery에 두는 것이 다른 열한 가지와 가장 큰 차이입니다.",
+                  "why": "다른 열한 가지가 무엇인지 되짚어야 BigFrames의 실행 경계가 보인다.",
+                  "fix": "로컬 메모리와 직접 관리하는 작업자를 이름으로 적어 차이를 바로 보인다"
+                }
+              ]
+            },
+            {
+              "role": "구조 편집자",
+              "findings": [
+                {
+                  "quote": "GeoPandas의 `GeoDataFrame` 은 pandas DataFrame에 점, 선, 면을 담는 geometry 열과 좌표계를 더합니다.",
+                  "why": "GeoDataFrame은 geometry 열이 핵심이고 좌표계는 비어 있을 수도 있는데 둘을 같은 필수 요소처럼 묶었다.",
+                  "fix": "geometry 열은 더하고 좌표계는 함께 기록할 수 있다고 나눈다"
+                }
+              ]
+            },
+            {
+              "role": "문체 편집자",
+              "findings": [
+                {
+                  "quote": "다른 열한 가지와 가장 큰 차이입니다.",
+                  "why": "비교 대상을 숫자로 대신해 독자가 앞 절을 다시 세어야 한다.",
+                  "fix": "계산이 머무는 자리를 직접 쓴다"
+                }
+              ]
+            },
+            {
+              "role": "빼기 심사자",
+              "findings": [
+                {
+                  "quote": "전체 `vaex` 패키지는 시각화와 머신러닝 구성 요소도 함께 설치합니다.",
+                  "why": "설치되는 구성요소 목록은 Vaex를 고를지 판단하거나 같은 합계 예제를 실행하는 데 필요하지 않다.",
+                  "fix": "문장을 빼고 데이터 크기와 파일 형식이라는 선택 기준만 남긴다"
+                }
+              ]
+            },
+            {
+              "role": "검색 독자",
+              "findings": []
+            }
+          ]
+        },
+        {
+          "reviewers": [
+            {
+              "role": "첫 독자",
+              "findings": []
+            },
+            {
+              "role": "구조 편집자",
+              "findings": []
+            },
+            {
+              "role": "문체 편집자",
+              "findings": []
+            },
+            {
+              "role": "빼기 심사자",
+              "findings": []
+            },
+            {
+              "role": "검색 독자",
+              "findings": []
+            }
+          ]
+        }
+      ],
+      "kept": [],
+      "edits": [
+        {
+          "what": "앞선 수정에서 제목을 파이썬 데이터프레임 라이브러리 6가지로 고치고 H2 여섯 개를 pandas, Polars, Dask, Modin, cuDF, PySpark DataFrame 하나씩으로 다시 짰다"
+        },
+        {
+          "what": "DuckDB, PyArrow, Ibis를 독립 DataFrame 절에서 빼고 각각 데이터베이스, Table과 메모리 규격, 계산 표현식이라는 경계를 도입에서 밝혔다"
+        },
+        {
+          "what": "앞선 여섯 절에서 같은 판매 기록 네 줄과 서울 수량 합계 5를 사용해 문법과 실행 경계를 나란히 비교했다"
+        },
+        {
+          "what": "pandas, Polars, Dask는 현재 환경에서 실행했고 Modin은 pandas 3과 분리한 Python 3.12 환경에서 Ray로 실행했다. cuDF와 PySpark는 실행하지 못한 조건을 코드 앞에 밝히고 출력 블록을 싣지 않았다"
+        },
+        {
+          "what": "hanlint가 찾은 도입 이미지 수, 질문 부재, 긴 도입, cuDF 설치 누락, 관형격 누적을 고쳤다. 공식 패키지 이름 cudf-cu12와 import 이름 cudf를 연결하지 못한 installImport 한 건은 이유가 붙은 인라인 예외로 남겼다"
+        },
+        {
+          "what": "본문에 남은 DataFrame만 기준으로 cells.json, media.json, track.json을 함께 맞추고 기존 이미지 세 장의 역할과 앵커를 새 절에 연결했다"
+        },
+        {
+          "what": "Vaex, DataFusion, GeoPandas, Narwhals, Daft, BigFrames를 각각 독립 H2로 추가해 제목과 비교표를 12가지로 넓혔다"
+        },
+        {
+          "what": "Vaex 4.19.0, DataFusion 54.0.0, GeoPandas 1.1.4, Narwhals 2.25.0, Daft 0.7.24를 격리 환경에서 실행해 DataFrame 종류와 서울 수량 합계 5를 확인했다"
+        },
+        {
+          "what": "BigFrames 2.48.0은 패키지 import와 DataFrame 생성자 서명, Google Cloud의 프로젝트와 위치와 권한 문서까지 확인했다. 과금 프로젝트와 인증이 필요한 BigQuery 계산은 실행 출력으로 제시하지 않았다"
+        },
+        {
+          "what": "GeoDataFrame의 좌표계가 선택임을 바로잡고, Narwhals가 실행 엔진이 아닌 호환 계층이라는 경계와 여섯 새 DataFrame의 선택 조건을 각 절에 남겼다"
+        },
+        {
+          "what": "최종 확인에서 hanlint가 DataFusion 도입부의 같은 종결 반복을 notice로 짚어, 질의 계획과 실제 계산 시점을 인과로 잇고 error와 notice를 모두 0으로 만들었다"
+        }
+      ]
     }
   ]
 }

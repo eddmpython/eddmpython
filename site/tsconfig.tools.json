@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "react": ["./node_modules/@types/react"],
+      "react/jsx-runtime": ["./node_modules/@types/react/jsx-runtime.d.ts"]
+    }
+  },
+  "include": ["../blog/posts/007-excel-compare/tool", "../blog/posts/008-pdf-table/tool", "src/spreadsheet.ts", "src/pdfLibraries.ts"]
+}

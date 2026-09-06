@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 import urllib.request
+import urllib.parse
 import os
 import re
 import struct
@@ -17,7 +18,7 @@ sys.dont_write_bytecode = True
 from project_env import load_project_env
 
 
-from media_paths import MASTER_SUFFIX, REPO_ROOT, STAGING_ROOT  # noqa: E402
+from media_paths import MASTER_SUFFIX, REPO_ROOT, staging_root  # noqa: E402
 BLOG_ROOT = REPO_ROOT / "blog"
 POSTS_ROOT = BLOG_ROOT / "posts"
 CATALOG_PATH = BLOG_ROOT / "media" / "catalog.json"
@@ -46,6 +47,7 @@ IMAGEGEN_V2 = "eddmpython-dark-v2"
 IMAGEGEN_PALETTE = "eddmpython-gray-master-v1"
 # 옛 값. 새로 발행하지 않는다. 이미 올라간 자산의 계획을 읽기 위해서만 받는다.
 LEGACY_IMAGEGEN_PALETTES = {"eddmpython-carbon-ivory-sand-v1"}
+imageStyle = json.loads((BLOG_ROOT / "media" / "imageStyle.json").read_text(encoding="utf-8"))
 
 
 SKIP_DIRS = frozenset({"media", "scripts", "embeds"})
@@ -157,9 +159,8 @@ def plan_entry(
     if source_kind not in {"imagegen", "screenshot", "official", "licensed", "recording", "authored"}:
         raise ValueError(f"지원하지 않는 sourceKind: {asset_id}: {source_kind}")
     expected_profiles = {
-        "imagegen": {"dark-editorial-v1", IMAGEGEN_V2},
-        # 손으로 그린 SVG 다이어그램. 교안 저장소의 SVG 가 정본이고 색은 design.ts 토큰을 직접 쓴다.
-        # 렌더는 eddmpython-course/scripts/renderDiagram.mjs 가 맡는다. 회색 원본과 칠하기가 없다.
+        "imagegen": {"dark-editorial-v1", IMAGEGEN_V2, imageStyle["visualProfile"]},
+        # 직접 그린 도식. sourceSvg 또는 sourceModule이 정본이며 색은 design.ts를 읽는다.
         "authored": {"design-token-svg-v1"},
         "screenshot": {"product-screen-v1"},
         "official": {"source-original-v1"},
@@ -174,8 +175,19 @@ def plan_entry(
         raise ValueError(f"{IMAGEGEN_V2}에는 {IMAGEGEN_PALETTE}가 필요함: {asset_id}")
     if source_kind == "imagegen" and not str(entry.get("prompt") or "").strip():
         raise ValueError(f"ImageGen 계획에는 prompt가 필요함: {asset_id}")
-    if source_kind == "authored" and not str(entry.get("sourceSvg") or "").strip():
-        raise ValueError(f"authored 계획에는 정본 SVG 경로 sourceSvg 가 필요함: {asset_id}")
+    if entry["visualProfile"] == imageStyle["visualProfile"]:
+        if entry.get("palettePolicy") != imageStyle["palettePolicy"]:
+            raise ValueError(f"신규 이미지의 palettePolicy가 공통 기준과 다름: {asset_id}")
+        if entry.get("visualMode") not in imageStyle["visualModes"]:
+            raise ValueError(f"신규 이미지에는 visualMode가 필요함: {asset_id}")
+        if entry["visualMode"] == "screen":
+            for key in ("sourceUrl", "captureState"):
+                if not str(entry.get(key) or "").strip():
+                    raise ValueError(f"화면 묘사에는 실제 {key}가 필요함: {asset_id}")
+        if entry["visualMode"] == "diagram" and not str(entry.get("diagramEvidence") or "").strip():
+            raise ValueError(f"도식에는 diagramEvidence가 필요함: {asset_id}")
+    if source_kind == "authored" and not str(entry.get("sourceSvg") or entry.get("sourceModule") or "").strip():
+        raise ValueError(f"authored 계획에는 sourceSvg 또는 sourceModule이 필요함: {asset_id}")
     if source_kind == "screenshot":
         for key in ("sourceUrl", "captureState"):
             if not str(entry.get(key) or "").strip():
@@ -343,7 +355,7 @@ def mp4_dimensions(data: bytes) -> tuple[int, int]:
 
 
 def staging_path(post: str, key: str, explicit: str | None) -> Path:
-    stage_dir = (STAGING_ROOT / post).resolve()
+    stage_dir = (staging_root() / post).resolve()
     if explicit:
         path = Path(explicit)
         if not path.is_absolute():
@@ -370,7 +382,7 @@ def master_staging_path(post: str, key: str) -> Path | None:
     원본 이름은 `<assetKey>.master.png` 라 `staging_path` 가 찾는 `<assetKey>.png` 와 겹치지
     않는다. 파일 stem 이 `<assetKey>.master` 이기 때문이다.
     """
-    path = (STAGING_ROOT / post / f"{key}{MASTER_SUFFIX}").resolve()
+    path = (staging_root() / post / f"{key}{MASTER_SUFFIX}").resolve()
     return path if path.is_file() else None
 
 
@@ -629,7 +641,7 @@ def publish(
     local_path.unlink()
     if master_local:
         master_local.unlink()
-    if local_path.parent == (STAGING_ROOT / post).resolve() and not any(local_path.parent.iterdir()):
+    if local_path.parent == (staging_root() / post).resolve() and not any(local_path.parent.iterdir()):
         local_path.parent.rmdir()
     what = "발행본과 원본" if master_sha else "발행본"
     print(f"{asset_id}: {what} HF 업로드, catalog와 본문 반영, staging 정리 완료")
@@ -639,9 +651,9 @@ def publish(
 def verify_remote() -> None:
     """catalog 의 객체가 원격에 그대로 있는지 본다.
 
-    HF 트리 API 는 인증 없이 요청 한 번으로 저장소의 모든 파일과 그 LFS oid 를 준다.
+    HF 트리 API 의 Link 헤더를 따라 마지막 페이지까지 파일과 LFS oid 를 모은다.
     LFS oid 는 그 파일 내용의 sha256 이고, 우리 객체 주소가 바로 그 값이다. 그래서 바이트를
-    하나도 안 받고 콘텐츠 주소 계약 자체를 검증할 수 있다. 실측으로 649개 항목이 0.4초에 온다.
+    하나도 안 받고 콘텐츠 주소 계약 자체를 검증할 수 있다.
 
     존재만 보는 것으로는 부족하다. 발행본은 잃어도 원본에서 다시 칠하면 되지만 **원본은
     그곳이 유일본이다.** 로컬 사본을 두지 않기로 했으므로 여기가 유일한 감시 지점이다.
@@ -663,14 +675,27 @@ def verify_remote() -> None:
     token = optional_token()
     if token:
         headers["Authorization"] = f"Bearer {token}"
-    request = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(request, timeout=120) as response:
-        tree = json.loads(response.read())
-    remote = {
-        str(item.get("path")): item
-        for item in tree
-        if isinstance(item, dict) and item.get("type") == "file"
-    }
+    tree_path = urllib.parse.urlsplit(url).path
+    visited: set[str] = set()
+    remote: dict[str, dict] = {}
+    while url:
+        parsed = urllib.parse.urlsplit(url)
+        if parsed.scheme != "https" or parsed.netloc != "huggingface.co" or parsed.path != tree_path:
+            raise RuntimeError("원격 목록의 다음 페이지가 같은 저장소 API가 아닙니다")
+        if url in visited:
+            raise RuntimeError("원격 목록의 다음 페이지가 반복됩니다")
+        visited.add(url)
+        request = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(request, timeout=120) as response:
+            tree = json.loads(response.read())
+            link = response.headers.get("Link", "")
+        if not isinstance(tree, list):
+            raise RuntimeError("원격 파일 목록이 배열이 아닙니다")
+        for item in tree:
+            if isinstance(item, dict) and item.get("type") == "file":
+                remote[str(item.get("path"))] = item
+        next_page = re.search(r'<([^>]+)>\s*;\s*rel="?next"?', link)
+        url = urllib.parse.urljoin(url, next_page.group(1)) if next_page else ""
 
     master_sha = {
         str(record["masterSha256"])
@@ -711,7 +736,7 @@ def verify_remote() -> None:
         )
     print(
         f"블로그 미디어 원격 검증: 객체 {checked}개 내용 해시 일치 "
-        f"(원본 {len(master_sha)}개 포함, 요청 1회)"
+        f"(원본 {len(master_sha)}개 포함, 요청 {len(visited)}회)"
     )
 
 

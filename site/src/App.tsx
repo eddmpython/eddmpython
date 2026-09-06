@@ -3,6 +3,7 @@ import { BrowserRouter, useLocation } from "react-router-dom";
 import { scrollToHashTarget } from "./hashNavigation";
 import { Routes } from "./routes";
 import { designCssVars } from "./design";
+import { CODE_CELL_STYLE } from "./codeCell";
 
 /** 라우트가 바뀌면 맨 위로. 해시가 있으면 그 요소로. */
 function ScrollBehavior() {
@@ -21,6 +22,7 @@ export default function App() {
   return (
     <>
       <style data-eddm-design>{designCssVars("dark")}</style>
+      <style data-eddm-code-cell>{CODE_CELL_STYLE}</style>
       <BrowserRouter>
         <ScrollBehavior />
         <Routes />

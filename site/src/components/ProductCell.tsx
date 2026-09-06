@@ -42,6 +42,7 @@ export function ProductCell({ product }: { product: Product }) {
 
       <div id={panelId}>
         <PyCell
+          key={`${product.id}-${tab}`}
           code={code}
           onCodeChange={setCode}
           packages={product.cellPackages}

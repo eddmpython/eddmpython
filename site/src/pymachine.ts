@@ -4,17 +4,20 @@ const ENGINE_INDEX = "https://cdn.jsdelivr.net/pyodide/v314.0.2/full/";
 export type Machine = {
   runAsync: (code: string) => Promise<unknown>;
   loadPackages: (packages: string[]) => Promise<unknown>;
-  /**
-   * 실행 중 stdout 을 받아 갈 핸들러. `null` 로 되돌리면 다시 기본 동작이다.
-   *
-   * 이것을 걸지 않으면 `print` 출력이 어디에도 안 남고 `runAsync` 의 반환값만 남는다.
-   * 셀 예제는 대부분 `print` 로 결과를 보여 주므로 걸지 않으면 화면에 `(반환값 없음)` 만 뜬다.
-   */
-  setStdout?: (handler: ((text: string) => void) | null) => void;
-  setStderr?: (handler: ((text: string) => void) | null) => void;
 };
 
 let booting: Promise<Machine> | null = null;
+let machineQueue: Promise<unknown> = Promise.resolve();
+
+/** 패키지 설치와 출력 수집을 포함한 작업 전체를 순서대로 실행한다. */
+export function withMachine<T>(job: (machine: Machine) => Promise<T>, onStart?: () => void): Promise<T> {
+  const task = machineQueue.then(async () => {
+    onStart?.();
+    return job(await getMachine());
+  });
+  machineQueue = task.catch(() => undefined);
+  return task;
+}
 
 /**
  * 페이지 전체가 pyproc 머신 하나를 나눠 쓴다.

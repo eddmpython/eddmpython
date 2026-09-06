@@ -12,7 +12,7 @@
  *
  * 사용: node scripts/blog-shot.mjs [주소] [slug]
  *   기본은 http://localhost:8788 과 python-qr 이다.
- *   로컬은 `npx wrangler dev --port 8788 --persist-to ../../eddmpython.out/wrangler-state` 로 띄운다.
+ *   로컬은 `node scripts/siteWrangler.mjs dev --port 8788`로 띄운다.
  *   Worker 를 거쳐야 CSP 가 실제로 붙으므로 vite preview 로는 이 검사가 성립하지 않는다.
  */
 import { mkdir, writeFile } from "node:fs/promises";
@@ -21,7 +21,7 @@ import { fileURLToPath } from "node:url";
 import { PyProcControlClient } from "pyproc/control";
 
 const SITE = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const OUT = resolve(SITE, "../../eddmpython.out/blog-shot");
+const OUT = resolve(executionRoot(), "blog-shot");
 const base = (process.argv[2] ?? "http://localhost:8788").replace(/\/$/, "");
 const slug = process.argv[3] ?? "python-qr";
 const target = `${base}/blog/${slug}`;
@@ -162,3 +162,4 @@ for (const viewport of VIEWPORTS) {
 const failed = checks.filter((ok) => !ok).length;
 console.log(failed ? `\n검사 ${failed} 개 실패` : "\n검사 전부 통과");
 process.exit(failed ? 1 : 0);
+import { executionRoot } from "./executionWorkspace.mjs";

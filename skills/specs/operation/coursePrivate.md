@@ -22,7 +22,6 @@ status: observed
 sideProject/
   eddmpython/          공개. 랜딩, 블로그, 강의장 Worker
   eddmpython-course/   비공개. 교안. 여기가 정본이다
-  eddmpython.out/      두 저장소의 산출물. 저장소 밖이다
 ```
 
 ## 2026-08-20 에 저장소를 나눴다

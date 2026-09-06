@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "examples": {
+    "csv-parquet-code": {
+      "title": "CSV 코드의 앞자리 0 지키기",
+      "description": "같은 CSV를 자동 추정과 문자열 지정으로 읽습니다. 0012를 0007로 바꿔 두 결과를 비교해 보세요",
+      "hint": "브라우저 메모리에서만 읽습니다. 첫 줄은 자동 추정, 두 번째 줄은 code를 문자열로 지정한 결과입니다.",
+      "code": "import io\nimport pyarrow as pa\nimport pyarrow.csv as csv\n\ncsvText = '\"code\",\"region\",\"qty\"\\n\"0012\",\"서울\",3\\n\"0013\",\"부산\",5\\n\"0014\",\"서울\",2\\n'\ndata = csvText.encode(\"utf-8\")\nsingle = csv.ReadOptions(use_threads=False)\n\nguessed = csv.read_csv(io.BytesIO(data), read_options=single)\noptions = csv.ConvertOptions(column_types={\"code\": pa.string()})\nfixed = csv.read_csv(io.BytesIO(data), read_options=single, convert_options=options)\n\nprint(guessed[\"code\"].to_pylist())\nprint(fixed[\"code\"].to_pylist())\n",
+      "packages": [
+        "pyarrow==22.0.0"
+      ],
+      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
+    },
+    "csv-parquet-schema": {
+      "title": "Parquet에 남은 자료형 확인",
+      "description": "표를 Parquet 바이트로 저장한 뒤 스키마와 code 값을 읽습니다.",
+      "hint": "buffer는 메모리 안의 파일입니다. 내 컴퓨터에 파일을 남기려면 맨 위 도구의 내려받기 버튼을 누릅니다.",
+      "code": "import io\nimport pyarrow as pa\nimport pyarrow.parquet as pq\n\ntable = pa.table({\n    \"code\": [\"0012\", \"0013\", \"0014\"],\n    \"region\": [\"서울\", \"부산\", \"서울\"],\n    \"qty\": [3, 5, 2],\n})\nbuffer = io.BytesIO()\npq.write_table(table, buffer, compression=\"snappy\")\n\nprint(pq.read_schema(io.BytesIO(buffer.getvalue())))\nrestored = pq.read_table(io.BytesIO(buffer.getvalue()), use_threads=False)\nprint(restored[\"code\"].to_pylist())\n",
+      "packages": [
+        "pyarrow==22.0.0"
+      ],
+      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
+    },
+    "csv-parquet-columns": {
+      "title": "Parquet에서 qty만 읽기",
+      "description": "columns에 읽을 열 이름을 넣습니다. region을 추가하면 출력에 지역도 나타납니다.",
+      "hint": "앞의 실행 칸을 돌리지 않아도 됩니다. 이 코드가 표를 만든 뒤 메모리에 저장했다가 다시 읽습니다.",
+      "code": "import io\nimport pyarrow as pa\nimport pyarrow.parquet as pq\n\ntable = pa.table({\n    \"code\": [\"0012\", \"0013\", \"0014\"],\n    \"region\": [\"서울\", \"부산\", \"서울\"],\n    \"qty\": [3, 5, 2],\n})\nbuffer = io.BytesIO()\npq.write_table(table, buffer, compression=\"snappy\")\nselected = pq.read_table(\n    io.BytesIO(buffer.getvalue()), columns=[\"qty\"], use_threads=False,\n)\n\nprint(selected.column_names)\nprint(selected.to_pydict())\n",
+      "packages": [
+        "pyarrow==22.0.0"
+      ],
+      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor"
+    },
+    "csv-parquet-compression": {
+      "title": "Parquet의 압축만 바꿔 비교",
+      "description": "같은 십만 행을 압축 없이, Snappy 압축으로 각각 저장해 실제 바이트 수를 확인합니다.",
+      "hint": "rowCount를 1000으로 바꾸면 천 행에서도 압축 여부를 비교합니다. 파일은 메모리에만 만듭니다.",
+      "packages": [
+        "pyarrow==22.0.0"
+      ],
+      "fullUrl": "https://eddmpython.com/codaro/run/?surface=editor#editor",
+      "code": "import io\nimport pyarrow as pa\nimport pyarrow.parquet as pq\n\nrowCount = 100000\ntable = pa.table({\n    \"code\": [f\"{i % 1000 + 12:04d}\" for i in range(rowCount)],\n    \"region\": [[\"서울\", \"부산\", \"서울\", \"대구\"][i % 4] for i in range(rowCount)],\n    \"qty\": [[3, 5, 2, 7][i % 4] for i in range(rowCount)],\n})\nfor label, compression in [(\"압축 없음\", None), (\"Snappy\", \"snappy\")]:\n    buffer = io.BytesIO()\n    pq.write_table(table, buffer, compression=compression)\n    print(f\"{label}: {len(buffer.getvalue()):,}바이트\")\n"
+    }
+  }
+}

@@ -1055,7 +1055,7 @@ check("읽기 모드는 실행 칸을 16대9 캐러셀에 넣지 않고 본문 �
   assert.ok(!html.includes("data-carousel-item"));
   // 실행 칸은 시각물 번호를 받지 않는다
   assert.equal(visuals, 0);
-  assert.ok(html.includes('<section class="cell" data-cell="expense-variables"'));
+  assert.ok(html.includes('<section class="cell eddm-cell" data-cell="expense-variables"'));
   assert.ok(html.indexOf("<p>실행 전 설명입니다.</p>") < html.indexOf('data-cell="expense-variables"'));
   assert.ok(html.indexOf('data-cell="expense-variables"') < html.indexOf("<p>실행 뒤 설명입니다.</p>"));
 });
@@ -1157,7 +1157,12 @@ check("실행 칸은 실행 전에 상태 글자와 자리 표시 출력을 두�
   assert.ok(!html.includes("실행을 누르면"));
   assert.ok(html.includes('<div class="cell-out" data-output hidden>'));
   assert.ok(html.includes('<button type="button" class="cell-reset" data-reset hidden>처음으로</button>'));
-  assert.ok(html.includes('<button type="button" class="cell-run" data-run>'));
+  assert.ok(html.includes('<button type="button" class="cell-run" data-run aria-label="실행"'));
+  assert.ok(html.includes('aria-keyshortcuts="Shift+Enter"'));
+  assert.ok(html.includes('class="cell-body"><div class="cell-gutter"'));
+  assert.ok(html.indexOf('class="cell-run"') < html.indexOf('<textarea'));
+  assert.ok(html.indexOf('class="cell-run"') > html.indexOf('class="cell-body"'));
+  assert.ok(html.includes('Tab 들여쓰기'));
   // 첫 높이는 줄 수와 같다. 스크립트가 맞춘 높이와 같아야 열릴 때 출렁이지 않는다.
   assert.ok(html.includes('rows="2"'));
   assert.ok(html.includes('aria-label="부서와 기준금액 바꾸기 실습"'));

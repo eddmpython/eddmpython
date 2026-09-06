@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { join, resolve, sep } from "node:path";
 import { createHash } from "node:crypto";
 import { inspect } from "./check-workspace.mjs";
+import { executionRoot } from "./executionWorkspace.mjs";
 
 /*
  * 산출물 폴더 검사기의 우회로를 잡는다.
@@ -188,10 +189,9 @@ for (const [label, body] of [
       `정본 ${found ? found[1] : "(못 읽음)"} / 계약 ${actual}`,
     );
   }
-  const outputDir = source.match(/^OUTPUT_DIR = "([^"]*)"$/m);
   check(
-    "OUTPUT_ROOT 이 파이썬 정본의 이름으로 끝난다",
-    outputDir !== null && contract.OUTPUT_ROOT.endsWith(outputDir[1]),
+    "OUTPUT_ROOT이 현재 작업 공간과 같다",
+    contract.OUTPUT_ROOT === executionRoot(),
     `${contract.OUTPUT_ROOT}`,
   );
 }
@@ -255,39 +255,28 @@ ${two}`],
   check("정본에 없으면 죽는다", missing);
 }
 
-/* 15. 산출물을 쓰는 곳들이 전부 게이트가 보는 폴더 안에 있다.
- *
- * 이것이 갈라지면 게이트는 실패하지 않는다. 아무도 안 쓰는 폴더를 보며
- * "산출물 폴더가 아직 없습니다" 를 찍고 exit 0 으로 통과한다. 검사기가 눈을 감은 채
- * 초록불을 띄우는 것이라 가장 알아채기 어렵다. */
+/* 15. 모든 작성자가 같은 실행 경로 함수를 소비한다. 고정 외부 경로로 돌아가지 않는다. */
 {
-  const { OUTPUT_ROOT } = await import("./workspace-contract.mjs");
   const SITE = fileURLToPath(new URL("..", import.meta.url));
-  const REPO = resolve(SITE, "..");
   const writers = [
-    ["vite 클라이언트", "vite.config.ts", /const OUT_DIR = "([^"]+)"/, SITE],
-    ["vite SSR", "vite.config.ts", /const SSR_DIR = "([^"]+)"/, SITE],
-    ["wrangler 자산", "wrangler.jsonc", /"directory": "([^"]+)"/, SITE],
-    ["시각 검증", "scripts/visual-api.mjs", /OUTPUT_ROOT = resolve\(SITE_ROOT, "([^"]+)"\)/, SITE],
+    "vite.config.ts", "scripts/siteWrangler.mjs", "scripts/visual-api.mjs",
+    "scripts/check-leak.mjs", "scripts/check-seo.mjs", "scripts/admin-shot.mjs",
+    "scripts/blog-shot.mjs", "scripts/classroom-shot.mjs", "scripts/classroom-audit.mjs",
+    "scripts/codeCellShot.mjs", "scripts/giscus-probe.mjs",
   ];
-  for (const [label, file, pattern, base] of writers) {
+  for (const file of writers) {
     const source = readFileSync(join(SITE, file), "utf-8");
-    const found = source.match(pattern);
-    const target = found ? resolve(base, found[1]) : "";
-    check(
-      `${label} 이 게이트가 보는 폴더 안이다`,
-      found !== null && (target === OUTPUT_ROOT || target.startsWith(OUTPUT_ROOT + sep)),
-      `${found ? found[1] : "(패턴 못 찾음)"} -> ${target}`,
-    );
+    check(`${file}이 작업 경로를 쓴다`, source.includes("executionRoot()") && !source.includes("eddmpython.out"));
   }
-  const leak = readFileSync(join(SITE, "scripts/check-leak.mjs"), "utf-8");
-  const leakPath = leak.match(/resolve\(REPO, "\.\.", "([^"]+)", "([^"]+)"\)/);
-  const leakTarget = leakPath ? resolve(REPO, "..", leakPath[1], leakPath[2]) : "";
-  check(
-    "누출 검사가 게이트가 보는 폴더 안이다",
-    leakPath !== null && leakTarget.startsWith(OUTPUT_ROOT + sep),
-    leakTarget,
-  );
+  check("Wrangler에 고정 자산 경로가 없다", !readFileSync(join(SITE, "wrangler.jsonc"), "utf8").includes('"directory"'));
+  for (const value of ["", ".", resolve(SITE, "../.out"), resolve(SITE, "../../eddmpython.out"), resolve(executionRoot(), ".."), resolve(executionRoot(), "nested")]) {
+    let rejected = false;
+    try { executionRoot(value); } catch { rejected = true; }
+    check(`잘못된 실행 경로 차단: ${value || "미지정"}`, rejected);
+  }
+  const python = process.platform === "win32" ? "../.venv/Scripts/python.exe" : "../.venv/bin/python";
+  const actual = execFileSync(python, ["-B", "-c", "import sys; sys.path.insert(0, '../blog/scripts'); from media_paths import execution_root; print(execution_root())"], { encoding: "utf8" }).trim();
+  check("Python과 JavaScript가 같은 작업 경로를 쓴다", resolve(actual) === executionRoot());
 }
 
 for (const { label, ok, detail } of cases) {

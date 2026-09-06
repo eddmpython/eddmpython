@@ -28,7 +28,7 @@ status: observed
 |---|---|
 | 워커 이름 | `eddmpython-site` |
 | 진입점 | `site/worker.ts` |
-| 정적 자산 | `../../eddmpython.out/site-dist` (저장소 밖) |
+| 정적 자산 | 현재 `EDDMPYTHON_RUN_DIR`의 `site-dist` |
 | 도메인 | `eddmpython.com`, `www.eddmpython.com` |
 | 설정 | `site/wrangler.jsonc` |
 
@@ -55,6 +55,9 @@ status: observed
 검증이 실패하면 원인을 먼저 확인하고, 새 배포가 운영을 깨뜨렸다면 기록한 version id로 롤백한다.
 
 ## 배포 절차
+
+[workspace.md](workspace.md)에 따라 작업 공간을 먼저 지정한다. `siteWrangler.mjs`가 같은
+작업의 빌드를 `--assets`로 전달한다. 의존성은 `site/node_modules`에서 읽는다.
 
 ```bash
 cd site

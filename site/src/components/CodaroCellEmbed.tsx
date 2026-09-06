@@ -55,30 +55,20 @@ export function CodaroCellEmbed({ exampleId }: { exampleId: string }) {
   return (
     <aside
       aria-label={`실습 셀: ${example.title}`}
-      className="my-8 overflow-hidden rounded-2xl border border-[var(--eddm-line-base)] bg-[var(--eddm-raise)]"
+      className="my-10 min-w-0"
     >
-      <header className="border-b border-[var(--eddm-line-base)] px-4 py-4 md:px-5">
-        <p className="font-mono text-[11px] tracking-[0.14em] text-ivory/38 uppercase">
-          실습 셀
-        </p>
-        <h3 className="mt-2 text-base font-medium text-ivory md:text-lg">
-          {example.title}
-        </h3>
-        <p className="mt-2 text-sm leading-relaxed text-ivory/58">
-          {example.description}
-        </p>
-      </header>
-      <div className="p-3 md:p-4">
         <PyCell
+          key={exampleId}
           code={code}
           onCodeChange={setCode}
+          title={example.title}
+          description={example.description}
           packages={example.packages ?? []}
           hint={example.hint}
-          minRows={10}
+          minRows={2}
         />
-      </div>
-      <footer className="flex flex-col gap-2 border-t border-[var(--eddm-line-base)] px-4 py-3 text-xs leading-relaxed text-ivory/48 sm:flex-row sm:items-center sm:justify-between md:px-5">
-        <span>이 셀은 입문 예제 실행용이며 강검증과 진도 저장은 전체 Web Run에서 이어집니다</span>
+      <footer className="flex flex-wrap items-baseline justify-between gap-2 text-xs leading-relaxed text-ivory/48">
+        <span>설치 없이 이 브라우저에서 실행합니다. 수정한 코드는 새로고침하면 초기화됩니다.</span>
         <a
           href={example.fullUrl}
           target="_blank"

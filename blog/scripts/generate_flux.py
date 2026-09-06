@@ -1,11 +1,11 @@
-"""plan의 섹션 근거와 imagegen 장면을 합쳐 FLUX 1.1 Pro로 생성한다.
+"""이전 회색 원본과 교안용 FLUX 생성 경로. 신규 블로그는 내장 ImageGen을 쓴다.
 
 사용: python -X utf8 blog/scripts/generate_flux.py <post-id> [--only key1,key2] [--force] [--plan 경로]
 - 계약: skills/specs/operation/blogMedia.md. 블로그는 글 하나가 폴더 하나이고
   blog/posts/<글 폴더>/media.json 이 그 글의 이미지 계획 정본이다.
 - 교안은 --plan ../eddmpython-course/curriculum/<카테고리>/plan.json 을 준다. 본문 문장이 공개 저장소로
   새지 않게 plan만 갈라 두었고 이미지와 catalog는 블로그와 공유한다.
-- 출력: ../eddmpython.out/blog-media/<post-id>/<assetKey>.master.png (색 없는 회색 원본, Git 밖)
+- 출력: 현재 작업 실행 공간의 blog-media/<post-id>/<assetKey>.master.png (Git 밖)
 - 이 스크립트는 색을 만들지 않는다. 강조색은 paint_media.py 가 site/src/design.ts 에서 읽어 입힌다.
   강조색이 바뀌면 원본은 그대로 두고 paint_media.py 만 다시 돌린다.
 - 키: 저장소 루트 .env의 REPLICATE_API_TOKEN. 값은 어디에도 출력하지 않는다.
@@ -21,12 +21,10 @@ import sys
 import time
 from pathlib import Path
 
-import requests
-
 sys.dont_write_bytecode = True
 from project_env import load_project_env
 
-from media_paths import MASTER_SUFFIX, REPO_ROOT, STAGING_ROOT  # noqa: E402
+from media_paths import MASTER_SUFFIX, REPO_ROOT, staging_root  # noqa: E402
 POSTS_ROOT = REPO_ROOT / "blog" / "posts"
 API = "https://api.replicate.com/v1/predictions"
 MODEL = "black-forest-labs/flux-1.1-pro"
@@ -41,6 +39,9 @@ PALETTE_POLICY = "eddmpython-gray-master-v1"
 
 def composePrompt(asset: dict[str, object]) -> str:
     """본문 주장과 실제 피사체를 자유 장면 지시보다 높은 우선순위로 붙인다."""
+    style = json.loads((REPO_ROOT / "blog" / "media" / "imageStyle.json").read_text(encoding="utf-8"))
+    if asset.get("visualProfile") == style["visualProfile"]:
+        raise ValueError("신규 블로그 이미지와 도식은 내장 ImageGen으로 제작한다. site/scripts/imagePrompt.mjs로 프롬프트를 준비한다.")
     required = (
         "sectionHeading",
         "contentAnchor",
@@ -63,6 +64,7 @@ def composePrompt(asset: dict[str, object]) -> str:
         f"Relationship the image must explain: {asset['visualRelationship']}",
         "Do not replace the concrete subject with a generic workshop, road, gate, machine, or decorative metaphor.",
         "The image is rejected if a reader cannot connect it to this section without guessing.",
+        "Use a 16:9 composition. Keep the subject and every essential connection inside an 8 percent safe margin.",
     ]
     if asset.get("visualProfile") == COLOR_PROFILE:
         if asset.get("palettePolicy") != PALETTE_POLICY:
@@ -123,7 +125,9 @@ def loadToken() -> str:
     return token
 
 
-def create(headers: dict[str, str], prompt: str, aspectRatio: str = "3:2", model: str = MODEL) -> str:
+def create(headers: dict[str, str], prompt: str, aspectRatio: str = "16:9", model: str = MODEL) -> str:
+    import requests
+
     payload = {
         "version": model,
         "input": {
@@ -142,6 +146,8 @@ def create(headers: dict[str, str], prompt: str, aspectRatio: str = "3:2", model
 
 
 def poll(headers: dict[str, str], pid: str, timeout: int = 240) -> str:
+    import requests
+
     deadline = time.time() + timeout
     while time.time() < deadline:
         r = requests.get(f"{API}/{pid}", headers=headers, timeout=30)
@@ -181,10 +187,9 @@ def main() -> None:
     )
     if plan.get("version") not in (1, 2) or not validPromptContract:
         sys.exit("media.json 의 section-grounded-v2 계약이나 교안 plan 의 course-visual-16x9-v1 계약이 필요하다.")
-    # 블로그 글은 3:2 로 만들고, 교안 시각물은 강의 무대와 같은 16:9 로 만든다
-    # (정본: eddmpython-course/scripts/course-scene.mjs 의 generationGuide.canvas).
+    # 블로그도 교안과 같은 가로 프레임을 사용한다. 운영 계약은 blogMedia.md가 소유한다.
     coursePlan = plan.get("visualPlanContract") == 2
-    aspectRatio = "16:9" if coursePlan else "3:2"
+    aspectRatio = "16:9"
     model = COURSE_MODEL if coursePlan else MODEL
     assets = plan.get("assets", {})
     onlyKeys = {k.strip() for k in args.only.split(",") if k.strip()}
@@ -200,8 +205,12 @@ def main() -> None:
     if not targets:
         sys.exit(f"{plan_path}에 {args.post}의 imagegen 자산이 없다.")
 
+    # 생성 경로가 맞는지 자격증명 조회와 유료 요청 전에 확인한다.
+    prompts = {asset["assetKey"]: composePrompt(asset) for asset in targets}
+    import requests
+
     headers = {"Authorization": f"Token {loadToken()}", "Content-Type": "application/json"}
-    outDir = STAGING_ROOT / args.post
+    outDir = staging_root() / args.post
     outDir.mkdir(parents=True, exist_ok=True)
 
     done = 0
@@ -211,7 +220,7 @@ def main() -> None:
         if dest.exists() and not args.force:
             print(f"skip {key}: 이미 있음")
             continue
-        prompt = composePrompt(asset)
+        prompt = prompts[key]
         print(f"generate {key} ...")
         pid = create(headers, prompt, aspectRatio, model)
         url = poll(headers, pid)

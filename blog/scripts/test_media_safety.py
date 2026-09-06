@@ -25,6 +25,10 @@ import publish_media
 
 
 class _FakeResponse(io.BytesIO):
+    def __init__(self, data, headers=None):
+        super().__init__(data)
+        self.headers = headers or {}
+
     def __enter__(self):
         return self
 
@@ -239,6 +243,40 @@ def verifyCatchesRemoteDrift() -> None:
             assert "295" not in out.getvalue()
             assert "일치" in out.getvalue()
 
+            # 원본이 두 번째 페이지에 있어도 첫 페이지 누락으로 오인하지 않는다.
+            requests = []
+            next_url = "https://huggingface.co/api/datasets/example/none/tree/main?cursor=second"
+
+            def paged(request, timeout=0):
+                requests.append(request.full_url)
+                if len(requests) == 1:
+                    return _FakeResponse(json.dumps([whole[0]]).encode(), {"Link": f'<{next_url}>; rel="next"'})
+                return _FakeResponse(json.dumps([whole[1]]).encode())
+
+            urllib.request.urlopen = paged
+            with contextlib.redirect_stdout(io.StringIO()) as out:
+                publish_media.verify_remote()
+            assert requests[1] == next_url and len(requests) == 2
+            assert "요청 2회" in out.getvalue()
+
+            # 다음 페이지 링크에 자격증명을 싣고 다른 사이트로 나가거나 무한 반복하지 않는다.
+            first_url = "https://huggingface.co/api/datasets/example/none/tree/main?recursive=true"
+            for unsafe_url in ["https://example.com/steal", first_url]:
+                calls = []
+
+                def unsafe(request, timeout=0):
+                    calls.append(request.full_url)
+                    return _FakeResponse(b"[]", {"Link": f'<{unsafe_url}>; rel="next"'})
+
+                urllib.request.urlopen = unsafe
+                try:
+                    publish_media.verify_remote()
+                except RuntimeError:
+                    pass
+                else:
+                    raise AssertionError("안전하지 않은 다음 페이지를 허용했다")
+                assert len(calls) == 1
+
             # 죽는 것만으로는 부족하다. 비상 상황에서 무엇이 잘못됐는지 다른 말로 알려야 한다.
             # 원본이 사라진 것과 해시를 못 본 것은 대응이 다르다.
             cases = {
@@ -322,7 +360,44 @@ def findNeverCallsMasterUnused() -> None:
     print("  찾기: 원본을 안 쓰는 중이라 부르지 않는다")
 
 
+def directImagePlan() -> None:
+    """새 스타일 계획을 발행기가 읽고 잘못된 생성 경로는 유료 요청 전에 거부한다."""
+    import generate_flux
+
+    style = publish_media.imageStyle
+    entry = {
+        "role": "section", "sectionHeading": "파일 읽기", "sectionSubtitle": "문자열 값을 확인합니다",
+        "visualProfile": style["visualProfile"], "palettePolicy": style["palettePolicy"],
+        "sourceKind": "imagegen", "sourcePolicy": "auto", "visualMode": "screen",
+        "alt": "실제 파일 화면", "placement": "H3 부제 바로 뒤", "narrativeUse": "값 대조",
+        "contentAnchor": "문자열로 읽으면 0012가 남습니다.", "visualSubject": "code 열",
+        "visualRelationship": "파일의 문자와 읽은 값이 같다", "prompt": "실제 화면의 code 열 확대",
+        "sourceUrl": "https://example.com/product", "captureState": "0012를 읽은 화면",
+    }
+
+    def check(candidate):
+        return publish_media.plan_entry({"version": 1, "promptContract": "section-grounded-v2", "assets": {"screen": candidate}}, "999-test/screen")
+
+    assert check(entry)["visualMode"] == "screen"
+    for candidate in ({**entry, "captureState": ""}, {**entry, "palettePolicy": "wrong"}, {**entry, "visualMode": "diagram"}):
+        try:
+            check(candidate)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("근거 없는 신규 이미지 계획을 통과시켰다")
+    assert check({**entry, "visualMode": "diagram", "diagramEvidence": "측정 결과"})
+    try:
+        generate_flux.composePrompt(entry)
+    except ValueError as error:
+        assert "내장 ImageGen" in str(error)
+    else:
+        raise AssertionError("신규 이미지를 이전 FLUX 경로로 생성하려 한다")
+    print("  신규 이미지: 공통 스타일과 화면 및 도식 근거를 확인한다")
+
+
 def main() -> None:
+    directImagePlan()
     pruneRefusesWhenCourseUnreadable()
     fetchRejectsWrongBytes()
     verifyCatchesRemoteDrift()

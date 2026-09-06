@@ -1,11 +1,12 @@
 import { readdir, readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
+import { executionRoot } from "./executionWorkspace.mjs";
 
 const origin = "https://eddmpython.com";
 const repoRoot = resolve(process.cwd(), "..");
 const blogRoot = resolve(repoRoot, "blog");
 const contentRoot = resolve(blogRoot, "posts");
-const distRoot = resolve(repoRoot, "../eddmpython.out/site-dist");
+const distRoot = join(executionRoot(), "site-dist");
 /** 글 폴더 이름. 앞의 세 자리가 발행 순번이다. */
 const postName = /^(\d{3}-[a-z0-9]+(?:-[a-z0-9]+)*)$/;
 // 글은 blog/posts/<글 폴더>/index.md 다. 폴더가 곧 글이다.

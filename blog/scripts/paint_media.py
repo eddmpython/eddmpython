@@ -1,4 +1,4 @@
-"""회색 원본에 저장소 정본 강조색을 입힌다.
+"""이전 회색 원본 전용. 신규 이미지와 제품 원본의 색은 blogMedia.md 계약에 따라 보존한다.
 
 사용: python -X utf8 blog/scripts/paint_media.py <post-id> [--only key1,key2] [--desaturate]
 
@@ -50,7 +50,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageFilter
 
-from media_paths import MASTER_SUFFIX, REPO_ROOT, STAGING_ROOT  # noqa: E402
+from media_paths import MASTER_SUFFIX, REPO_ROOT, staging_root  # noqa: E402
 POSTS_ROOT = REPO_ROOT / "blog" / "posts"
 CATALOG_PATH = REPO_ROOT / "blog" / "media" / "catalog.json"
 DESIGN_TS = REPO_ROOT / "site" / "src" / "design.ts"
@@ -270,7 +270,7 @@ def main() -> None:
     ap.add_argument("--only", default="")
     args = ap.parse_args()
 
-    stage = STAGING_ROOT / args.post
+    stage = staging_root() / args.post
     pulled = fetchMasters(args.post, stage)
     if pulled:
         print(f"원본을 원격에서 받았다: {', '.join(pulled)}")

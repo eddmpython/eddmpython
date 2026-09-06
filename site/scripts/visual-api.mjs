@@ -7,11 +7,12 @@ import { PyProcControlClient } from "pyproc/control";
 import { preview } from "vite";
 import { VISUAL_VIEWPORTS, visualContractFor } from "./visual-contract.mjs";
 import { planFullPageCaptures } from "./visual-capture-plan.mjs";
+import { executionRoot } from "./executionWorkspace.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SITE_ROOT = resolve(HERE, "..");
 const REPO_ROOT = resolve(SITE_ROOT, "..");
-const OUTPUT_ROOT = resolve(SITE_ROOT, "../../eddmpython.out");
+const OUTPUT_ROOT = executionRoot();
 const DIST_ROOT = join(OUTPUT_ROOT, "site-dist");
 const VISUAL_ROOT = join(OUTPUT_ROOT, "visual");
 const APPROVAL_PATH = join(VISUAL_ROOT, "approval.json");
@@ -225,6 +226,7 @@ async function inspectPage(client, sessionRef, checks) {
     `(() => {
       const checks = ${JSON.stringify(checks)};
       const errors = [];
+      const advisories = [];
       const visible = (element) => {
         if (!element) return false;
         const style = getComputedStyle(element);
@@ -240,6 +242,27 @@ async function inspectPage(client, sessionRef, checks) {
             const count = document.querySelectorAll(check.selector).length;
             if (check.exact !== undefined && count !== check.exact) errors.push(check.selector + " 개수 " + count + ", 기대 " + check.exact);
             if (check.min !== undefined && count < check.min) errors.push(check.selector + " 개수 " + count + ", 최소 " + check.min);
+          } else if (check.type === "article-sections") {
+            const prose = document.querySelector('[data-article-body]')?.cloneNode(true);
+            prose?.querySelectorAll("pre, code").forEach(element => element.remove());
+            if (prose?.textContent.includes("<!--")) errors.push("본문에 HTML 주석이 노출되었습니다");
+            const headings = Array.from(document.querySelectorAll('[data-article-body] > h2'));
+            for (const heading of headings) {
+              if (heading.textContent.includes("더 해 볼 것")) continue;
+              const elements = [];
+              for (let next = heading.nextElementSibling; next && next.tagName !== "H2"; next = next.nextElementSibling) elements.push(next);
+              if (elements[0]?.tagName !== "H3") advisories.push("문장형 부제가 필요한 본문 절: " + heading.textContent);
+              const visual = '[data-article-visual="image"], [data-article-visual="video"], [data-article-visual="simulation"]';
+              const primary = elements[0]?.tagName === "H3" ? 1 : 0;
+              if (!elements[primary]?.matches(visual)) advisories.push("부제 바로 뒤에 주 이미지·영상·시뮬레이션이 필요한 절: " + heading.textContent);
+              if (elements[primary + 1]?.tagName !== "P") advisories.push("주 시각물 바로 뒤에 서술형 설명이 필요한 절: " + heading.textContent);
+            }
+            for (const image of document.querySelectorAll('[data-article-visual="image"] img')) {
+              const rect = image.getBoundingClientRect();
+              if (Math.abs(rect.width / rect.height - 16 / 9) > 0.01) errors.push("본문 이미지 프레임이 16:9가 아닙니다: " + image.alt);
+              if (getComputedStyle(image).objectFit !== "contain") errors.push("본문 이미지가 원본을 자르거나 늘일 수 있습니다: " + image.alt);
+              if (getComputedStyle(image).filter !== "none") errors.push("본문 이미지에 색 필터가 적용되었습니다: " + image.alt);
+            }
           } else if (check.type === "text") {
             const found = Array.from(document.querySelectorAll(check.selector)).some((item) => item.textContent.includes(check.includes));
             if (!found) errors.push(check.selector + "에서 텍스트를 찾지 못했습니다: " + check.includes);
@@ -268,8 +291,18 @@ async function inspectPage(client, sessionRef, checks) {
         errors,
         metrics: {
           title: document.title,
+          sectionAdvisories: advisories,
           viewportWidth: innerWidth,
           viewportHeight: innerHeight,
+          layoutWidth: root.clientWidth,
+          overflowElements: Array.from(document.querySelectorAll("body *")).filter(element => {
+            const rect = element.getBoundingClientRect();
+            if (rect.right <= root.clientWidth + 1 || rect.width === 0) return false;
+            for (let parent = element.parentElement; parent && parent !== document.body; parent = parent.parentElement) {
+              if (["auto", "scroll", "hidden", "clip"].includes(getComputedStyle(parent).overflowX)) return false;
+            }
+            return true;
+          }).slice(0, 8).map(element => ({ tag: element.tagName, className: element.className, text: element.textContent.slice(0, 100) })),
           scrollWidth: Math.max(root.scrollWidth, document.body.scrollWidth),
           scrollHeight: Math.max(root.scrollHeight, document.body.scrollHeight),
           imageCount: document.images.length,
@@ -439,6 +472,9 @@ export async function captureVisualEvidence({ baseUrl, routeFilters = [] } = {})
           const inspected = await inspectPage(client, sessionRef, contract.checks);
           metrics = inspected.metrics;
           errors.push(...inspected.errors);
+          if (metrics.viewportWidth > viewport.width + 1) {
+            errors.push(`뷰포트가 본문 폭에 맞춰 늘어났습니다: ${metrics.viewportWidth}px, 지정 폭 ${viewport.width}px. ${JSON.stringify(metrics.overflowElements)}`);
+          }
           if (metrics.scrollWidth > metrics.viewportWidth + 1) {
             errors.push(`가로 넘침 ${metrics.scrollWidth}px, 뷰포트 ${metrics.viewportWidth}px`);
           }
@@ -451,6 +487,13 @@ export async function captureVisualEvidence({ baseUrl, routeFilters = [] } = {})
               const evidence = await runInteraction(client, sessionRef, interaction);
               const captured = { id: interaction.id, evidence };
               if (interaction.captureAfter) {
+                await evaluate(client, sessionRef, `(async () => {
+                  await Promise.allSettled(Array.from(document.images).filter(image => {
+                    const rect = image.getBoundingClientRect();
+                    return rect.bottom > 0 && rect.top < innerHeight;
+                  }).map(image => image.decode()));
+                  await new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done)));
+                })()`, { awaitPromise: true });
                 const interactionFile = `${contract.id}.${viewport.id}.interaction-${interaction.id}.jpg`;
                 await saveScreenshot(client, sessionRef, join(runDir, interactionFile), { quality: 90 });
                 screenshotFiles.push({
@@ -475,10 +518,23 @@ export async function captureVisualEvidence({ baseUrl, routeFilters = [] } = {})
           await evaluate(
             client,
             sessionRef,
-            `(async () => { scrollTo(0, 0); await new Promise((resolveFrame) => requestAnimationFrame(() => requestAnimationFrame(resolveFrame))); return true; })()`,
+            `(async () => {
+              scrollTo(0, 0);
+              await Promise.allSettled(Array.from(document.images).map(image => image.decode()));
+              await new Promise(resolvePaint => setTimeout(resolvePaint, 250));
+              await new Promise((resolveFrame) => requestAnimationFrame(() => requestAnimationFrame(resolveFrame)));
+              return true;
+            })()`,
             { awaitPromise: true },
           );
           const topFile = `${contract.id}.${viewport.id}.top.jpg`;
+          const topToc = await evaluate(client, sessionRef, `(() => {
+            const first = document.querySelector('[data-article-body] > h2');
+            if (!first) return true;
+            const active = document.querySelector('[data-blog-toc-desktop] a[aria-current="location"]');
+            return active?.getAttribute("href") === "#" + first.id;
+          })()`);
+          if (!topToc) errors.push("맨 위로 돌아왔지만 목차의 첫 절이 선택되지 않았습니다");
           await saveScreenshot(client, sessionRef, join(runDir, topFile), { quality: 88 });
           screenshotFiles.push({ kind: "top", file: topFile });
 
@@ -534,14 +590,19 @@ export async function captureVisualEvidence({ baseUrl, routeFilters = [] } = {})
             const clip = await evaluate(
               client,
               sessionRef,
-              `(() => {
+              `(async () => {
                 const element = document.querySelector(${JSON.stringify(capture.selector)});
+                if (!element && ${Boolean(capture.optional)}) return null;
                 if (!element) throw new Error("캡처 요소가 없습니다: " + ${JSON.stringify(capture.selector)});
+                element.scrollIntoView({ block: "center" });
+                await new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done)));
                 const rect = element.getBoundingClientRect();
                 return { x: Math.max(0, rect.left + scrollX), y: Math.max(0, rect.top + scrollY),
                   width: rect.width, height: rect.height, scale: 1 };
               })()`,
+              { awaitPromise: true },
             );
+            if (!clip) continue;
             await saveScreenshot(client, sessionRef, join(runDir, focusFile), { quality: 90, clip });
             screenshotFiles.push({
               kind: "focus",
