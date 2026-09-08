@@ -606,6 +606,36 @@
       "post": "008-pdf-table",
       "sha256": "3dc1b60478124ab8ce2726e43b9b1635476d853b2c2c307466a77e522eaadd41"
     },
+    "009-xlwings-lite/basics": {
+      "assetKey": "basics",
+      "path": "objects/sha256/e6/e65e858bfad623ccb0abc19f59761710afce17df257350ef7f4cffd8097f82fa.png",
+      "post": "009-xlwings-lite",
+      "sha256": "e65e858bfad623ccb0abc19f59761710afce17df257350ef7f4cffd8097f82fa"
+    },
+    "009-xlwings-lite/cheatsheet": {
+      "assetKey": "cheatsheet",
+      "path": "objects/sha256/85/852a987f4825928cc78735de0978272378f52ad1495b6ef1c594b3426c091ed2.png",
+      "post": "009-xlwings-lite",
+      "sha256": "852a987f4825928cc78735de0978272378f52ad1495b6ef1c594b3426c091ed2"
+    },
+    "009-xlwings-lite/lite": {
+      "assetKey": "lite",
+      "path": "objects/sha256/51/5155d93ab956d89c89325c352ac5ffc1d4265456c2887debdfc56eec1ca54dd1.png",
+      "post": "009-xlwings-lite",
+      "sha256": "5155d93ab956d89c89325c352ac5ffc1d4265456c2887debdfc56eec1ca54dd1"
+    },
+    "009-xlwings-lite/pandas": {
+      "assetKey": "pandas",
+      "path": "objects/sha256/ac/ac3f508d341a1e41e2adc74265964ef1139d20ec87a9ea7d98daf751947d380b.png",
+      "post": "009-xlwings-lite",
+      "sha256": "ac3f508d341a1e41e2adc74265964ef1139d20ec87a9ea7d98daf751947d380b"
+    },
+    "009-xlwings-lite/scripts": {
+      "assetKey": "scripts",
+      "path": "objects/sha256/c8/c85587ad23d6a24051606b87a8d0199c13546a9171892e253f035201f8b5ba81.png",
+      "post": "009-xlwings-lite",
+      "sha256": "c85587ad23d6a24051606b87a8d0199c13546a9171892e253f035201f8b5ba81"
+    },
     "01-ai-agent-scenes/agent-common-ability": {
       "assetKey": "agent-common-ability",
       "path": "objects/sha256/eb/eb20e9e96a6096fd860af367792b3bcb8c51ed48e1fc00dc5e208ef9a16c5b93.webp",
@@ -6010,6 +6040,16 @@
       "visualSubject": "VS Code 상자와 Python 확장 상자와 Python 상자가 화살표로 이어지고 Python 아래 터미널 상자에 합계 250000 이 찍히며 왼쪽 아래에 확장이 없으면 실행 버튼이 생기지 않는다는 띠가 있는 구조",
       "width": 2048
     },
+    "5155d93ab956d89c89325c352ac5ffc1d4265456c2887debdfc56eec1ca54dd1": {
+      "alt": "Excel 홈 리본에 추가된 xlwings Lite 버튼",
+      "bytes": 43226,
+      "height": 232,
+      "mime": "image/png",
+      "path": "objects/sha256/51/5155d93ab956d89c89325c352ac5ffc1d4265456c2887debdfc56eec1ca54dd1.png",
+      "sourcePost": "009-xlwings-lite",
+      "visualSubject": "Excel 홈 리본에 추가된 xlwings Lite 버튼",
+      "width": 573
+    },
     "516cef5a94f1fd637aad618fd598ed4b5d9025f6480bb2dae2a399f02a4d5008": {
       "alt": "확인 대상과 통과 기준을 담은 왼쪽 카드 네 개가 화살표로 오른쪽의 실제 근거 카드와 하나씩 이어지고, 맨 아래 강조된 띠에서는 원본 보호가 Git 상태가 아니라 실행 전후 해시로 이어지는 그림",
       "bytes": 31748,
@@ -7982,6 +8022,16 @@
       "visualSubject": "숫자선 위의 50000, 80000, 100000, 120000 이 기준 100000 을 두고 갈라져 if amount < 100000 은 정상, elif amount > 100000 은 확인필요, else 는 기준과 같음 세 상자로 이어지는 모습",
       "width": 2048
     },
+    "852a987f4825928cc78735de0978272378f52ad1495b6ef1c594b3426c091ed2": {
+      "alt": "pandas 공식 치트시트의 표 생성, 정렬, 행과 열 선택 구역",
+      "bytes": 612789,
+      "height": 1392,
+      "mime": "image/png",
+      "path": "objects/sha256/85/852a987f4825928cc78735de0978272378f52ad1495b6ef1c594b3426c091ed2.png",
+      "sourcePost": "009-xlwings-lite",
+      "visualSubject": "pandas 공식 치트시트의 표 생성, 정렬, 행과 열 선택 구역",
+      "width": 1800
+    },
     "8564e650595d605604e75cdb32064d2ca74b34c48f0d0630780b310a00bff241": {
       "alt": "Edge로 연 계약서_골라낸쪽.pdf에 계약서 표지가 보이고 도구 막대에 1 / 3 이 표시된 모습",
       "bytes": 25144,
@@ -9618,6 +9668,16 @@
       "visualSubject": "같은 학습자가 왼쪽의 가벼운 실행 자리에서 연습한 뒤 오른쪽 자기 컴퓨터에서 엑셀 파일과 문서와 예약 작업을 다루는 장면",
       "width": 1600
     },
+    "ac3f508d341a1e41e2adc74265964ef1139d20ec87a9ea7d98daf751947d380b": {
+      "alt": "Codaro pandas 입문의 학습 내용과 첫 설명",
+      "bytes": 84501,
+      "height": 900,
+      "mime": "image/png",
+      "path": "objects/sha256/ac/ac3f508d341a1e41e2adc74265964ef1139d20ec87a9ea7d98daf751947d380b.png",
+      "sourcePost": "009-xlwings-lite",
+      "visualSubject": "Codaro pandas 입문의 학습 내용과 첫 설명",
+      "width": 1440
+    },
     "ac6607f39c130900a2339dcb3a401fae4b5d40e879034fb79fca95be789a764d": {
       "alt": "품목 셀의 원문 무선 마우스와 직접 수정한 무선 마우스 검토가 나란히 표시된 화면",
       "bytes": 21319,
@@ -10669,6 +10729,16 @@
       "sourcePost": "03-python-outside-excel",
       "visualSubject": "expense.xlsx 파일을 열었을 때 workbook.xml과 sheet1.xml과 styles.xml이 나타나는 패키지 구조",
       "width": 1600
+    },
+    "c85587ad23d6a24051606b87a8d0199c13546a9171892e253f035201f8b5ba81": {
+      "alt": "xlwings Lite 공식 문서의 기본 스크립트와 셀에 값을 쓰는 코드",
+      "bytes": 109115,
+      "height": 900,
+      "mime": "image/png",
+      "path": "objects/sha256/c8/c85587ad23d6a24051606b87a8d0199c13546a9171892e253f035201f8b5ba81.png",
+      "sourcePost": "009-xlwings-lite",
+      "visualSubject": "xlwings Lite 공식 문서의 기본 스크립트와 셀에 값을 쓰는 코드",
+      "width": 1440
     },
     "c85d4f6db6b4ee7e57e34b04c128381843f3944ff3e15f619ea5cbe3b3bb8aca": {
       "alt": "1000행에서는 작은 Parquet이 더 느리고 십만 행에서는 열 선택에 따라 시간이 달라지는 실측 읽기 시간 그래프",
@@ -11838,6 +11908,16 @@
       "sourcePost": "01-file-inventory",
       "visualSubject": "보호된 입력 폴더와 별도 결과표",
       "width": 1600
+    },
+    "e65e858bfad623ccb0abc19f59761710afce17df257350ef7f4cffd8097f82fa": {
+      "alt": "Codaro의 파이썬 첫 수업과 실행할 예제",
+      "bytes": 92577,
+      "height": 900,
+      "mime": "image/png",
+      "path": "objects/sha256/e6/e65e858bfad623ccb0abc19f59761710afce17df257350ef7f4cffd8097f82fa.png",
+      "sourcePost": "009-xlwings-lite",
+      "visualSubject": "Codaro의 파이썬 첫 수업과 실행할 예제",
+      "width": 1440
     },
     "e65fbd771b20e2ab40b848e172c02e7a5faff7cc69b231092593f5496e5daed1": {
       "alt": "rowNumber 2 3 4 5가 D열 읽기와 E열 F열 쓰기의 같은 행 번호로 연결되는 코드 주소 지도",
