@@ -19,6 +19,12 @@ status: observed
 
 ## 무엇이 도는가
 
+Taxly 테스트 실행 파일은 공개 문서 프록시와 별도다. `site/admin.ts`의 운영자 세션 검증 뒤
+`site/taxlyDownload.ts`가 서비스 바인딩으로 전달한다. 연결 설정은
+`site/wrangler.classroom.jsonc`가 소유한다. 공개 메뉴·사이트맵·공개 파일 저장소에는 추가하지 않는다.
+이 저장소에는 Taxly 실행 파일, 카탈로그와 제품 인증 로직을 복사하지 않는다. 현재 경로는 구현 검증
+단계이며 서비스 연결과 실제 파일 배치가 끝나기 전에는 다운로드 성공으로 기록하지 않는다.
+
 `site/worker.ts` 의 `PROXIED` 표에 있는 첫 경로 조각을 GitHub Pages 로 넘긴다.
 경로는 그대로 유지한다.
 

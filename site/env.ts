@@ -5,6 +5,8 @@
  * Env 를 따로 적으면 배포 설정과 코드가 조용히 갈라진다.
  */
 export type Env = {
+  /** Taxly가 소유하는 비공개 테스트 파일 서비스. 연결 전에는 다운로드가 닫힌다. */
+  TAXLY_TEST_RUNTIME?: Cloudflare.Env['TAXLY_TEST_RUNTIME'];
   /** 방 목록, 방마다의 열림 상태, 세션 서명 키를 든다. 인스턴스는 하나다. */
   CLASSROOM: DurableObjectNamespace;
   /** 교안 묶음이 들어 있다. eddmpython-course 저장소가 발행한다. */

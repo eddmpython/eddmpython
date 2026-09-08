@@ -19,6 +19,7 @@ import { checkToken, clearCookie, cookie, hmac, issueToken, readCookie, safeEqua
 import { header, page } from "./shell";
 import { DESIGN } from "./src/design";
 import type { Env } from "./env";
+import { taxlyDownload } from "./taxlyDownload";
 
 /** 운영자 쿠키. 수강생 쿠키와 이름도 경로도 겹치지 않는다. */
 const ADMIN_COOKIE = "eddm_admin";
@@ -455,6 +456,13 @@ async function api(request: Request, env: Env): Promise<Response> {
 
 export async function handleAdmin(request: Request, env: Env, url: URL): Promise<Response> {
   const path = url.pathname.replace(/\/$/, "") || ADMIN_PATH;
+
+  if (path === "/admin/taxly/download") {
+    if (!(await signedIn(env, request))) {
+      return new Response("not found", { status: 404, headers: { "Cache-Control": "private, no-store", "X-Robots-Tag": "noindex, nofollow" } });
+    }
+    return taxlyDownload(request, env.TAXLY_TEST_RUNTIME);
+  }
 
   if (path === "/admin/login") {
     if (request.method !== "POST") return new Response(null, { status: 303, headers: { location: ADMIN_PATH } });
