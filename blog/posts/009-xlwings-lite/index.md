@@ -51,6 +51,19 @@ xlwings Lite는 Excel 추가 기능 안에서 Python을 실행합니다. 컴퓨�
 
 열린 시트에 결과를 쓰는 작업은 스크립트부터 시작합니다. `Run Hello World`를 눌렀을 때 A1에 `Hello xlwings!`가 나타나면, Python 코드가 현재 통합문서의 셀을 바꾼 것입니다.
 
+## .xlsx 파일은 ZIP이다
+### Excel을 켜지 않고 저장된 파일 내용을 바꿀 수 있습니다
+
+[엑셀 파일을 압축파일로 열어 보는 영상](https://www.youtube.com/shorts/l4J3QvePJtQ)
+
+엑셀을 켜지 않고도 셀 값을 바꿀 수 있을까요? **일반적인 `.xlsx` 파일은 여러 파일을 ZIP으로 묶어 놓은 압축파일입니다.** 안에는 시트의 값과 수식, 서식 등을 담은 XML 파일이 들어 있습니다. XML은 데이터를 정해진 태그로 기록하는 텍스트 형식이므로, 프로그램이 읽고 내용을 바꾼 뒤 다시 묶을 수 있습니다. Excel은 그렇게 저장된 파일을 읽어 셀과 시트로 보여 줍니다. [Microsoft의 파일 구조 설명](https://learn.microsoft.com/en-us/office/open-xml/spreadsheet/structure-of-a-spreadsheetml-document)
+
+영상처럼 직접 확인하려면 먼저 연습용 통합문서를 컴퓨터에 `.xlsx` 파일로 저장합니다. 웹용 Excel에서는 `파일` 메뉴에서 사본을 내려받습니다. 저장한 파일을 복사하고 복사본의 확장자만 `.zip`으로 바꿔 엽니다. Windows에서 확장자가 안 보이면 파일 탐색기의 `보기 > 표시 > 파일 확장명`을 켭니다. 압축파일 안의 `xl/worksheets` 폴더를 찾아보세요
+
+파일 내용을 바꿀 때는 Excel이 읽을 수 있도록 파일 구조와 연결 관계를 지켜야 합니다. 여기서 말하는 대상은 `.xlsx`이며, 옛 `.xls`나 암호화된 파일은 같은 방식으로 열리지 않습니다.
+
+xlwings Lite의 Python 코드도 통합문서 안에 저장됩니다. 확인한 저장 형식에서는 `xl/webextensions/` 안의 XML에 `main.py`가 들어 있었습니다. **코드를 파일에 저장하는 일과 실행하는 일은 다릅니다.** 저장된 코드는 Excel에서 xlwings Lite를 열어 실행합니다. [공식 코드 저장 설명](https://lite.xlwings.org/self-hosting)
+
 ## 기초 문법은 Codaro에서
 ### 변수와 함수가 낯설면 짧은 예제를 바꾸며 익힙니다
 
@@ -102,6 +115,7 @@ xlwings Lite와 pandas는 맡은 일이 다릅니다. **xlwings Lite는 Excel의
 
 ## 더 해 볼 것
 
+- 통합문서 안의 Python 코드를 외부에서 바꾸려면 AI에게 [xlwings Lite ZIP 수정 스킬](https://github.com/eddmpython/eddmpython/blob/main/blog/posts/009-xlwings-lite/xlwings-lite-zip/SKILL.md) 주소와 연습용 통합문서, 교체할 Python 파일을 함께 줍니다
 - 셀에서 Python 함수를 직접 부르려면 [xlwings Lite 사용자 함수 안내](https://lite.xlwings.org/custom-functions)를 봅니다
 - pandas 표를 Excel 범위로 읽고 쓰는 형식은 [xlwings DataFrame 변환 안내](https://docs.xlwings.org/en/stable/converters.html#pandas-dataframe-converter)에서 확인합니다
 - xlwings Lite에서도 pandas를 쓰려면 [패키지 설치 안내](https://lite.xlwings.org/dependencies)를 확인합니다
