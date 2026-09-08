@@ -28,7 +28,8 @@ description: eddmpython 브랜드 저장소의 사이트, 제품 카탈로그, �
 | 사이트 배포와 롤백 | `operation/deploy.md`, `operation/visualVerification.md` |
 | 도메인과 제품 문서 프록시 | `operation/domains.md`, `operation/productProxy.md` |
 | 랜딩 카피와 제품 정보 | `operation/productMarketing.md`, `operation/seoContract.md` |
-| 블로그 발행과 이미지 | `operation/blogPublishing.md`, `operation/blogCopy.md`, `operation/contentStrategy.md` |
+| 블로그 발행과 이미지 | `operation/blogPublishing.md`, `operation/blogMedia.md`, `operation/visualVerification.md` |
+| 블로그 제목과 주제 | `operation/blogCopy.md`, `operation/contentStrategy.md` |
 | 브랜드 이미지와 OG | `operation/brandAssets.md` |
 | 비밀과 공개 저장소 경계 | `operation/secrets.md` |
 | 임시 산출물과 정리 | `operation/workspace.md` |
