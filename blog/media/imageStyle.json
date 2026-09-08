@@ -9,6 +9,7 @@
   "aspectRatio": "16:9",
   "safeMarginPercent": 8,
   "instructions": [
+    "The highest priority is intuitive learning: the learner must immediately recognize what is being taught and see the relevant action, difference or result. Accuracy and readability come before visual style, color treatment or decorative consistency. If the learning target becomes harder to understand, revise the composition instead of accepting a stylish image.",
     "Depict the actual subject, screen state, action and result described in the article. No symbolic substitution, generic stock scene, or unrelated decorative props.",
     "Real products must come from verified official or permitted reference images. Preserve their identity, proportions, logos and original colors. Never invent a product appearance.",
     "For a screen explanation, use the supplied actual screenshot as the content reference. Preserve the real layout, controls, labels, values and result. Enlarge the relevant region without inventing UI. A generated depiction is an explanatory illustration, not evidence of an actual capture.",

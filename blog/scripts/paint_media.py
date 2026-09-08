@@ -296,7 +296,6 @@ def main() -> None:
         lum = normalizeTone(lum)
         px, coverage, spread = paint(lum, palette)
         out = stage / f"{key}.webp"
-        Image.fromarray((px * 255).astype(np.uint8)).save(out, "WEBP", quality=90)
         ok = spread <= MAX_SPREAD * 100
         print(
             f"{'  ' if ok else '  퍼짐'} {key:28} "
@@ -305,6 +304,8 @@ def main() -> None:
         )
         if not ok:
             failed.append((key, spread))
+        else:
+            Image.fromarray((px * 255).astype(np.uint8)).save(out, "WEBP", quality=90)
 
     if failed:
         print()

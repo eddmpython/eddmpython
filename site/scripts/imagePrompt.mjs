@@ -48,14 +48,17 @@ export function composeImagePrompt(entry, palette) {
 
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
   const { DESIGN } = await import("../src/design.ts");
-  const [post, asset] = process.argv.slice(2);
-  if (!post || !asset) {
+  const args = process.argv.slice(2);
+  const [post, asset, flag, planPath] = args;
+  if (!args.length) {
     console.log(JSON.stringify({ ...imageStyle, palette: Object.fromEntries(Object.entries(imageStyle.paletteTokens).map(([role, token]) => [role, DESIGN.palette[token]])) }, null, 2));
   } else {
-    if (!/^\d{3}-[a-z0-9]+(?:-[a-z0-9]+)*$/.test(post) || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(asset)) throw new Error("글과 자산 키 형식이 잘못됐습니다");
+    if (!/^\d{2,3}-[a-z0-9]+(?:-[a-z0-9]+)*$/.test(post ?? "") || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(asset ?? "")) throw new Error("글과 자산 키 형식이 잘못됐습니다");
+    if (args.length !== 2 && !(args.length === 4 && flag === "--plan" && planPath)) throw new Error("사용: imagePrompt.mjs <post-id> <asset-key> [--plan <path>]");
     const root = fileURLToPath(new URL("../../blog/posts/", import.meta.url));
-    const plan = JSON.parse(readFileSync(resolve(root, post, "media.json"), "utf8"));
-    if (!plan.assets[asset]) throw new Error(`이미지 계획이 없습니다: ${post}/${asset}`);
-    console.log(composeImagePrompt(plan.assets[asset], DESIGN.palette));
+    const plan = JSON.parse(readFileSync(planPath ? resolve(planPath) : resolve(root, post, "media.json"), "utf8"));
+    const entry = plan.assets?.[`${post}/${asset}`] ?? plan.assets?.[asset];
+    if (!entry || (entry.post && entry.post !== post)) throw new Error(`이미지 계획이 없습니다: ${post}/${asset}`);
+    console.log(composeImagePrompt(entry, DESIGN.palette));
   }
 }

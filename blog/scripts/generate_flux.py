@@ -207,6 +207,7 @@ def main() -> None:
         sys.exit("media.json 의 section-grounded-v2 계약이나 교안 plan 의 course-visual-16x9-v1 계약이 필요하다.")
     # 블로그도 교안과 같은 가로 프레임을 사용한다. 운영 계약은 blogMedia.md가 소유한다.
     coursePlan = plan.get("visualPlanContract") == 2
+    style = json.loads((REPO_ROOT / "blog" / "media" / "imageStyle.json").read_text(encoding="utf-8"))
     aspectRatio = "16:9"
     model = COURSE_MODEL if coursePlan else MODEL
     assets = plan.get("assets", {})
@@ -239,12 +240,14 @@ def main() -> None:
             print(f"skip {key}: 이미 있음")
             continue
         prompt = prompts[key]
+        sharedProfile = asset.get("visualProfile") == style["visualProfile"]
+        selectedModel = COURSE_MODEL if sharedProfile else model
         print(f"generate {key} ...")
-        pid = create(headers, prompt, aspectRatio, model)
+        pid = create(headers, prompt, aspectRatio, selectedModel)
         url = poll(headers, pid)
         r = requests.get(url, timeout=120)
         r.raise_for_status()
-        if coursePlan:
+        if coursePlan and not sharedProfile:
             fitCourseCanvas(r.content, dest)
         else:
             dest.write_bytes(r.content)

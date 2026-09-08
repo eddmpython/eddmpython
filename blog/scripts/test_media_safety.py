@@ -400,7 +400,70 @@ def directImagePlan() -> None:
     print("  신규 이미지: 공통 스타일과 화면 및 도식 근거를 확인한다")
 
 
+def rejectedPaintPreservesOutput() -> None:
+    from unittest.mock import patch
+    import numpy as np
+
+    with tempfile.TemporaryDirectory() as folder:
+        stage = Path(folder) / "999-test"
+        stage.mkdir()
+        (stage / f"cell{paint_media.MASTER_SUFFIX}").write_bytes(b"master")
+        output = stage / "cell.webp"
+        for previous in (None, b"previous-reviewed-image"):
+            if previous is not None:
+                output.write_bytes(previous)
+            with contextlib.ExitStack() as stack:
+                stack.enter_context(patch.object(sys, "argv", ["paint_media.py", "999-test", "--only", "cell"]))
+                stack.enter_context(patch.object(paint_media, "staging_root", return_value=Path(folder)))
+                stack.enter_context(patch.object(paint_media, "fetchMasters", return_value=[]))
+                stack.enter_context(patch.object(paint_media, "loadPalette", return_value={"brand": "accent", "carbon": "background", "ivory": "surface"}))
+                stack.enter_context(patch.object(paint_media, "readMaster", return_value=(np.zeros((2, 2)), 0)))
+                stack.enter_context(patch.object(paint_media, "paint", return_value=(np.zeros((2, 2, 3)), 3, 100)))
+                stack.enter_context(contextlib.redirect_stdout(io.StringIO()))
+                try:
+                    paint_media.main()
+                except SystemExit:
+                    pass
+                else:
+                    raise AssertionError("흩어진 강조를 통과시켰다")
+            assert output.read_bytes() == previous if previous is not None else not output.exists()
+
+
+def fallbackPreservesMaster() -> None:
+    from unittest.mock import patch
+    import generate_flux
+    import requests
+
+    style = json.loads((publish_media.REPO_ROOT / "blog/media/imageStyle.json").read_text(encoding="utf-8"))
+    with tempfile.TemporaryDirectory() as folder:
+        root = Path(folder)
+        planPath = root / "plan.json"
+        for course in (False, True):
+            plan = {"version": 1, "promptContract": "section-grounded-v2", "assets": {"cell": {"sourceKind": "imagegen", "visualProfile": style["visualProfile"]}}}
+            if course:
+                plan["visualPlanContract"] = 2
+            planPath.write_text(json.dumps(plan), encoding="utf-8")
+            with contextlib.ExitStack() as stack:
+                stack.enter_context(patch.object(sys, "argv", ["generate_flux.py", "999-test", "--plan", str(planPath), "--imagegen-unavailable", "--force"]))
+                stack.enter_context(patch.object(generate_flux, "staging_root", return_value=root))
+                stack.enter_context(patch.object(generate_flux, "composePrompt", return_value="grayscale prompt"))
+                stack.enter_context(patch.object(generate_flux, "loadToken", return_value="test-token"))
+                create = stack.enter_context(patch.object(generate_flux, "create", return_value="prediction"))
+                stack.enter_context(patch.object(generate_flux, "poll", return_value="https://example.com/image"))
+                response = requests.Response()
+                response.status_code = 200
+                response._content = b"original-provider-bytes"
+                stack.enter_context(patch.object(requests, "get", return_value=response))
+                stack.enter_context(patch.object(generate_flux.time, "sleep"))
+                stack.enter_context(contextlib.redirect_stdout(io.StringIO()))
+                generate_flux.main()
+                assert create.call_args.args[-1] == generate_flux.COURSE_MODEL
+                assert (root / "999-test" / f"cell{generate_flux.MASTER_SUFFIX}").read_bytes() == response.content
+
+
 def main() -> None:
+    fallbackPreservesMaster()
+    rejectedPaintPreservesOutput()
     directImagePlan()
     pruneRefusesWhenCourseUnreadable()
     fetchRejectsWrongBytes()
