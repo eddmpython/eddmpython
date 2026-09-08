@@ -1,4 +1,4 @@
-"""이전 회색 원본과 교안용 FLUX 생성 경로. 신규 블로그는 내장 ImageGen을 쓴다.
+"""이미지 생성 도구가 없는 환경의 FLUX 경로. 선택 기준은 blogMedia.md가 소유한다.
 
 사용: python -X utf8 blog/scripts/generate_flux.py <post-id> [--only key1,key2] [--force] [--plan 경로]
 - 계약: skills/specs/operation/blogMedia.md. 블로그는 글 하나가 폴더 하나이고
@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -37,11 +38,24 @@ COLOR_PROFILE = "eddmpython-dark-v2"
 PALETTE_POLICY = "eddmpython-gray-master-v1"
 
 
-def composePrompt(asset: dict[str, object]) -> str:
+def composePrompt(asset: dict[str, object], imagegenUnavailable: bool = False) -> str:
     """본문 주장과 실제 피사체를 자유 장면 지시보다 높은 우선순위로 붙인다."""
     style = json.loads((REPO_ROOT / "blog" / "media" / "imageStyle.json").read_text(encoding="utf-8"))
     if asset.get("visualProfile") == style["visualProfile"]:
-        raise ValueError("신규 블로그 이미지와 도식은 내장 ImageGen으로 제작한다. site/scripts/imagePrompt.mjs로 프롬프트를 준비한다.")
+        if not imagegenUnavailable:
+            raise ValueError("내장 ImageGen을 우선한다. 이미지 생성 도구가 없는 환경에서만 FLUX를 사용한다.")
+        script = (
+            "import {composeImagePrompt} from './scripts/imagePrompt.mjs';"
+            "import {DESIGN} from './src/design.ts';"
+            "let input='';for await(const chunk of process.stdin) input+=chunk;"
+            "process.stdout.write(composeImagePrompt(JSON.parse(input),DESIGN.palette));"
+        )
+        result = subprocess.run(
+            ["node", "--experimental-strip-types", "--input-type=module", "-e", script],
+            cwd=REPO_ROOT / "site", input=json.dumps(asset), text=True, encoding="utf-8",
+            capture_output=True, check=True,
+        )
+        return result.stdout
     required = (
         "sectionHeading",
         "contentAnchor",
@@ -173,7 +187,11 @@ def main() -> None:
         default="",
         help="다른 plan.json 경로. 교안은 ../eddmpython-course/curriculum/<카테고리>/plan.json 을 쓴다",
     )
+    parser.add_argument("--imagegen-unavailable", action="store_true",
+                        help="이미지 생성 도구가 없는 환경임을 확인한 경우에만 사용")
     args = parser.parse_args()
+    if not args.imagegen_unavailable:
+        sys.exit("ImageGen을 우선한다. 도구가 없는 환경에서만 --imagegen-unavailable로 FLUX를 실행한다.")
 
     plan_path = Path(args.plan).resolve() if args.plan else POSTS_ROOT / args.post / "media.json"
     if not plan_path.exists():
@@ -206,7 +224,7 @@ def main() -> None:
         sys.exit(f"{plan_path}에 {args.post}의 imagegen 자산이 없다.")
 
     # 생성 경로가 맞는지 자격증명 조회와 유료 요청 전에 확인한다.
-    prompts = {asset["assetKey"]: composePrompt(asset) for asset in targets}
+    prompts = {asset["assetKey"]: composePrompt(asset, args.imagegen_unavailable) for asset in targets}
     import requests
 
     headers = {"Authorization": f"Token {loadToken()}", "Content-Type": "application/json"}

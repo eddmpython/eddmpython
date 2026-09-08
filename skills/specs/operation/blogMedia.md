@@ -145,7 +145,7 @@ status: observed
 `visualSubject` 와 `sourcePost` 만 들어가고 그것은 이미지 설명이다.
 
 ```bash
-python -X utf8 blog/scripts/generate_flux.py <post-id> --plan ../eddmpython-course/curriculum/01-automation-start/plan.json
+python -X utf8 blog/scripts/generate_flux.py <post-id> --plan ../eddmpython-course/curriculum/01-automation-start/plan.json --imagegen-unavailable
 python -X utf8 blog/scripts/publish_media.py --asset <post-id>/<key> --plan ../eddmpython-course/curriculum/01-automation-start/plan.json --reviewed
 ```
 
@@ -283,9 +283,9 @@ ImageGen으로 수정한다. 원본 캡처만으로 설명이 충분하면 생�
 | 화면 표현 | 글자, 아이콘과 데이터는 선명하게. 화면 위에 종이 결, 붓 터치, 거친 필름 입자를 덧씌우지 않음 |
 | 피할 느낌 | 금색·세피아 색조, 네온, 플라스틱 장난감, 과도한 광택, 장식용 그라데이션, 의미 없는 빛 효과 |
 
-강조색은 장식이 아니라 **설명에서 보라는 곳**에 놓는다. 가장 밝은 픽셀을 자동으로 코랄로 칠하는
-방식은 신규 이미지에 쓰지 않는다. 실제 제품 원본에 들어 있는 색은 금지 팔레트에 맞추려고 변조하지
-않는다. 팔레트 제한은 새로 추가하는 배경, 장식과 강조를 대상으로 한다.
+강조색은 장식이 아니라 **설명에서 보라는 곳**에 놓는다. 생성 원본에서는 그 대상 하나만 작은
+최고 명도 영역으로 만들고, 후처리가 그 명도 차이를 이용해 강조색을 입힌다. 밝은 곳이 엉뚱한
+사물이나 글자에 흩어지면 원본부터 다시 구성한다. 실제 제품 원본과 캡처에는 이 처리를 적용하지 않는다.
 
 큰 제목, 부제, 본문과 캡션은 HTML과 마크다운에 남긴다. 이미지에는 대상과 관계를 식별하는 데 필요한
 짧은 라벨만 넣는다. 실제 화면의 글자는 그대로 유지하고 새로 필요한 라벨은 본문과 같은 이름을 쓴다.
@@ -295,15 +295,34 @@ ImageGen으로 수정한다. 원본 캡처만으로 설명이 충분하면 생�
 동일한 스타일 참조로 연결한다. 내용 참조와 스타일 참조를 구분하며, 스타일 참조의 사물이나 내용을
 다른 글에 복제하지 않는다. 내용의 정확성과 화면의 가독성이 스타일보다 우선한다.
 
-## ImageGen 제작
+## 공통 이미지 제작
 
-신규 설명 이미지와 필요한 도식은 전역 `imagegen` 스킬을 읽고 **내장 ImageGen**으로 만든다.
+eddmpython, course와 Codaro의 설명용 이미지 제작 원칙은 이 절 한 곳에서 관리한다.
+공통 프롬프트는 `blog/media/imageStyle.json`, 색상 값은 `site/src/design.ts`, 후처리 계산은
+`blog/scripts/paint_media.py`가 소유한다. 소비 저장소는 이 기준을 참조하고 자체 질감이나
+이미지용 팔레트를 덧붙이지 않는다. 제품 UI의 기능별 토큰과 실제 화면 캡처 절차는 각 제품이 소유한다.
+
+신규 설명 이미지와 필요한 도식은 전역 `imagegen` 스킬을 읽고 **ImageGen을 1순위**로 만든다.
+이미지 생성 도구가 없는 Claude Code 환경에서는 `generate_flux.py`의 FLUX 경로를 쓴다.
+이 대체 경로는 운영자가 명시한 선택이다. ImageGen의 품질이나 크기가 마음에 들지 않거나
+일시적으로 실패했다는 이유로 도구가 없는 환경으로 취급하지 않는다.
 도식이 정확해야 한다는 이유로 SVG, HTML, Canvas, Mermaid를 렌더한 이미지를 대신 납품하지 않는다.
-계산과 데이터 검증에 코드를 쓰는 것은 허용하지만 최종 설명용 도식 이미지는 ImageGen이 만든다.
+정확한 글자와 긴 코드는 본문에 두고, 그림은 그 섹션의 대상과 변화가 바로 보이도록 구성한다.
+그림을 이해하기 위해 창고, 길, 로봇 같은 다른 비유를 먼저 해석해야 하면 대상을 다시 고른다.
 
-기존 `generate_flux.py`는 이전 회색 원본과 교안 작업을 위한 별도 API 경로다. 신규 블로그 이미지의
-기본 생성 명령이 아니다. 모델이나 CLI 경로를 바꾸는 것은 `imagegen` 스킬의 명시 선택 절차를 따른다.
-기존 `authored` 자산도 호환과 이력 재현을 위해 읽을 뿐 신규 제작의 기본값으로 고르지 않는다.
+두 생성 경로 모두 **회색 원본 생성 → 원본 확인 → 공통 색상 후처리 → 본문에서 확인 → 발행**을
+따른다. 모델에게 최종 브랜드 색을 직접 그리게 하지 않는다. 기존 `authored` 자산은 이력 재현용으로
+유지하며 기존 원본을 일괄 재생성하지 않는다.
+
+FLUX 명령은 이미지 생성 도구가 없음을 확인한 뒤 저장소 루트에서 실행한다. 신규 계획은 아래
+공통 프로필을 사용하며, FLUX도 `imagePrompt.mjs`의 같은 프롬프트를 소비한다.
+
+```powershell
+.venv/Scripts/python.exe -B blog/scripts/generate_flux.py <post-id> --only <asset-key> --imagegen-unavailable
+```
+
+실제 생성 도구와 대체 경로를 선택한 이유는 계획의 생성 기록에 남긴다. `sourceKind: imagegen`은
+생성 이미지라는 자산 종류를 뜻하며 도구 이름의 증거로 사용하지 않는다.
 
 ### 프롬프트 구성
 
@@ -350,15 +369,20 @@ node --experimental-strip-types scripts/imagePrompt.mjs <post-id> <asset-key>
 5. 데스크톱과 모바일 본문에서 자르지 않고 읽히는지 확인한다. 제목과 캡션, 출처는 이미지 밖에 둔다
 6. 통과한 파일만 기존 staging과 Hugging Face 발행 절차로 연결한다
 
-생성된 원본은 색을 다시 칠하지 않고 그대로 보존한다. `imagegen` 스킬의 기본 저장 위치는 작업
-입구일 뿐이며, 글에 연결할 이미지의 최종 바이트는 아래 콘텐츠 주소 객체로 발행한다. 수정본은 새 객체로
-남기고 이전 객체를 자동 삭제하지 않는다. 필요한 변환에서도 내용과 색을 바꾸지 않으며, 색·장면·강조를
-수정할 때는 ImageGen에 원본을 참조로 제공한다.
+회색 원본은 `media_paths.py`가 정한 원본 접미사로 작업 staging에 보존하고, 아래 명령으로
+별도의 발행본을 만든다. 강조 위치와 글자 가독성은 후처리 뒤에도 원본과 대조한다.
+
+```powershell
+.venv/Scripts/python.exe -B blog/scripts/paint_media.py <post-id> --only <asset-key>
+```
+
+색이 바뀌면 같은 원본에서 다시 후처리한다. 장면을 바꿀 때만 생성 도구로 원본을 수정한다.
+원본과 발행본은 모두 콘텐츠 주소 객체로 보존하며 이전 객체를 자동 삭제하지 않는다.
 
 ### 이전 회색 원본의 유지
 
-`eddmpython-dark-v2`와 `eddmpython-gray-master-v1`은 기존 자산과 해당 계약을 쓰는 교안의
-유지 경로다. `paint_media.py`는 이 회색 원본 전용이며 신규 이미지와 제품 원본을 넣지 않는다.
+`eddmpython-dark-v2`와 `eddmpython-gray-master-v1`은 기존 자산의 이력 재현에도 계속 사용한다.
+같은 후처리기가 신규 회색 원본도 처리한다. 공식 원본과 실제 제품 캡처는 넣지 않는다.
 기존 원본의 `masterSha256`과 `masterPath`는 지우지 않는다. 원본을 다시 받을 때는 해시를 대조하고,
 기존 강조색을 다시 칠해 발행하면 원본과 발행본을 함께 업로드한다.
 

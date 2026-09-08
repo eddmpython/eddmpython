@@ -29,7 +29,7 @@ export function composeImagePrompt(entry, palette) {
     return `${role}: ${palette[token]}`;
   });
   return [
-    `Mode: ${entry.visualMode}. Create with the built-in ImageGen tool.`,
+    `Mode: ${entry.visualMode}. Preferred generator: ${imageStyle.generator}. Fallback: ${imageStyle.fallback.generator}, only when ${imageStyle.fallback.condition}.`,
     `Article claim (context, not image text): ${entry.contentAnchor}`,
     `Subject: ${entry.visualSubject}`,
     `Relationship: ${entry.visualRelationship}`,
@@ -41,7 +41,7 @@ export function composeImagePrompt(entry, palette) {
     ...(entry.diagramEvidence ? [`Verified diagram evidence: ${entry.diagramEvidence}`] : []),
     "Shared style instructions override conflicting decorative directions, but never source facts:",
     ...imageStyle.instructions,
-    `Added palette from DESIGN: ${colors.join(", ")}.`,
+    `Postprocessing palette from DESIGN, do not render these hues into the master: ${colors.join(", ")}.`,
     `Canvas: ${imageStyle.aspectRatio}. Keep essential content inside a ${imageStyle.safeMarginPercent}% safe margin.`,
   ].join("\n");
 }

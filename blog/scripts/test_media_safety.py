@@ -393,6 +393,10 @@ def directImagePlan() -> None:
         assert "내장 ImageGen" in str(error)
     else:
         raise AssertionError("신규 이미지를 이전 FLUX 경로로 생성하려 한다")
+    fallbackPrompt = generate_flux.composePrompt(entry, imagegenUnavailable=True)
+    assert "neutral grayscale only" in fallbackPrompt
+    assert "do not render these hues into the master" in fallbackPrompt
+    assert entry["contentAnchor"] in fallbackPrompt
     print("  신규 이미지: 공통 스타일과 화면 및 도식 근거를 확인한다")
 
 

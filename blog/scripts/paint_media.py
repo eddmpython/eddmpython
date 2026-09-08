@@ -1,4 +1,4 @@
-"""이전 회색 원본 전용. 신규 이미지와 제품 원본의 색은 blogMedia.md 계약에 따라 보존한다.
+"""생성한 회색 원본에 공통 색을 입힌다. 공식 원본과 실제 캡처에는 적용하지 않는다.
 
 사용: python -X utf8 blog/scripts/paint_media.py <post-id> [--only key1,key2] [--desaturate]
 

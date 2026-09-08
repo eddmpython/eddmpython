@@ -1,8 +1,9 @@
 {
-  "version": 1,
+  "version": 2,
   "visualProfile": "eddmpython-direct-v1",
   "palettePolicy": "eddmpython-source-aware-v1",
   "generator": "imagegen",
+  "fallback": { "generator": "flux", "condition": "the environment has no image generation tool" },
   "visualModes": ["scene", "screen", "diagram"],
   "paletteTokens": { "background": "carbon", "surface": "ivory", "accent": "brand" },
   "aspectRatio": "16:9",
@@ -12,9 +13,10 @@
     "Real products must come from verified official or permitted reference images. Preserve their identity, proportions, logos and original colors. Never invent a product appearance.",
     "For a screen explanation, use the supplied actual screenshot as the content reference. Preserve the real layout, controls, labels, values and result. Enlarge the relevant region without inventing UI. A generated depiction is an explanatory illustration, not evidence of an actual capture.",
     "For new explanatory artwork, use a restrained realistic digital editorial finish, matte surfaces, clean edges, subtle material texture and soft neutral directional light. Do not add paper grain to a digital screen or turn software work into a handwritten manuscript scene.",
-    "Use the supplied background and surface palette for added surroundings. Use the supplied accent only on the one action, changed value or result being explained, never as an all-over tint or decoration. Product and screenshot source colors take precedence over this added palette.",
+    "Generate the master in neutral grayscale only, with no hue. The shared postprocessor applies the background, surface and accent tokens after generation. Product and screenshot source colors take precedence: actual captures and official originals bypass grayscale conversion and recoloring.",
+    "Make the one action, changed value or result being explained the only small brightest region. Keep other surfaces in middle gray and the background dark. This luminance separation guides the accent postprocessor; do not add unrelated bright highlights. Reject the result if the final accent lands away from the intended subject.",
     "Maintain clear subject contrast and neutral shadows. No gold, sepia, neon, cinematic glow, excessive blur, plastic-toy rendering, ornamental gradients, fake robots or glowing brains. Do not recolor existing product branding to enforce these restrictions.",
-    "A diagram is exceptional: create it with ImageGen only when the exact structure or numerical comparison cannot be understood from the actual scene. Use only the supplied verified relationships, values and units. Do not use a repeated box-and-arrow template by default.",
+    "A diagram is exceptional: use it only when the exact structure or numerical comparison cannot be understood from the actual scene. Use only verified relationships, values and units. Prefer a directly recognizable subject and its change over a repeated box-and-arrow template.",
     "Preserve required source text verbatim. New labels must be short and only those needed to identify the subject or relationship. Never bake the article title, subtitle, explanation paragraph or caption into the image.",
     "Use the style reference only for rendering treatment, never for its objects or facts. Use the content reference for facts and layout. Content accuracy has priority if the references conflict.",
     "Keep the composition readable at mobile article width. Leave caption and source attribution outside the image. No watermark or unrelated text."
