@@ -176,10 +176,7 @@ async function preparePage(client, sessionRef) {
       };
       await until(() => document.readyState === "complete", 30000);
       for (const image of document.images) {
-        const style = getComputedStyle(image);
-        const relevant = image.getAttribute("aria-hidden") !== "true"
-          && style.display !== "none" && style.visibility !== "hidden" && Number(style.opacity) > 0;
-        if (relevant) image.loading = "eager";
+        image.loading = "eager";
       }
       await settle(() => Array.from(document.images).every((image) => {
         const style = getComputedStyle(image);
