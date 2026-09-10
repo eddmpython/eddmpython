@@ -89,7 +89,7 @@ SyntaxError: cannot assign to subscript here. Maybe you meant '==' instead of '=
 
 https://eddmpython.com/codaro/run/?example=py-1991-syntax
 
-다만 35년의 변화가 철자뿐이었던 것은 아닙니다. 위 표의 `print`를 바꾼 파이썬 3은 텍스트를 다루는 방식까지 갈랐고, 그 변화 때문에 파이썬 2와 3은 11년 넘게 함께 쓰였습니다.
+35년 동안 문법만 바뀐 것은 아닙니다. 위 표의 `print`를 바꾼 파이썬 3은 텍스트와 바이트를 구분하는 방식도 바꿨고, 그 변화 때문에 파이썬 2와 3은 11년 넘게 함께 쓰였습니다.
 
 ## 파이썬 3에서 함수가 된 print
 ### 출력할 값을 괄호 안에 넣는 호출로 변경
@@ -121,7 +121,7 @@ https://eddmpython.com/codaro/run/?example=py-two-to-three
 `print`는 괄호를 넣어 고칠 수 있지만 텍스트를 다루는 코드는 자료형까지 확인해야 했습니다.
 
 ## 텍스트와 바이트의 분리
-### 글자와 저장할 숫자를 서로 다른 타입으로 다루기
+### 텍스트는 str, 바이트는 bytes로 구분
 
 [![텍스트와 바이트의 분리 개념을 확인하는 공식 문서 화면](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/67/67aea24b7ddedfc50fa0ffe9c8bb75a4ec56bdd3542604641d7ad61ed33c5c97.png "텍스트와 바이트의 분리 개념을 확인하는 공식 문서 화면 · 실제 캡처")](https://docs.python.org/3/whatsnew/3.0.html#text-vs-data-instead-of-unicode-vs-8-bit)
 
@@ -151,7 +151,7 @@ https://eddmpython.com/codaro/run/?example=py-two-to-three
 2020년 1월 1일 | 연장된 Python 2.7 지원 종료
 ```
 
-이 호환성 변화 때문에 옮겨 가는 데 오래 걸렸습니다. 3.0이 2008년 12월에 나왔고 2.7 지원이 2020년 1월 1일에 끝났으니 두 판이 11년 넘게 함께 살았습니다. [PEP 373](https://peps.python.org/pep-0373/)에 따르면 2.7 지원 종료는 원래 계획한 2015년보다 5년 늦춰졌습니다.
+이 호환성 변화 때문에 옮겨 가는 데 오래 걸렸습니다. 3.0이 2008년 12월에 나왔고 2.7 지원이 2020년 1월 1일에 끝났으니 두 버전이 11년 넘게 함께 쓰였습니다. [PEP 373](https://peps.python.org/pep-0373/)에 따르면 2.7 지원 종료는 원래 계획한 2015년보다 5년 늦춰졌습니다.
 
 지금 파이썬 2.7은 지원이 끝난 판입니다. 긴 전환기를 거친 파이썬의 사용 규모는 언어 순위에서도 볼 수 있지만, 조사마다 세는 대상이 다릅니다.
 
@@ -179,8 +179,6 @@ Stack Overflow는 개발자에게 직접 묻습니다. 지난 1년 동안 그 �
 GitHub은 월간 기여자 수를 셉니다. Octoverse 2025에서 TypeScript는 2025년 8월 파이썬을 약 4만 2천 명 차이로 넘어섰고, 파이썬은 2위에 남았습니다. 같은 보고서에서는 파이썬이 AI와 데이터 과학 작업에서 여전히 앞선다고 설명합니다.
 
 그래서 순위표로 언어를 고르면 무엇을 놓칠까요? 세 표 어디에도 `내가 하려는 일에 맞는가`는 없습니다. 데이터 분석이나 AI 자동화를 하려면 파이썬 생태계를 먼저 보고, 브라우저 화면을 만들려면 JavaScript와 TypeScript 생태계를 먼저 봐야 합니다. 순위는 그 판단을 대신해 주지 않습니다.
-
-순위가 알려 주지 않는 것이 하나 더 있습니다. 지금 이 언어 안에서 무엇이 바뀌는 중인지입니다.
 
 ## 코드 실행을 빠르게 만든 인터프리터
 ### 같은 코드를 처리하는 비용을 줄인 Python 3.11
@@ -249,20 +247,20 @@ https://eddmpython.com/codaro/run/?example=py-gil-check
 
 출처: [Python Software Foundation](https://docs.python.org/3/howto/free-threading-python.html) · [사용 조건](https://docs.python.org/3/license.html). 원문 화면 일부를 캡처했습니다.
 
-| free-threaded 빌드 | 상태 |
+| 버전과 빌드 | GIL 설정과 free-threaded 지원 |
 |---|---|
 | Python 3.13 | 실험 도입 |
 | Python 3.14 | 공식 지원되는 선택지 |
 | 기본 빌드 | GIL을 켜고 실행 |
 
-GIL을 선택해서 끌 수 있게 만든 제안이 [PEP 703](https://peps.python.org/pep-0703/)입니다. `free-threaded` 빌드는 3.13에 실험으로 들어왔고, 3.14에서는 [PEP 779](https://peps.python.org/pep-0779/)가 정한 기준을 채워 공식 지원 단계가 됐습니다. 다만 기본 빌드는 여전히 GIL을 켭니다. [공식 안내](https://docs.python.org/3/howto/free-threading-python.html)에 따르면 `free-threaded` 빌드의 단일 스레드 평균 부담은 환경에 따라 약 1%에서 8%입니다. 여러 코어를 쓰는 대신 그 부담과 패키지 호환성을 함께 확인해야 합니다.
+GIL을 선택해서 끌 수 있게 만든 제안이 [PEP 703](https://peps.python.org/pep-0703/)입니다. `free-threaded` 빌드는 3.13에 실험으로 들어왔고, 3.14에서는 [PEP 779](https://peps.python.org/pep-0779/)가 정한 기준을 채워 공식 지원 단계가 됐습니다. 다만 기본 빌드는 여전히 GIL을 켭니다. [공식 안내](https://docs.python.org/3/howto/free-threading-python.html)에 따르면 `free-threaded` 빌드는 단일 스레드로 실행할 때 기본 빌드보다 평균 약 1%에서 8% 더 느렸습니다. 이는 pyperformance 벤치마크 결과이며 작업과 장비에 따라 차이가 납니다. 여러 코어로 계산할 수 있더라도 실제 작업의 처리 시간과 패키지 호환성을 함께 확인해야 합니다.
 
-GIL을 끌 수 있는 빌드인지 확인했습니다. 스레드와 별개로, 자주 실행하는 코드 자체를 바꾸는 실험도 있습니다.
+GIL을 끄는 빌드는 여러 스레드의 동시 계산을 위한 선택입니다. 자주 실행하는 코드를 기계어로 바꾸는 JIT는 별도의 기능입니다.
 
-## 반복하는 코드를 바꾸는 JIT
+## 자주 실행하는 코드를 기계어로 바꾸는 JIT
 ### 실행 중 자주 쓰는 코드를 기계어로 컴파일
 
-[![반복하는 코드를 바꾸는 JIT 개념을 확인하는 공식 문서 화면](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/59/592b517e9171f238d390577b04f50c008d9fd4308565cb41ea433d1eea0e2118.png "반복하는 코드를 바꾸는 JIT 개념을 확인하는 공식 문서 화면 · 실제 캡처")](https://peps.python.org/pep-0744/)
+[![자주 실행하는 코드를 기계어로 바꾸는 JIT 개념을 확인하는 공식 문서 화면](https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/59/592b517e9171f238d390577b04f50c008d9fd4308565cb41ea433d1eea0e2118.png "자주 실행하는 코드를 기계어로 바꾸는 JIT 개념을 확인하는 공식 문서 화면 · 실제 캡처")](https://peps.python.org/pep-0744/)
 
 출처: [Brandt Bucher, Savannah Ostrowski](https://peps.python.org/pep-0744/) · [사용 조건](https://peps.python.org/pep-0744/#copyright). 원문 화면 일부를 캡처했습니다.
 
@@ -325,6 +323,6 @@ print(sys.version.split()[0])
 
 - 파이썬이라는 이름은 BBC 코미디 `Monty Python's Flying Circus`에서 따왔습니다. 이름을 고른 이야기는 [공식 FAQ](https://docs.python.org/3/faq/general.html#why-is-it-called-python)에 있습니다.
 - 파이썬이 무엇을 바꾸는 중인지 직접 보려면 [PEP 목록](https://peps.python.org/)을 엽니다. `Accepted`는 수락된 제안입니다. 적용될 버전과 구현 상태는 각 제안에서 따로 확인합니다.
-- 자물쇠 없는 파이썬은 윈도우와 macOS 설치 프로그램에서 `free-threaded`를 골라 켭니다. 무엇이 아직 안 되는지는 [공식 free-threading 안내](https://docs.python.org/3/howto/free-threading-python.html)에 있습니다.
+- GIL을 끌 수 있는 파이썬을 설치하려면 윈도우와 macOS 설치 프로그램에서 `free-threaded`를 고릅니다. 무엇이 아직 안 되는지는 [공식 free-threading 안내](https://docs.python.org/3/howto/free-threading-python.html)에 있습니다.
 - 개발팀이 무엇을 하는지 따라가려면 [Python Insider](https://blog.python.org/)를 봅니다. 릴리스와 큰 변경이 여기에 먼저 올라옵니다.
 - 파이썬 2 코드를 아직 들고 있다면 `2to3` 명령을 찾아도 없습니다. `2to3`와 `lib2to3`는 3.13에서 빠졌습니다. 3.12 이하를 따로 깔면 `2to3 -w 내파일.py`로 한 번은 돌릴 수 있습니다.

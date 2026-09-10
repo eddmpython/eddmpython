@@ -85,8 +85,6 @@ https://eddmpython.com/codaro/run/?example=csv-parquet-code
 
 `ConvertOptions`는 CSV 문자를 어떤 값으로 바꿀지 정하는 설정입니다. `column_types`에 열 이름 `code`와 문자열 자료형 `pa.string()`을 짝지어 넣습니다. 입력에 있는 `0012`를 `0007`로 고치고 다시 실행하면 자동 추정은 7, 문자열 지정은 `0007`을 남깁니다.
 
-코드의 `BytesIO`는 파일처럼 읽고 쓸 바이트를 메모리에 담습니다. 이 실행 칸은 디스크 파일을 바꾸지 않습니다.
-
 CSV를 받는 사람에게는 `code`를 문자열로 읽는 설정도 알려 줘야 합니다. 값과 읽기 설정을 함께 전달해야 같은 상품 코드를 얻습니다.
 
 ## Parquet에 함께 저장한 자료형

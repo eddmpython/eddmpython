@@ -169,8 +169,6 @@ rg --files -g ".github/workflows/*" -g "tests/**" -g "test/**"
 
 파일 이름 뒤의 `.md`는 메모장으로도 열 수 있는 글 파일 형식입니다. Codex는 `AGENTS.md`에서, Claude Code는 `CLAUDE.md`에서 지침을 읽습니다. 읽기 방식은 [OpenAI의 안내](https://developers.openai.com/codex/guides/agents-md)와 [Claude Code의 안내](https://code.claude.com/docs/en/memory)에서 확인할 수 있습니다.
 
-한 도구만 쓴다면 그 도구의 파일 하나면 됩니다.
-
 ## AI 작업. 두 지침 파일 연결
 
 ### 다른 지침 파일을 읽도록 연결하면 규칙을 두 번 적지 않습니다

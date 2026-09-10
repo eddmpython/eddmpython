@@ -6335,13 +6335,13 @@
       "width": 1672
     },
     "592b517e9171f238d390577b04f50c008d9fd4308565cb41ea433d1eea0e2118": {
-      "alt": "반복하는 코드를 바꾸는 JIT 개념을 확인하는 공식 문서 화면",
+      "alt": "자주 실행하는 코드를 기계어로 바꾸는 JIT 개념을 확인하는 공식 문서 화면",
       "bytes": 49741,
       "height": 580,
       "mime": "image/png",
       "path": "objects/sha256/59/592b517e9171f238d390577b04f50c008d9fd4308565cb41ea433d1eea0e2118.png",
       "sourcePost": "005-python-history",
-      "visualSubject": "반복하는 코드를 바꾸는 JIT 개념을 확인하는 공식 문서 화면",
+      "visualSubject": "자주 실행하는 코드를 기계어로 바꾸는 JIT 개념을 확인하는 공식 문서 화면",
       "width": 821
     },
     "592cf0e492c49e1d5e24247726beecbae6cfcb045df69df1944859690068d2c7": {
@@ -6892,13 +6892,13 @@
       "width": 2048
     },
     "64b0bfa9983e015f0a5194d6d07dc0e22bbc897913db3a8eb8edfcec14af2b44": {
-      "alt": "Narwhals DataFrame, 여러 표를 받는 한 가지 API 개념을 확인하는 공식 문서 화면",
+      "alt": "Narwhals DataFrame, 여러 라이브러리를 같은 문법으로 개념을 확인하는 공식 문서 화면",
       "bytes": 66218,
       "height": 563,
       "mime": "image/png",
       "path": "objects/sha256/64/64b0bfa9983e015f0a5194d6d07dc0e22bbc897913db3a8eb8edfcec14af2b44.png",
       "sourcePost": "004-dataframe-libraries",
-      "visualSubject": "Narwhals DataFrame, 여러 표를 받는 한 가지 API 개념을 확인하는 공식 문서 화면",
+      "visualSubject": "Narwhals DataFrame, 여러 라이브러리를 같은 문법으로 개념을 확인하는 공식 문서 화면",
       "width": 1000
     },
     "64fbfacfed7c396201f972c62f393a6d95cdc6ad5c5d9d7974653297a0ca42b7": {
@@ -10962,13 +10962,13 @@
       "width": 2048
     },
     "ce7918d89c28d8508dc7ab713b0a61da52a3d4cb6ffb80009e6a993a1511e3e8": {
-      "alt": "pandas DataFrame, 가장 넓은 출발점 개념을 확인하는 공식 문서 화면",
+      "alt": "pandas DataFrame, 일반적인 표 분석 개념을 확인하는 공식 문서 화면",
       "bytes": 13943,
       "height": 569,
       "mime": "image/png",
       "path": "objects/sha256/ce/ce7918d89c28d8508dc7ab713b0a61da52a3d4cb6ffb80009e6a993a1511e3e8.png",
       "sourcePost": "004-dataframe-libraries",
-      "visualSubject": "pandas DataFrame, 가장 넓은 출발점 개념을 확인하는 공식 문서 화면",
+      "visualSubject": "pandas DataFrame, 일반적인 표 분석 개념을 확인하는 공식 문서 화면",
       "width": 751
     },
     "cf779364419eddd5c56cbb280b2a088f3e78fdcb9b125cf7d00ba10bd3957688": {

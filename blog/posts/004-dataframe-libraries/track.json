@@ -20,7 +20,7 @@
       "why": "Daft 0.7.24에서 from_pydict, where, agg, collect 예제와 출력 5를 직접 확인했다. 버전이 바뀌면 멀티모달 자료형과 분산 실행 경계를 다시 본다."
     },
     "dask": {
-      "anchor": "Dask DataFrame은 여러 pandas DataFrame을 행 방향 파티션으로 나눈 뒤 하나의 큰 표처럼 보이게 합니다.",
+      "anchor": "Dask DataFrame은 표를 행 단위로 나눈 여러 pandas DataFrame을 하나의 큰 표처럼 다룹니다.",
       "kind": "pypi",
       "package": "dask",
       "why": "Dask 2026.8.0의 DataFrame 설계와 from_dict, compute 예제를 사용한다. 메이저가 바뀌면 파티션과 메타데이터 계약을 다시 실행한다."
@@ -68,7 +68,7 @@
       "why": "PySpark 4.2.0의 공식 설치 조건과 Spark DataFrame API를 사용한다. 메이저가 바뀌면 Python과 Java 최소 버전, local 실행 코드를 다시 확인해야 한다."
     },
     "vaex": {
-      "anchor": "Vaex DataFrame은 HDF5와 Arrow 파일을 메모리에 전부 복사하지 않고 필요한 열을 늦게 계산하는 로컬 표입니다.",
+      "anchor": "Vaex DataFrame은 HDF5와 Arrow 파일을 메모리에 전부 복사하지 않고 필요한 열의 계산을 결과 요청 시점까지 미루는 표입니다.",
       "kind": "pypi",
       "package": "vaex",
       "why": "Vaex 4.19.0을 Python 3.12 격리 환경에 설치해 from_dict, 선택, sum 예제와 출력 5를 직접 확인했다. 버전이 바뀌면 지원 Python과 파일 형식을 다시 본다."

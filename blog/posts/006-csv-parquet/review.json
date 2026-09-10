@@ -1,67 +1,77 @@
 {
   "version": 1,
+  "date": "2026-09-10",
+  "scope": "블로그 전체의 의미 불명확한 비유와 비문 점검 및 hanlint와 im-not-ai 비교",
   "rounds": [
     {
+      "round": 1,
       "reviewers": [
         {
           "role": "첫 독자",
+          "agent": "firstReader",
           "findings": []
         },
         {
           "role": "구조 편집자",
-          "findings": [
-            {
-              "quote": "반복이 많은 표의 행 수를 늘리면 이 실험에서는 Parquet 파일이 더 작아집니다",
-              "why": "행 수가 늘수록 Parquet 파일 자체가 작아진다는 뜻으로 읽힌다. 본문은 CSV보다 작다는 상대 비교다.",
-              "fix": "반복이 많은 1,000행과 100,000행 표에서는 Parquet 파일이 CSV보다 작습니다"
-            }
-          ]
+          "agent": "structureEditor",
+          "findings": []
         },
         {
           "role": "문체 편집자",
+          "agent": "styleEditor",
           "findings": [
             {
-              "quote": "만든 바이트를 그대로 내려받으므로 도구에 나온 크기가 파일 크기입니다.",
-              "why": "다운로드를 설명하다가 구현 표현으로 바뀌어 바이트가 무엇을 가리키는지 다시 풀어 읽어야 한다.",
-              "fix": "내려받은 파일의 크기는 도구에 표시된 크기와 같습니다."
-            },
-            {
-              "quote": "수량 합계만 필요하다면 지역 이름과 상품 코드를 읽은 표에 담을 이유가 없습니다.",
-              "why": "상품 코드를 읽은 표로 먼저 묶여 읽혀 목적어와 수식 관계가 흔들린다.",
-              "fix": "수량 합계만 필요하다면 지역 이름과 상품 코드까지 읽을 필요는 없습니다."
+              "quote": "코드의 `BytesIO`는 파일처럼 읽고 쓸 바이트를 메모리에 담습니다.",
+              "why": "바이트를 담는다는 압축 설명보다 역할을 직접 설명해야 한다.",
+              "fix": "`BytesIO`는 메모리에 담은 데이터를 파일처럼 읽고 쓰게 합니다."
             }
           ]
         },
         {
           "role": "빼기 심사자",
-          "findings": []
+          "agent": "subtractEditor",
+          "findings": [
+            {
+              "quote": "코드의 `BytesIO`는 파일처럼 읽고 쓸 바이트를 메모리에 담습니다. 이 실행 칸은 디스크 파일을 바꾸지 않습니다.",
+              "why": "이 단계의 목표는 code 자료형을 지정해 앞자리 0을 남기는 것이다. BytesIO 내부 저장 위치를 몰라도 안내대로 입력을 바꾸고 두 출력을 비교할 수 있다.",
+              "fix": "문단 삭제.",
+              "action": "delete"
+            }
+          ]
         },
         {
           "role": "검색 독자",
+          "agent": "searchReader",
           "findings": []
         }
       ]
     },
     {
+      "round": 2,
       "reviewers": [
         {
           "role": "첫 독자",
+          "agent": "firstReader",
           "findings": []
         },
         {
           "role": "구조 편집자",
+          "agent": "structureEditor",
           "findings": []
         },
         {
           "role": "문체 편집자",
+          "agent": "styleEditor",
           "findings": []
         },
         {
           "role": "빼기 심사자",
+          "agent": "subtractEditor",
           "findings": []
         },
         {
           "role": "검색 독자",
+          "agent": "searchReader",
           "findings": []
         }
       ]
@@ -70,20 +80,14 @@
   "kept": [],
   "edits": [
     {
-      "what": "섹션 기준을 01단원의 04번 교안 하나로 바로잡아 문장형 부제와 개념별 주 이미지, 설명과 보조 자료 순서로 다시 구성했다. 개념 도식과 실측 그래프 12개를 직접 렌더하고 검수한 뒤 HF에 연결했다. 새 독립 검토의 첫 지적을 반영해 상대 크기 비교 부제와 내려받기 및 열 선택 문장을 고쳤다."
-    },
-    "섹션 도식을 실제 도구와 코드셀 출력 캡처 8장, ImageGen 설명 이미지 4장으로 교체했다. 도식은 열별 저장 관계 한 곳에만 남기고 실제 바이트 배치와 구분했다. 기존 본문 수치와 측정 기록, 독립 평가 이력은 유지했다."
+      "what": "앞자리 0을 보존하는 실습에 불필요한 BytesIO 내부 동작 문단을 삭제했다."
+    }
   ],
   "verification": {
-    "hanlint": "0.0.8, 저장소의 문장형 부제 설정으로 error 0",
-    "localExamples": "PyArrow 22.0.0으로 test.py 재실행 완료",
-    "media": "주 이미지 12개를 2048x1152 PNG로 직접 렌더하고 실제 픽셀을 모두 검수하여 HF에 발행했다. 기존 실제 도구 화면은 보조 이미지로 보존했다.",
-    "visualEvidence": "../eddmpython.out/visual/20260905T035928700Z",
-    "visualReview": "006과 기존 003을 데스크톱 1440x1000 및 모바일 390x844에서 진단했다. 006의 주 이미지 12개와 보조 이미지 1개가 모두 로드되었고 섹션 순서 권고, 이미지 오류, 가로 넘침은 0개다. 목차 이동 후의 이미지 로딩과 모바일 개념 이미지 12개, 비교 도구, 실행 칸을 실제 캡처로 확인했다. 16:9 프레임 안에서 원본 비율과 색을 유지한다. 전체 사이트 배포 승인용 검증은 아니다.",
-    "browserExamples": "최종 두 화면 폭에서 3행 비교 도구와 CSV 문자열 읽기, Parquet 자료형, 필요한 열 선택, 압축 비교 실행 칸 네 개가 통과했다. PyArrow 22.0.0의 test.py에서도 독립 예제와 변경 예제를 재실행했다.",
-    "publicChecks": "6개 글 계약, hanlint, 미디어 및 부제 규칙 테스트, TypeScript, Vite 정적 빌드, 9개 페이지 SEO, 비공개 교안 누출 검사가 통과했다.",
-    "remainingScope": "기존 003의 주 이미지 누락 권고 11개는 남아 있다. 공통 렌더러 진단 통과를 기존 다섯 글의 개념별 이미지 보완 완료로 취급하지 않는다.",
-    "workflowBlocker": "npm test와 npm run build는 기존 출력 경로의 course-room-media, git-index-course-runtime, three-actions-current.webp 세 항목에 대한 workspace 검사에서 실패했다. 다른 작업 산출물은 보존했으며 커밋, 블로그 승인, 배포는 실행하지 않았다."
+    "baselineHanlint": "0.0.8",
+    "baselineErrors": 0,
+    "codeAndOutput": "원문과 수정본의 python, text, bash, powershell, json 코드 블록이 동일함을 대조했다.",
+    "finalSha256": "975ac2e9ca2532812c92f4e65440e7f5c5bcf2f22a7d48f09be84c0774f80e0d"
   },
   "previousReviews": [
     {

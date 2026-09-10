@@ -1,132 +1,77 @@
 {
   "version": 1,
-  "why": "사용자가 문장이 읽히지 않는다고 지적해 본문을 다시 썼다. 이전의 검사 및 평가 통과는 자연스러운 글의 증거가 되지 못했다. 이번 독립 재평가에서 남은 지적도 숨기지 않고 기록한다. 수정본 재평가에서 스킬 문서로 연결했다는 표현이 다시 지적됐다. 제안한 문장으로 고쳤으며 세 번째 평가는 하지 않았다. 마지막 라운드에 지적이 없었다고 기록하지 않는다.",
+  "date": "2026-09-10",
+  "scope": "블로그 전체의 의미 불명확한 비유와 비문 점검 및 hanlint와 im-not-ai 비교",
   "rounds": [
     {
+      "round": 1,
       "reviewers": [
         {
           "role": "첫 독자",
-          "findings": [
-            {
-              "quote": "열린 셀에 바로 쓰기",
-              "why": "통합문서를 여는 것과 셀을 선택하는 것을 혼동한 표현이다.",
-              "fix": "A1 셀에 문장 쓰기"
-            },
-            {
-              "quote": "xlwings Lite는 Excel 추가 기능 안에서 Python을 실행합니다. 컴퓨터에 Python을 따로 설치하지 않아도 되며, 개인과 업무 용도로 무료로 쓸 수 있습니다.",
-              "why": "도입에서 읽은 설명이 설치 단계 앞에 반복된다.",
-              "fix": "실행 위치와 별도 Python 설치 설명을 삭제했다."
-            },
-            {
-              "quote": "`sheet = book.sheets[0]`으로 그 문서의 첫 시트를 골라 `sheet`라는 이름을 붙입니다.",
-              "why": "0이 첫 시트인 이유가 없어 숫자를 다시 보게 된다.",
-              "fix": "파이썬에서는 순서를 0부터 센다는 설명을 보탰다."
-            }
-          ]
+          "agent": "firstReader",
+          "findings": []
         },
         {
           "role": "구조 편집자",
+          "agent": "structureEditor",
           "findings": [
             {
-              "quote": "파일을 수정할 수 있는 이유는 알았지만, 직접 코드를 쓰려면 파이썬 문법도 필요합니다.",
-              "why": "ZIP 구조 확인과 문법 학습을 알았지만으로 대립시킨다.",
-              "fix": "A1 기본 예제로 돌아가 직접 코드를 바꾸고 싶은 독자에게 문법 학습을 안내했다."
-            },
-            {
-              "quote": "xlwings Lite는 Excel 추가 기능 안에서 Python을 실행합니다. 컴퓨터에 Python을 따로 설치하지 않아도 되며, 개인과 업무 용도로 무료로 쓸 수 있습니다.",
-              "why": "도입에서 읽은 설명이 설치 단계 앞에 반복된다.",
-              "fix": "실행 위치와 별도 Python 설치 설명을 삭제했다."
+              "quote": "A1에 문장을 쓰는 데는 앞서 실행한 기본 예제만 있으면 됩니다.",
+              "why": "ZIP 구조를 네 문단 읽은 다음에야 첫 실습에 필요 없는 내용임을 밝힌다. xlwings Lite로 첫 셀을 쓰는 독자의 흐름이 끊긴다.",
+              "fix": "A1 실습 끝에 기본 동작은 여기까지이며 아래부터는 파일 구조와 문법을 더 알아볼 때 읽는다는 선택 안내를 둔다. 또는 ZIP 구조 절을 기본 예제와 문법 학습 안내 뒤로 옮긴다. ZIP 설명 자체의 삭제는 요구하지 않는다."
             }
           ]
         },
         {
           "role": "문체 편집자",
-          "findings": [
-            {
-              "quote": "열린 셀에 바로 쓰기",
-              "why": "통합문서를 여는 것과 셀을 선택하는 것을 혼동한 표현이다.",
-              "fix": "A1 셀에 문장 쓰기"
-            },
-            {
-              "quote": "연습용 새 통합문서를 열고 아래 순서로 추가합니다.",
-              "why": "추가할 대상이 생략됐다.",
-              "fix": "xlwings Lite를 추가한다고 적었다."
-            },
-            {
-              "quote": "이 작업을 AI에게 맡길 수 있도록 글 끝에 수정 스킬을 붙였습니다.",
-              "why": "수정 스킬의 뜻과 대상 작업이 불분명하다.",
-              "fix": "AI가 통합문서의 코드를 교체할 때 따를 지침이라고 설명했다."
-            },
-            {
-              "quote": "표의 모양을 확인했다면",
-              "why": "다음 수업으로 옮기는 이유가 흐리다.",
-              "fix": "레스토랑 팁 분석에서 행 선택과 합계 코드를 연습한다고 적었다."
-            },
-            {
-              "quote": "파일을 수정할 수 있는 이유는 알았지만, 직접 코드를 쓰려면 파이썬 문법도 필요합니다.",
-              "why": "ZIP 구조 확인과 문법 학습을 알았지만으로 대립시킨다.",
-              "fix": "A1 기본 예제로 돌아가 직접 코드를 바꾸고 싶은 독자에게 문법 학습을 안내했다."
-            }
-          ]
+          "agent": "styleEditor",
+          "findings": []
         },
         {
           "role": "빼기 심사자",
+          "agent": "subtractEditor",
           "findings": [
             {
-              "quote": "xlwings Lite는 Excel 추가 기능 안에서 Python을 실행합니다. 컴퓨터에 Python을 따로 설치하지 않아도 되며, 개인과 업무 용도로 무료로 쓸 수 있습니다.",
-              "why": "도입에서 읽은 설명이 설치 단계 앞에 반복된다.",
-              "fix": "실행 위치와 별도 Python 설치 설명을 삭제했다."
-            },
-            {
-              "quote": "pandas에서 다루는 표를 `DataFrame`이라고 부릅니다.",
-              "why": "뒤에서 사용하지 않는 이름을 외우게 한다.",
-              "fix": "삭제했다."
-            },
-            {
-              "quote": "치트시트는 pandas의 자주 쓰는 문법을 모은 참고표입니다. 처음부터 외우기보다 Codaro의 pandas 예제를 바꾸다가 함수 이름이 생각나지 않을 때 펼쳐 둡니다.",
-              "why": "앞 절의 설명을 되풀이한다.",
-              "fix": "반복을 지우고 필요한 구역을 찾는 방법으로 시작했다."
+              "quote": "A1에 문장을 쓰는 데는 앞서 실행한 기본 예제만 있으면 됩니다.",
+              "why": "이 문장은 .xlsx ZIP 구조를 길게 설명한 뒤 그 설명 없이도 원래 목표를 달성한다고 확인한다. 엑셀에서 첫 코드를 실행하려는 독자는 ZIP과 XML 내부 구조를 몰라도 진행할 수 있다.",
+              "fix": "ZIP 구조와 외부 코드 교체 설명은 더 해 볼 것의 기존 ZIP 수정 스킬 항목에 한두 문장으로 묶어 옮긴다. 기본 예제 뒤에는 A1 값을 고쳐 다시 실행하거나 기초 문법 학습 링크로 이어 간다.",
+              "action": "defer"
             }
           ]
         },
         {
           "role": "검색 독자",
-          "findings": [
-            {
-              "quote": "xlwings Lite는 Excel 추가 기능 안에서 Python을 실행합니다. 컴퓨터에 Python을 따로 설치하지 않아도 되며, 개인과 업무 용도로 무료로 쓸 수 있습니다.",
-              "why": "도입에서 읽은 설명이 설치 단계 앞에 반복된다.",
-              "fix": "실행 위치와 별도 Python 설치 설명을 삭제했다."
-            }
-          ]
+          "agent": "searchReader",
+          "findings": []
         }
       ]
     },
     {
+      "round": 2,
       "reviewers": [
         {
           "role": "첫 독자",
+          "agent": "firstReader",
           "findings": []
         },
         {
           "role": "구조 편집자",
+          "agent": "structureEditor",
           "findings": []
         },
         {
           "role": "문체 편집자",
-          "findings": [
-            {
-              "quote": "글 끝에는 AI가 통합문서 안의 코드를 교체할 때 따를 지침을 스킬 문서로 연결했습니다.",
-              "why": "지침을 문서로 만들었다는 뜻인지 링크를 붙였다는 뜻인지 다시 풀어야 한다.",
-              "fix": "AI가 통합문서 안의 코드를 교체할 때 따를 지침은 스킬 문서에 담았습니다. 문서 링크는 글 끝에 있습니다."
-            }
-          ]
+          "agent": "styleEditor",
+          "findings": []
         },
         {
           "role": "빼기 심사자",
+          "agent": "subtractEditor",
           "findings": []
         },
         {
           "role": "검색 독자",
+          "agent": "searchReader",
           "findings": []
         }
       ]
@@ -135,24 +80,16 @@
   "kept": [],
   "edits": [
     {
-      "what": "추상적인 표현, 잘못 수식한 제목, 반복 설명을 고치고 문단 사이의 이유를 보탰다. 이전 기록은 Git 이력에 남아 있다."
+      "what": "기본 예제 완료 직후 선택 참고의 시작을 밝혔다. ZIP 설명의 지시어와 반복 문장을 고쳤다."
     },
     {
-      "what": "재평가에서 지적한 스킬 문서 설명을 두 문장으로 풀어 고쳤다. 새 지적이 있었던 사실을 유지했다."
+      "what": "ZIP 구조는 원문의 summary와 readerTakeaway가 약속한 학습 목표라 삭제하지 않았다. 첫 실습 직후 선택 참고라고 알리는 안을 채택했고 빼기 심사자 재평가에서 새 지적이 없었다."
     }
   ],
   "verification": {
-    "sources": [
-      "https://lite.xlwings.org/quickstart",
-      "https://lite.xlwings.org/custom-scripts",
-      "https://lite.xlwings.org/dependencies",
-      "https://pandas.pydata.org/Pandas_Cheat_Sheet.pdf"
-    ],
-    "excelExecution": "공식 예제의 코드와 결과를 대조했다. 실제 Excel 추가 기능에서 실행하지 않았으므로 직접 실행 검증으로 보고하지 않는다.",
-    "learningLinks": "Codaro의 기초 및 pandas 입문 공개 페이지를 pyproc-control로 열고 클라이언트 로딩 후 본문을 확인했다.",
-    "zipSkill": "가짜 데이터 ZIP으로 한글과 특수문자의 JSON 및 XML 왕복 복원, 다른 부품 바이트, 항목 순서와 ZIP 주석 보존을 검사했다. 실제 Excel에서 파일을 열어 실행한 검증은 하지 않았다.",
-    "video": "YouTube oEmbed에서 제목 엑셀 사실은 zip 압축파일입니다. 및 채널 으뜸이네 파이썬을 확인했다.",
-    "hanlint": "site/node_modules/.bin/hanlint.cmd로 검사했다. error 0이며 notice는 지원 환경 및 출처 설명과 문단 연결을 직접 읽어 판단했다."
-  },
-  "loop": "unresolved"
+    "baselineHanlint": "0.0.8",
+    "baselineErrors": 0,
+    "codeAndOutput": "원문과 수정본의 python, text, bash, powershell, json 코드 블록이 동일함을 대조했다.",
+    "finalSha256": "8638972586b7b7421c6ca19f9c27744142782e7ea738918c2e088888c7c9d6f9"
+  }
 }
