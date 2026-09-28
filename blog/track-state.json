@@ -14,8 +14,8 @@
       "at": "2026-09-01"
     },
     "004-dataframe-libraries/daft": {
-      "value": "0.7.24",
-      "at": "2026-09-01"
+      "value": "0.7.25",
+      "at": "2026-09-12"
     },
     "004-dataframe-libraries/dask": {
       "value": "2026.8.0",
@@ -38,8 +38,8 @@
       "at": "2026-09-08"
     },
     "004-dataframe-libraries/pandas": {
-      "at": "2026-08-26",
-      "value": "3.0.5"
+      "value": "3.0.6",
+      "at": "2026-09-17"
     },
     "004-dataframe-libraries/polars": {
       "value": "1.44.2",
@@ -54,8 +54,8 @@
       "at": "2026-09-01"
     },
     "005-python-history/insider": {
-      "value": "https://blog.python.org/2026/09/python-3150-rc2/",
-      "at": "2026-09-01"
+      "value": "https://blog.python.org/2026/09/python-docs-in-german/",
+      "at": "2026-09-26"
     },
     "005-python-history/python-latest": {
       "value": "3.14.7",
