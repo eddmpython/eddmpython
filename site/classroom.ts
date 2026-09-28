@@ -124,10 +124,6 @@ article .q { font-style:normal; color:var(--eddm-ivory); }
 .state.on { background:var(--eddm-accent-bg); color:var(--eddm-accent); }
 /* 이 카테고리를 덮으면 무엇이 되는지. 왜 듣는지가 목록에서 보여야 한다. */
 .goal { margin:.5rem 0 1rem 2.1rem; font-size:.87rem; color:var(--eddm-text-muted); line-height:1.7; }
-/* 잠긴 카테고리. 가리지 않고 이름만 보여 준다. 본문은 여전히 안 내려간다. */
-.later { border:1px solid var(--eddm-line); border-radius:.85rem; padding:1.1rem 1.5rem; opacity:.6; }
-.later-h { margin:0 0 .7rem; font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--eddm-text-faint); }
-.later-row { display:flex; justify-content:space-between; gap:1rem; padding:.4rem 0; font-size:.92rem; color:var(--eddm-text-muted); }
 .tag { font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--eddm-accent); }
 a.post { display:flex; gap:.9rem; align-items:baseline; margin-left:2.1rem; padding:.65rem 0;
   border-top:1px solid var(--eddm-line); color:inherit; text-decoration:none; line-height:1.6; }
@@ -1554,17 +1550,21 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     );
   }
 
+  const courseState = cachedCourse ?? await course(env);
+  const open = visible(courseState.categories, room.unlocked);
+
   /**
-   * 비공개 시각물. 교안 KV 의 `media/<sha256>.<ext>` 를 방 세션이 있고 방이 열린 요청에만 준다.
-   *
-   * 강사 사진과 연락처가 든 장표처럼 Hugging Face 에 올리면 안 되는 것이 여기로 온다
-   * (2026-09-02 운영자 결정). 카테고리 잠금까지는 묻지 않는다. 열리지 않은 글의 주소는 화면에
-   * 나가지 않고, 이름이 내용 해시라 목록 없이는 추측할 수 없기 때문이다. `media` 는 카테고리
-   * 슬러그(`NN-...`)가 될 수 없어 글 주소와 겹치지 않는다.
+   * 비공개 시각물과 실습 파일은 이 방에서 열린 글이 참조할 때만 준다.
+   * 내용 해시를 다른 방에서 알아내도 그 방에 열리지 않은 자료를 받을 수 없어야 한다.
+   * `media` 는 카테고리 슬러그(`NN-...`)가 될 수 없어 글 주소와 겹치지 않는다.
    */
   if (parts[1] === "media" && parts.length === 3) {
     const key = parts[2];
     if (!ROOM_MEDIA_KEY.test(key)) return new Response("not found", { status: 404 });
+    const source = `room://${key}`;
+    if (!open.some((category) => category.posts.some((post) => post.body.includes(source)))) {
+      return new Response("없는 시각물입니다.", { status: 404 });
+    }
     const bytes = await env.COURSE.get(`media/${key}`, { type: "arrayBuffer", cacheTtl: 3600 });
     if (!bytes) return new Response("없는 시각물입니다.", { status: 404 });
     return new Response(bytes, {
@@ -1578,10 +1578,6 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     });
   }
 
-  const courseState = cachedCourse ?? await course(env);
-  const all = courseState.categories;
-  const open = visible(all, room.unlocked);
-
   if (parts.length === 1) {
     const firstCategory = open[0];
     const firstPost = firstCategory?.posts[0];
@@ -1591,9 +1587,6 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
         headers: { location: `${roomRoot}/${firstCategory.slug}/${firstPost.id}#lecture=s1.1` },
       });
     }
-    // 잠긴 카테고리도 이름만 보여 준다. 진도가 어디까지 남았는지 알면 덜 불안하다.
-    // 본문은 여전히 안 내려간다. 그것이 이 파일이 존재하는 이유다.
-    const locked = all.filter((c: CourseCategory) => !room.unlocked.includes(c.slug));
     const cards = open.length
       ? open
           .map((c, i) => {
@@ -1614,14 +1607,6 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
           })
           .join("")
       : '<p class="wait">곧 시작합니다. 이 화면을 열어 두시면 됩니다.</p>';
-    const later = locked.length
-      ? `<div class="later"><p class="later-h">다음에 열립니다</p>${locked
-          .map(
-            (c) =>
-              `<div class="later-row"><span>${esc(c.title)}</span><span>${c.posts.length}편</span></div>`,
-          )
-          .join("")}</div>`
-      : "";
     const total = open.reduce((n, c) => n + c.posts.length, 0);
     return roomPage(
       room.title,
@@ -1634,7 +1619,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
              ? `${open.length}개 과정 ${total}편이 열려 있습니다. 순서대로 따라오시면 됩니다.`
              : "곧 시작합니다. 이 화면을 열어 두고 기다리시면 됩니다."
          }</p>
-       </section>${cards}${later}`,
+       </section>${cards}`,
       stamp,
     );
   }
