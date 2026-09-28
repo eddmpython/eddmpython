@@ -6,7 +6,6 @@
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": false,
   "preview_urls": false,
-  "services": [{ "binding": "TAXLY_TEST_RUNTIME", "service": "taxly-test-runtime" }],
   "routes": [
     { "pattern": "eddmpython.com/admin", "zone_name": "eddmpython.com" },
     { "pattern": "eddmpython.com/admin/*", "zone_name": "eddmpython.com" },
