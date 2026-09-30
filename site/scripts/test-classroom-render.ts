@@ -786,7 +786,9 @@ check("읽기 본문 하나를 장면과 비트 계약으로 투영한다", () =
   assert.equal(lecture.html.match(/aria-hidden="true" inert/g)?.length, 2);
   assert.ok(lecture.html.includes('aria-labelledby="lecture-s1-title"'));
   assert.ok(lecture.html.includes('id="lecture-s1-title" tabindex="-1"'));
-  assert.ok(lecture.html.includes("설명은 읽기 모드 본문입니다."));
+  assert.ok(!lecture.html.includes("설명은 읽기 모드 본문입니다."));
+  assert.ok(!lecture.html.includes("<pre>"));
+  assert.ok(renderPost(body).html.includes("설명은 읽기 모드 본문입니다."));
   assert.ok(lecture.html.includes("결과를 확인합니다"));
   assert.equal(lecture.html.match(/class="scene-support"/g)?.length, 1);
   assert.ok(lecture.html.includes('<p data-carousel-description="1" data-carousel-description-active="true">첫 그림이 보여 주는 핵심입니다</p>'));
@@ -1000,8 +1002,7 @@ check("굵게 안의 용어 마커도 툴팁이 된다", () => {
   assert.ok(html.includes('<strong><span class="term"'));
 });
 
-check("강의 장면의 용어는 읽기 화면과 다른 id 를 받는다", () => {
-  // 같은 페이지에 읽기 본문과 강의 장면이 함께 있다. id 가 겹치면 aria 연결이 깨진다
+check("본문의 용어 설명은 읽기 화면에만 있고 강의 장면에 중복되지 않는다", () => {
   const body = [
     "## 첫 장면",
     "",
@@ -1018,7 +1019,7 @@ check("강의 장면의 용어는 읽기 화면과 다른 id 를 받는다", () 
   const lecture = renderLecture(body, scenes, {}, GLOSSARY);
   assert.equal(lecture.ok, true);
   assert.ok(read.html.includes('id="term-r-1"'));
-  assert.ok(lecture.html.includes('id="term-l-1"'));
+  assert.ok(!lecture.html.includes('id="term-l-1"'));
   assert.ok(!lecture.html.includes('id="term-r-1"'));
 });
 
@@ -1100,7 +1101,7 @@ check("같은 H2의 이미지는 캐러셀에 남고 실행 칸은 라벨과 설
   assert.ok(html.indexOf("결과 캡션") < html.indexOf("결과 설명입니다."));
 });
 
-check("강의 모드는 실행 칸을 무대에 올리지 않고 시각물만 센다", () => {
+check("강의 모드는 설명과 코드와 실행 칸을 빼고 시각물만 보여 준다", () => {
   const body = [
     "## 실습 장면",
     "",
@@ -1109,6 +1110,10 @@ check("강의 모드는 실행 칸을 무대에 올리지 않고 시각물만 �
     '![그림](https://a.b/1.png "그림 캡션")',
     "",
     "설명 문단입니다.",
+    "",
+    "```python",
+    "print('practiceResult')",
+    "```",
     "",
     CELL_URL,
     "",
@@ -1121,7 +1126,11 @@ check("강의 모드는 실행 칸을 무대에 올리지 않고 시각물만 �
   assert.equal(lecture.hasCells, false);
   assert.ok(!lecture.html.includes("data-cell="));
   assert.ok(!lecture.html.includes("expense-variables"));
+  assert.ok(!lecture.html.includes("<pre>"));
+  assert.ok(!lecture.html.includes("practiceResult"));
+  assert.ok(renderPost(body, CELLS).html.includes("practiceResult"));
   assert.equal(lecture.html.match(/data-carousel-item=/g)?.length, 1);
+  assert.ok(!lecture.html.includes("설명 문단입니다."));
   // 실행 칸을 시각물로 세던 옛 묶음은 수가 어긋나 강의 모드가 닫힌다
   const stale = renderLecture(body, [{ ...scene, visualCount: 2 }], CELLS);
   assert.equal(stale.ok, false);

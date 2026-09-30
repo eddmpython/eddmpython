@@ -951,11 +951,10 @@ export function renderLecture(
     if (state.visual !== scene.visualCount) return { html: "", hasCells: false, ok: false };
     const visuals = parts.filter((part) => TOP_VISUAL.test(part));
     // 강의 무대에는 시각물만 오른다. 실행 칸은 읽기 모드의 코드 실습이라 장표에 싣지 않는다 (계약 10).
-    const content = parts.filter((part) => !TOP_VISUAL.test(part) && !CELL_PART.test(part));
     const support = visualSupport(visuals);
     const carouselId = `lecture-carousel-${index + 1}`;
     const controls = carouselControls(visuals.length, carouselId);
-    const html = [visualCarousel(visuals, scene.fit, section.title, null, carouselId), ...content].join("\n");
+    const html = visualCarousel(visuals, scene.fit, section.title, null, carouselId);
     hasCells ||= html.includes('data-cell="');
     const timeline = compileSceneTimeline(scene).slice(0, 1);
     const titleId = `lecture-${scene.id}-title`;

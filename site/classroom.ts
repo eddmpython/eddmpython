@@ -48,17 +48,23 @@ import type { Env } from "./env";
 const CLASSROOM_STYLE = `
 ${CODE_CELL_STYLE}
 /* 글 화면. 왼쪽 과정 이동, 가운데 본문, 오른쪽 목차 */
-.wrap.wide { width:min(94vw,120rem); max-width:none; }
+.wrap.wide { width:min(calc(100% - 3rem),82rem); max-width:none; padding-inline:0; }
+.wrap.wide:has(.lay) { width:calc(100% - 3rem); }
 .lay { display:grid;
-  grid-template-columns:clamp(13rem,14vw,17rem) minmax(0,1fr) clamp(13rem,14vw,17rem);
-  gap:clamp(2rem,3vw,4rem); align-items:start; }
+  grid-template-columns:minmax(17rem,1fr) minmax(0,48rem) minmax(17rem,1fr);
+  gap:clamp(1.5rem,2vw,3rem); align-items:start; }
+.body { min-width:0; width:100%; max-width:48rem; justify-self:center; }
+.side { width:100%; max-width:18rem; justify-self:start; }
+.toc { width:100%; max-width:18rem; justify-self:end; }
 .side, .toc { position:sticky; top:2rem; max-height:calc(100vh - 4rem); overflow-y:auto;
   font-size:.85rem; scrollbar-width:thin; }
 .side-h, .toc-h { margin:1.25rem 0 .6rem; font-size:.72rem; letter-spacing:.12em;
   text-transform:uppercase; color:var(--eddm-text-dim); }
 .nav-post { display:flex; gap:.6rem; padding:.5rem .6rem; border-radius:.45rem;
   color:var(--eddm-text-muted); text-decoration:none; line-height:1.5; }
-.nav-post b { color:var(--eddm-text-faint); font-weight:500; font-variant-numeric:tabular-nums; }
+.nav-post b { flex:0 0 auto; color:var(--eddm-text-faint); font-weight:500; font-variant-numeric:tabular-nums; }
+.nav-post span, .toc a span { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.side-h { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; letter-spacing:0; }
 .nav-post:hover { background:var(--eddm-raise); color:var(--eddm-ivory); }
 .nav-post.on { background:var(--eddm-accent-bg); color:var(--eddm-accent); }
 .nav-post.on b { color:var(--eddm-accent-dim); }
@@ -104,13 +110,14 @@ article .q { font-style:normal; color:var(--eddm-ivory); }
 .pager b { font-weight:400; font-size:.9rem; color:var(--eddm-text); line-height:1.5; }
 .pager i { flex:1; }
 
-@media (max-width:1100px) {
+@media (max-width:1200px) {
   .lay { grid-template-columns:minmax(0,1fr); gap:2rem; }
   .side, .toc { position:static; max-height:none; }
   .body { order:0; }
   .side { order:1; }
   .toc { order:-1; border:1px solid var(--eddm-line); border-radius:.7rem; padding:.5rem 1rem; }
   .toc[open] { padding-bottom:1rem; }
+  .toc, .side { width:100%; max-width:48rem; box-sizing:border-box; justify-self:center; }
   .toc-h { cursor:pointer; padding:.5rem 0; }
   .toc-h::after { content:"펼치기"; font-size:.7rem; color:var(--eddm-accent); letter-spacing:0; }
   .toc[open] .toc-h::after { content:"접기"; }
@@ -135,7 +142,7 @@ a.post:hover { color:var(--eddm-accent); }
 a.post:hover b { color:var(--eddm-accent-dim); }
 .wait { color:var(--eddm-text-dim); }
 article img, article video { max-width:100%; height:auto; border-radius:.6rem; display:block; margin:1.75rem 0; }
-article { font-size:1.0625rem; }
+article { font-size:1.125rem; }
 article img { cursor:zoom-in; }
 figure.media { margin:1.75rem 0; }
 figure.media img, figure.media video { margin:0; }
@@ -296,7 +303,7 @@ article a:hover { border-bottom-color:var(--eddm-accent); }
 /* 강의 모드는 이미지 무대가 본체다. 상하 크롬 없이 왼쪽 인덱스와 장표만 화면을 쓴다. */
 .lecture-deck[hidden] { display:none; }
 .lecture-deck { position:fixed; inset:0; z-index:100; display:grid;
-  grid-template-columns:clamp(15rem,17vw,19rem) minmax(0,1fr); grid-template-rows:minmax(0,1fr);
+  grid-template-columns:clamp(11rem,14vw,15rem) minmax(0,1fr); grid-template-rows:minmax(0,1fr);
   --eddm-lecture-progress:0%; --lecture-motion:220ms;
   width:100vw; height:100vh; height:100dvh; max-width:none; max-height:none; margin:0; padding:0;
   overflow:hidden; background:var(--eddm-carbon); color:var(--eddm-ivory); }
@@ -378,8 +385,8 @@ body.lecture-on { overflow:hidden; }
 .lecture-stage > .lecture-scene { grid-column:1; grid-row:1; min-height:0; }
 /* 장표는 제목, 부제, 가로줄, 보조설명, 규격화된 16:9 시각물 무대를 위에서 아래로 쌓는다. */
 .lecture-scene, .lecture-map-thumb-scene { display:none; position:relative; width:100%; height:100%; min-width:0; min-height:0;
-  --scene-content-width:min(90%,108rem); --scene-visual-scale:.9; --scene-block-space:clamp(3.5rem,6.5vh,6rem);
-  box-sizing:border-box; padding:var(--scene-block-space) clamp(1.2rem,3.4vw,4rem); contain:layout style;
+  --scene-content-width:min(100%,108rem); --scene-visual-scale:1; --scene-block-space:clamp(1.25rem,3vh,2.5rem);
+  box-sizing:border-box; padding:var(--scene-block-space) clamp(1.2rem,2.5vw,3rem); contain:layout style;
   grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(0,1fr);
   grid-template-areas:"head" "canvas"; gap:clamp(.55rem,.9vh,.8rem); }
 .lecture-scene.on { display:grid; }
@@ -396,10 +403,10 @@ body.lecture-on { overflow:hidden; }
 .scene-copy { min-width:0; padding-bottom:clamp(.35rem,.65vh,.55rem);
   border-bottom:1px solid var(--eddm-line-base); opacity:1; transition:opacity var(--lecture-motion) ease; }
 .scene-title-row { display:flex; align-items:flex-start; gap:1rem; }
-.scene-head h2 { margin:0; font-size:clamp(2.2rem,3.8vw,4.1rem); line-height:1.02;
+.scene-head h2 { margin:0; font-size:clamp(1.75rem,2.8vw,3rem); line-height:1.2;
   min-width:0; flex:1; letter-spacing:-.05em; text-wrap:balance; }
 .scene-subtitle { max-width:92rem; margin:clamp(.4rem,1vh,.7rem) 0 0; color:var(--eddm-text-muted);
-  font-size:clamp(1.15rem,1.45vw,1.65rem); line-height:1.38; text-wrap:balance; }
+  font-size:clamp(1.125rem,1.3vw,1.5rem); line-height:1.5; text-wrap:balance; }
 .scene-head > .scene-support { min-height:1.5em; margin:clamp(1rem,1.55vh,1.4rem) 0 0; color:var(--eddm-text); }
 .scene-head > .scene-support > p { margin:0; font-size:clamp(1rem,1.15vw,1.25rem); line-height:1.45; }
 .scene-support a { color:var(--eddm-accent); text-underline-offset:.15em; }
@@ -1647,7 +1654,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
         (p, i) =>
           `<a class="nav-post${p.id === post.id ? " on" : ""}" href="${esc(roomRoot)}/${esc(
             category.slug,
-          )}/${esc(p.id)}"><b>${String(i + 1).padStart(2, "0")}</b><span>${esc(p.title)}</span></a>`,
+          )}/${esc(p.id)}" title="${esc(p.title)}"><b>${String(i + 1).padStart(2, "0")}</b><span>${esc(p.title)}</span></a>`,
       )
       .join("");
 
@@ -1658,7 +1665,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
         }</span></summary>${headings
           .map(
             (h: string, i: number) =>
-              `<a href="#s${i + 1}" data-to="s${i + 1}"><b>${String(i + 1).padStart(
+              `<a href="#s${i + 1}" data-to="s${i + 1}" title="${esc(h)}"><b>${String(i + 1).padStart(
                 2,
                 "0",
               )}</b><span>${esc(h)}</span></a>`,
