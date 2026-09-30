@@ -1588,14 +1588,6 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
   }
 
   if (parts.length === 1) {
-    const firstCategory = open[0];
-    const firstPost = firstCategory?.posts[0];
-    if (localPreview && firstCategory && firstPost) {
-      return new Response(null, {
-        status: 302,
-        headers: { location: `${roomRoot}/${firstCategory.slug}/${firstPost.id}#lecture=s1.1` },
-      });
-    }
     const cards = open.length
       ? open
           .map((c, i) => {
@@ -1673,17 +1665,21 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
           .join("")}</details>`
       : "";
 
-    const prev = category.posts[at - 1];
-    const next = category.posts[at + 1];
+    const previousCategory = open.find(c => c.nextCategory === category.slug);
+    const followingCategory = open.find(c => c.slug === category.nextCategory);
+    const prevCategory = at > 0 ? category : previousCategory;
+    const nextCategory = at < category.posts.length - 1 ? category : followingCategory;
+    const prev = at > 0 ? category.posts[at - 1] : previousCategory?.posts.at(-1);
+    const next = at < category.posts.length - 1 ? category.posts[at + 1] : followingCategory?.posts[0];
     const foot =
       prev || next
         ? `<div class="pager">${
             prev
-              ? `<a href="${esc(roomRoot)}/${esc(category.slug)}/${esc(prev.id)}"><span>이전</span><b>${esc(prev.title)}</b></a>`
+              ? `<a href="${esc(roomRoot)}/${esc(prevCategory!.slug)}/${esc(prev.id)}"><span>${prevCategory === category ? "이전" : `이전 과정 · ${esc(prevCategory!.title)}`}</span><b>${esc(prev.title)}</b></a>`
               : "<i></i>"
           }${
             next
-              ? `<a class="nx" href="${esc(roomRoot)}/${esc(category.slug)}/${esc(next.id)}"><span>다음</span><b>${esc(next.title)}</b></a>`
+              ? `<a class="nx" href="${esc(roomRoot)}/${esc(nextCategory!.slug)}/${esc(next.id)}"><span>${nextCategory === category ? "다음" : `다음 과정 · ${esc(nextCategory!.title)}`}</span><b>${esc(next.title)}</b></a>`
               : "<i></i>"
           }</div>`
         : "";

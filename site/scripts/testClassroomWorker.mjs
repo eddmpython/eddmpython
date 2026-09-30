@@ -74,19 +74,19 @@ const bundle = {
       slug: "01-shared",
       order: 1,
       title: "공통 과정",
-      posts: [{ id: "01-start", title: "공통 실습", body: `[공통.xlsx](room://${publicFile})` }],
+      posts: [{ id: "01-start", title: "공통 실습", summary: "공통 자료 확인", body: `[공통.xlsx](room://${publicFile})` }],
     },
     {
       slug: "02-alpha",
       order: 2,
       title: "A 프로젝트 과정",
-      posts: [{ id: "01-alpha", title: "A 실습", body: `[A.xlsx](room://${alphaFile})` }],
+      posts: [{ id: "01-alpha", title: "A 실습", summary: "A 자료 확인", body: `[A.xlsx](room://${alphaFile})` }],
     },
     {
       slug: "03-beta",
       order: 3,
       title: "B 프로젝트 과정",
-      posts: [{ id: "01-beta", title: "B 실습", body: `[B.xlsx](room://${betaFile}) [잘못된 주소](ROOM://${invalidSchemeFile})` }],
+      posts: [{ id: "01-beta", title: "B 실습", summary: "B 자료 확인", body: `[B.xlsx](room://${betaFile}) [잘못된 주소](ROOM://${invalidSchemeFile})` }],
     },
   ],
 };
@@ -159,5 +159,19 @@ assert.match(roomTestHtml, /A 프로젝트 과정/);
 assert.match(roomTestHtml, /B 프로젝트 과정/);
 assert.equal((await requestRoom(`/room-test/media/${alphaFile}`)).status, 200);
 assert.equal((await requestRoom(`/room-test/media/${betaFile}`)).status, 200);
+
+// Only an explicitly linked and open next category continues the lesson sequence.
+const firstPath = "/room/alpha/01-shared/01-start";
+const unlinked = await (await requestRoom(firstPath, alphaCookie)).text();
+assert.doesNotMatch(unlinked, /다음 과정/);
+bundle.categories[0].nextCategory = "02-alpha";
+const linked = await (await requestRoom(firstPath, alphaCookie)).text();
+assert.match(linked, /class="nx" href="\/room\/alpha\/02-alpha\/01-alpha"/);
+assert.match(linked, /다음 과정/);
+const back = await (await requestRoom("/room/alpha/02-alpha/01-alpha", alphaCookie)).text();
+assert.match(back, /href="\/room\/alpha\/01-shared\/01-start"><span>이전 과정/);
+const hiddenNext = await (await requestRoom("/room/beta/01-shared/01-start", betaCookie)).text();
+assert.doesNotMatch(hiddenNext, /다음 과정|A 프로젝트 과정/);
+delete bundle.categories[0].nextCategory;
 
 console.log("classroom worker: 독립 배포와 방별 과정·파일 접근 계약 통과");

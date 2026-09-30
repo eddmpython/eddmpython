@@ -23,6 +23,8 @@ export type CourseCategory = {
   title: string;
   /** 이 카테고리를 덮을 때 독자의 일 하나가 무엇이 되는지. schema 2 부터 온다 */
   goal?: string;
+  /** Only explicitly linked, open categories participate in cross-category navigation. */
+  nextCategory?: string;
   /** 실행 칸 예제. schema 3 부터 온다. 교안이 링크로 부르고 렌더러가 칸으로 그린다 */
   cells?: Cells;
   posts: CoursePost[];
