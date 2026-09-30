@@ -424,11 +424,19 @@ npm run classroom:audit
 함께 읽어 배포와 발행 사이에 강의 모드가 사라지지 않게 한다. 강의장 런타임만 바꾼 경우에는
 course 전용 Worker만 배포하고 교안 KV를 다시 발행하지 않는다.
 
-교안 저장소 `main`의 교안과 발행 코드 변경은 `.github/workflows/publishCourse.yml`이 자동으로
-검사하고 발행한다. GitHub가 실행 때마다 발급한 OIDC 증표를 course 전용 Worker가 저장소 ID,
-브랜치와 워크플로까지 확인한 뒤 묶음을 받는다. 장기 Cloudflare API 토큰은 GitHub에 저장하지
-않는다. Worker는 묶음의 모양과 SHA-256을 확인하고 KV에 쓴 뒤 판 번호를 바꾸며, 워크플로는
-원격 묶음과 판 번호를 되읽어 같은지 확인해야 성공한다.
+교안 저장소의 `.github/workflows/publishCourse.yml`은 `main`에서 워크플로에 지정한
+카테고리 또는 발행 코드가 바뀌면 검사 후 **그 카테고리 하나만** 자동 발행한다. GitHub가 실행
+때마다 발급한 OIDC 증표를 course 전용 Worker가 저장소 ID, 브랜치와 워크플로까지 확인한다.
+장기 Cloudflare API 토큰은 GitHub에 저장하지 않는다.
+
+자동 발행기는 운영 묶음의 SHA-256을 먼저 읽고, 선택한 카테고리와 그 해시를 `PATCH`로 보낸다.
+Worker는 요청의 SHA-256과 기존 묶음의 해시를 확인한 다음 해당 카테고리만 추가하거나 교체한다.
+나머지 카테고리와 용어집은 운영 묶음의 값을 그대로 둔다. 준비하는 사이 운영 묶음이 바뀌면
+`409`로 멈춘다. 발행 뒤에는 묶음의 SHA-256과 판 번호를 되읽어 확인한다.
+
+수동 발행도 비공개 교안 저장소에서 `npm run publish:course -- --category <카테고리>`로
+대상을 명시한다. 인자 없는 원격 전체 발행은 거부하며, 전체 묶음을 교체하는 별도 작업에만
+`--full`을 명시한다.
 
 ```powershell
 npm run deploy:classroom

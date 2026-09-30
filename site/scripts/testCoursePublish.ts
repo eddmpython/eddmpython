@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 
-import { handleCoursePublish, verifyGitHubOidc } from "../coursePublish.ts";
+import { handleCoursePublish, mergeCourseCategory, verifyGitHubOidc } from "../coursePublish.ts";
 import type { Env } from "../env.ts";
 
 const issuer = "https://token.actions.githubusercontent.com";
@@ -115,5 +115,88 @@ const rejected = await handleCoursePublish(new Request(audience, {
   body: bundle,
 }), env, { fetcher, now: now * 1000 });
 assert.equal(rejected.status, 400);
+
+const prior = JSON.parse(bundle);
+prior.glossary = { "용어": "한 줄 설명" };
+prior.categories.push({
+  slug: "07-existing-course", order: 7, title: "기존 과정", posts: [
+    { id: "01-locked", title: "기존 수업", summary: "", body: "# 기존 수업", scenes: [] },
+  ],
+});
+const before = JSON.stringify(prior);
+values.set("bundle", before);
+const oldCategory = JSON.stringify(prior.categories[1]);
+const newCategory = {
+  slug: "08-private-course", order: 8, title: "별도 과정", posts: [
+    { id: "01-start", title: "새 수업", summary: "", body: "# 새 수업", scenes: [] },
+  ],
+};
+const merged = mergeCourseCategory(before, newCategory);
+assert(merged);
+assert.equal(JSON.stringify(JSON.parse(merged).categories[1]), oldCategory);
+assert.equal(JSON.stringify(JSON.parse(merged).glossary), JSON.stringify(prior.glossary));
+assert.equal(mergeCourseCategory(before, { slug: "08-private-course", posts: "invalid" }), null);
+const patchBody = JSON.stringify({ category: newCategory });
+const patchHash = await crypto.subtle.digest("SHA-256", encoder.encode(patchBody));
+const patchDigest = [...new Uint8Array(patchHash)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+const baseDigest = await crypto.subtle.digest("SHA-256", encoder.encode(before));
+const baseHash = [...new Uint8Array(baseDigest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+const patched = await handleCoursePublish(new Request(audience, {
+  method: "PATCH",
+  headers: {
+    authorization: auth, "content-type": "application/json",
+    "x-course-sha256": patchDigest, "x-course-base-sha256": baseHash,
+  },
+  body: patchBody,
+}), env, { fetcher, now: now * 1000 });
+assert.equal(patched.status, 200);
+assert.equal(values.get("bundle"), merged);
+assert.equal(JSON.stringify(JSON.parse(values.get("bundle")!).categories[1]), oldCategory);
+const changed = await handleCoursePublish(new Request(audience, {
+  method: "PATCH",
+  headers: {
+    authorization: auth, "content-type": "application/json",
+    "x-course-sha256": patchDigest, "x-course-base-sha256": baseHash,
+  },
+  body: patchBody,
+}), env, { fetcher, now: now * 1000 });
+assert.equal(changed.status, 409);
+assert.equal(values.get("bundle"), merged);
+
+const nullBody = "null";
+const nullDigest = await crypto.subtle.digest("SHA-256", encoder.encode(nullBody));
+const nullHash = [...new Uint8Array(nullDigest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+const malformed = await handleCoursePublish(new Request(audience, {
+  method: "PATCH",
+  headers: {
+    authorization: auth, "content-type": "application/json",
+    "x-course-sha256": nullHash, "x-course-base-sha256": baseHash,
+  },
+  body: nullBody,
+}), env, { fetcher, now: now * 1000 });
+assert.equal(malformed.status, 400);
+
+let reads = 0;
+let writes = 0;
+const racingEnv = {
+  COURSE: {
+    get: async (key: string) => {
+      if (key !== "bundle") return null;
+      reads += 1;
+      return reads === 1 ? before : merged;
+    },
+    put: async () => { writes += 1; },
+  },
+} as unknown as Env;
+const racing = await handleCoursePublish(new Request(audience, {
+  method: "PATCH",
+  headers: {
+    authorization: auth, "content-type": "application/json",
+    "x-course-sha256": patchDigest, "x-course-base-sha256": baseHash,
+  },
+  body: patchBody,
+}), racingEnv, { fetcher, now: now * 1000 });
+assert.equal(racing.status, 409);
+assert.equal(writes, 0);
 
 console.log("course publish: GitHub OIDC와 묶음 발행 계약 통과");

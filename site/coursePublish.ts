@@ -181,6 +181,32 @@ export function validCourseBundle(raw: string): { categories: number; posts: num
   return { categories: source.categories.length, posts };
 }
 
+/** Replace one category in the live bundle while retaining every other category and the glossary. */
+export function mergeCourseCategory(baseRaw: string, category: unknown): string | null {
+  let base: Record<string, unknown>;
+  try { base = JSON.parse(baseRaw) as Record<string, unknown>; }
+  catch { return null; }
+  if (baseRaw !== JSON.stringify(base) || !validCourseBundle(baseRaw)) return null;
+  if (!category || typeof category !== "object" || Array.isArray(category)) return null;
+  const slug = (category as { slug?: unknown }).slug;
+  if (typeof slug !== "string" || !/^\d{2}-[a-z0-9-]+$/.test(slug)) return null;
+  const prior = base.categories as Array<{ slug: string }>;
+  const at = prior.findIndex((item) => item.slug === slug);
+  const categories = [...prior];
+  if (at < 0) categories.push(category as { slug: string });
+  else categories[at] = category as { slug: string };
+  const merged = JSON.stringify({ ...base, categories });
+  if (!validCourseBundle(merged)) return null;
+  const result = JSON.parse(merged) as { categories: Array<{ slug: string }>; glossary?: unknown };
+  if (JSON.stringify(result.glossary) !== JSON.stringify(base.glossary)) return null;
+  for (const item of prior) {
+    if (item.slug === slug) continue;
+    const kept = result.categories.find((candidate) => candidate.slug === item.slug);
+    if (!kept || JSON.stringify(kept) !== JSON.stringify(item)) return null;
+  }
+  return merged;
+}
+
 async function authorized(
   request: Request,
   options: { fetcher?: typeof fetch; now?: number } = {},
@@ -201,7 +227,7 @@ export async function handleCoursePublish(
     const [raw, version] = await Promise.all([env.COURSE.get("bundle"), env.COURSE.get("version")]);
     return jsonResponse({ hash: raw ? await sha256(raw) : "", version: version ?? "" });
   }
-  if (request.method !== "POST") return jsonResponse({ error: "method not allowed" }, 405);
+  if (request.method !== "POST" && request.method !== "PATCH") return jsonResponse({ error: "method not allowed" }, 405);
   if (!request.headers.get("content-type")?.toLowerCase().startsWith("application/json")) {
     return jsonResponse({ error: "application/json required" }, 415);
   }
@@ -216,6 +242,30 @@ export async function handleCoursePublish(
   const hash = await sha256(raw);
   if (!/^[0-9a-f]{64}$/.test(expectedHash) || hash !== expectedHash) {
     return jsonResponse({ error: "bundle hash mismatch" }, 400);
+  }
+  if (request.method === "PATCH") {
+    const baseHash = request.headers.get("x-course-base-sha256") ?? "";
+    if (!/^[0-9a-f]{64}$/.test(baseHash)) return jsonResponse({ error: "base hash required" }, 400);
+    let patch: { category?: unknown };
+    try { patch = JSON.parse(raw) as { category?: unknown }; }
+    catch { return jsonResponse({ error: "invalid category patch" }, 400); }
+    if (!patch || typeof patch !== "object" || Array.isArray(patch)
+      || Object.keys(patch).length !== 1 || !patch.category) {
+      return jsonResponse({ error: "invalid category patch" }, 400);
+    }
+    const base = await env.COURSE.get("bundle");
+    if (!base || await sha256(base) !== baseHash) return jsonResponse({ error: "bundle changed" }, 409);
+    const merged = mergeCourseCategory(base, patch.category);
+    if (!merged || textEncoder.encode(merged).byteLength > MAX_BUNDLE_BYTES) {
+      return jsonResponse({ error: "invalid merged bundle" }, 400);
+    }
+    const mergedHash = await sha256(merged);
+    // Detect a writer that changed the bundle while this request validated the patch.
+    if (await env.COURSE.get("bundle") !== base) return jsonResponse({ error: "bundle changed" }, 409);
+    if (merged !== base) await env.COURSE.put("bundle", merged);
+    const version = mergedHash.slice(0, 16);
+    await env.COURSE.put("version", version);
+    return jsonResponse({ ok: true, hash: mergedHash, version, ...validCourseBundle(merged) });
   }
   const summary = validCourseBundle(raw);
   if (!summary) return jsonResponse({ error: "invalid course bundle" }, 400);

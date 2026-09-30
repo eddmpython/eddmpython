@@ -41,7 +41,7 @@ sideProject/
 교안은 Cloudflare KV 에 있고 강의장 Worker 가 요청마다 읽는다. 비공개 저장소가 KV 로 발행한다.
 
 ```text
-eddmpython-course  ──npm run publish:course──▶  KV
+eddmpython-course  ──카테고리별 교안 발행──▶  KV
 eddmpython-course  ──npm run deploy:classroom──▶  course Worker  ──▶  /admin, /room
 ```
 
@@ -51,10 +51,17 @@ eddmpython-course  ──npm run deploy:classroom──▶  course Worker  ─�
 - **교안 발행이 사이트 배포를 기다리지 않는다.** 교안은 강의 준비 때마다 고치는데 공개 사이트의
   배포 의식(테스트, 시각 승인)을 매번 통과할 이유가 없다
 
-일반 교안 수정은 KV만 발행한다. 장면 계약이나 강의 화면 코드가 바뀐 날에는
-`eddmpython-course`에서 `npm run publish:runtime`을 실행한다. 이 명령은 `/admin`과 `/room`만
-맡는 `eddmpython-classroom` Worker를 먼저 배포하고 KV를 뒤이어 발행한다. 공개 사이트 전체
-`npm run deploy`를 호출하지 않으며 블로그 빌드, 승인, 시각 검사를 실행하지 않는다.
+일반 교안 수정은 비공개 저장소에서
+`npm run publish:course -- --category <카테고리>`로 해당 카테고리만 KV에 발행한다.
+발행기는 운영 묶음을 읽어 선택한 카테고리만 합치며, 다른 카테고리와 용어집을 보존한다.
+`main`의 자동 발행도 워크플로에 지정된 카테고리만 같은 방식으로 합친다. 인자 없는 원격 전체
+발행은 거부하며, 전체 묶음 교체가 필요한 별도 작업에만 `--full`을 명시한다. 자동 발행의 OIDC
+인증과 묶음 해시 검증은 [강의장 운영 절차](classroom.md#배포)를 따른다.
+
+장면 계약이나 강의 화면 코드가 바뀐 날에는 `eddmpython-course`에서
+`npm run publish:runtime -- --category <카테고리>`를 실행한다. 이 명령은 `/admin`과 `/room`만
+맡는 `eddmpython-classroom` Worker를 먼저 배포하고 해당 카테고리를 KV에 발행한다. 공개 사이트
+전체 `npm run deploy`를 호출하지 않으며 블로그 빌드, 승인, 시각 검사를 실행하지 않는다.
 
 course Worker의 배포 정본은 `site/wrangler.classroom.jsonc`다. 이 Worker는 교안 KV를 직접 읽고,
 방 상태는 기존 `eddmpython-site` Worker가 소유한 Durable Object를 외부 바인딩으로 그대로 쓴다.
