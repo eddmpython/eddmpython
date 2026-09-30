@@ -107,6 +107,8 @@ article .q { font-style:normal; color:var(--eddm-ivory); }
 @media (max-width:1100px) {
   .lay { grid-template-columns:minmax(0,1fr); gap:2rem; }
   .side, .toc { position:static; max-height:none; }
+  .body { order:0; }
+  .side { order:1; }
   .toc { order:-1; border:1px solid var(--eddm-line); border-radius:.7rem; padding:.5rem 1rem; }
   .toc[open] { padding-bottom:1rem; }
   .toc-h { cursor:pointer; padding:.5rem 0; }
