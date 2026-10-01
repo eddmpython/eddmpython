@@ -95,6 +95,9 @@ article .q { font-style:normal; color:var(--eddm-ivory); }
   background:var(--eddm-accent-bg); color:var(--eddm-accent); font-size:.82rem; font-weight:500; }
 .lecture-open svg { width:16px; height:16px; }
 .lecture-open:hover { border-color:var(--eddm-accent); }
+.lecture-open[hidden] { display:none; }
+.lecture-entry { display:flex; gap:.5rem; flex-wrap:wrap; }
+.lecture-entry [data-lecture-watch] { border-color:var(--eddm-accent); }
 @media (max-width:640px) {
   .body-top { display:block; }
   .lecture-open { margin:0 0 1.5rem; }
@@ -393,6 +396,33 @@ body.lecture-on { overflow:hidden; }
   overflow:hidden; display:grid; grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1fr);
   touch-action:pan-y; }
 .lecture-stage > .lecture-scene { grid-column:1; grid-row:1; min-height:0; }
+.lecture-bar { position:absolute; top:0; right:0; z-index:6; display:flex; gap:.65rem; align-items:center; padding:.75rem 1rem; }
+.lecture-bar button, .lecture-bar select, .lecture-resources button { font:inherit; font-size:.85rem; padding:.6rem .8rem; border:1px solid var(--eddm-line-base); border-radius:.5rem; color:var(--eddm-ivory); background:var(--eddm-carbon); cursor:pointer; }
+.lecture-bar select { display:none; max-width:48vw; }
+.lecture-resources[hidden] { display:none; }
+.lecture-resources { position:absolute; z-index:8; top:4rem; right:1rem; bottom:1rem; width:min(42rem,calc(100vw - 2rem)); box-sizing:border-box; overflow:auto; padding:1.25rem; border:1px solid var(--eddm-line-base); border-radius:.75rem; background:var(--eddm-carbon); box-shadow:0 10px 50px #0008; }
+.lecture-resources > button { float:right; }
+.lecture-resources h2 { margin:.25rem 0 1rem; font-size:1.25rem; }
+.lecture-resources p { color:var(--eddm-text-muted); line-height:1.65; }
+.lecture-resources a { color:var(--eddm-accent); text-decoration:underline; }
+.lecture-resources .command-box { margin:1rem 0; }
+.lecture-resources .command-box pre { padding:1rem; font-size:1rem; line-height:1.7; white-space:pre-wrap; overflow-wrap:anywhere; }
+.lecture-map-title { display:none; }
+.lecture-watch .lecture-map-thumb { display:none; }
+.lecture-watch .lecture-map-title { display:block; grid-column:2; font-size:.82rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lecture-watch .lecture-map-item { padding:.85rem .35rem; }
+.lecture-watch .lecture-stage { padding-top:4rem; }
+.lecture-watch .lecture-scene { padding:.75rem; grid-template-rows:minmax(0,1fr); grid-template-areas:"canvas"; }
+.lecture-watch .lecture-scene > .scene-head, .lecture-watch [data-carousel-for], .lecture-watch .carousel-controls { display:none; }
+.lecture-watch .scene-canvas { align-self:stretch; }
+@media (max-width:800px) {
+  .lecture-deck.lecture-watch { grid-template-columns:minmax(0,1fr); }
+  .lecture-watch .lecture-rail { display:none; }
+  .lecture-watch .lecture-stage { grid-column:1; }
+  .lecture-watch .lecture-bar { left:0; padding:.5rem; gap:.4rem; justify-content:space-between; }
+  .lecture-watch .lecture-bar select { display:block; min-width:0; }
+  .lecture-watch .lecture-bar button { padding:.55rem; white-space:nowrap; font-size:.75rem; }
+}
 /* 장표는 제목, 부제, 가로줄, 보조설명, 규격화된 16:9 시각물 무대를 위에서 아래로 쌓는다. */
 .lecture-scene, .lecture-map-thumb-scene { display:none; position:relative; width:100%; height:100%; min-width:0; min-height:0;
   --scene-content-width:min(100%,108rem); --scene-visual-scale:1; --scene-block-space:clamp(1.25rem,3vh,2.5rem);
@@ -554,8 +584,9 @@ body.lecture-on { overflow:hidden; }
  * IntersectionObserver 로 화면에 든 절을 잡아 목차에 표시만 한다.
  */
 const COMMAND_SCRIPT = `
-document.querySelectorAll('[data-command-copy]').forEach(button => {
-  button.addEventListener('click', async () => {
+document.addEventListener('click', async (event) => {
+    const button = event.target.closest('[data-command-copy]');
+    if (!button) return;
     const code = button.closest('.command-box').querySelector('pre');
     try {
       await navigator.clipboard.writeText(code.textContent);
@@ -566,7 +597,6 @@ document.querySelectorAll('[data-command-copy]').forEach(button => {
       const selection = window.getSelection(); selection.removeAllRanges(); selection.addRange(range);
       button.textContent = '선택됨 · 직접 복사';
     }
-  });
 });`;
 
 const TOC_SCRIPT = `
@@ -896,6 +926,7 @@ const LECTURE_SCRIPT = `
 (() => {
   const deck = document.querySelector("[data-lecture-deck]");
   const openButton = document.querySelector("[data-lecture-open]");
+  const watchButton = document.querySelector("[data-lecture-watch]");
   if (!deck || !openButton) return;
   const scenes = [...deck.querySelectorAll(".lecture-scene")];
   if (!scenes.length) return;
@@ -909,6 +940,64 @@ const LECTURE_SCRIPT = `
   let frameAt = 0;
   let beforeHash = "";
   let opened = false;
+  let watching = false;
+  const videos = scenes.map(scene => scene.querySelector('[data-carousel-item] video'));
+  const canWatch = videos.every(Boolean);
+  if (watchButton) watchButton.hidden = !canWatch;
+  const resources = deck.querySelector('[data-lecture-resources]');
+  const resourceBody = deck.querySelector('[data-lecture-resource-body]');
+  const resourceButton = deck.querySelector('[data-lecture-resource-open]');
+  const chapterSelect = deck.querySelector('[data-lecture-chapters]');
+  const headings = [...document.querySelectorAll('article h2[id]')];
+  const resourceNodes = headings.map(heading => {
+    const nodes = [];
+    for (let node = heading.nextElementSibling; node && node.tagName !== 'H2'; node = node.nextElementSibling) nodes.push(node);
+    return nodes;
+  });
+  const fillResources = () => {
+    resourceBody.replaceChildren();
+    const title = document.createElement('h2');
+    title.textContent = scenes[sceneAt].querySelector('h2')?.textContent || '실습 자료';
+    resourceBody.append(title);
+    const hint = document.createElement('p');
+    hint.textContent = '명령을 복사해 내 컴퓨터에서 실행합니다. 영상을 계속 보려면 자료를 닫고 재생하세요.';
+    resourceBody.append(hint);
+    const seenLinks = new Set();
+    for (const node of resourceNodes[sceneAt] || []) {
+      if (node.matches('.command-box')) resourceBody.append(node.cloneNode(true));
+      else node.querySelectorAll('.command-box').forEach(box => resourceBody.append(box.cloneNode(true)));
+      node.querySelectorAll('a[href]').forEach(link => {
+        if (link.querySelector('img, video') || !link.textContent.trim() || seenLinks.has(link.href)) return;
+        seenLinks.add(link.href);
+        const copy = link.cloneNode(true);
+        copy.target = '_blank'; copy.rel = 'noopener';
+        const line = document.createElement('p'); line.append(copy); resourceBody.append(line);
+      });
+    }
+    const homework = document.querySelector('.side a[href$="/homework"]');
+    if (homework) {
+      const link = homework.cloneNode(true); link.className = ''; link.target = '_blank'; link.rel = 'noopener';
+      const line = document.createElement('p'); line.append(link); resourceBody.append(line);
+    }
+  };
+  const closeResources = () => { resources.hidden = true; resourceButton.setAttribute('aria-expanded', 'false'); resourceButton.focus(); };
+  resourceButton.addEventListener('click', () => {
+    if (!resources.hidden) { closeResources(); return; }
+    videos[sceneAt]?.pause(); fillResources(); resources.hidden = false;
+    resourceButton.setAttribute('aria-expanded', 'true'); resources.querySelector('button').focus();
+  });
+  deck.querySelector('[data-lecture-resource-close]').addEventListener('click', closeResources);
+  scenes.forEach((scene, index) => {
+    const option = document.createElement('option'); option.value = String(index);
+    option.textContent = String(index + 1).padStart(2, '0') + ' · ' + scene.querySelector('h2').textContent;
+    chapterSelect.append(option);
+    videos[index]?.addEventListener('ended', () => {
+      if (!opened || !watching || sceneAt !== index) return;
+      if (index < scenes.length - 1) showScene(index + 1);
+      else showAlert('강의가 끝났습니다. 실습 자료의 내 숙제에서 제출 결과를 확인하세요.');
+    });
+  });
+  chapterSelect.addEventListener('change', () => showScene(Number(chapterSelect.value)));
   let alertTimer = null;
 
   const showAlert = (message) => {
@@ -993,6 +1082,8 @@ const LECTURE_SCRIPT = `
     const title = scene.querySelector("h2")?.textContent.trim() || "강의 장면";
     button.setAttribute("aria-label", number.textContent + " " + title);
     button.append(number, thumb);
+    const label = document.createElement('span');
+    label.className = 'lecture-map-title'; label.textContent = title; button.append(label);
     const activate = () => {
       showScene(sceneIndex);
       deck.focus({ preventScroll:true });
@@ -1254,6 +1345,13 @@ const LECTURE_SCRIPT = `
     prime(scenes[sceneAt]);
     prime(scenes[sceneAt + 1]);
     apply(fire);
+    chapterSelect.value = String(sceneAt);
+    if (watching) {
+      resources.hidden = true; resourceButton.setAttribute('aria-expanded', 'false');
+      const video = videos[sceneAt];
+      if (video.ended) video.currentTime = 0;
+      video.play().catch(() => showAlert('영상의 재생 버튼을 누르면 강의가 시작됩니다.'));
+    }
   };
 
   const next = () => {
@@ -1285,6 +1383,8 @@ const LECTURE_SCRIPT = `
     if (!opened) return;
     deck.querySelectorAll("video, audio").forEach((media) => media.pause());
     opened = false;
+    watching = false;
+    deck.classList.remove('lecture-watch');
     deck.hidden = true;
     document.body.classList.remove("lecture-on");
     if (document.fullscreenElement === deck) await document.exitFullscreen().catch(() => {});
@@ -1300,17 +1400,21 @@ const LECTURE_SCRIPT = `
     return found;
   };
 
-  const open = async (fromHash = false) => {
+  const open = async (fromHash = false, watch = false) => {
     if (opened) return;
     document.querySelectorAll("article video, article audio").forEach((media) => media.pause());
     opened = true;
+    watching = watch && canWatch;
+    deck.classList.toggle('lecture-watch', watching);
+    resources.hidden = true;
+    sceneWidthKeys.clear(); thumbLayoutKey = '';
     if (!fromHash) beforeHash = location.hash && !location.hash.startsWith("#lecture=") ? location.hash : location.pathname + location.search;
     deck.hidden = false;
     document.body.classList.add("lecture-on");
-    let targetScene = nearestScene();
+    let targetScene = watching ? 0 : nearestScene();
     let targetVisual = 0;
     const saved = location.hash.match(/^#lecture=(s\\d+)\\.(\\d+)$/);
-    if (saved) {
+    if (saved && !watching) {
       const found = scenes.findIndex((scene) => scene.dataset.scene === saved[1]);
       if (found >= 0) {
         targetScene = found;
@@ -1319,11 +1423,12 @@ const LECTURE_SCRIPT = `
     }
     showScene(targetScene, false, targetVisual);
     deck.focus({ preventScroll:true });
-    if (!fromHash && deck.requestFullscreen) await deck.requestFullscreen().catch(() => {});
     syncFullscreen();
   };
 
   openButton.addEventListener("click", () => { void open(false); });
+  watchButton?.addEventListener('click', () => { void open(false, true); });
+  deck.querySelector('[data-lecture-close]').addEventListener('click', () => { void close(); });
   fullscreenButton.addEventListener("click", () => { void toggleFullscreen(); });
   document.addEventListener("fullscreenchange", syncFullscreen);
   addEventListener("resize", syncLayout);
@@ -1371,6 +1476,13 @@ const LECTURE_SCRIPT = `
       return;
     }
     if (event.target?.matches?.("input, textarea") && event.key !== "Escape") return;
+    if (event.target?.matches?.('select, button, a') && event.key !== 'Escape') return;
+    if (watching && event.key === ' ' && !event.target?.matches?.('video')) {
+      event.preventDefault(); const video = videos[sceneAt];
+      if (video.paused) video.play().catch(() => {}); else video.pause();
+      return;
+    }
+    if (event.key === 'Escape' && !resources.hidden) { event.preventDefault(); closeResources(); return; }
     if (event.target?.closest?.("[data-visual-carousel], [data-carousel-for]") && ["ArrowLeft", "ArrowRight", " ", "Enter"].includes(event.key)) return;
     if (["ArrowRight", "PageDown", " "].includes(event.key)) { event.preventDefault(); next(); }
     else if (["ArrowLeft", "PageUp"].includes(event.key)) { event.preventDefault(); prev(); }
@@ -1783,6 +1895,15 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
              </div>
            </aside>
            <p class="lecture-alert" data-lecture-alert role="status" aria-live="assertive" aria-atomic="true" hidden></p>
+           <div class="lecture-bar">
+             <select data-lecture-chapters aria-label="영상 섹션 선택"></select>
+             <button type="button" data-lecture-resource-open aria-expanded="false">실습 자료</button>
+             <button type="button" data-lecture-close>교안으로</button>
+           </div>
+           <aside class="lecture-resources" data-lecture-resources aria-label="현재 섹션 실습 자료" hidden>
+             <button type="button" data-lecture-resource-close>닫기</button>
+             <div data-lecture-resource-body></div>
+           </aside>
            <div class="lecture-stage">
              ${lecture.html}
            </div>
@@ -1807,7 +1928,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
              <h1>${esc(post.title)}</h1>
            </div>${
              lecture.ok
-               ? `<button type="button" class="lecture-open" data-lecture-open><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="m9 21 3-4 3 4M8 9h8M8 12h5"/></svg>강의 모드</button>`
+               ? `<div class="lecture-entry"><button type="button" class="lecture-open" data-lecture-watch hidden>▶ 영상으로 학습</button><button type="button" class="lecture-open" data-lecture-open><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="m9 21 3-4 3 4M8 9h8M8 12h5"/></svg>강의 모드</button></div>`
                : ""
            }</div>
            <p class="sub">${esc(post.summary)}</p>
@@ -1817,7 +1938,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
          ${toc}
        </div>${lectureUi}`,
       stamp
-        + (!localAccess && !previewAccess ? `(() => {const seen=new Set();const send=(kind,section)=>fetch(${JSON.stringify(`${roomRoot}/activity`)},{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({kind,section,category:${JSON.stringify(category.slug)},post:${JSON.stringify(post.id)}})});const observer=new IntersectionObserver(entries=>{for(const entry of entries){if(!entry.isIntersecting||seen.has(entry.target.id)||document.hidden)continue;seen.add(entry.target.id);send('section',Number(entry.target.id.slice(1))).catch(()=>{});}},{threshold:.5});document.querySelectorAll('article h2[id^="s"]').forEach(h=>observer.observe(h));document.querySelector('[data-lecture-open]')?.addEventListener('click',()=>send('lecture').catch(()=>{}));})();` : "")
+        + (!localAccess && !previewAccess ? `(() => {const seen=new Set();const send=(kind,section)=>fetch(${JSON.stringify(`${roomRoot}/activity`)},{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({kind,section,category:${JSON.stringify(category.slug)},post:${JSON.stringify(post.id)}})});const observer=new IntersectionObserver(entries=>{for(const entry of entries){if(!entry.isIntersecting||seen.has(entry.target.id)||document.hidden)continue;seen.add(entry.target.id);send('section',Number(entry.target.id.slice(1))).catch(()=>{});}},{threshold:.5});document.querySelectorAll('article h2[id^="s"]').forEach(h=>observer.observe(h));document.querySelectorAll('[data-lecture-open],[data-lecture-watch]').forEach(button=>button.addEventListener('click',()=>send('lecture').catch(()=>{})));document.querySelector('[data-lecture-deck]')?.addEventListener('lectureframe',event=>{const section=event.detail.scene+1;const id='s'+section;if(!seen.has(id)){seen.add(id);send('section',section).catch(()=>{});}});})();` : "")
         + TOC_SCRIPT
         + COMMAND_SCRIPT
         + (hasCells || lecture.hasCells ? CELL_SCRIPT : "")
