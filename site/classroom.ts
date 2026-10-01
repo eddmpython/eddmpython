@@ -994,7 +994,7 @@ const LECTURE_SCRIPT = `
     videos[index]?.addEventListener('ended', () => {
       if (!opened || !watching || sceneAt !== index) return;
       if (index < scenes.length - 1) showScene(index + 1);
-      else showAlert('강의가 끝났습니다. 실습 자료의 내 숙제에서 제출 결과를 확인하세요.');
+      else showAlert('강의가 끝났습니다.');
     });
   });
   chapterSelect.addEventListener('change', () => showScene(Number(chapterSelect.value)));
@@ -1811,7 +1811,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
              ? `${open.length}개 과정 ${total}편이 열려 있습니다. 순서대로 따라오시면 됩니다.`
              : "곧 시작합니다. 이 화면을 열어 두고 기다리시면 됩니다."
          }</p>
-       </section>${studentEnabled ? `<p><a href="${esc(roomRoot)}/homework">내 숙제 →</a></p><p class="wait" style="font-size:.8rem">강의장 접속, 수업 열람과 제출 기록은 강사가 학습 안내에 사용합니다.</p>` : ""}${cards}`,
+       </section>${studentEnabled ? `<p class="wait" style="font-size:.8rem">강의장 접속, 수업 열람과 제출 기록은 강사가 학습 안내에 사용합니다.</p>` : ""}${cards}`,
       stamp,
     );
   }
@@ -1918,7 +1918,6 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
        <div class="lay">
          <aside class="side">
            <a class="back" href="${esc(roomRoot)}">← ${esc(room.title)}</a>
-           ${studentEnabled ? `<a class="back" href="${esc(roomRoot)}/homework">내 숙제</a>` : ""}
            <p class="side-h">${esc(category.title)}</p>
            ${nav}
          </aside>
