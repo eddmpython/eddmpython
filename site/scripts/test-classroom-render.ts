@@ -339,6 +339,10 @@ check("링크와 굵게와 인라인 코드", () => {
   assert.equal(inline("`code`"), "<code>code</code>");
 });
 
+check("본문의 섹션 이동은 같은 탭에서 열린다", () => {
+  assert.equal(inline("[다음 실습](#s3)"), '<a href="#s3">다음 실습</a>');
+});
+
 /*
  * 새 탭.
  *

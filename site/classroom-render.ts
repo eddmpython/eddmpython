@@ -28,14 +28,14 @@ export function esc(text: string): string {
  *
  * 강의 중에 학습자가 Colab 이나 공식 문서 링크를 누르면 같은 탭이 넘어가면서 읽던 절이
  * 통째로 사라진다. 뒤로 가기로 돌아와도 실행 칸에 친 코드와 캐러셀 위치는 복구되지 않는다.
- * 그래서 본문이 만든 링크는 전부 새 탭에서 연다 (2026-09-03 운영자 지시).
+ * 그래서 외부로 나가는 본문 링크는 새 탭에서 연다 (2026-09-03 운영자 지시).
  *
  * `noopener` 는 새 탭이 `window.opener` 로 강의 화면을 되돌아 조작하지 못하게 막고,
  * `noreferrer` 는 강의방 주소가 referrer 로 바깥에 새는 것을 막는다. 강의방은 비밀번호로
  * 여는 비공개 표면이라 둘 다 필요하다.
  *
  * 강의방 안의 이동(카테고리 목록, 이전과 다음 글, 섹션 앵커, 뒤로)은 여기 해당하지 않는다.
- * 그것은 본문 링크가 아니라 앱 이동이라 같은 탭에 머물러야 한다 (`classroom.ts`).
+ * 본문에 있는 섹션 앵커도 같은 탭에 머물러야 한다.
  */
 export const NEW_TAB = ' target="_blank" rel="noopener noreferrer"';
 
@@ -58,6 +58,7 @@ export function inline(text: string, mediaBase?: string): string {
         // term:// 는 브라우저가 열 수 있는 주소가 아니라 applyGlossary 가 걷어 낼 마커다.
         // 새 탭 속성을 붙이면 그 정규식이 안 맞아 용어가 전부 깨진 링크로 나간다.
         if (href.startsWith("term://")) return `<a href="${href}">${label}</a>`;
+        if (href.startsWith("#")) return `<a href="${href}">${label}</a>`;
         if (/^room:\/\//i.test(href)) {
           const file = href.match(ROOM_MEDIA);
           // 모양이 틀린 주소(대문자, 캡션이 딸린 주소)는 브라우저가 열 수 없다. 링크로 내보내면
