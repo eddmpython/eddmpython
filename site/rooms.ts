@@ -10,9 +10,11 @@
  */
 import { LOCK_MS, MAX_FAILS, randomHex, stretch, safeEqual } from "./auth";
 import type { Env } from "./env";
+import { StudentStore } from "./studentStore";
 
 /** 방 하나. 비밀번호는 원문을 두지 않고 salt 를 섞어 늘린 해시만 둔다. */
 export type Room = {
+  id: string;
   slug: string;
   title: string;
   open: boolean;
@@ -28,6 +30,7 @@ export type Room = {
 
 /** 운영장 화면에 보내는 모양. 해시와 salt 는 빼고 보낸다. */
 export type PublicRoom = {
+  id: string;
   slug: string;
   title: string;
   open: boolean;
@@ -67,6 +70,7 @@ export function validSlug(slug: string): boolean {
 
 function publicRoom(room: Room): PublicRoom {
   return {
+    id: room.id,
     slug: room.slug,
     title: room.title,
     open: room.open,
@@ -79,9 +83,17 @@ function publicRoom(room: Room): PublicRoom {
 
 export class Classroom {
   private state: DurableObjectState;
+  private students: StudentStore;
 
   constructor(state: DurableObjectState) {
     this.state = state;
+    this.students = new StudentStore(state.storage);
+    state.blockConcurrencyWhile(async () => {
+      const rooms = await state.storage.list<Room>({ prefix: "room:" });
+      for (const [key, room] of rooms) {
+        if (!room.id) await state.storage.put(key, { ...room, id: crypto.randomUUID() });
+      }
+    });
   }
 
   private async rooms(): Promise<Map<string, Room>> {
@@ -115,6 +127,8 @@ export class Classroom {
     const action = String(body.action ?? "");
     const slug = typeof body.slug === "string" ? body.slug : "";
     const now = Date.now();
+
+    if (action.startsWith("student")) return this.students.handle(body);
 
     if (action === "signKey") return Response.json({ key: await this.signKey() });
 
@@ -194,6 +208,7 @@ export class Classroom {
       }
       const salt = randomHex(16);
       await this.put({
+        id: crypto.randomUUID(),
         slug,
         title: String(body.title ?? slug).slice(0, 60) || slug,
         // 주소와 비밀번호를 먼저 정하고 커리큘럼을 고른 뒤 운영자가 직접 입장을 연다.

@@ -19,6 +19,7 @@
   "kv_namespaces": [
     { "binding": "COURSE", "id": "4ff8960b8706499cba4e05069b74c532" }
   ],
+  "r2_buckets": [{ "binding": "SUBMISSIONS", "bucket_name": "eddmpython-course-submissions" }],
   "durable_objects": {
     "bindings": [
       {

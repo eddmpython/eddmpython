@@ -11,6 +11,8 @@ export type Env = {
   CLASSROOM: DurableObjectNamespace;
   /** 교안 묶음이 들어 있다. eddmpython-course 저장소가 발행한다. */
   COURSE: KVNamespace;
+  /** 수강자 첨부 파일. 공개 URL 없이 인증한 강의장과 관리자만 내려받는다. */
+  SUBMISSIONS?: R2Bucket;
   /**
    * 운영장 로그인 비밀번호. 배포 때 넣는 유일한 비밀값이다.
    *

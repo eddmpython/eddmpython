@@ -20,6 +20,7 @@ import { header, page } from "./shell";
 import { DESIGN } from "./src/design";
 import type { Env } from "./env";
 import { taxlyDownload } from "./taxlyDownload";
+import { handleStudents } from "./students";
 
 /** 운영자 쿠키. 수강생 쿠키와 이름도 경로도 겹치지 않는다. */
 const ADMIN_COOKIE = "eddm_admin";
@@ -354,6 +355,8 @@ function consolePage(): Response {
     <form method="post" action="/admin/logout"><button type="submit">나가기</button></form>
   </div>
 
+  <nav class="row" aria-label="강의 관리 메뉴"><a href="/admin/students">수강자 관리 →</a><span class="note">숙제 · 제출물 · 접속 기록</span></nav>
+
   <div class="warn" id="cwarn" hidden>
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8"/><path d="M2 3h20v5H2z"/><path d="M10 12h4"/></svg>
     <span><b>교안 묶음을 읽지 못했습니다.</b> 방 조종은 그대로 됩니다. eddmpython-course 에서 npm run publish:course 를 다시 해 주세요</span>
@@ -414,7 +417,7 @@ async function login(request: Request, env: Env, url: URL): Promise<Response> {
   return new Response(null, {
     status: 303,
     headers: {
-      location: ADMIN_PATH,
+      location: "/admin/students",
       "set-cookie": cookie(
         ADMIN_COOKIE,
         await issueToken(key, SUBJECT, String(data.gen)),
@@ -456,6 +459,13 @@ async function api(request: Request, env: Env): Promise<Response> {
 
 export async function handleAdmin(request: Request, env: Env, url: URL): Promise<Response> {
   const path = url.pathname.replace(/\/$/, "") || ADMIN_PATH;
+
+  if (path === "/admin/students" || path.startsWith("/admin/students/")) {
+    if (!(await signedIn(env, request))) {
+      return request.method === "GET" ? loginPage() : Response.json({ error: "로그인이 필요합니다" }, { status: 401 });
+    }
+    return handleStudents(request, env, url);
+  }
 
   if (path === "/admin/taxly/download") {
     if (!(await signedIn(env, request))) {

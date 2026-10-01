@@ -31,6 +31,7 @@ import { call, validSlug, type PublicRoom } from "./rooms";
 import { course, courseVersion, type CourseCategory } from "./course";
 import { header, page, themeToggle } from "./shell";
 import type { Env } from "./env";
+import { homeworkPage, recordActivity, sameOrigin, readJson } from "./students";
 
 
 
@@ -1481,6 +1482,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
   if (roomTest) {
     cachedCourse = await course(env);
     room = {
+      id: "local-test",
       slug,
       title: "강의장 전체 검수",
       open: true,
@@ -1514,6 +1516,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
       );
     }
     const fresh = await signKey(env);
+    if (room.open) await recordActivity(env, room, "login", "강의장 로그인");
     return new Response(null, {
       status: 303,
       headers: {
@@ -1529,9 +1532,12 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
   }
 
   const key = localAccess ? "" : await signKey(env);
+  const previewToken = readCookie(request, "eddm_preview");
+  const adminState = !localAccess && previewToken ? await call(env, { action: "adminSession" }) : null;
+  const previewAccess = Boolean(adminState && await checkToken(key, previewToken, `preview:${room.slug}:${room.gen}`, String(adminState.data.gen)));
 
   // 폴링도 들어온 사람만 한다. 앞에 두면 비밀번호 없이 방 상태를 감시할 수 있다.
-  if (!localAccess && !(await hasSession(key, request, room))) {
+  if (!localAccess && !previewAccess && !(await hasSession(key, request, room))) {
     if (parts[1] === "state" && parts.length === 2) {
       return Response.json({ error: "로그인이 필요합니다" }, { status: 401 });
     }
@@ -1562,6 +1568,21 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
   const courseState = cachedCourse ?? await course(env);
   const open = visible(courseState.categories, room.unlocked);
 
+  if (parts[1] === "homework") return homeworkPage(request, env, url, room, parts, previewAccess, !localAccess && !previewAccess);
+  if (parts[1] === "activity" && parts.length === 2 && request.method === "POST") {
+    if (!sameOrigin(request, url)) return new Response("forbidden", { status: 403 });
+    const body = await readJson(request, 2000);
+    const category = open.find(c => c.slug === body?.category);
+    const post = category?.posts.find(p => p.id === body?.post);
+    if (!post || !["section", "lecture"].includes(String(body?.kind))) return new Response("not found", { status: 404 });
+    const section = Number(body?.section);
+    const headings = post.body.match(/^## (.+)$/gm)?.map(h => h.slice(3)) ?? [];
+    if (body?.kind === "section" && (!Number.isInteger(section) || section < 1 || section > headings.length)) return new Response("not found", { status: 404 });
+    if (!localAccess && !previewAccess) await recordActivity(env, room, String(body?.kind), body?.kind === "section" ? `${post.title} · ${headings[section - 1]}` : post.title, `${category!.slug}/${post.id}${body?.kind === "section" ? `#s${section}` : ""}`);
+    return Response.json({ ok: true }, { headers: { "cache-control": "no-store" } });
+  }
+  if (request.method !== "GET") return new Response("not found", { status: 404 });
+
   /**
    * 비공개 시각물과 실습 파일은 이 방에서 열린 글이 참조할 때만 준다.
    * 내용 해시를 다른 방에서 알아내도 그 방에 열리지 않은 자료를 받을 수 없어야 한다.
@@ -1576,6 +1597,11 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     }
     const bytes = await env.COURSE.get(`media/${key}`, { type: "arrayBuffer", cacheTtl: 3600 });
     if (!bytes) return new Response("없는 시각물입니다.", { status: 404 });
+    if (!localAccess && !previewAccess && !/\.(webp|png|jpg|jpeg|gif|svg|mp4|webm)$/i.test(key)) {
+      const post = open.flatMap(c => c.posts).find(p => p.body.includes(source))!;
+      const name = [...post.body.matchAll(/\[([^\]]+)\]\((room:\/\/[^)]+)\)/g)].find(m => m[2] === source)?.[1];
+      await recordActivity(env, room, "download", `${post.title} · ${name ?? "실습 자료"}`, key);
+    }
     return new Response(bytes, {
       headers: {
         "content-type": mediaContentType(key),
@@ -1587,7 +1613,9 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     });
   }
 
+  const studentEnabled = Boolean(room.id && (parts.length === 1 || (parts.length === 3 && parts[1] !== "media")) && (await call(env, { action: "studentInfo", roomId: room.id })).data.enabled);
   if (parts.length === 1) {
+    if (!localAccess && !previewAccess) await recordActivity(env, room, "visit", "수업 목록");
     const cards = open.length
       ? open
           .map((c, i) => {
@@ -1620,7 +1648,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
              ? `${open.length}개 과정 ${total}편이 열려 있습니다. 순서대로 따라오시면 됩니다.`
              : "곧 시작합니다. 이 화면을 열어 두고 기다리시면 됩니다."
          }</p>
-       </section>${cards}`,
+       </section>${studentEnabled ? `<p><a href="${esc(roomRoot)}/homework">내 숙제 · 제출과 피드백 →</a></p><p class="wait" style="font-size:.8rem">강의장 접속, 수업 열람과 제출 기록은 강사가 학습 안내에 사용합니다.</p>` : ""}${cards}`,
       stamp,
     );
   }
@@ -1632,6 +1660,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     const at = category.posts.findIndex((p) => p.id === parts[2]);
     const post = category.posts[at];
     if (!post) return new Response("없는 글입니다.", { status: 404 });
+    if (!localAccess && !previewAccess) await recordActivity(env, room, "lesson", post.title, `${category.slug}/${post.id}`);
     // 비공개 시각물은 이 방의 경로로 붙는다. 쿠키가 방 경로에 묶여 있어 그 아래 주소에만 실린다.
     const media = { mediaBase: `${roomRoot}/media` };
     const { html, headings, hasCells } = renderPost(post.body, category.cells ?? {}, courseState.glossary, {
@@ -1717,6 +1746,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
        <div class="lay">
          <aside class="side">
            <a class="back" href="${esc(roomRoot)}">← ${esc(room.title)}</a>
+           ${studentEnabled ? `<a class="back" href="${esc(roomRoot)}/homework">내 숙제 · 제출과 피드백</a>` : ""}
            <p class="side-h">${esc(category.title)}</p>
            ${nav}
          </aside>
@@ -1736,6 +1766,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
          ${toc}
        </div>${lectureUi}`,
       stamp
+        + (!localAccess && !previewAccess ? `(() => {const seen=new Set();const send=(kind,section)=>fetch(${JSON.stringify(`${roomRoot}/activity`)},{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({kind,section,category:${JSON.stringify(category.slug)},post:${JSON.stringify(post.id)}})});const observer=new IntersectionObserver(entries=>{for(const entry of entries){if(!entry.isIntersecting||seen.has(entry.target.id)||document.hidden)continue;seen.add(entry.target.id);send('section',Number(entry.target.id.slice(1))).catch(()=>{});}},{threshold:.5});document.querySelectorAll('article h2[id^="s"]').forEach(h=>observer.observe(h));document.querySelector('[data-lecture-open]')?.addEventListener('click',()=>send('lecture').catch(()=>{}));})();` : "")
         + TOC_SCRIPT
         + (hasCells || lecture.hasCells ? CELL_SCRIPT : "")
         + CAROUSEL_SCRIPT
