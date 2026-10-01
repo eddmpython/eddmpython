@@ -125,9 +125,9 @@ const loginRoom = async (slug) => {
 };
 const alphaCookie = await loginRoom("alpha");
 const betaCookie = await loginRoom("beta");
-const requestRoom = async (path, cookie) => {
+const requestRoom = async (path, cookie, headers = {}) => {
   const url = new URL(`https://eddmpython.com${path}`);
-  return handleRoom(new Request(url, { headers: cookie ? { cookie } : {} }), env, url);
+  return handleRoom(new Request(url, { headers: { ...headers, ...(cookie ? { cookie } : {}) } }), env, url);
 };
 
 const alphaPage = await requestRoom("/room/alpha", alphaCookie);
@@ -141,6 +141,24 @@ assert.equal((await requestRoom(`/room/alpha/media/${betaFile}`, alphaCookie)).s
 assert.deepEqual(mediaReads, [], "권한 없는 파일은 KV에서 읽지 않아야 합니다");
 assert.equal((await requestRoom(`/room/alpha/media/${publicFile}`, alphaCookie)).status, 200);
 assert.equal((await requestRoom(`/room/alpha/media/${alphaFile}`, alphaCookie)).status, 200);
+
+// 영상 탐색은 허용된 자료의 요청 구간을 돌려줘야 한다. 전체 파일로 응답하면 Chrome이 처음으로 돌아간다.
+const mediaPath = `/room/alpha/media/${alphaFile}`;
+const original = `media/${alphaFile}`;
+for (const [range, start, end] of [["bytes=2-8", 2, 8], ["bytes=5-", 5, original.length - 1], ["bytes=-4", original.length - 4, original.length - 1]]) {
+  const response = await requestRoom(mediaPath, alphaCookie, { range });
+  assert.equal(response.status, 206);
+  assert.equal(response.headers.get("content-range"), `bytes ${start}-${end}/${original.length}`);
+  assert.match(response.headers.get("cache-control"), /^private,/);
+  assert.equal(await response.text(), original.slice(start, end + 1));
+}
+const outside = await requestRoom(mediaPath, alphaCookie, { range: "bytes=9999-" });
+assert.equal(outside.status, 416);
+assert.equal(outside.headers.get("content-range"), `bytes */${original.length}`);
+assert.equal((await requestRoom(mediaPath, alphaCookie, { range: "bytes=2-8", "if-range": '"old"' })).status, 200);
+const readsBeforeRange = mediaReads.length;
+assert.equal((await requestRoom(`/room/alpha/media/${betaFile}`, alphaCookie, { range: "bytes=2-8" })).status, 404);
+assert.equal(mediaReads.length, readsBeforeRange, "구간 요청도 다른 방 자료를 읽으면 안 됩니다");
 
 const betaHtml = await (await requestRoom("/room/beta", betaCookie)).text();
 assert.match(betaHtml, /공통 과정/);

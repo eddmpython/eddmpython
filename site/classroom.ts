@@ -1637,15 +1637,31 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
       const name = [...post.body.matchAll(/\[([^\]]+)\]\((room:\/\/[^)]+)\)/g)].find(m => m[2] === source)?.[1];
       await recordActivity(env, room, "download", `${post.title} · ${name ?? "실습 자료"}`, key);
     }
-    return new Response(bytes, {
-      headers: {
-        "content-type": mediaContentType(key),
-        // 내용 해시 주소라 영원히 같다. 다만 공유 캐시에는 남기지 않는다. 비공개 자료다.
-        "cache-control": "private, max-age=31536000, immutable",
-        etag: `"${key}"`,
-        "x-robots-tag": "noindex",
-      },
+    const headers = new Headers({
+      "content-type": mediaContentType(key),
+      // 내용 해시 주소라 영원히 같다. 다만 공유 캐시에는 남기지 않는다. 비공개 자료다.
+      "cache-control": "private, max-age=31536000, immutable",
+      etag: `"${key}"`,
+      "x-robots-tag": "noindex",
+      "accept-ranges": "bytes",
     });
+    const range = request.headers.get("range");
+    const validator = request.headers.get("if-range");
+    const match = range && (!validator || validator === headers.get("etag"))
+      ? /^bytes=(\d*)-(\d*)$/i.exec(range.trim()) : null;
+    if (match && (match[1] || match[2])) {
+      const total = bytes.byteLength;
+      const start = match[1] ? Number(match[1]) : Math.max(0, total - Number(match[2]));
+      const end = match[1] && match[2] ? Math.min(Number(match[2]), total - 1) : total - 1;
+      if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end) || start > end || start >= total) {
+        headers.set("content-range", `bytes */${total}`);
+        return new Response(null, { status: 416, headers });
+      }
+      headers.set("content-range", `bytes ${start}-${end}/${total}`);
+      // 고정 길이 본문에서 Workers가 Content-Length를 정한다. 버퍼를 복제하지 않는다.
+      return new Response(new Uint8Array(bytes, start, end - start + 1), { status: 206, headers });
+    }
+    return new Response(bytes, { headers });
   }
 
   const studentEnabled = Boolean(room.id && (parts.length === 1 || (parts.length === 3 && parts[1] !== "media")) && (await call(env, { action: "studentInfo", roomId: room.id })).data.enabled);
