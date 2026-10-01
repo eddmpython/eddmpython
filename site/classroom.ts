@@ -189,6 +189,14 @@ article li { margin:.5rem 0; }
 article li::marker { color:var(--eddm-accent-dim); }
 article pre { overflow-x:auto; margin:1.5rem 0; padding:1rem; border:1px solid var(--eddm-line-base);
   border-radius:.6rem; background:var(--eddm-code-surface); }
+.command-box { margin:1.5rem 0; overflow:hidden; border:1px solid var(--eddm-line-base); border-radius:.65rem; }
+.command-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.65rem 1rem;
+  border-bottom:1px solid var(--eddm-line-base); background:var(--eddm-raise); color:var(--eddm-text-muted); font-size:.8rem; }
+.command-head button { padding:.3rem .7rem; border:1px solid var(--eddm-line-strong); border-radius:.35rem;
+  background:var(--eddm-paper); color:var(--eddm-ivory); font:inherit; cursor:pointer; }
+.command-head button:hover { border-color:var(--eddm-accent); }
+article .command-box pre { margin:0; border:0; border-radius:0; font-size:.88rem; line-height:1.8; tab-size:2; }
+article .command-prompt pre { white-space:pre-wrap; overflow-wrap:anywhere; }
 .table-wrap { margin:1.5rem 0; overflow-x:auto; border:1px solid var(--eddm-line-base); border-radius:.65rem; }
 article table { width:100%; min-width:42rem; border-collapse:collapse; }
 article th, article td { padding:.75rem .85rem; border-bottom:1px solid var(--eddm-line-base);
@@ -259,6 +267,7 @@ article tbody tr:last-child td { border-bottom:0; }
 .zoom.on { display:flex; }
 .zoom img { max-width:100%; max-height:100%; border-radius:.4rem; }
 .back { color:var(--eddm-text-muted); text-decoration:none; font-size:.9rem; }
+.side > .back { display:block; margin-bottom:.6rem; }
 article a { color:var(--eddm-accent); text-decoration:none; border-bottom:1px solid var(--eddm-accent-line); }
 article a:hover { border-bottom-color:var(--eddm-accent); }
 
@@ -544,6 +553,22 @@ body.lecture-on { overflow:hidden; }
  * 강사가 화면을 띄워 놓고 설명하는 동안 수강생이 "지금 어디" 를 놓치면 따라오지 못한다.
  * IntersectionObserver 로 화면에 든 절을 잡아 목차에 표시만 한다.
  */
+const COMMAND_SCRIPT = `
+document.querySelectorAll('[data-command-copy]').forEach(button => {
+  button.addEventListener('click', async () => {
+    const code = button.closest('.command-box').querySelector('pre');
+    try {
+      await navigator.clipboard.writeText(code.textContent);
+      button.textContent = '복사됨';
+      setTimeout(() => { button.textContent = '복사'; }, 1800);
+    } catch {
+      const range = document.createRange(); range.selectNodeContents(code);
+      const selection = window.getSelection(); selection.removeAllRanges(); selection.addRange(range);
+      button.textContent = '선택됨 · 직접 복사';
+    }
+  });
+});`;
+
 const TOC_SCRIPT = `
 (() => {
   const toc = document.querySelector(".toc");
@@ -1648,7 +1673,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
              ? `${open.length}개 과정 ${total}편이 열려 있습니다. 순서대로 따라오시면 됩니다.`
              : "곧 시작합니다. 이 화면을 열어 두고 기다리시면 됩니다."
          }</p>
-       </section>${studentEnabled ? `<p><a href="${esc(roomRoot)}/homework">내 숙제 · 제출과 피드백 →</a></p><p class="wait" style="font-size:.8rem">강의장 접속, 수업 열람과 제출 기록은 강사가 학습 안내에 사용합니다.</p>` : ""}${cards}`,
+       </section>${studentEnabled ? `<p><a href="${esc(roomRoot)}/homework">내 숙제 →</a></p><p class="wait" style="font-size:.8rem">강의장 접속, 수업 열람과 제출 기록은 강사가 학습 안내에 사용합니다.</p>` : ""}${cards}`,
       stamp,
     );
   }
@@ -1746,7 +1771,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
        <div class="lay">
          <aside class="side">
            <a class="back" href="${esc(roomRoot)}">← ${esc(room.title)}</a>
-           ${studentEnabled ? `<a class="back" href="${esc(roomRoot)}/homework">내 숙제 · 제출과 피드백</a>` : ""}
+           ${studentEnabled ? `<a class="back" href="${esc(roomRoot)}/homework">내 숙제</a>` : ""}
            <p class="side-h">${esc(category.title)}</p>
            ${nav}
          </aside>
@@ -1768,6 +1793,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
       stamp
         + (!localAccess && !previewAccess ? `(() => {const seen=new Set();const send=(kind,section)=>fetch(${JSON.stringify(`${roomRoot}/activity`)},{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({kind,section,category:${JSON.stringify(category.slug)},post:${JSON.stringify(post.id)}})});const observer=new IntersectionObserver(entries=>{for(const entry of entries){if(!entry.isIntersecting||seen.has(entry.target.id)||document.hidden)continue;seen.add(entry.target.id);send('section',Number(entry.target.id.slice(1))).catch(()=>{});}},{threshold:.5});document.querySelectorAll('article h2[id^="s"]').forEach(h=>observer.observe(h));document.querySelector('[data-lecture-open]')?.addEventListener('click',()=>send('lecture').catch(()=>{}));})();` : "")
         + TOC_SCRIPT
+        + COMMAND_SCRIPT
         + (hasCells || lecture.hasCells ? CELL_SCRIPT : "")
         + CAROUSEL_SCRIPT
         + (lecture.ok ? LECTURE_SCRIPT : "")

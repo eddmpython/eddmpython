@@ -707,7 +707,10 @@ function renderMarkdownParts(
        * 같은 판정이어야 한다.** 한쪽만 코드를 세면 장면의 시각물 번호가 어긋나 무대에
        * 엉뚱한 자료가 뜬다.
        */
-      out.push(`<pre>${esc(content)}</pre>`);
+      if (language === "powershell" || language === "prompt") {
+        const label = language === "powershell" ? "PowerShell에 입력" : "AI에게 요청";
+        out.push(`<div class="command-box${language === "prompt" ? " command-prompt" : ""}"><div class="command-head"><span>${label}</span><button type="button" data-command-copy aria-label="${label}할 내용 복사">복사</button></div><pre>${esc(content)}</pre></div>`);
+      } else out.push(`<pre>${esc(content)}</pre>`);
     }
     at = m.index + m[0].length;
   }
