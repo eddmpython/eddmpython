@@ -63,10 +63,10 @@ export const DESIGN = {
       hoverSurface: `color-mix(in srgb, ${PALETTE.ivory} 8%, transparent)`,
     },
     light: {
-      canvas: PALETTE.ivory,
-      frame: `color-mix(in srgb, ${PALETTE.ivory} 92%, ${PALETTE.carbon})`,
+      canvas: PALETTE.paper,
+      frame: `color-mix(in srgb, ${PALETTE.paper} 92%, ${PALETTE.carbon})`,
       foreground: PALETTE.carbon,
-      accentContrast: PALETTE.ivory,
+      accentContrast: PALETTE.paper,
       raisedSurface: `color-mix(in srgb, ${PALETTE.paper} 60%, transparent)`,
       hoverSurface: `color-mix(in srgb, ${PALETTE.carbon} 6%, transparent)`,
     },
