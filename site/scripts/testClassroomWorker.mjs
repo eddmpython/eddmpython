@@ -174,4 +174,23 @@ const hiddenNext = await (await requestRoom("/room/beta/01-shared/01-start", bet
 assert.doesNotMatch(hiddenNext, /다음 과정|A 프로젝트 과정/);
 delete bundle.categories[0].nextCategory;
 
+// Production authentication remains required for slugs with underscores. Local previews use
+// the same stored room and unlocks, with both the dev flag and a loopback URL required.
+rooms.alpha_one = { ...rooms.alpha, slug: "alpha_one" };
+const previewRequest = async (origin, enabled) => {
+  const url = new URL(`${origin}/room/alpha_one`);
+  return handleRoom(new Request(url), { ...env, LOCAL_PREVIEW_BYPASS: enabled }, url);
+};
+const localRoom = await previewRequest("http://127.0.0.1:8787", "1");
+assert.equal(localRoom.status, 200);
+assert.match(await localRoom.text(), /A 프로젝트 과정/);
+for (const [origin, flag] of [["https://eddmpython.com", "1"], ["https://eddmpython.com", undefined], ["http://127.0.0.1:8787", undefined]]) {
+  const response = await previewRequest(origin, flag);
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /type="password"/);
+  assert.doesNotMatch(html, /A 프로젝트 과정/);
+}
+delete rooms.alpha_one;
+
 console.log("classroom worker: 독립 배포와 방별 과정·파일 접근 계약 통과");

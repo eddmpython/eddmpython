@@ -41,7 +41,7 @@
     "check:approved": "node scripts/check-blog-approved.mjs",
     "track": "node scripts/track.mjs",
     "check:leak": "node scripts/check-leak.mjs",
-    "classroom:dev": "node scripts/siteWrangler.mjs dev --port 8787 --var LOCAL_PREVIEW_BYPASS:1",
+    "classroom:dev": "node scripts/siteWrangler.mjs dev --port 8787 --ip 127.0.0.1 --local-upstream 127.0.0.1 --var LOCAL_PREVIEW_BYPASS:1",
     "classroom:preview": "node scripts/classroom-preview.mjs",
     "postclassroom:dev": "node scripts/clean-wrangler.mjs",
     "classroom:clean": "node scripts/clean-wrangler.mjs",

@@ -447,6 +447,17 @@ npm run deploy:classroom
 ```
 
 Durable Object 마이그레이션이 `wrangler.jsonc` 에 있으므로 첫 배포에서 클래스가 만들어진다.
+현재 `Classroom`의 배포 소유자는 `eddmpython-site`이고 course Worker는 그 인스턴스를 참조한다.
+따라서 `rooms.ts` 변경은 course Worker 배포만으로 저장소 쪽에 반영되지 않는다. 2026-10-01에는
+방 이름에 밑줄을 허용하도록 기존 배포 코드의 `ROOM_SLUG` 한 곳만 바꿨다.
+Cloudflare의 [스크립트 내용 교체 API](https://developers.cloudflare.com/api/resources/workers/subresources/scripts/subresources/content/methods/update/)를 사용해 현재 배포 모듈의 다른 바이트를 보존했고,
+교체 후 소스·바인딩·호환성 설정·관측 설정을 되읽어 확인했다. 로컬 사이트 자산을 빌드하거나 올리지 않았다.
+이후 저장소 로직을 고칠 때도 실제 소유자에 반영됐는지 별도로 확인한다.
+
+로컬 인증 생략은 `LOCAL_PREVIEW_BYPASS=1`과 루프백 주소가 함께 있을 때 적용한다.
+`classroom:dev`는 `--local-upstream 127.0.0.1`로 요청 주소가 운영 도메인으로 바뀌지 않게 한다.
+운영 도메인에서는 개발 플래그만으로 인증을 생략할 수 없다.
+
 `ADMIN_PASSWORD` 를 넣기 전에는 운영장에 아무도 못 들어가고 방도 못 만든다. 그래서 배포
 자체는 강의방을 열지 않는다.
 

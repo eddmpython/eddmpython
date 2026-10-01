@@ -1468,10 +1468,10 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     : path.split("/").slice(2);
   const slug = parts[0] ?? "";
   if (!validSlug(slug)) return new Response("not found", { status: 404 });
-  // 사람이 한 장씩 보는 로컬 검수방만 인증을 생략한다. 이 값은 classroom:dev 명령이
-  // 주입하며 배포 환경에는 없으므로 운영 강의방 인증에는 닿지 않는다.
+  // 로컬 실행기가 준비한 방은 운영과 같은 주소로 연다. 인증 생략은 개발 플래그와
+  // 루프백 주소가 모두 있어야 하며 운영 도메인에는 적용하지 않는다.
   const localPreview =
-    slug === "preview" &&
+    ["127.0.0.1", "localhost", "[::1]"].includes(url.hostname) &&
     String(env.LOCAL_PREVIEW_BYPASS) === "1";
   const localAccess = roomTest || localPreview;
   const roomRoot = roomTest ? "/room-test" : roomPath(slug);

@@ -364,7 +364,7 @@ function consolePage(): Response {
   <div class="new">
     <div class="section-head"><h2>새 강의방</h2><p>URL과 비밀번호를 먼저 정합니다</p></div>
     <form id="n-form">
-      <label class="field"><span>강의방 URL</span><span class="url-input"><span>/room/</span><input id="n-slug" placeholder="0820" aria-label="강의방 URL 이름" pattern="[a-z0-9][a-z0-9-]{1,30}" required></span></label>
+      <label class="field"><span>강의방 URL</span><span class="url-input"><span>/room/</span><input id="n-slug" placeholder="0820" aria-label="강의방 URL 이름" pattern="[a-z0-9][a-z0-9_\\-]{1,30}" required></span></label>
       <label class="field"><span>강의방 이름</span><input id="n-title" placeholder="8월 업무 자동화 강의" aria-label="강의방 이름" maxlength="60" required></label>
       <label class="field"><span>수강 비밀번호</span><input type="password" id="n-pw" placeholder="네 자 이상" aria-label="수강 비밀번호" minlength="4" autocomplete="new-password" required></label>
       <button type="submit" class="go" id="n-go">강의방 만들기</button>

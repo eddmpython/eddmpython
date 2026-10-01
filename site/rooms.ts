@@ -52,7 +52,7 @@ type AdminAuth = {
   lockedUntil: number;
 };
 
-const ROOM_SLUG = /^[a-z0-9][a-z0-9-]{1,30}$/;
+const ROOM_SLUG = /^[a-z0-9][a-z0-9_-]{1,30}$/;
 /**
  * 방 이름으로 쓸 수 없는 말.
  *
