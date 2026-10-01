@@ -54,12 +54,12 @@
       "at": "2026-09-01"
     },
     "005-python-history/insider": {
-      "value": "https://blog.python.org/2026/09/python-docs-in-german/",
-      "at": "2026-09-26"
+      "value": "https://blog.python.org/2026/09/language-summit-2026/",
+      "at": "2026-10-01"
     },
     "005-python-history/python-latest": {
-      "value": "3.14.7",
-      "at": "2026-08-26"
+      "value": "3.14.8",
+      "at": "2026-10-01"
     }
   }
 }
