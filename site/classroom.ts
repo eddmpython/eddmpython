@@ -805,6 +805,12 @@ const CELL_SCRIPT = `
 
 const CAROUSEL_SCRIPT = `
 (() => {
+  document.addEventListener("play", (event) => {
+    if (!(event.target instanceof HTMLMediaElement)) return;
+    document.querySelectorAll("video, audio").forEach((media) => {
+      if (media !== event.target && !media.paused) media.pause();
+    });
+  }, true);
   const mount = (root) => {
     const items = [...root.querySelectorAll(":scope > .visual-carousel-frame > .visual-carousel-track > [data-carousel-item]")];
     if (!items.length) return;
@@ -821,6 +827,7 @@ const CAROUSEL_SCRIPT = `
       at = Math.max(0, Math.min(items.length - 1, Number(nextAt) || 0));
       items.forEach((item, index) => {
         const active = index === at;
+        if (!active) item.querySelectorAll("video, audio").forEach((media) => media.pause());
         item.hidden = !active;
         item.setAttribute("aria-hidden", active ? "false" : "true");
         item.toggleAttribute("inert", !active);
@@ -1087,6 +1094,7 @@ const LECTURE_SCRIPT = `
     } else if (node.dataset[name] !== undefined) delete node.dataset[name];
   };
   const hideAll = (scene) => allVisuals(scene).forEach((visual) => {
+    visual.querySelectorAll("video, audio").forEach((media) => media.pause());
     delete visual.dataset.sceneVisible;
     delete visual.dataset.sceneEffect;
     delete visual.dataset.sceneActive;
@@ -1275,6 +1283,7 @@ const LECTURE_SCRIPT = `
 
   const close = async () => {
     if (!opened) return;
+    deck.querySelectorAll("video, audio").forEach((media) => media.pause());
     opened = false;
     deck.hidden = true;
     document.body.classList.remove("lecture-on");
@@ -1293,6 +1302,7 @@ const LECTURE_SCRIPT = `
 
   const open = async (fromHash = false) => {
     if (opened) return;
+    document.querySelectorAll("article video, article audio").forEach((media) => media.pause());
     opened = true;
     if (!fromHash) beforeHash = location.hash && !location.hash.startsWith("#lecture=") ? location.hash : location.pathname + location.search;
     deck.hidden = false;
