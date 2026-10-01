@@ -49,5 +49,18 @@ try {
   const next = (await call('studentEvents', 'alpha', { before: first.at(-1).id })).events;
   assert.equal(first.length, 50); assert.ok(next.length > 0); assert.ok(next.every(e => e.id < first.at(-1).id));
   assert.equal((await call('studentEvents', 'beta')).events.length, 0);
+  assert.deepEqual((await call('studentInfo')).completed, []);
+  const firstLesson = { lesson: '01-start/01-first', required: [], title: '첫 수업' };
+  const nextLesson = { lesson: '01-start/02-next', required: [firstLesson.lesson], title: '다음 수업' };
+  assert.equal((await call('studentComplete', 'alpha', nextLesson)).status, 409);
+  assert.equal((await call('studentComplete', 'alpha', { ...firstLesson, lesson: '../outside' })).status, 400);
+  assert.equal((await call('studentComplete', 'alpha', firstLesson)).status, 200);
+  assert.equal((await call('studentComplete', 'alpha', firstLesson)).status, 200);
+  assert.equal((await call('studentGet')).events.filter(e => e.kind === 'complete').length, 1);
+  assert.deepEqual((await call('studentInfo')).completed, [firstLesson.lesson]);
+  assert.deepEqual((await call('studentInfo', 'beta')).completed, []);
+  assert.equal((await call('studentComplete', 'beta', nextLesson)).status, 409);
+  assert.equal((await call('studentComplete', 'alpha', nextLesson)).status, 200);
+  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM lessonCompletions WHERE roomId=?').get('alpha').n, 2);
   console.log('수강자 저장소: 방 분리, 제출 검증, 중복 제출, 검토, 재제출, 보관, 기록 페이지 확인');
 } finally { db.close(); }

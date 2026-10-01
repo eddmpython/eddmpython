@@ -7,7 +7,7 @@ import { cookie, issueToken } from "./auth";
 
 const methods: Record<string, string> = { any: "글·링크·파일 중 선택", link: "링크 제출", file: "파일 제출", text: "글로 제출" };
 const statuses: Record<string, string> = { pending: "검토 대기", revision: "수정 요청", accepted: "확인 완료" };
-const kinds: Record<string, string> = { login: "로그인", visit: "강의장 접속", lesson: "수업 열람", section: "섹션 열람", lecture: "강의 모드", download: "자료 다운로드", submission: "숙제 제출" };
+const kinds: Record<string, string> = { login: "로그인", visit: "강의장 접속", lesson: "수업 열람", section: "섹션 열람", lecture: "강의 모드", download: "자료 다운로드", submission: "숙제 제출", complete: "학습 완료" };
 type RecordRow = Record<string, any>;
 const date = (value: unknown) => value ? new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", dateStyle: "medium", timeStyle: "short", hour12: false }).format(Number(value)) : "기록 없음";
 const due = (value: unknown) => value ? date(value) : "기한 미정";

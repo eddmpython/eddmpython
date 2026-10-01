@@ -100,6 +100,7 @@ const env = {
         if (action === "get") return Response.json({ room: rooms[slug] ?? null });
         if (action === "login") return Response.json({ ok: true });
         if (action === "signKey") return Response.json({ key: "test-sign-key" });
+        if (action === "studentInfo") return Response.json({ enabled: false, completed: [] });
         return Response.json({ error: "unexpected action" }, { status: 400 });
       },
     }),

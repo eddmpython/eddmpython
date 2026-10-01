@@ -66,7 +66,12 @@ ${CODE_CELL_STYLE}
 .nav-post b { flex:0 0 auto; color:var(--eddm-text-faint); font-weight:500; font-variant-numeric:tabular-nums; }
 .nav-post span, .toc a span { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .side-h { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; letter-spacing:0; }
-.nav-post:hover { background:var(--eddm-raise); color:var(--eddm-ivory); }
+.nav-post[href]:hover { background:var(--eddm-raise); color:var(--eddm-ivory); }
+.lesson-locked { opacity:.42; cursor:not-allowed; }
+.lesson-done { margin-left:auto; font-style:normal; color:var(--eddm-accent); }
+.lesson-completion { margin-top:3rem; padding:1.2rem; border:1px solid var(--eddm-accent-line); border-radius:.7rem; }
+.lesson-completion p { margin:0 0 .8rem; color:var(--eddm-text-muted); line-height:1.7; }
+.lesson-completion button { padding:.7rem 1rem; border:1px solid var(--eddm-accent-line); border-radius:.5rem; background:var(--eddm-accent-bg); color:var(--eddm-accent); font:inherit; cursor:pointer; }
 .nav-post.on { background:var(--eddm-accent-bg); color:var(--eddm-accent); }
 .nav-post.on b { color:var(--eddm-accent-dim); }
 .toc-h { display:flex; align-items:baseline; justify-content:space-between; gap:.5rem;
@@ -105,7 +110,7 @@ article .q { font-style:normal; color:var(--eddm-ivory); }
 
 /* 이전 다음 */
 .pager { display:flex; gap:1rem; margin-top:4rem; padding-top:2rem; border-top:1px solid var(--eddm-line); }
-.pager a { flex:1; padding:1rem 1.1rem; border:1px solid var(--eddm-line-base); border-radius:.7rem;
+.pager a, .pager > .lesson-locked { flex:1; padding:1rem 1.1rem; border:1px solid var(--eddm-line-base); border-radius:.7rem;
   text-decoration:none; color:inherit; display:block; }
 .pager a:hover { border-color:var(--eddm-accent-line); }
 .pager .nx { text-align:right; }
@@ -138,9 +143,9 @@ article .q { font-style:normal; color:var(--eddm-ivory); }
 /* 이 카테고리를 덮으면 무엇이 되는지. 왜 듣는지가 목록에서 보여야 한다. */
 .goal { margin:.5rem 0 1rem 2.1rem; font-size:.87rem; color:var(--eddm-text-muted); line-height:1.7; }
 .tag { font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--eddm-accent); }
-a.post { display:flex; gap:.9rem; align-items:baseline; margin-left:2.1rem; padding:.65rem 0;
+.post { display:flex; gap:.9rem; align-items:baseline; margin-left:2.1rem; padding:.65rem 0;
   border-top:1px solid var(--eddm-line); color:inherit; text-decoration:none; line-height:1.6; }
-a.post b { flex:0 0 auto; font-weight:500; font-size:.78rem; color:var(--eddm-text-faint);
+.post b { flex:0 0 auto; font-weight:500; font-size:.78rem; color:var(--eddm-text-faint);
   font-variant-numeric:tabular-nums; }
 a.post:hover { color:var(--eddm-accent); }
 a.post:hover b { color:var(--eddm-accent-dim); }
@@ -1588,8 +1593,8 @@ setInterval(async () => {
  * 폴더 이름 목록이고 진도까지 같이 새어 나간다. 이 저장소는 커리큘럼 공개를 금지한다.
  * 서명 키로 눌러서 밖에서는 바뀌었다는 것만 알게 한다.
  */
-async function stampOf(key: string, room: PublicRoom, version: string): Promise<string> {
-  const raw = `${room.gen}:${room.open ? 1 : 0}:${[...room.unlocked].sort().join(",")}:${version}`;
+async function stampOf(key: string, room: PublicRoom, version: string, completed: string[] = []): Promise<string> {
+  const raw = `${room.gen}:${room.open ? 1 : 0}:${[...room.unlocked].sort().join(",")}:${version}:${completed.join(",")}`;
   return (await hmac(key, raw)).slice(0, 16);
 }
 
@@ -1691,17 +1696,24 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     return loginPage(slug, room.title);
   }
 
+  const studentResult = roomTest ? { status: 200, data: { enabled: false, completed: [] } } : await call(env, { action: "studentInfo", roomId: room.id });
+  if (studentResult.status !== 200 || typeof studentResult.data.enabled !== "boolean") return new Response("학습 기록을 불러오지 못했습니다. 잠시 뒤 다시 시도해 주세요", { status: 503 });
+  const studentInfo = studentResult.data;
+  const studentEnabled = studentInfo.enabled === true;
+  const completed = new Set<string>(studentInfo.completed ?? []);
+  // 강사 미리보기와 로컬 교안 검수는 수강생 진도를 바꾸지 않는다.
+  const sequential = studentEnabled && !previewAccess && !localAccess;
   if (!roomTest && parts[1] === "state" && parts.length === 2) {
     // 지문만 준다. 본문도 카테고리 목록도 여기서 안 내려간다.
     return Response.json(
-      { stamp: await stampOf(key, room, await courseVersion(env)) },
+      { stamp: await stampOf(key, room, await courseVersion(env), [...completed]) },
       { headers: { "cache-control": "no-store" } },
     );
   }
 
   const stamp = localAccess
     ? ""
-    : `window.__stamp=${JSON.stringify(await stampOf(key, room, await courseVersion(env)))};${poll(slug)}`;
+    : `window.__stamp=${JSON.stringify(await stampOf(key, room, await courseVersion(env), [...completed]))};${poll(slug)}`;
 
   if (!room.open) {
     return roomPage(
@@ -1714,6 +1726,29 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
 
   const courseState = cachedCourse ?? await course(env);
   const open = visible(courseState.categories, room.unlocked);
+  // 카테고리는 독립적으로 시작한다. 명시적으로 이어진 과정만 선수 관계를 따른다.
+  const requiredLessons = (category: CourseCategory, postId: string): string[] => {
+    const required = category.posts.slice(0, category.posts.findIndex(p => p.id === postId)).map(p => `${category.slug}/${p.id}`);
+    const seen = new Set([category.slug]);
+    let previous = open.find(c => c.nextCategory === category.slug);
+    while (previous && !seen.has(previous.slug)) {
+      seen.add(previous.slug);
+      required.push(...previous.posts.map(p => `${previous!.slug}/${p.id}`));
+      previous = open.find(c => c.nextCategory === previous!.slug);
+    }
+    return required;
+  };
+  const canOpen = (category: CourseCategory, postId: string) => !sequential || requiredLessons(category, postId).every(lesson => completed.has(lesson));
+
+  if (parts.length === 4 && parts[3] === "complete" && request.method === "POST") {
+    if (!sameOrigin(request, url) || !sequential) return new Response("forbidden", { status: 403 });
+    const category = open.find(c => c.slug === parts[1]);
+    const post = category?.posts.find(p => p.id === parts[2]);
+    if (!category || !post) return new Response("not found", { status: 404 });
+    const result = await call(env, { action: "studentComplete", roomId: room.id, lesson: `${category.slug}/${post.id}`, title: post.title, required: requiredLessons(category, post.id) });
+    if (result.status !== 200) return new Response(String(result.data.error), { status: result.status });
+    return new Response(null, { status: 303, headers: { location: `${roomRoot}/${category.slug}/${post.id}#lesson-completion`, "cache-control": "no-store" } });
+  }
 
   if (parts[1] === "homework") return homeworkPage(request, env, url, room, parts, previewAccess, !localAccess && !previewAccess);
   if (parts[1] === "activity" && parts.length === 2 && request.method === "POST") {
@@ -1721,7 +1756,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     const body = await readJson(request, 2000);
     const category = open.find(c => c.slug === body?.category);
     const post = category?.posts.find(p => p.id === body?.post);
-    if (!post || !["section", "lecture"].includes(String(body?.kind))) return new Response("not found", { status: 404 });
+    if (!post || !canOpen(category!, post.id) || !["section", "lecture"].includes(String(body?.kind))) return new Response("not found", { status: 404 });
     const section = Number(body?.section);
     const headings = post.body.match(/^## (.+)$/gm)?.map(h => h.slice(3)) ?? [];
     if (body?.kind === "section" && (!Number.isInteger(section) || section < 1 || section > headings.length)) return new Response("not found", { status: 404 });
@@ -1739,7 +1774,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     const key = parts[2];
     if (!ROOM_MEDIA_KEY.test(key)) return new Response("not found", { status: 404 });
     const source = `room://${key}`;
-    if (!open.some((category) => category.posts.some((post) => post.body.includes(source)))) {
+    if (!open.some((category) => category.posts.some((post) => canOpen(category, post.id) && post.body.includes(source)))) {
       return new Response("없는 시각물입니다.", { status: 404 });
     }
     const bytes = await env.COURSE.get(`media/${key}`, { type: "arrayBuffer", cacheTtl: 3600 });
@@ -1776,7 +1811,6 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     return new Response(bytes, { headers });
   }
 
-  const studentEnabled = Boolean(room.id && (parts.length === 1 || (parts.length === 3 && parts[1] !== "media")) && (await call(env, { action: "studentInfo", roomId: room.id })).data.enabled);
   if (parts.length === 1) {
     if (!localAccess && !previewAccess) await recordActivity(env, room, "visit", "수업 목록");
     const cards = open.length
@@ -1786,9 +1820,9 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
             const posts = c.posts
               .map(
                 (p, j) =>
-                  `<a class="post" href="${esc(roomRoot)}/${esc(c.slug)}/${esc(p.id)}"><b>${String(
+                  `${canOpen(c, p.id) ? `<a class="post" href="${esc(roomRoot)}/${esc(c.slug)}/${esc(p.id)}">` : '<span class="post lesson-locked" aria-disabled="true" title="앞 편의 학습을 완료하면 열립니다">'}<b>${String(
                     j + 1,
-                  ).padStart(2, "0")}</b><span>${esc(p.title)}</span></a>`,
+                  ).padStart(2, "0")}</b><span>${esc(p.title)}</span>${completed.has(`${c.slug}/${p.id}`) ? '<em class="lesson-done" aria-label="학습 완료">✓</em>' : ""}${canOpen(c, p.id) ? "</a>" : "</span>"}`,
               )
               .join("");
             return `<div class="cat"><div class="cat-h"><span class="cat-n">${esc(n)}</span>
@@ -1808,7 +1842,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
          <h1>${esc(room.title)}</h1>
          <p class="sub">${
            total
-             ? `${open.length}개 과정 ${total}편이 열려 있습니다. 순서대로 따라오시면 됩니다.`
+             ? `${open.length}개 과정 ${total}편이 있습니다. ${sequential ? "한 편을 완료하면 다음 편이 열립니다." : "순서대로 따라오시면 됩니다."}`
              : "곧 시작합니다. 이 화면을 열어 두고 기다리시면 됩니다."
          }</p>
        </section>${studentEnabled ? `<p class="wait" style="font-size:.8rem">강의장 접속, 수업 열람과 제출 기록은 강사가 학습 안내에 사용합니다.</p>` : ""}${cards}`,
@@ -1823,6 +1857,10 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     const at = category.posts.findIndex((p) => p.id === parts[2]);
     const post = category.posts[at];
     if (!post) return new Response("없는 글입니다.", { status: 404 });
+    if (!canOpen(category, post.id)) {
+      const first = open.flatMap(c => c.posts.map(p => ({ category: c, post: p }))).find(item => requiredLessons(category, post.id).includes(`${item.category.slug}/${item.post.id}`) && !completed.has(`${item.category.slug}/${item.post.id}`) && canOpen(item.category, item.post.id));
+      return new Response(null, { status: 303, headers: { location: first ? `${roomRoot}/${first.category.slug}/${first.post.id}` : roomRoot, "cache-control": "no-store" } });
+    }
     if (!localAccess && !previewAccess) await recordActivity(env, room, "lesson", post.title, `${category.slug}/${post.id}`);
     // 비공개 시각물은 이 방의 경로로 붙는다. 쿠키가 방 경로에 묶여 있어 그 아래 주소에만 실린다.
     const media = { mediaBase: `${roomRoot}/media` };
@@ -1836,9 +1874,10 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     const nav = category.posts
       .map(
         (p, i) =>
-          `<a class="nav-post${p.id === post.id ? " on" : ""}" href="${esc(roomRoot)}/${esc(
+          canOpen(category, p.id) ? `<a class="nav-post${p.id === post.id ? " on" : ""}" href="${esc(roomRoot)}/${esc(
             category.slug,
-          )}/${esc(p.id)}" title="${esc(p.title)}"><b>${String(i + 1).padStart(2, "0")}</b><span>${esc(p.title)}</span></a>`,
+          )}/${esc(p.id)}" title="${esc(p.title)}"${p.id === post.id ? ' aria-current="page"' : ""}><b>${String(i + 1).padStart(2, "0")}</b><span>${esc(p.title)}</span>${completed.has(`${category.slug}/${p.id}`) ? '<em class="lesson-done" aria-label="학습 완료">✓</em>' : ""}</a>`
+          : `<span class="nav-post lesson-locked" aria-disabled="true" title="${esc(p.title)} · 앞 편의 학습을 완료하면 열립니다"><b>${String(i + 1).padStart(2, "0")}</b><span>${esc(p.title)}</span></span>`,
       )
       .join("");
 
@@ -1871,11 +1910,16 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
               : "<i></i>"
           }${
             next
-              ? `<a class="nx" href="${esc(roomRoot)}/${esc(nextCategory!.slug)}/${esc(next.id)}"><span>${nextCategory === category ? "다음" : `다음 과정 · ${esc(nextCategory!.title)}`}</span><b>${esc(next.title)}</b></a>`
+              ? canOpen(nextCategory!, next.id) ? `<a class="nx" href="${esc(roomRoot)}/${esc(nextCategory!.slug)}/${esc(next.id)}"><span>${nextCategory === category ? "다음" : `다음 과정 · ${esc(nextCategory!.title)}`}</span><b>${esc(next.title)}</b></a>`
+                : `<div class="nx lesson-locked" aria-disabled="true"><span>학습 완료 후 다음 편</span><b>${esc(next.title)}</b></div>`
               : "<i></i>"
           }</div>`
         : "";
 
+    const completion = sequential ? `<section class="lesson-completion" id="lesson-completion" aria-label="학습 완료">
+      ${completed.has(`${category.slug}/${post.id}`) ? `<p role="status">✓ 이 편의 학습을 완료했습니다.${next ? " 다음 편을 열 수 있습니다." : ""}</p>`
+        : `<p>이 편의 학습과 실습을 마쳤다면 완료를 눌러 주세요${next ? "<br>완료하면 다음 편이 열립니다." : ""}</p><form method="post" action="${esc(roomRoot)}/${esc(category.slug)}/${esc(post.id)}/complete"><button type="submit">학습 완료${next ? "하고 다음 편 열기" : ""}</button></form>`}
+      </section>` : "";
     const lectureUi = lecture.ok
       ? `<div class="lecture-deck" data-lecture-deck data-lecture-runtime="${COURSE_SCENE_RUNTIME}" role="dialog" aria-modal="true" aria-label="${esc(
           post.title,
@@ -1932,6 +1976,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
            }</div>
            <p class="sub">${esc(post.summary)}</p>
            <article>${html}</article>
+           ${completion}
            ${foot}
          </main>
          ${toc}

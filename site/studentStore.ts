@@ -20,6 +20,7 @@ export class StudentStore {
       CREATE INDEX IF NOT EXISTS filesSubmission ON submissionFiles(submissionId);
       CREATE TABLE IF NOT EXISTS studentEvents (id INTEGER PRIMARY KEY AUTOINCREMENT, roomId TEXT NOT NULL, kind TEXT NOT NULL, title TEXT NOT NULL, path TEXT NOT NULL, at INTEGER NOT NULL);
       CREATE INDEX IF NOT EXISTS eventsRoom ON studentEvents(roomId, id DESC);
+      CREATE TABLE IF NOT EXISTS lessonCompletions (roomId TEXT NOT NULL, lesson TEXT NOT NULL, completed INTEGER NOT NULL, PRIMARY KEY(roomId, lesson));
     `);
   }
   private rows(query: string, ...values: SqlStorageValue[]): Row[] { return this.sql.exec(query, ...values).toArray(); }
@@ -33,7 +34,7 @@ export class StudentStore {
     const now = Date.now();
     if (action === "studentList") {
       return Response.json({ students: this.rows(`SELECT s.*,
-        (SELECT MAX(at) FROM studentEvents WHERE roomId=s.roomId AND kind IN ('login','visit','lesson','section','lecture','download','submission')) AS lastAt,
+        (SELECT MAX(at) FROM studentEvents WHERE roomId=s.roomId AND kind IN ('login','visit','lesson','section','lecture','download','submission','complete')) AS lastAt,
         (SELECT COUNT(*) FROM assignments a WHERE a.roomId=s.roomId AND a.archived=0 AND a.dueAt < ? AND NOT EXISTS
           (SELECT 1 FROM submissions u WHERE u.assignmentId=a.id)) AS overdue,
         (SELECT COUNT(*) FROM submissions u JOIN assignments a ON a.id=u.assignmentId WHERE u.roomId=s.roomId AND a.archived=0 AND u.status='pending' AND u.id=(SELECT id FROM submissions WHERE assignmentId=u.assignmentId ORDER BY created DESC, rowid DESC LIMIT 1)) AS pending,
@@ -49,9 +50,22 @@ export class StudentStore {
       return Response.json({ ok: true });
     }
     const student = this.one("SELECT * FROM students WHERE roomId=?", roomId);
-    if (action === "studentInfo") return Response.json({ enabled: Boolean(student) });
+    if (action === "studentInfo") return Response.json({ enabled: Boolean(student), completed: student
+      ? this.rows("SELECT lesson FROM lessonCompletions WHERE roomId=? ORDER BY lesson", roomId).map(row => row.lesson) : [] });
     // 등록하지 않은 단체 강의장은 기록하지 않는다.
     if (!student) return action === "studentEvent" ? Response.json({ ok: true }) : fail("등록되지 않은 수강자입니다", 404);
+    if (action === "studentComplete") {
+      const lesson = text(body.lesson, 300);
+      const required = body.required;
+      if (!/^[a-z0-9-]+\/[a-z0-9-]+$/.test(lesson) || !Array.isArray(required) || required.some(value => typeof value !== "string")) return fail("수업 정보가 올바르지 않습니다");
+      const completed = new Set(this.rows("SELECT lesson FROM lessonCompletions WHERE roomId=?", roomId).map(row => row.lesson));
+      if (required.some(value => !completed.has(value))) return fail("앞 편의 학습을 먼저 완료해 주세요", 409);
+      if (!completed.has(lesson)) this.storage.transactionSync(() => {
+        this.sql.exec("INSERT INTO lessonCompletions(roomId,lesson,completed) VALUES(?,?,?)", roomId, lesson, now);
+        this.event(roomId, "complete", text(body.title, 180), lesson);
+      });
+      return Response.json({ ok: true });
+    }
     if (action === "studentGet") {
       return Response.json({ student,
         assignments: this.rows("SELECT * FROM assignments WHERE roomId=? ORDER BY archived, created DESC", roomId),
