@@ -544,6 +544,7 @@ body.lecture-on { overflow:hidden; }
 }
 @media (max-width:900px) {
   .lecture-deck { grid-template-columns:6.5rem minmax(0,1fr); }
+  .lecture-deck:not(.lecture-watch) .lecture-stage { padding-top:3.75rem; }
   .lecture-rail { padding-top:max(.65rem,env(safe-area-inset-top)); padding-right:.35rem;
     padding-bottom:max(.5rem,env(safe-area-inset-bottom)); padding-left:max(.35rem,env(safe-area-inset-left)); }
   .lecture-brand { padding-bottom:.55rem; }
@@ -568,6 +569,8 @@ body.lecture-on { overflow:hidden; }
 }
 @media (max-width:600px) {
   .lecture-deck { grid-template-columns:4rem minmax(0,1fr); }
+  .scene-title-row { flex-wrap:wrap; gap:.5rem; }
+  .scene-title-row h2 { flex-basis:100%; }
   .lecture-rail { padding-right:.0625rem; padding-left:max(.0625rem,env(safe-area-inset-left)); }
   .lecture-map-list { padding-right:0; padding-left:0; }
   .lecture-scene, .lecture-map-thumb-scene { --scene-visual-scale:.97; padding:.75rem; }
