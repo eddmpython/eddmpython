@@ -155,6 +155,7 @@ article { font-size:1.125rem; }
 article img { cursor:zoom-in; }
 .lesson-progress{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin:1rem 0 1.5rem;font-size:.9rem;color:var(--eddm-text-muted)}
 .lesson-progress progress{width:8rem;accent-color:var(--eddm-accent)}
+.lesson-progress a{color:var(--eddm-accent)}
 .resume-link{display:inline-block;margin:.5rem 0 1rem;color:var(--eddm-accent)}
 .page-loading{position:fixed;z-index:1000;right:1.5rem;top:1.5rem;width:1.4rem;height:1.4rem;border:2px solid var(--eddm-line);border-top-color:var(--eddm-accent);border-radius:50%;animation:course-spin .7s linear infinite}
 .page-loading[hidden]{display:none}
@@ -1591,7 +1592,7 @@ const ROOM_NAV_SCRIPT = `
   sectionLink.hidden=false;sectionLink.href='#'+saved.section;sectionLink.textContent='이어서 읽기 · '+saved.title;
  }
  if(!('IntersectionObserver' in window))return;
- const remember=(section)=>{if(document.hidden||!section)return;try{localStorage.setItem(key,JSON.stringify({path:location.pathname,section:section.id,title:section.textContent.trim()}));}catch{}};
+ const remember=(section)=>{if(document.hidden||!section)return;try{localStorage.setItem(key,JSON.stringify({path:location.pathname,section:section.id,title:(section.querySelector('.section-title')||section).textContent.trim()}));}catch{}};
  document.querySelectorAll('[data-to]').forEach(link=>link.addEventListener('click',()=>remember(document.getElementById(link.dataset.to))));
  const observer=new IntersectionObserver(entries=>{for(const entry of entries)if(entry.isIntersecting)remember(entry.target);},{rootMargin:'0px 0px -55% 0px'});
  document.querySelectorAll('article h2[id]').forEach(h=>observer.observe(h));
