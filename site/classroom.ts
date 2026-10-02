@@ -32,6 +32,7 @@ import { course, courseVersion, roomCourse, type CourseCategory } from "./course
 import { header, page, themeToggle } from "./shell";
 import type { Env } from "./env";
 import { homeworkPage, recordActivity, sameOrigin, readJson } from "./students";
+import { connectGithub, githubForm, githubPractice, githubScript, githubStyle } from "./studentGithub";
 
 
 
@@ -48,6 +49,7 @@ import { homeworkPage, recordActivity, sameOrigin, readJson } from "./students";
  */
 const CLASSROOM_STYLE = `
 ${CODE_CELL_STYLE}
+${githubStyle}
 /* 글 화면. 왼쪽 과정 이동, 가운데 본문, 오른쪽 목차 */
 .wrap.wide { width:min(calc(100% - 3rem),82rem); max-width:none; padding-inline:0; }
 .wrap.wide:has(.lay) { width:calc(100% - 3rem); }
@@ -1806,6 +1808,17 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
   };
   const canOpen = (category: CourseCategory, postId: string) => !sequential || requiredLessons(category, postId).every(lesson => completed.has(lesson));
 
+  if (parts.length === 2 && parts[1] === "github" && request.method === "POST") {
+    if (!sameOrigin(request, url) || !sequential) return Response.json({ error: "수강자 강의장에서 진행해 주세요" }, { status: 403 });
+    const link = studentInfo.github;
+    const category = open.find(c => c.posts.some(p => `${c.slug}/${p.id}` === link?.lesson));
+    const post = category?.posts.find(p => `${category.slug}/${p.id}` === link?.lesson);
+    if (!category || !post || !canOpen(category, post.id)) return Response.json({ error: "연결할 실습 수업이 없습니다" }, { status: 404 });
+    const body = await readJson(request, 1000);
+    if (!body) return Response.json({ error: "GitHub 사용자 이름을 확인해 주세요" }, { status: 400 });
+    return connectGithub(env, room, body);
+  }
+
   if (parts.length === 4 && parts[3] === "complete" && request.method === "POST") {
     if (!sameOrigin(request, url) || !sequential) return new Response("forbidden", { status: 403 });
     const category = open.find(c => c.slug === parts[1]);
@@ -1936,6 +1949,10 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     const { html, headings, hasCells } = renderPost(post.body, category.cells ?? {}, courseState.glossary, {
       ...media,
       scenes: post.scenes ?? [],
+      github: studentInfo.github?.lesson === `${category.slug}/${post.id}` ? {
+        connect: githubForm(studentInfo.github, room, localAccess || previewAccess, Boolean(env.GITHUB_INVITE_TOKEN)),
+        practice: githubPractice(room),
+      } : undefined,
     });
     const lecture = renderLecture(post.body, post.scenes ?? [], category.cells ?? {}, courseState.glossary, media);
 
@@ -2056,6 +2073,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
         + (!localAccess && !previewAccess ? `(() => {const seen=new Set();const send=(kind,section)=>fetch(${JSON.stringify(`${roomRoot}/activity`)},{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({kind,section,category:${JSON.stringify(category.slug)},post:${JSON.stringify(post.id)}})});const observer=new IntersectionObserver(entries=>{for(const entry of entries){if(!entry.isIntersecting||seen.has(entry.target.id)||document.hidden)continue;seen.add(entry.target.id);send('section',Number(entry.target.id.slice(1))).catch(()=>{});}},{threshold:.5});document.querySelectorAll('article h2[id^="s"]').forEach(h=>observer.observe(h));document.querySelectorAll('[data-lecture-open],[data-lecture-watch]').forEach(button=>button.addEventListener('click',()=>send('lecture').catch(()=>{})));document.querySelector('[data-lecture-deck]')?.addEventListener('lectureframe',event=>{const section=event.detail.scene+1;const id='s'+section;if(!seen.has(id)){seen.add(id);send('section',section).catch(()=>{});}});})();` : "")
         + TOC_SCRIPT
         + COMMAND_SCRIPT
+        + (html.includes("data-github-form") ? githubScript : "")
         + (hasCells || lecture.hasCells ? CELL_SCRIPT : "")
         + CAROUSEL_SCRIPT
         + (lecture.ok ? LECTURE_SCRIPT : "")

@@ -14,13 +14,15 @@ export type Env = {
   /** 수강자 첨부 파일. 공개 URL 없이 인증한 강의장과 관리자만 내려받는다. */
   SUBMISSIONS?: R2Bucket;
   /**
-   * 운영장 로그인 비밀번호. 배포 때 넣는 유일한 비밀값이다.
+   * 운영장 로그인 비밀번호.
    *
    * 한때 `CR_ADMIN_TOKEN` 이었다. 그때는 운영 화면이 운영자 노트북에서 돌고 이 토큰을
    * Bearer 헤더로 얹어 Worker 를 조종했다. 이제 운영장이 서버에 있으므로 사람이 치는
    * 비밀번호이고, 방 비밀번호와 같은 잠금 규칙 아래에서 검사한다.
    */
   ADMIN_PASSWORD?: string;
+  /** 지정한 비공개 실습 저장소에만 Administration 쓰기 권한을 가진 서버용 인증 정보. */
+  GITHUB_INVITE_TOKEN?: string;
   /** `npm run classroom:dev`가 preview 방과 `/room-test`에만 주입한다. 배포 환경에는 존재하지 않는다. */
   LOCAL_PREVIEW_BYPASS?: string;
 };

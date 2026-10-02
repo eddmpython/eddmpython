@@ -1,3 +1,4 @@
 # 강의장 로컬 테스트용 예시. 값은 비워 둔다.
-# scripts/classroom-admin.mjs 가 .classroom-admin.json 의 로컬 토큰과 맞춰 자동으로 채운다.
-CR_ADMIN_TOKEN=
+ADMIN_PASSWORD=
+# 선택한 비공개 실습 저장소 하나에 Administration: Read and write 권한으로 발급한다.
+GITHUB_INVITE_TOKEN=

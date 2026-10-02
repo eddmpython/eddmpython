@@ -534,7 +534,7 @@ function pendingMedia(key: string, alt: string, caption: string, label = "시각
 }
 
 /** `mediaBase` 는 비공개 시각물이 붙을 방 경로다. 방 밖(검사, 감사)에서는 없다. */
-type RenderState = { visual: number; mediaBase?: string };
+type RenderState = { visual: number; mediaBase?: string; github?: { connect: string; practice: string } };
 
 function visual(html: string, state: RenderState): string {
   state.visual += 1;
@@ -693,7 +693,9 @@ function renderMarkdownParts(
     out.push(...blocks(text.slice(at, m.index), headings, cells, state));
     const language = m[1].trim().toLowerCase();
     const content = m[2].replace(/\n$/, "");
-    if (language === "course-embed") {
+    if (language === "course-github") {
+      out.push(state.github?.[content.trim() === "practice" ? "practice" : "connect"] ?? '<p>GitHub 계정 연결과 실습 명령은 교안에서 확인하세요.</p>');
+    } else if (language === "course-embed") {
       const embed = courseEmbed(content);
       out.push(embed ? visual(embed, state) : `<div class="pending"><b>embed 계약 오류</b></div>`);
     } else if (language !== "course-scene") {
@@ -888,10 +890,10 @@ export function renderPost(
   body: string,
   cells: Cells = {},
   glossary: Glossary = {},
-  options: { mediaBase?: string; scenes?: CourseScene[] } = {},
+  options: { mediaBase?: string; scenes?: CourseScene[]; github?: { connect: string; practice: string } } = {},
 ): { html: string; headings: string[]; hasCells: boolean; visuals: number } {
   const headings: string[] = [];
-  const state: RenderState = { visual: 0, mediaBase: options.mediaBase };
+  const state: RenderState = { visual: 0, mediaBase: options.mediaBase, github: options.github };
   const marked = markGlossaryTerms(body, glossary);
   const parts = renderMarkdownParts(marked, headings, cells, state);
   const html = applyGlossary(groupReadingCarousels(parts, options.scenes ?? []), glossary, "term-r")

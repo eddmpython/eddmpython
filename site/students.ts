@@ -5,10 +5,11 @@ import type { Env } from "./env";
 import { course, roomCourse, validCurriculum } from "./course";
 import { curriculumEditor, curriculumStyle, curriculumScript } from "./curriculumEditor";
 import { cookie, issueToken } from "./auth";
+import { githubLabels, verifyGithubRepository } from "./studentGithub";
 
 const methods: Record<string, string> = { any: "글·링크·파일 중 선택", link: "링크 제출", file: "파일 제출", text: "글로 제출" };
 const statuses: Record<string, string> = { pending: "검토 대기", revision: "수정 요청", accepted: "확인 완료" };
-const kinds: Record<string, string> = { login: "로그인", visit: "강의장 접속", lesson: "수업 열람", section: "섹션 열람", lecture: "강의 모드", download: "자료 다운로드", submission: "숙제 제출", complete: "학습 완료" };
+const kinds: Record<string, string> = { github: "GitHub 연결", login: "로그인", visit: "강의장 접속", lesson: "수업 열람", section: "섹션 열람", lecture: "강의 모드", download: "자료 다운로드", submission: "숙제 제출", complete: "학습 완료" };
 type RecordRow = Record<string, any>;
 const date = (value: unknown) => value ? new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", dateStyle: "medium", timeStyle: "short", hour12: false }).format(Number(value)) : "기록 없음";
 const due = (value: unknown) => value ? date(value) : "기한 미정";
@@ -66,10 +67,16 @@ export async function handleStudents(request: Request, env: Env, url: URL): Prom
   if (parts[0] === "api" && request.method === "POST") {
     if (!sameOrigin(request, url)) return Response.json({ error: "이 화면에서 다시 시도해 주세요" }, { status: 403 });
     const body = await readJson(request);
-    const allowed = ["studentSave", "studentAssignment", "studentReview", "studentArchive", "studentEvents", "roomCurriculum"];
+    const allowed = ["studentSave", "studentAssignment", "studentReview", "studentArchive", "studentEvents", "roomCurriculum", "studentGithubConfig"];
     if (!body || !allowed.includes(String(body.action))) return Response.json({ error: "지원하지 않는 작업입니다" }, { status: 400 });
     const room = rooms.find(r => r.id === body.roomId);
     if (!room) return new Response("없는 강의장입니다", { status: 404 });
+    if (body.action === "studentGithubConfig") {
+      const found = await course(env);
+      if (!roomCourse(found.categories, room).some(c => c.posts.some(p => `${c.slug}/${p.id}` === body.lesson))) return Response.json({ error: "이 강의장에 배정한 수업을 선택해 주세요" }, { status: 400 });
+      try { if (env.GITHUB_INVITE_TOKEN) await verifyGithubRepository(env, String(body.repository)); }
+      catch (error) { return Response.json({ error: error instanceof Error ? error.message : "저장소를 확인하지 못했습니다" }, { status: 400 }); }
+    }
     if (body.action === "roomCurriculum") {
       const found = await course(env);
       if (!found.ok) return Response.json({ error: "교안 목록을 불러오지 못했습니다. 다시 시도해 주세요" }, { status: 503 });
@@ -96,7 +103,7 @@ export async function handleStudents(request: Request, env: Env, url: URL): Prom
     const found = await course(env);
     return adminPage("수강자 관리", `<p class="muted">수강자의 학습 진행과 제출물을 확인하고, 필요한 수업과 숙제를 배정합니다.</p><div class="stats"><div class="stat"><span>검토할 제출물</span><b>${students.reduce((n, s) => n + Number(s.pending), 0)}</b></div><div class="stat"><span>기한 지난 미제출</span><b>${students.reduce((n, s) => n + Number(s.overdue), 0)}</b></div><div class="stat"><span>등록 수강자</span><b>${students.length}명</b></div></div>
     <input class="search" data-search aria-label="수강자 검색" placeholder="이름 또는 강의장 주소로 검색">
-    <div class="table-wrap"><table><thead><tr><th>수강자</th><th>학습 진행</th><th>확인할 일</th><th>마지막 활동</th><th class="hide-small">제출</th></tr></thead><tbody>${students.map(s => { const room = rooms.find(r => r.id === s.roomId)!; const lessons = roomCourse(found.categories, room).flatMap(c => c.posts.map(p => `${c.slug}/${p.id}`)); const count = lessons.filter(id => s.completed.includes(id)).length; return `<tr data-student="${esc((s.name + " " + room.slug).toLowerCase())}"><td><a class="name" href="/admin/students/${esc(s.roomId)}">${esc(s.name)} →</a><div class="muted small">${esc(room.slug)}</div></td><td><a href="/admin/students/${esc(s.roomId)}?tab=progress">${count} / ${lessons.length}편 완료</a><progress value="${count}" max="${lessons.length || 1}" aria-label="완료한 수업"></progress><span class="small muted">${esc(s.lastLesson ?? "아직 열람하지 않음")}</span></td><td>${s.pending ? `<span class="badge pending">검토 ${s.pending}</span> ` : ""}${s.overdue ? `<span class="badge overdue">미제출 ${s.overdue}</span>` : ""}${!s.pending && !s.overdue ? '<span class="muted">없음</span>' : ""}</td><td class="small">${date(s.lastAt)}</td><td class="hide-small">${s.submitted}건</td></tr>`; }).join("")}</tbody></table></div>${students.length ? "" : '<p class="empty">개인 강의장에 수강자를 등록하면 이곳에서 관리할 수 있습니다.</p>'}
+    <div class="table-wrap"><table><thead><tr><th>수강자</th><th>학습 진행</th><th>확인할 일</th><th>마지막 활동</th><th class="hide-small">제출</th></tr></thead><tbody>${students.map(s => { const room = rooms.find(r => r.id === s.roomId)!; const lessons = roomCourse(found.categories, room).flatMap(c => c.posts.map(p => `${c.slug}/${p.id}`)); const count = lessons.filter(id => s.completed.includes(id)).length; return `<tr data-student="${esc((s.name + " " + room.slug).toLowerCase())}"><td><a class="name" href="/admin/students/${esc(s.roomId)}">${esc(s.name)} →</a><div class="muted small">${esc(room.slug)}</div>${s.githubStatus ? `<a class="small" href="/admin/students/${esc(s.roomId)}?tab=settings">GitHub · ${esc(githubLabels[s.githubStatus])}${s.githubUsername ? " · " + esc(s.githubUsername) : ""}</a>` : ""}</td><td><a href="/admin/students/${esc(s.roomId)}?tab=progress">${count} / ${lessons.length}편 완료</a><progress value="${count}" max="${lessons.length || 1}" aria-label="완료한 수업"></progress><span class="small muted">${esc(s.lastLesson ?? "아직 열람하지 않음")}</span></td><td>${s.pending ? `<span class="badge pending">검토 ${s.pending}</span> ` : ""}${s.overdue ? `<span class="badge overdue">미제출 ${s.overdue}</span>` : ""}${!s.pending && !s.overdue ? '<span class="muted">없음</span>' : ""}</td><td class="small">${date(s.lastAt)}</td><td class="hide-small">${s.submitted}건</td></tr>`; }).join("")}</tbody></table></div>${students.length ? "" : '<p class="empty">개인 강의장에 수강자를 등록하면 이곳에서 관리할 수 있습니다.</p>'}
     <details class="panel"><summary>수강자 등록</summary>${available.length ? `<form class="form-grid" data-json-form>${hidden("action", "studentSave")}<label>이름<input name="name" required maxlength="60"></label><label>개인 강의장<select name="roomId">${available.map(r => `<option value="${esc(r.id)}">${esc(r.title)} · ${esc(r.slug)}</option>`).join("")}</select></label>${saveButton("등록")}</form>` : '<p>등록할 개인 강의장이 없습니다. <a href="/admin">강의장 설정</a>에서 먼저 만드세요</p>'}</details><p class="notice">시간은 한국 시간입니다. 접속·열람은 해당 강의장에서 발생한 활동이며 학습 완료를 뜻하지 않습니다.</p>`);
   }
   const room = rooms.find(r => r.id === parts[0]);
@@ -109,7 +116,7 @@ export async function handleStudents(request: Request, env: Env, url: URL): Prom
   if (parts.length !== 1) return new Response("not found", { status: 404 });
   const result = await call(env, { action: "studentGet", roomId: room.id });
   if (result.status !== 200) return new Response("등록되지 않은 수강자입니다", { status: 404 });
-  const { student, assignments, submissions, files, completions, reading } = result.data;
+  const { student, assignments, submissions, files, completions, reading, github } = result.data;
   let events = result.data.events as RecordRow[];
   const root = `/admin/students/${room.id}`;
   const tab = url.searchParams.get("tab") ?? "progress";
@@ -131,7 +138,10 @@ export async function handleStudents(request: Request, env: Env, url: URL): Prom
     const found = await course(env);
     body = found.ok ? curriculumEditor(room, found.categories, root) : '<p class="message">교안 목록을 불러오지 못했습니다. 다시 시도해 주세요</p>';
   } else if (tab === "settings") {
+    const found = await course(env);
+    const lessons = roomCourse(found.categories, room).flatMap(c => c.posts.map(p => ({ id: `${c.slug}/${p.id}`, title: p.title })));
     body = `<form class="form-grid panel" data-json-form>${hidden("action", "studentSave")}${hidden("roomId", room.id)}<label>이름<input name="name" value="${esc(student.name)}" required maxlength="60"></label><label class="full">강사 메모<textarea name="note" maxlength="4000">${esc(student.note)}</textarea><span class="muted small">수강자에게 보이지 않습니다</span></label>${saveButton()}</form>`;
+    body += `<section class="panel"><h2>GitHub 실습 저장소</h2><p>자동 초대 인증: ${env.GITHUB_INVITE_TOKEN ? "설정됨" : "설정 필요"}</p><p>계정: ${github?.username ? `<a href="https://github.com/${esc(github.username)}" target="_blank" rel="noreferrer">${esc(github.username)}</a>` : "입력 전"} · ${esc(githubLabels[github?.status ?? "unlinked"])}</p>${github?.updated ? `<p class="small">마지막 확인: ${date(github.updated)}</p>` : ""}${github?.error ? `<p class="message">${esc(github.error)}</p>` : ""}<form class="form-grid" data-json-form>${hidden("action", "studentGithubConfig")}${hidden("roomId", room.id)}<label class="full">비공개 저장소<input name="repository" placeholder="소유자/저장소" value="${esc(github?.repository ?? "")}" required ${github?.username ? "readonly" : ""}></label><label class="full">연결할 수업<select name="lesson">${lessons.map(l => `<option value="${esc(l.id)}" ${l.id === github?.lesson ? "selected" : ""}>${esc(l.title)}</option>`).join("")}</select></label>${saveButton("저장소 연결")}</form></section>`;
   } else if (tab === "activity") {
     const kind = url.searchParams.get("kind") ?? "";
     if (kind) events = (await call(env, { action: "studentEvents", roomId: room.id, kind })).data.events;
