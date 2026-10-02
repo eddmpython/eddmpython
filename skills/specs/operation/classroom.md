@@ -515,7 +515,9 @@ npx wrangler secret put ADMIN_PASSWORD
 관리자 수강자 정보에서 `소유자/저장소`와 연결할 수업을 지정한다. 두 개인 강의장에 같은
 저장소를 지정할 수 있다. 레코드는 기존 수강자 SQLite의 `studentGithub` 테이블이 소유한다.
 원고의 `course-github` 펜스는 `connect`일 때 계정 입력 UI, `practice`일 때 현재 강의장
-주소에 해당하는 `practice/<slug>/README.md` 실행 명령을 출력한다. 저장소에 그 경로를
+주소에 해당하는 `practice/<slug>/README.md` 실행 명령을 출력한다. `file`은 실습 파일 경로만
+표시하며, 저장소가 설정된 방의 후속 수업에서도 사용할 수 있다. `connect`와 `practice`는
+지정된 연결 수업에서만 표시한다. 저장소에 그 경로를
 먼저 준비한다. 소스에 저장소 주소나 수강자 정보를 하드코딩하지 않는다.
 
 인증 정보는 `eddmpython-classroom` Worker의 `GITHUB_INVITE_TOKEN` secret으로 설정한다.

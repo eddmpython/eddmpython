@@ -29,7 +29,7 @@ try {
   const kv = await mf.getKVNamespace('COURSE');
   await kv.put('bundle', JSON.stringify({ schema: 4, sceneContract: 12, categories: [{ slug: '01-start', title: '환경', order: 1, posts: [
     { id: '01-first', title: '연결', summary: '계정', body: '## 계정\n\n```course-github\nconnect\n```\n\n## 파일\n\n```course-github\npractice\n```' },
-    { id: '02-next', title: '다음', summary: '다음', body: '## 다음\n\n수업' },
+    { id: '02-next', title: '다음', summary: '다음', body: '## 파일\n\n```course-github\nfile\n```\n\n```course-github\nconnect\n```\n\n```course-github\npractice\n```' },
   ] }] }));
   const ns = await mf.getDurableObjectNamespace('CLASSROOM'), stub = ns.get(ns.idFromName('main'));
   const call = async body => { const res = await stub.fetch('https://classroom/do', { method: 'POST', body: JSON.stringify(body) }); return { status: res.status, ...await res.json() }; };
@@ -57,6 +57,17 @@ try {
   assert.equal(calls.length, before, 'rejected requests must not contact GitHub');
   const page = await (await request('/room/invite/01-start/01-first', {}, cookies.get('invite'))).text();
   assert.match(page, /data-github-form/); assert.match(page, /practice\/invite\/README.md/); assert.ok(!page.includes(token));
+  for (const slug of ['invite', 'active', 'unconfigured']) {
+    const preview = await request('/admin/students/' + rooms.get(slug).id + '/preview', {}, admin);
+    const cookie = preview.headers.get('set-cookie').split(';')[0];
+    const response = await request('/room/' + slug + '/01-start/02-next', {}, cookie);
+    assert.equal(response.status, 200);
+    const article = (await response.text()).match(/<article>([\s\S]*?)<\/article>/)[1];
+    if (slug === 'unconfigured') assert.doesNotMatch(article, /practice\//);
+    else assert.ok(article.includes('practice/' + slug + '/README.md'));
+    assert.doesNotMatch(article, /data-github-form|notepad README.md|Set-Location/);
+    assert.ok(!article.includes('practice/' + (slug === 'invite' ? 'active' : 'invite') + '/README.md'));
+  }
   const result = await json('/room/invite/github', { ...input, repository: 'attacker/other', roomId: rooms.get('active').id }, cookies.get('invite'));
   assert.equal(result.status, 200); assert.match((await result.json()).html, /초대 수락 대기/);
   assert.equal((await call({ action: 'studentGet', roomId: rooms.get('invite').id })).github.status, 'pending');

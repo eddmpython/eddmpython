@@ -1948,12 +1948,14 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     if (!localAccess && !previewAccess) await recordActivity(env, room, "lesson", post.title, `${category.slug}/${post.id}`);
     // 비공개 시각물은 이 방의 경로로 붙는다. 쿠키가 방 경로에 묶여 있어 그 아래 주소에만 실린다.
     const media = { mediaBase: `${roomRoot}/media` };
+    const githubLesson = studentInfo.github?.lesson === `${category.slug}/${post.id}`;
     const { html, headings, hasCells } = renderPost(post.body, category.cells ?? {}, courseState.glossary, {
       ...media,
       scenes: post.scenes ?? [],
-      github: studentInfo.github?.lesson === `${category.slug}/${post.id}` ? {
-        connect: githubForm(studentInfo.github, room, localAccess || previewAccess, Boolean(env.GITHUB_INVITE_TOKEN)),
-        practice: githubPractice(room),
+      github: studentInfo.github ? {
+        connect: githubLesson ? githubForm(studentInfo.github, room, localAccess || previewAccess, Boolean(env.GITHUB_INVITE_TOKEN)) : undefined,
+        practice: githubLesson ? githubPractice(room) : undefined,
+        file: githubPractice(room, false),
       } : undefined,
     });
     const lecture = renderLecture(post.body, post.scenes ?? [], category.cells ?? {}, courseState.glossary, media);

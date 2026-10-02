@@ -86,9 +86,11 @@ export function githubForm(link: GithubLink | null, room: PublicRoom, readOnly: 
     </form></section>`;
 }
 
-export function githubPractice(room: PublicRoom): string {
+export function githubPractice(room: PublicRoom, withCommand = true): string {
+  const file = `<p>내 실습 파일: <code>practice/${esc(room.slug)}/README.md</code></p>`;
+  if (!withCommand) return file;
   const command = `Set-Location (Join-Path ([Environment]::GetFolderPath("MyDocuments")) "gitPractice/coursePractice/practice/${room.slug}")\nnotepad README.md`;
-  return `<p>내 실습 파일: <code>practice/${esc(room.slug)}/README.md</code></p><div class="command-box"><div class="command-head"><span>PowerShell에 입력</span><button type="button" data-command-copy aria-label="PowerShell에 입력할 내용 복사">복사</button></div><pre>${esc(command)}</pre></div>`;
+  return `${file}<div class="command-box"><div class="command-head"><span>PowerShell에 입력</span><button type="button" data-command-copy aria-label="PowerShell에 입력할 내용 복사">복사</button></div><pre>${esc(command)}</pre></div>`;
 }
 
 export const githubStyle = `.github-connect{margin:1.5rem 0;padding:1.4rem;border:1px solid var(--eddm-line-strong);border-radius:.8rem}.github-heading{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}.github-heading span{font-size:.85rem;color:var(--eddm-text-muted)}.github-connect form{display:block}.github-connect label{display:grid;gap:.5rem;margin:1rem 0}.github-connect input:not([type=checkbox]){width:100%;box-sizing:border-box;padding:.7rem;border:1px solid var(--eddm-line-strong);border-radius:.4rem;background:var(--eddm-carbon);color:var(--eddm-ivory);font:inherit}.github-connect .github-confirm{display:flex;align-items:baseline;font-size:.9rem}.github-button{display:inline-block;padding:.7rem 1rem;border:1px solid var(--eddm-line-strong);border-radius:.5rem;background:var(--eddm-carbon);color:var(--eddm-ivory);font:inherit;cursor:pointer}.github-button:disabled{opacity:.5;cursor:default}.github-message{font-size:.9rem}.github-connect[aria-busy=true] .github-message:before{content:"";display:inline-block;width:1rem;height:1rem;border:2px solid var(--eddm-line);border-top-color:var(--eddm-accent);border-radius:50%;animation:github-spin .8s linear infinite;margin-right:.5rem}@keyframes github-spin{to{transform:rotate(360deg)}}`;
