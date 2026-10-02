@@ -10,6 +10,7 @@ export const curriculumStyle = `
 .curriculum-group{border:1px solid var(--eddm-line);border-radius:.7rem;padding:1rem;margin-bottom:1rem}
 .curriculum-group h3{flex:1;min-width:0}.curriculum-row{display:flex;align-items:center;gap:.7rem;padding:.8rem 0;border-top:1px solid var(--eddm-line)}
 .curriculum-row>span{flex:1;min-width:0;overflow-wrap:anywhere}.curriculum-controls{display:flex;gap:.3rem;flex-shrink:0}
+.curriculum-row[hidden]{display:none}
 .curriculum-controls button{padding:.35rem .55rem}.curriculum-group .topline{margin-bottom:.8rem}
 .curriculum-grid details{border-bottom:1px solid var(--eddm-line);padding-bottom:.5rem}.curriculum-grid summary{display:flex;justify-content:space-between;gap:1rem}
 .curriculum-grid button:disabled{cursor:default}.curriculum-save{position:sticky;bottom:0;padding:1rem 0;background:var(--eddm-carbon);border-top:1px solid var(--eddm-line);z-index:1}
