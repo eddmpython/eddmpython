@@ -12,7 +12,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { articleOf, changedByHashes, missingReviews, skillOpenedBy } from "../blogWritingGate.mjs";
+import { articleOf, changedByHashes, missingReviews } from "../blogWritingGate.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const GATE = resolve(HERE, "..", "blogWritingGate.mjs");
@@ -27,23 +27,6 @@ function check(name, actual, expected) {
     console.error(`  FAIL ${name}\n    기대 ${JSON.stringify(expected)}\n    실제 ${JSON.stringify(actual)}`);
   }
 }
-
-/* 1. 스킬을 실제로 열었는가 */
-
-// 여는 것으로 보는 것
-check("절대경로 슬래시", skillOpenedBy({ file_path: `${WORKSPACE}/../.claude/skills/blog-writing/SKILL.md` }), true);
-check("역슬래시 경로", skillOpenedBy({ file_path: "C:\\Users\\MSI\\.claude\\skills\\blog-writing\\SKILL.md" }), true);
-check("셸로 읽기", skillOpenedBy({ command: "cat ~/.claude/skills/blog-writing/SKILL.md" }), true);
-check("Skill 도구 전역", skillOpenedBy({ skill: "blog-writing" }), true);
-check("Skill 도구 포인터", skillOpenedBy({ skill: "blog-writer" }), true);
-
-// 열지 않은 것으로 보는 것
-check("포인터 파일만 읽기", skillOpenedBy({ file_path: ".claude/skills/blog-writer/SKILL.md" }), false);
-check("참고 자료만 읽기", skillOpenedBy({ file_path: ".claude/skills/blog-writing/references/course-writing.md" }), false);
-check("본문 읽기", skillOpenedBy({ file_path: "blog/posts/004-dataframe-libraries/index.md" }), false);
-check("무관한 명령", skillOpenedBy({ command: "npm test" }), false);
-check("빈 입력", skillOpenedBy({}), false);
-check("이름만 비슷한 스킬", skillOpenedBy({ skill: "blog-media" }), false);
 
 /* 2. 이 경로가 블로그 본문인가 */
 
@@ -108,26 +91,13 @@ try {
   sh("git add -A && git commit -q -m base");
 
   const gitDir = join(SANDBOX, ".git");
-  const marker = join(gitDir, "claude-blogwriting-open");
   writeFileSync(join(gitDir, "claude-session-base"), sh("git rev-parse HEAD").toString().trim(), "utf8");
 
-  // 세션이 시작하면 열람 표시가 없다.
   check("start 는 통과한다", run("start"), 0);
-  check("start 뒤 표시 없음", existsSync(marker), false);
+  check("본문 작성에 삭제된 스킬을 요구하지 않음", run("pre", { tool_input: { file_path: article } }), 0);
+  check("다른 파일 쓰기", run("pre", { tool_input: { file_path: "site/src/x.ts" } }), 0);
 
-  // 스킬 없이 본문을 쓰면 막힌다.
-  check("스킬 없이 본문 쓰기", run("pre", { tool_input: { file_path: article } }), 2);
-  check("스킬 없이 다른 파일 쓰기", run("pre", { tool_input: { file_path: "site/src/x.ts" } }), 0);
-  check("스킬 없이 이미지 계획 쓰기", run("pre", { tool_input: { file_path: "blog/posts/004-dataframe-libraries/media.json" } }), 0);
-
-  // 스킬을 열면 표시가 남고 통행이 열린다.
-  check("무관한 읽기는 표시 안 남김", run("post", { tool_input: { file_path: "README.md" } }), 0);
-  check("무관한 읽기 뒤 여전히 막힘", run("pre", { tool_input: { file_path: article } }), 2);
-  check("스킬 읽기", run("post", { tool_input: { file_path: "/c/Users/MSI/.claude/skills/blog-writing/SKILL.md" } }), 0);
-  check("스킬 읽은 뒤 표시 남음", existsSync(marker), true);
-  check("스킬 읽은 뒤 본문 쓰기", run("pre", { tool_input: { file_path: article } }), 0);
-
-  // 승인 파일은 스킬을 열었든 아니든 쓰기 도구로 못 건드린다.
+  // 승인 파일은 쓰기 도구로 직접 변경할 수 없다.
   check("승인 파일 직접 쓰기", run("pre", { tool_input: { file_path: "blog/approved.json" } }), 2);
   check(
     "승인 파일 절대경로",
@@ -135,11 +105,6 @@ try {
     2,
   );
   check("이름만 비슷한 파일", run("pre", { tool_input: { file_path: "blog/approved.json.bak" } }), 0);
-
-  // 다음 세션이 시작하면 표시가 지워진다.
-  check("다시 start", run("start"), 0);
-  check("start 가 표시를 지움", existsSync(marker), false);
-  check("새 세션은 다시 막힘", run("pre", { tool_input: { file_path: article } }), 2);
 
   // 턴을 끝낼 때 본문과 기록이 같이 바뀌었는지 본다.
   check("변경이 없으면 통과", run("stop", {}), 0);
