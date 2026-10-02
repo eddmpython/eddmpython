@@ -97,6 +97,7 @@ const env = {
     get: () => ({
       fetch: async (_url, init) => {
         const { action, slug } = JSON.parse(init.body);
+        if (action === "roomContext") return Response.json({ room: rooms[slug] ?? null, key: "test-sign-key", student: { enabled: false, completed: [] } });
         if (action === "get") return Response.json({ room: rooms[slug] ?? null });
         if (action === "login") return Response.json({ ok: true });
         if (action === "signKey") return Response.json({ key: "test-sign-key" });

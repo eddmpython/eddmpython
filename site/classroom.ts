@@ -153,6 +153,14 @@ a.post:hover b { color:var(--eddm-accent-dim); }
 article img, article video { max-width:100%; height:auto; border-radius:.6rem; display:block; margin:1.75rem 0; }
 article { font-size:1.125rem; }
 article img { cursor:zoom-in; }
+.lesson-progress{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin:1rem 0 1.5rem;font-size:.9rem;color:var(--eddm-text-muted)}
+.lesson-progress progress{width:8rem;accent-color:var(--eddm-accent)}
+.resume-link{display:inline-block;margin:.5rem 0 1rem;color:var(--eddm-accent)}
+.page-loading{position:fixed;z-index:1000;right:1.5rem;top:1.5rem;width:1.4rem;height:1.4rem;border:2px solid var(--eddm-line);border-top-color:var(--eddm-accent);border-radius:50%;animation:course-spin .7s linear infinite}
+.page-loading[hidden]{display:none}
+.scene-canvas [data-media-state="loading"] .scene-media-status:before{content:"";width:1.4rem;height:1.4rem;border:2px solid var(--eddm-line);border-top-color:var(--eddm-accent);border-radius:50%;animation:course-spin .7s linear infinite}
+@keyframes course-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.page-loading,.scene-canvas [data-media-state="loading"] .scene-media-status:before{animation-duration:2s}}
 figure.media { margin:1.75rem 0; }
 figure.media img, figure.media video { margin:0; }
 figure.media figcaption { margin-top:.55rem; font-size:.9375rem; line-height:1.6; color:var(--eddm-text-muted); }
@@ -609,12 +617,16 @@ const TOC_SCRIPT = `
   const toc = document.querySelector(".toc");
   if (!toc) return;
   // 좁은 화면에서는 접어 둔다. 열 줄이 펼쳐지면 본문에 닿기까지 두 화면을 스크롤한다.
-  const narrow = () => matchMedia("(max-width:1100px)").matches;
+  const narrow = () => matchMedia("(max-width:1200px)").matches;
   if (narrow()) toc.removeAttribute("open");
   // 목차에서 뛰면 그 자리에서 다시 접는다. 펼친 채로 두면 본문을 가린다.
   toc.addEventListener("click", (e) => {
-    if (narrow() && e.target.closest && e.target.closest("a[data-to]")) {
-      setTimeout(() => toc.removeAttribute("open"), 0);
+    const link = e.target.closest?.("a[data-to]");
+    if (narrow() && link) {
+      e.preventDefault();
+      toc.removeAttribute("open");
+      history.pushState(null, "", link.hash);
+      requestAnimationFrame(() => document.getElementById(link.dataset.to)?.scrollIntoView({block:"start"}));
     }
   });
   if (!("IntersectionObserver" in window)) return;
@@ -629,7 +641,7 @@ const TOC_SCRIPT = `
       const a = links.get(top);
       const box = toc.getBoundingClientRect();
       const r = a.getBoundingClientRect();
-      if (r.top < box.top || r.bottom > box.bottom) a.scrollIntoView({ block: "nearest" });
+      if (!narrow() && (r.top < box.top || r.bottom > box.bottom)) a.scrollIntoView({ block: "nearest" });
     }
   };
   const at = document.querySelector(".toc-at");
@@ -646,7 +658,7 @@ const TOC_SCRIPT = `
       for (const id of links.keys()) { i += 1; if (seen.has(id)) { n = i; break; } }
       if (n) at.textContent = n + " / " + links.size;
     }
-  }, { rootMargin: "-72px 0px -65% 0px" });
+  }, { rootMargin: "0px 0px -65% 0px" });
   document.querySelectorAll("article h2[id]").forEach((h) => io.observe(h));
 
   // 읽은 만큼 차는 띠. 글이 길어서 어디쯤인지 감이 없으면 지친다.
@@ -929,6 +941,7 @@ const CAROUSEL_SCRIPT = `
  */
 const LECTURE_SCRIPT = `
 (() => {
+ const initialize = () => {
   const deck = document.querySelector("[data-lecture-deck]");
   const openButton = document.querySelector("[data-lecture-open]");
   const watchButton = document.querySelector("[data-lecture-watch]");
@@ -1222,14 +1235,14 @@ const LECTURE_SCRIPT = `
     const loading = () => {
       clearTimeout(timer);
       delete host.dataset.mediaState;
-      timer = setTimeout(() => set("loading", "시각물을 불러오는 중입니다"), 350);
+      timer = setTimeout(() => { set("loading", ""); box.setAttribute("aria-label", "이미지 로딩"); }, 350);
     };
     const ready = () => {
       set("ready", "");
       requestAnimationFrame(syncLayout);
     };
     const failed = () => set("error", "시각물을 불러오지 못했습니다. 연결을 확인한 뒤 다시 시도해 주세요");
-    const sourceUrl = media.getAttribute("src") || "";
+    const sourceUrl = media.getAttribute("src") || media.getAttribute("data-src") || "";
     retry.addEventListener("click", () => {
       if (!sourceUrl) return;
       loading();
@@ -1244,7 +1257,7 @@ const LECTURE_SCRIPT = `
     media.addEventListener(readyEvent, ready);
     media.addEventListener("error", failed);
     mediaHosts.set(media, { host, ready, failed, loading });
-    if (media.matches("img") && media.complete) {
+    if (media.matches("img") && media.hasAttribute("src") && media.complete) {
       if (media.naturalWidth > 0) ready();
       else failed();
     } else if (media.matches("video") && media.readyState >= 1) ready();
@@ -1252,9 +1265,11 @@ const LECTURE_SCRIPT = `
   };
   scenes.forEach((scene) => scene.querySelectorAll("img, video, .course-embed > iframe").forEach(bindMedia));
   const decodedSources = new WeakMap();
+  let thumbs = null;
   const prime = (scene) => {
     if (!scene) return;
     scene.querySelectorAll("img").forEach((img) => {
+      if (img.dataset.src) { img.src = img.dataset.src; delete img.dataset.src; }
       const source = img.currentSrc || img.src;
       if (decodedSources.get(img) === source) return;
       img.loading = "eager";
@@ -1388,6 +1403,7 @@ const LECTURE_SCRIPT = `
     if (!opened) return;
     deck.querySelectorAll("video, audio").forEach((media) => media.pause());
     opened = false;
+    thumbs?.disconnect();
     watching = false;
     deck.classList.remove('lecture-watch');
     deck.hidden = true;
@@ -1415,6 +1431,8 @@ const LECTURE_SCRIPT = `
     sceneWidthKeys.clear(); thumbLayoutKey = '';
     if (!fromHash) beforeHash = location.hash && !location.hash.startsWith("#lecture=") ? location.hash : location.pathname + location.search;
     deck.hidden = false;
+    thumbs = new IntersectionObserver(entries => { for (const entry of entries) if (entry.isIntersecting) { prime(entry.target); thumbs.unobserve(entry.target); } }, { root: mapList, rootMargin: "100px" });
+    mapItems.forEach(item => thumbs.observe(item));
     document.body.classList.add("lecture-on");
     let targetScene = watching ? 0 : nearestScene();
     let targetVisual = 0;
@@ -1501,6 +1519,16 @@ const LECTURE_SCRIPT = `
   addEventListener("pagehide", () => {
     if (alertTimer) clearTimeout(alertTimer);
   }, { once:true });
+ };
+ const watch = document.querySelector('[data-lecture-watch]');
+ const sceneList = [...document.querySelectorAll('.lecture-stage .lecture-scene')];
+ if (watch) watch.hidden = !sceneList.length || !sceneList.every(scene => scene.querySelector('[data-carousel-item] video'));
+ if (location.hash.startsWith('#lecture=')) initialize();
+ else document.addEventListener('click', function start(event) {
+  if (!event.target.closest('[data-lecture-open], [data-lecture-watch]')) return;
+  document.removeEventListener('click', start, true);
+  initialize();
+ }, true);
 })();
 `;
 
@@ -1537,6 +1565,39 @@ function hasSession(key: string, request: Request, room: PublicRoom): Promise<bo
  *
  * 공용 크롬은 shell.ts 가 깔고 여기서는 강의방 CSS 와 확대 오버레이만 얹는다.
  */
+const ROOM_NAV_SCRIPT = `
+(() => {
+ const spinner=document.querySelector('[data-page-loading]');let timer;
+ document.addEventListener('input',()=>{window.__courseDirty=true;});
+ const clear=()=>{clearTimeout(timer);if(spinner)spinner.hidden=true;};
+ const busy=()=>{if(spinner)spinner.hidden=false;clearTimeout(timer);timer=setTimeout(clear,15000);};
+ addEventListener('pageshow',clear);
+ document.addEventListener('click',event=>{
+  const link=event.target.closest('a[href]');
+  if(!link||event.defaultPrevented||event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey||link.target==='_blank'||link.hasAttribute('download'))return;
+  const url=new URL(link.href,location.href);
+  if(url.origin===location.origin&&url.pathname!==location.pathname&&!url.pathname.includes('/media/')&&!url.pathname.includes('/files/'))busy();
+ });
+ document.addEventListener('submit',event=>{if(!event.defaultPrevented)busy();});
+ const root=location.pathname.split('/').slice(0,3).join('/');
+ const key='course-position:'+root;
+ let saved;try{saved=JSON.parse(localStorage.getItem(key)||'null');}catch{}
+ const resume=document.querySelector('[data-resume]');
+ if(resume&&saved&&[...document.querySelectorAll('a.post')].some(a=>a.pathname===saved.path)){
+  resume.href=saved.path+'#'+saved.section;resume.textContent='이어서 읽기 · '+saved.title;
+ }
+ const sectionLink=document.querySelector('[data-resume-section]');
+ if(sectionLink&&saved?.path===location.pathname&&/^s[1-9][0-9]*$/.test(saved.section)&&document.getElementById(saved.section)){
+  sectionLink.hidden=false;sectionLink.href='#'+saved.section;sectionLink.textContent='이어서 읽기 · '+saved.title;
+ }
+ if(!('IntersectionObserver' in window))return;
+ const remember=(section)=>{if(document.hidden||!section)return;try{localStorage.setItem(key,JSON.stringify({path:location.pathname,section:section.id,title:section.textContent.trim()}));}catch{}};
+ document.querySelectorAll('[data-to]').forEach(link=>link.addEventListener('click',()=>remember(document.getElementById(link.dataset.to))));
+ const observer=new IntersectionObserver(entries=>{for(const entry of entries)if(entry.isIntersecting)remember(entry.target);},{rootMargin:'0px 0px -55% 0px'});
+ document.querySelectorAll('article h2[id]').forEach(h=>observer.observe(h));
+ document.querySelector('[data-lecture-deck]')?.addEventListener('lectureframe',event=>remember(document.getElementById('s'+(event.detail.scene+1))));
+})();`;
+
 function roomPage(
   title: string,
   inner: string,
@@ -1548,8 +1609,8 @@ function roomPage(
     title,
     style: CLASSROOM_STYLE,
     inner,
-    extraBody: `<div class="zoom" id="zoom"><img alt=""></div>`,
-    script: `${ZOOM_SCRIPT}${extraScript}`,
+    extraBody: `<div class="zoom" id="zoom"><img alt=""></div><div class="page-loading" data-page-loading role="status" aria-label="페이지 로딩" hidden></div>`,
+    script: `${ZOOM_SCRIPT}${ROOM_NAV_SCRIPT}${extraScript}`,
     wide,
     cells,
   });
@@ -1574,14 +1635,26 @@ function loginPage(slug: string, title: string, message = ""): Response {
 
 
 const poll = (slug: string) => `
-setInterval(async () => {
-  const r = await fetch("/room/${slug}/state", { cache: "no-store" });
-  // 세션이 끊겼으면(비밀번호가 바뀌었거나 방이 지워졌다) 그 자리에 머물지 않고 나간다
-  if (r.status === 401 || r.status === 404) { location.reload(); return; }
-  if (!r.ok) return;
-  const s = await r.json();
-  if (s.stamp !== window.__stamp) location.reload();
-}, 3000);`;
+(() => {
+ let checking=false;
+ const check=async()=>{
+  if(document.hidden||checking)return;
+  checking=true;
+  try{
+   const r=await fetch("/room/${slug}/state",{cache:"no-store",signal:AbortSignal.timeout(10000)});
+   if(r.status===401||r.status===404){location.reload();return;}
+   if(!r.ok)return;
+   const state=await r.json();
+   if(state.stamp!==window.__stamp){
+    // 작성 중인 제출물과 실행 코드가 자동 새로고침으로 사라지지 않게 한다.
+    if(window.__courseDirty||document.body.classList.contains('lecture-on'))return;
+    location.reload();
+   }
+  }catch{}finally{checking=false;}
+ };
+ setInterval(check,15000);
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)void check();});
+})();`;
 
 /**
  * 상태 지문. 무엇이 열렸는지가 **읽히지 않는** 값이어야 한다.
@@ -1628,6 +1701,8 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
 
   let cachedCourse: Awaited<ReturnType<typeof course>> | null = null;
   let room: PublicRoom;
+  let context: any = null;
+  const previewToken = readCookie(request, "eddm_preview");
   if (roomTest) {
     cachedCourse = await course(env);
     room = {
@@ -1641,7 +1716,8 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
       lockedUntil: 0,
     };
   } else {
-    const { data: found } = await call(env, { action: "get", slug });
+    const { data: found } = await call(env, { action: "roomContext", slug, preview: Boolean(previewToken) });
+    context = found;
     // 없는 방은 없는 주소다. 만들기 전에는 아무 데도 존재하지 않는다.
     if (!found.room) return new Response("없는 강의방입니다.", { status: 404 });
     room = found.room as PublicRoom;
@@ -1680,10 +1756,8 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     });
   }
 
-  const key = roomTest ? "" : await signKey(env);
-  const previewToken = readCookie(request, "eddm_preview");
-  const adminState = !roomTest && previewToken ? await call(env, { action: "adminSession" }) : null;
-  const previewAccess = Boolean(adminState && await checkToken(key, previewToken, `preview:${room.slug}:${room.gen}`, String(adminState.data.gen)));
+  const key = roomTest ? "" : context.key;
+  const previewAccess = Boolean(context?.adminGen && await checkToken(key, previewToken, `preview:${room.slug}:${room.gen}`, context.adminGen));
 
   // 폴링도 들어온 사람만 한다. 앞에 두면 비밀번호 없이 방 상태를 감시할 수 있다.
   if (!localAccess && !previewAccess && !(await hasSession(key, request, room))) {
@@ -1693,9 +1767,8 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     return loginPage(slug, room.title);
   }
 
-  const studentResult = roomTest ? { status: 200, data: { enabled: false, completed: [] } } : await call(env, { action: "studentInfo", roomId: room.id });
-  if (studentResult.status !== 200 || typeof studentResult.data.enabled !== "boolean") return new Response("학습 기록을 불러오지 못했습니다. 잠시 뒤 다시 시도해 주세요", { status: 503 });
-  const studentInfo = studentResult.data;
+  const studentInfo = roomTest ? { enabled: false, completed: [] } : context.student;
+  if (typeof studentInfo?.enabled !== "boolean") return new Response("학습 기록을 불러오지 못했습니다. 잠시 뒤 다시 시도해 주세요", { status: 503 });
   const studentEnabled = studentInfo.enabled === true;
   const completed = new Set<string>(studentInfo.completed ?? []);
   // 실제 방의 로컬 화면도 같은 순서를 따른다. 로컬 서버는 로컬 저장소에만 기록한다.
@@ -1709,7 +1782,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     );
   }
 
-  const stamp = roomTest
+  const stamp = roomTest || request.method !== "GET" || ["media", "activity", "files"].includes(parts[1])
     ? ""
     : `window.__stamp=${JSON.stringify(await stampOf(key, room, await courseVersion(env), [...completed]))};${poll(slug)}`;
 
@@ -1809,6 +1882,9 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     return new Response(bytes, { headers });
   }
 
+  const assigned = open.flatMap(c => c.posts.map(p => ({ lesson: c.slug + "/" + p.id, title: p.title, available: canOpen(c, p.id) })));
+  const completedCount = assigned.filter(p => completed.has(p.lesson)).length;
+  const progress = studentEnabled ? `<div class="lesson-progress"><span>학습 완료 ${completedCount} / ${assigned.length}편</span><progress value="${completedCount}" max="${assigned.length || 1}" aria-label="완료한 수업"></progress><a href="${esc(roomRoot)}/homework">숙제와 피드백</a></div>` : "";
   if (parts.length === 1) {
     if (!localAccess && !previewAccess) await recordActivity(env, room, "visit", "수업 목록");
     const cards = open.length
@@ -1825,7 +1901,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
               .join("");
             return `<div class="cat"><div class="cat-h"><span class="cat-n">${esc(n)}</span>
               <h2>${esc(c.title)}</h2><span class="state on">열림</span></div>
-              ${c.goal ? `<p class="goal">이 카테고리를 덮으면 ${esc(c.goal)} 것이 됩니다.</p>` : ""}
+              ${c.goal ? `<p class="goal">${esc(c.goal)}</p>` : ""}
               ${posts}
             </div>`;
           })
@@ -1843,7 +1919,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
              ? `${open.length}개 과정 ${total}편이 있습니다. ${sequential ? "한 편을 완료하면 다음 편이 열립니다." : "순서대로 따라오시면 됩니다."}`
              : "곧 시작합니다. 이 화면을 열어 두고 기다리시면 됩니다."
          }</p>
-       </section>${studentEnabled ? `<p class="wait" style="font-size:.8rem">강의장 접속, 수업 열람과 제출 기록은 강사가 학습 안내에 사용합니다.</p>` : ""}${cards}`,
+       </section>${progress}<a class="resume-link" data-resume href="${esc(roomRoot)}/${esc(assigned.find(p => p.available && !completed.has(p.lesson))?.lesson ?? assigned[0]?.lesson ?? "")}" ${assigned.length ? "" : "hidden"}>${completedCount ? "학습 이어가기" : "학습 시작"}</a>${studentEnabled ? `<p class="wait" style="font-size:.8rem">강의장 접속, 수업 열람과 제출 기록은 강사가 학습 안내에 사용합니다.</p>` : ""}${cards}`,
       stamp,
     );
   }
@@ -1972,7 +2048,9 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
                ? `<div class="lecture-entry"><button type="button" class="lecture-open" data-lecture-watch hidden>▶ 영상으로 학습</button><button type="button" class="lecture-open" data-lecture-open><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="m9 21 3-4 3 4M8 9h8M8 12h5"/></svg>강의 모드</button></div>`
                : ""
            }</div>
+           ${progress}
            <p class="sub">${esc(post.summary)}</p>
+           <a class="resume-link" data-resume-section hidden>이어서 읽기</a>
            <article>${html}</article>
            ${completion}
            ${foot}

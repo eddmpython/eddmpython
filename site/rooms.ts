@@ -194,8 +194,16 @@ export class Classroom {
       return Response.json({ rooms: all.map(publicRoom) });
     }
 
+    if (action === "roomContext") {
+      const room = await this.state.storage.get<Room>(`room:${slug}`);
+      if (!room) return Response.json({ room: null });
+      const student = await this.students.handle({ action: "studentInfo", roomId: room.id }).json();
+      return Response.json({ room: publicRoom(room), key: await this.signKey(),
+        adminGen: body.preview ? (await this.adminAuth()).gen : null, student });
+    }
+
     if (action === "get") {
-      const room = (await this.rooms()).get(slug);
+      const room = await this.state.storage.get<Room>(`room:${slug}`);
       return Response.json({ room: room ? publicRoom(room) : null });
     }
 

@@ -70,7 +70,7 @@ try {
   const filePath = html.match(/href="(\/room\/alpha\/homework\/files\/[^\"]+)"/)[1];
   assert.equal(await (await request(filePath, {}, aCookie)).text(), 'private result');
   assert.equal((await request(filePath.replace('/alpha/', '/beta/'), {}, bCookie)).status, 404);
-  const detail = await (await request('/admin/students/' + alpha.id, {}, admin)).text();
+  const detail = await (await request('/admin/students/' + alpha.id + '?tab=work', {}, admin)).text();
   const submissionId = detail.match(/name="id" value="([^"]+)"/g).map(s => s.match(/value="([^"]+)/)[1]).find(id => id !== assignment.id);
   assert.equal((await json('/admin/students/api', { action: 'studentReview', roomId: beta.id, id: submissionId, status: 'accepted' }, admin)).status, 404);
   assert.equal((await json('/admin/students/api', { action: 'studentReview', roomId: alpha.id, id: submissionId, status: 'revision', feedback: '결과를 다시 확인하세요' }, admin)).status, 200);
@@ -99,6 +99,14 @@ try {
   assert.equal((unlockedPage.match(/class="nav-post lesson-locked"/g) ?? []).length, 1);
   assert.match(unlockedPage, /href="\/room\/alpha\/01-start\/02-second"/);
   const completionEvents = await (await json('/admin/students/api', { action: 'studentEvents', roomId: alpha.id }, admin)).text();
+  const progressPage = await (await request('/admin/students/' + alpha.id, {}, admin)).text();
+  assert.match(progressPage, /1 \/ 5편/);
+  assert.match(progressPage, /수업별 진행/);
+  assert.match(progressPage, /완료: /);
+  assert.doesNotMatch(await (await request('/admin/students/' + beta.id, {}, admin)).text(), /완료: /);
+  const completionsOnly = await (await json('/admin/students/api', { action: 'studentEvents', roomId: alpha.id, kind: 'complete' }, admin)).json();
+  assert.match(completionsOnly.html, /학습 완료/);
+  assert.doesNotMatch(completionsOnly.html, /숙제 제출|수업 열람/);
   await post(firstPath + '/complete', {}, aCookie);
   assert.equal(await (await json('/admin/students/api', { action: 'studentEvents', roomId: alpha.id }, admin)).text(), completionEvents);
   for (const lesson of [secondPath, lastPath]) assert.equal((await post(lesson + '/complete', {}, aCookie)).status, 303);

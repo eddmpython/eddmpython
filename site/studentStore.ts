@@ -20,6 +20,7 @@ export class StudentStore {
       CREATE INDEX IF NOT EXISTS filesSubmission ON submissionFiles(submissionId);
       CREATE TABLE IF NOT EXISTS studentEvents (id INTEGER PRIMARY KEY AUTOINCREMENT, roomId TEXT NOT NULL, kind TEXT NOT NULL, title TEXT NOT NULL, path TEXT NOT NULL, at INTEGER NOT NULL);
       CREATE INDEX IF NOT EXISTS eventsRoom ON studentEvents(roomId, id DESC);
+      CREATE INDEX IF NOT EXISTS eventsRoomKind ON studentEvents(roomId, kind, id DESC);
       CREATE TABLE IF NOT EXISTS lessonCompletions (roomId TEXT NOT NULL, lesson TEXT NOT NULL, completed INTEGER NOT NULL, PRIMARY KEY(roomId, lesson));
     `);
   }
@@ -33,13 +34,16 @@ export class StudentStore {
     const roomId = text(body.roomId, 64);
     const now = Date.now();
     if (action === "studentList") {
+      const completions = this.rows("SELECT roomId, lesson FROM lessonCompletions");
       return Response.json({ students: this.rows(`SELECT s.*,
+        (SELECT title FROM studentEvents WHERE roomId=s.roomId AND kind IN ('lesson','section') ORDER BY id DESC LIMIT 1) AS lastLesson,
         (SELECT MAX(at) FROM studentEvents WHERE roomId=s.roomId AND kind IN ('login','visit','lesson','section','lecture','download','submission','complete')) AS lastAt,
         (SELECT COUNT(*) FROM assignments a WHERE a.roomId=s.roomId AND a.archived=0 AND a.dueAt < ? AND NOT EXISTS
           (SELECT 1 FROM submissions u WHERE u.assignmentId=a.id)) AS overdue,
         (SELECT COUNT(*) FROM submissions u JOIN assignments a ON a.id=u.assignmentId WHERE u.roomId=s.roomId AND a.archived=0 AND u.status='pending' AND u.id=(SELECT id FROM submissions WHERE assignmentId=u.assignmentId ORDER BY created DESC, rowid DESC LIMIT 1)) AS pending,
         (SELECT COUNT(*) FROM submissions WHERE roomId=s.roomId) AS submitted
-        FROM students s ORDER BY pending DESC, overdue DESC, s.name`, now) });
+        FROM students s ORDER BY pending DESC, overdue DESC, s.name`, now).map(student => ({ ...student,
+          completed: completions.filter(row => row.roomId === student.roomId).map(row => row.lesson) })) });
     }
     if (!roomId) return fail("수강자 강의장이 필요합니다");
     if (action === "studentSave") {
@@ -71,12 +75,17 @@ export class StudentStore {
         assignments: this.rows("SELECT * FROM assignments WHERE roomId=? ORDER BY archived, created DESC", roomId),
         submissions: this.rows("SELECT * FROM submissions WHERE roomId=? ORDER BY created DESC, rowid DESC", roomId),
         files: this.rows("SELECT * FROM submissionFiles WHERE roomId=?", roomId),
+        completions: this.rows("SELECT lesson, completed FROM lessonCompletions WHERE roomId=?", roomId),
+        reading: this.rows("SELECT e.* FROM studentEvents e WHERE e.roomId=? AND e.kind IN ('lesson','section') AND e.id=(SELECT MAX(id) FROM studentEvents WHERE roomId=e.roomId AND path=e.path AND kind=e.kind) ORDER BY e.id DESC", roomId),
         events: this.rows("SELECT * FROM studentEvents WHERE roomId=? ORDER BY id DESC LIMIT 50", roomId),
       });
     }
     if (action === "studentEvents") {
       const before = Number(body.before) || Number.MAX_SAFE_INTEGER;
-      return Response.json({ events: this.rows("SELECT * FROM studentEvents WHERE roomId=? AND id < ? ORDER BY id DESC LIMIT 50", roomId, before) });
+      const kind = text(body.kind, 20);
+      return Response.json({ events: kind
+        ? this.rows("SELECT * FROM studentEvents WHERE roomId=? AND kind=? AND id < ? ORDER BY id DESC LIMIT 50", roomId, kind, before)
+        : this.rows("SELECT * FROM studentEvents WHERE roomId=? AND id < ? ORDER BY id DESC LIMIT 50", roomId, before) });
     }
     if (action === "studentWork") {
       return Response.json({ assignments: this.rows("SELECT * FROM assignments WHERE roomId=? AND archived=0 ORDER BY dueAt IS NULL, dueAt, created", roomId),

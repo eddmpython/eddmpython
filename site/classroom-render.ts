@@ -894,7 +894,8 @@ export function renderPost(
   const state: RenderState = { visual: 0, mediaBase: options.mediaBase };
   const marked = markGlossaryTerms(body, glossary);
   const parts = renderMarkdownParts(marked, headings, cells, state);
-  const html = applyGlossary(groupReadingCarousels(parts, options.scenes ?? []), glossary, "term-r");
+  const html = applyGlossary(groupReadingCarousels(parts, options.scenes ?? []), glossary, "term-r")
+    .replace(/(<img\b[^>]*?) loading="lazy"/, '$1 loading="eager" fetchpriority="high" decoding="async"');
   // 실행 칸이 없는 글에는 파이썬 런타임 스크립트를 붙이지 않는다.
   return { html, headings, hasCells: html.includes('data-cell="'), visuals: state.visual };
 }
@@ -958,7 +959,8 @@ export function renderLecture(
     const support = visualSupport(visuals);
     const carouselId = `lecture-carousel-${index + 1}`;
     const controls = carouselControls(visuals.length, carouselId);
-    const html = visualCarousel(visuals, scene.fit, section.title, null, carouselId);
+    // 숨긴 강의 모드의 이미지와 썸네일은 실제로 보여 줄 때 요청한다.
+    const html = visualCarousel(visuals, scene.fit, section.title, null, carouselId).replace(/<img src=/g, '<img data-src=');
     hasCells ||= html.includes('data-cell="');
     const timeline = compileSceneTimeline(scene).slice(0, 1);
     const titleId = `lecture-${scene.id}-title`;
