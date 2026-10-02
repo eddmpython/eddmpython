@@ -66,6 +66,30 @@ const COURSE_SCENE_CONTRACTS = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 
 export type CourseState = { ok: boolean; categories: CourseCategory[]; glossary: Record<string, string> };
 
+/** A project selects source lessons and owns their order. Lesson content stays in the course bundle. */
+export type Curriculum = { category: string; posts: string[] }[];
+
+export function validCurriculum(value: unknown): value is Curriculum {
+  if (!Array.isArray(value) || value.length > 100) return false;
+  const categories = new Set<string>();
+  return value.every(group => {
+    if (!group || typeof group.category !== "string" || !Array.isArray(group.posts) || !group.posts.length || group.posts.length > 200 || categories.has(group.category)) return false;
+    categories.add(group.category);
+    return /^[a-z0-9-]+$/.test(group.category) && group.posts.every((id: unknown) => typeof id === "string" && /^[a-z0-9-]+$/.test(id)) && new Set(group.posts).size === group.posts.length;
+  });
+}
+
+export function roomCourse(categories: CourseCategory[], room: { unlocked: string[]; curriculum?: Curriculum }): CourseCategory[] {
+  if (room.curriculum === undefined) return categories.filter(c => room.unlocked.includes(c.slug));
+  const selected = room.curriculum.flatMap(group => {
+    const source = categories.find(c => c.slug === group.category);
+    if (!source) return [];
+    const posts = group.posts.flatMap(id => source.posts.find(p => p.id === id) ?? []);
+    return posts.length ? [{ ...source, posts, nextCategory: undefined }] : [];
+  });
+  return selected.map((category, index) => ({ ...category, order: index + 1, displayNumber: String(index + 1).padStart(2, "0"), nextCategory: selected[index + 1]?.slug }));
+}
+
 const isPost = (p: unknown): p is CoursePost =>
   !!p &&
   typeof (p as CoursePost).id === "string" &&

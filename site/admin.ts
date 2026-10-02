@@ -192,7 +192,7 @@ const ADMIN_SCRIPT = `
     }
     $("rooms").innerHTML = rooms.map((r) => {
       const url = origin + "/room/" + r.slug;
-      const cats = categories.map((c) => {
+      const cats = r.curriculum ? '<a href="/admin/students/' + r.id + '?tab=curriculum">커리큘럼 편집 →</a>' : categories.map((c) => {
         const on = r.unlocked.includes(c.slug);
         return '<label class="cat"><span>' + esc(c.title) +
           ' <span class="num">' + c.posts + "편</span></span>" +

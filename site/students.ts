@@ -2,7 +2,8 @@ import { call, type PublicRoom } from "./rooms";
 import { esc } from "./classroom-render";
 import { header, page } from "./shell";
 import type { Env } from "./env";
-import { course } from "./course";
+import { course, roomCourse, validCurriculum } from "./course";
+import { curriculumEditor, curriculumStyle, curriculumScript } from "./curriculumEditor";
 import { cookie, issueToken } from "./auth";
 
 const methods: Record<string, string> = { any: "글·링크·파일 중 선택", link: "링크 제출", file: "파일 제출", text: "글로 제출" };
@@ -29,18 +30,19 @@ export const STUDENT_STYLE = `
 .stack{display:grid;gap:1rem}.work-card{border:1px solid var(--eddm-line);border-radius:.85rem;padding:1.4rem}.work-card:has(.pending){border-color:var(--eddm-accent-line)}.work-card .meta{display:flex;gap:1rem;flex-wrap:wrap;font-size:.85rem;color:var(--eddm-text-muted);margin:.7rem 0}.submission{border-top:1px solid var(--eddm-line);padding-top:1rem;margin-top:1.2rem}.feedback{border-left:3px solid var(--eddm-accent);padding:.1rem 1rem;margin:1rem 0}.message{min-height:1.5rem;color:var(--eddm-accent)}.empty{padding:2rem 0;color:var(--eddm-text-muted)}.search{max-width:22rem;margin:0 0 1rem}.backlink{display:inline-block;margin-bottom:1rem}.notice{font-size:.85rem;color:var(--eddm-text-muted)}
 @media(max-width:650px){.wrap.wide{width:calc(100% - 2rem)}.students{padding-top:1rem}.students h1{font-size:1.6rem}.stats{gap:.5rem}.stat{padding:.8rem}.stat b{font-size:1.4rem}.form-grid{grid-template-columns:1fr}.students th,.students td{padding:.8rem .5rem}.hide-small{display:none}.work-card{padding:1rem}.admin-nav{gap:1rem}.panel{padding:1rem}}
 `;
-const script = `
+const script = curriculumScript + `
 document.querySelectorAll('[data-json-form]').forEach(form=>form.addEventListener('submit',async event=>{
  event.preventDefault();const message=form.querySelector('[role=status]');const button=event.submitter||form.querySelector('button');button.disabled=true;message.textContent='저장하고 있습니다';
  try {const body=Object.fromEntries(new FormData(form));if('dueAt' in body)body.dueAt=body.dueAt?Date.parse(body.dueAt+':00+09:00'):null;if('archived' in body)body.archived=body.archived==='true';
- const response=await fetch('/admin/students/api',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});const result=await response.json();if(!response.ok)throw Error(result.error||'저장하지 못했습니다');location.href=form.dataset.next||location.pathname;
+ if(form.curriculum)body.curriculum=form.curriculum();
+ const response=await fetch('/admin/students/api',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});const result=await response.json();if(!response.ok)throw Error(result.error||'저장하지 못했습니다');form.saved?.();location.href=form.dataset.next||location.pathname;
  }catch(error){message.textContent=error.message;button.disabled=false;}
 }));
 document.querySelector('[data-search]')?.addEventListener('input',event=>{const term=event.target.value.toLowerCase();document.querySelectorAll('[data-student]').forEach(row=>row.hidden=!row.dataset.student.includes(term));});
 document.querySelector('[data-more]')?.addEventListener('click',async event=>{const button=event.currentTarget;button.disabled=true;try{const r=await fetch('/admin/students/api',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'studentEvents',roomId:button.dataset.room,before:Number(button.dataset.before)})});const data=await r.json();if(!r.ok)throw Error(data.error);document.querySelector('[data-events]').insertAdjacentHTML('beforeend',data.html);button.dataset.before=data.before;button.hidden=!data.more;}catch(error){document.querySelector('#message').textContent=error.message;}finally{button.disabled=false;}});
 `;
 function adminPage(title: string, body: string) {
-  return page({ title, style: STUDENT_STYLE, script, wide: true, inner: `${header()}<main class="students"><div class="topline"><h1>${esc(title)}</h1><form method="post" action="/admin/logout"><button>나가기</button></form></div><nav class="admin-nav"><a href="/admin/students" aria-current="page">수강자 관리</a><a href="/admin">강의장 설정</a></nav>${body}</main>` });
+  return page({ title, style: STUDENT_STYLE + curriculumStyle, script, wide: true, inner: `${header()}<main class="students"><div class="topline"><h1>${esc(title)}</h1><form method="post" action="/admin/logout"><button>나가기</button></form></div><nav class="admin-nav"><a href="/admin/students" aria-current="page">수강자 관리</a><a href="/admin">강의장 설정</a></nav>${body}</main>` });
 }
 function hidden(name: string, value: string) { return `<input type="hidden" name="${name}" value="${esc(value)}">`; }
 function saveButton(text = "저장") { return `<div class="full actions"><button class="primary">${text}</button><span role="status" class="message" aria-live="polite"></span></div>`; }
@@ -57,13 +59,20 @@ export async function handleStudents(request: Request, env: Env, url: URL): Prom
   if (parts[0] === "api" && request.method === "POST") {
     if (!sameOrigin(request, url)) return Response.json({ error: "이 화면에서 다시 시도해 주세요" }, { status: 403 });
     const body = await readJson(request);
-    const allowed = ["studentSave", "studentAssignment", "studentReview", "studentArchive", "studentEvents"];
+    const allowed = ["studentSave", "studentAssignment", "studentReview", "studentArchive", "studentEvents", "roomCurriculum"];
     if (!body || !allowed.includes(String(body.action))) return Response.json({ error: "지원하지 않는 작업입니다" }, { status: 400 });
     const room = rooms.find(r => r.id === body.roomId);
     if (!room) return new Response("없는 강의장입니다", { status: 404 });
+    if (body.action === "roomCurriculum") {
+      const found = await course(env);
+      if (!found.ok) return Response.json({ error: "교안 목록을 불러오지 못했습니다. 다시 시도해 주세요" }, { status: 503 });
+      if (!validCurriculum(body.curriculum) || body.curriculum.some(group => group.posts.some(id => !found.categories.find(c => c.slug === group.category)?.posts.some(p => p.id === id)))) return Response.json({ error: "현재 교안 목록에 있는 수업을 선택해 주세요" }, { status: 400 });
+      const result = await call(env, { action: "roomCurriculum", slug: room.slug, title: body.title, curriculum: body.curriculum });
+      return Response.json(result.data, { status: result.status, headers: privateHeaders });
+    }
     if (body.action === "studentAssignment" && body.lesson) {
       const found = await course(env);
-      if (!found.categories.some(c => room.unlocked.includes(c.slug) && c.posts.some(p => `${c.slug}/${p.id}` === body.lesson))) return Response.json({ error: "이 강의장에 열린 수업을 선택해 주세요" }, { status: 400 });
+      if (!roomCourse(found.categories, room).some(c => c.posts.some(p => `${c.slug}/${p.id}` === body.lesson))) return Response.json({ error: "이 강의장에 열린 수업을 선택해 주세요" }, { status: 400 });
     }
     const result = await call(env, body);
     if (body.action === "studentEvents" && result.status === 200) {
@@ -95,16 +104,19 @@ export async function handleStudents(request: Request, env: Env, url: URL): Prom
   const { student, assignments, submissions, files, events } = result.data;
   const root = `/admin/students/${room.id}`;
   const tab = url.searchParams.get("tab") ?? "work";
-  const nav = `<a class="backlink" href="/admin/students">← 수강자 목록</a><div class="topline"><div><p class="muted small">${esc(room.title)} · /room/${esc(room.slug)}</p></div><a class="button" href="${root}/preview" target="_blank" rel="noreferrer">강의장 미리보기</a></div><nav class="admin-nav">${[["work", "숙제와 제출"], ["activity", "접속·활동 기록"], ["settings", "수강자 정보"]].map(([id, title]) => `<a href="${root}?tab=${id}" ${tab === id ? 'aria-current="page"' : ""}>${title}</a>`).join("")}</nav>`;
+  const nav = `<a class="backlink" href="/admin/students">← 수강자 목록</a><div class="topline"><div><p class="muted small">${esc(room.title)} · /room/${esc(room.slug)}</p></div><a class="button" href="${root}/preview" target="_blank" rel="noreferrer">강의장 미리보기</a></div><nav class="admin-nav">${[["work", "숙제와 제출"], ["curriculum", "커리큘럼"], ["activity", "접속·활동 기록"], ["settings", "수강자 정보"]].map(([id, title]) => `<a href="${root}?tab=${id}" ${tab === id ? 'aria-current="page"' : ""}>${title}</a>`).join("")}</nav>`;
   let body = "";
-  if (tab === "settings") {
+  if (tab === "curriculum") {
+    const found = await course(env);
+    body = found.ok ? curriculumEditor(room, found.categories, root) : '<p class="message">교안 목록을 불러오지 못했습니다. 다시 시도해 주세요</p>';
+  } else if (tab === "settings") {
     body = `<form class="form-grid panel" data-json-form>${hidden("action", "studentSave")}${hidden("roomId", room.id)}<label>이름<input name="name" value="${esc(student.name)}" required maxlength="60"></label><label class="full">강사 메모<textarea name="note" maxlength="4000">${esc(student.note)}</textarea><span class="muted small">수강자에게 보이지 않습니다</span></label>${saveButton()}</form>`;
   } else if (tab === "activity") {
     body = `<p class="notice">등록 이후의 접속과 열람, 다운로드, 제출을 기록합니다. 이전 활동과 컴퓨터에서 한 작업은 알 수 없습니다.</p><div class="table-wrap"><table><thead><tr><th>일시 (한국 시간)</th><th>활동</th><th>내용</th></tr></thead><tbody data-events>${eventRows(events)}</tbody></table></div>${events.length ? "" : '<p class="empty">아직 활동 기록이 없습니다.</p>'}<p id="message" role="status"></p><button data-more data-room="${esc(room.id)}" data-before="${events.at(-1)?.id ?? 0}" ${events.length < 50 ? "hidden" : ""}>이전 기록 더 보기</button>`;
   } else {
     const edit = assignments.find((a: RecordRow) => a.id === url.searchParams.get("edit"));
     const found = await course(env);
-    const lessons = found.categories.filter(c => room.unlocked.includes(c.slug)).flatMap(c => c.posts.map(p => ({value: `${c.slug}/${p.id}`, title: `${c.title} · ${p.title}`})));
+    const lessons = roomCourse(found.categories, room).flatMap(c => c.posts.map(p => ({value: `${c.slug}/${p.id}`, title: `${c.title} · ${p.title}`})));
     const active = assignments.filter((a: RecordRow) => !a.archived);
     body = `<details class="panel" ${edit ? "open" : ""}><summary>${edit ? "숙제 수정" : "새 숙제 내기"}</summary><form class="form-grid" data-json-form>${hidden("action", "studentAssignment")}${hidden("roomId", room.id)}${hidden("id", edit?.id ?? "")}<label class="full">숙제 제목<input name="title" required maxlength="100" value="${esc(edit?.title ?? "")}" placeholder="예: 첫 커밋을 GitHub에 올리기"></label><label class="full">무엇을 어떻게 제출하나요?<textarea name="instructions" required maxlength="12000" placeholder="할 일과 제출할 결과를 적어 주세요">${esc(edit?.instructions ?? "")}</textarea></label><label>제출 기한 (한국 시간)<input type="datetime-local" name="dueAt" value="${datetime(edit?.dueAt)}"><span class="muted small">비워 두면 기한 미정</span></label><label>제출 방식<select name="method">${Object.entries(methods).map(([v, t]) => `<option value="${v}" ${edit?.method === v ? "selected" : ""}>${t}</option>`).join("")}</select></label><label class="full">연결할 수업 (선택)<select name="lesson"><option value="">선택하지 않음</option>${lessons.map(l => `<option value="${esc(l.value)}" ${edit?.lesson === l.value ? "selected" : ""}>${esc(l.title)}</option>`).join("")}</select></label>${saveButton(edit ? "숙제 수정" : "숙제 등록")}</form></details><div class="stack">${active.map((a: RecordRow) => {
       const history = submissions.filter((s: RecordRow) => s.assignmentId === a.id); const latest = history[0];

@@ -28,7 +28,7 @@ import { codeKeyAction, CODE_CELL_STYLE } from "./src/codeCell";
 import { DESIGN } from "./src/design";
 import { checkToken, cookie, issueToken, hmac, readCookie } from "./auth";
 import { call, validSlug, type PublicRoom } from "./rooms";
-import { course, courseVersion, type CourseCategory } from "./course";
+import { course, courseVersion, roomCourse, type CourseCategory } from "./course";
 import { header, page, themeToggle } from "./shell";
 import type { Env } from "./env";
 import { homeworkPage, recordActivity, sameOrigin, readJson } from "./students";
@@ -1572,9 +1572,6 @@ function loginPage(slug: string, title: string, message = ""): Response {
 
 /* 라우팅 ---------------------------------------------------------------- */
 
-function visible(categories: CourseCategory[], unlocked: string[]): CourseCategory[] {
-  return categories.filter((c) => unlocked.includes(c.slug));
-}
 
 const poll = (slug: string) => `
 setInterval(async () => {
@@ -1594,7 +1591,7 @@ setInterval(async () => {
  * 서명 키로 눌러서 밖에서는 바뀌었다는 것만 알게 한다.
  */
 async function stampOf(key: string, room: PublicRoom, version: string, completed: string[] = []): Promise<string> {
-  const raw = `${room.gen}:${room.open ? 1 : 0}:${[...room.unlocked].sort().join(",")}:${version}:${completed.join(",")}`;
+  const raw = JSON.stringify([room.gen, room.open, room.title, room.curriculum ?? [...room.unlocked].sort(), version, completed]);
   return (await hmac(key, raw)).slice(0, 16);
 }
 
@@ -1726,7 +1723,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
   }
 
   const courseState = cachedCourse ?? await course(env);
-  const open = visible(courseState.categories, room.unlocked);
+  const open = roomCourse(courseState.categories, room);
   // 카테고리는 독립적으로 시작한다. 명시적으로 이어진 과정만 선수 관계를 따른다.
   const requiredLessons = (category: CourseCategory, postId: string): string[] => {
     const required = category.posts.slice(0, category.posts.findIndex(p => p.id === postId)).map(p => `${category.slug}/${p.id}`);

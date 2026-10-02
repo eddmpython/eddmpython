@@ -135,5 +135,31 @@ try {
   const localPreview = cookieOf(await request('/admin/students/' + beta.id + '/preview', {}, admin));
   assert.equal((await local('/room/beta/01-start/03-last', { headers: { cookie: localPreview } })).status, 200);
   assert.equal((await local('/room/beta/01-start/02-second/complete', { method: 'POST', headers: { cookie: localPreview } })).status, 403);
-  console.log('수강자 HTTP: 인증, 파일 제출·다운로드, 다른 방 접근 차단, 피드백, 미리보기 기록 제외, 주소 변경 후 이력 보존 확인');
+  // Project selections retain source IDs, student history and other rooms.
+  const curriculum = [{ category: '02-next', posts: ['01-next'] }, { category: '01-start', posts: ['02-second', '01-first'] }];
+  const betaBefore = (await (await json('/admin/api', { action: 'list' }, admin)).json()).rooms.find(r => r.id === beta.id);
+  const savePlan = value => json('/admin/students/api', { action: 'roomCurriculum', roomId: alpha.id, title: '개인 프로젝트', curriculum: value }, admin);
+  assert.equal((await savePlan(curriculum)).status, 200);
+  const planRoom = (await (await json('/admin/api', { action: 'list' }, admin)).json()).rooms.find(r => r.id === alpha.id);
+  assert.equal(planRoom.id, alpha.id);
+  assert.deepEqual(planRoom.curriculum, curriculum);
+  assert.deepEqual((await (await json('/admin/api', { action: 'list' }, admin)).json()).rooms.find(r => r.id === beta.id), betaBefore);
+  const planPreview = cookieOf(await request('/admin/students/' + alpha.id + '/preview', {}, admin));
+  const planIndex = await (await request('/room/renamed', {}, planPreview)).text();
+  assert.ok(planIndex.indexOf('/02-next/01-next') < planIndex.indexOf('/01-start/02-second'));
+  assert.ok(planIndex.indexOf('/01-start/02-second') < planIndex.indexOf('/01-start/01-first'));
+  assert.equal((await request('/room/renamed/01-start/03-last', {}, planPreview)).status, 404);
+  assert.equal((await request('/room/renamed/media/' + lockedMedia, {}, planPreview)).status, 404);
+  assert.equal((await json('/admin/students/api', { action: 'studentAssignment', roomId: alpha.id, title: '잘못된 연결', instructions: 'test', method: 'any', lesson: '01-start/03-last' }, admin)).status, 400);
+  assert.equal((await json('/admin/api', { action: 'toggle', slug: 'renamed', category: '03-free' }, admin)).status, 409);
+  assert.match(await (await request('/room/renamed/homework/' + assignment.id, {}, renamedCookie)).text(), /결과를 다시 확인하세요/);
+  const curriculumPage = await (await request('/admin/students/' + alpha.id + '?tab=curriculum', {}, admin)).text();
+  assert.match(curriculumPage, /data-curriculum/);
+  assert.match(curriculumPage, /커리큘럼 저장/);
+  assert.equal((await savePlan([{ category: '01-start', posts: ['not-real'] }])).status, 400);
+  assert.equal((await savePlan([{ category: '01-start', posts: ['01-first', '01-first'] }])).status, 400);
+  assert.equal((await savePlan([])).status, 200);
+  assert.equal((await request('/room/renamed/01-start/01-first', {}, planPreview)).status, 404);
+  assert.equal((await request('/room/legacy/01-start/03-last', {}, legacyCookie)).status, 200);
+  console.log('수강자 HTTP: 프로젝트별 수업 구성·순서, 자료 접근 제한, 다른 방과 기존 제출 이력 보존 확인');
 } finally { await mf.dispose(); }

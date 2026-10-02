@@ -11,6 +11,7 @@
 import { LOCK_MS, MAX_FAILS, randomHex, stretch, safeEqual } from "./auth";
 import type { Env } from "./env";
 import { StudentStore } from "./studentStore";
+import { validCurriculum, type Curriculum } from "./course";
 
 /** 방 하나. 비밀번호는 원문을 두지 않고 salt 를 섞어 늘린 해시만 둔다. */
 export type Room = {
@@ -19,6 +20,7 @@ export type Room = {
   title: string;
   open: boolean;
   unlocked: string[];
+  curriculum?: Curriculum;
   salt: string;
   hash: string;
   /** 세션 세대. 비밀번호를 바꾸면 새로 뽑아 그 전에 들어온 사람을 전부 내보낸다. */
@@ -35,6 +37,7 @@ export type PublicRoom = {
   title: string;
   open: boolean;
   unlocked: string[];
+  curriculum?: Curriculum;
   gen: string;
   created: number;
   lockedUntil: number;
@@ -75,6 +78,7 @@ function publicRoom(room: Room): PublicRoom {
     title: room.title,
     open: room.open,
     unlocked: room.unlocked,
+    curriculum: room.curriculum,
     gen: room.gen,
     created: room.created,
     lockedUntil: room.lockedUntil,
@@ -314,7 +318,18 @@ export class Classroom {
       return Response.json({ ok: true });
     }
 
+    if (action === "roomCurriculum") {
+      const title = typeof body.title === "string" ? body.title.trim() : "";
+      if (!title || title.length > 100 || !validCurriculum(body.curriculum)) return Response.json({ error: "프로젝트명과 수업 구성을 확인해 주세요" }, { status: 400 });
+      room.title = title;
+      room.curriculum = body.curriculum;
+      room.unlocked = body.curriculum.map(group => group.category);
+      await this.put(room);
+      return Response.json({ ok: true });
+    }
+
     if (action === "toggle") {
+      if (room.curriculum !== undefined) return Response.json({ error: "수강자 관리의 커리큘럼에서 수업을 변경해 주세요" }, { status: 409 });
       const category = String(body.category ?? "");
       const at = room.unlocked.indexOf(category);
       if (at >= 0) room.unlocked.splice(at, 1);
