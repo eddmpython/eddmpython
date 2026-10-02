@@ -1683,9 +1683,9 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     });
   }
 
-  const key = localAccess ? "" : await signKey(env);
+  const key = roomTest ? "" : await signKey(env);
   const previewToken = readCookie(request, "eddm_preview");
-  const adminState = !localAccess && previewToken ? await call(env, { action: "adminSession" }) : null;
+  const adminState = !roomTest && previewToken ? await call(env, { action: "adminSession" }) : null;
   const previewAccess = Boolean(adminState && await checkToken(key, previewToken, `preview:${room.slug}:${room.gen}`, String(adminState.data.gen)));
 
   // 폴링도 들어온 사람만 한다. 앞에 두면 비밀번호 없이 방 상태를 감시할 수 있다.
@@ -1701,8 +1701,9 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
   const studentInfo = studentResult.data;
   const studentEnabled = studentInfo.enabled === true;
   const completed = new Set<string>(studentInfo.completed ?? []);
-  // 강사 미리보기와 로컬 교안 검수는 수강생 진도를 바꾸지 않는다.
-  const sequential = studentEnabled && !previewAccess && !localAccess;
+  // 실제 방의 로컬 화면도 같은 순서를 따른다. 로컬 서버는 로컬 저장소에만 기록한다.
+  // 강사 미리보기와 room-test는 순서 제한 없이 교안을 검수한다.
+  const sequential = studentEnabled && !previewAccess;
   if (!roomTest && parts[1] === "state" && parts.length === 2) {
     // 지문만 준다. 본문도 카테고리 목록도 여기서 안 내려간다.
     return Response.json(
@@ -1711,7 +1712,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     );
   }
 
-  const stamp = localAccess
+  const stamp = roomTest
     ? ""
     : `window.__stamp=${JSON.stringify(await stampOf(key, room, await courseVersion(env), [...completed]))};${poll(slug)}`;
 

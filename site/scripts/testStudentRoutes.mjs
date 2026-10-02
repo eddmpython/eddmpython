@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 const built = await build({ stdin: { contents: 'export {default} from "./classroomWorker.ts"; export {Classroom} from "./rooms.ts";', resolveDir: fileURLToPath(new URL('../', import.meta.url)) }, bundle: true, format: 'esm', platform: 'browser', write: false, logLevel: 'silent' });
 const password = crypto.randomUUID();
 // 설치된 workerd가 지원하는 날짜로 실행한다. 운영 배포의 호환성 날짜는 설정 파일에서 유지한다.
-const mf = new Miniflare({ modules: true, script: built.outputFiles[0].text, compatibilityDate: '2026-08-08', compatibilityFlags: ['nodejs_compat'], durableObjects: { CLASSROOM: { className: 'Classroom', useSQLite: true } }, kvNamespaces: ['COURSE'], r2Buckets: ['SUBMISSIONS'], bindings: { ADMIN_PASSWORD: password } });
+const mf = new Miniflare({ modules: true, script: built.outputFiles[0].text, compatibilityDate: '2026-08-08', compatibilityFlags: ['nodejs_compat'], durableObjects: { CLASSROOM: { className: 'Classroom', useSQLite: true } }, kvNamespaces: ['COURSE'], r2Buckets: ['SUBMISSIONS'], bindings: { ADMIN_PASSWORD: password, LOCAL_PREVIEW_BYPASS: '1' } });
 const origin = 'https://classroom.example';
 const request = async (path, init = {}, cookie = '') => {
   const sent = new Request(origin + path, { ...init, headers: { origin, cookie, ...init.headers }, redirect: 'manual' });
@@ -120,5 +120,20 @@ try {
   assert.equal(legacy.status, 200);
   assert.doesNotMatch(await legacy.text(), /class="nav-post lesson-locked"/);
   assert.equal((await post('/room/legacy/01-start/03-last/complete', {}, legacyCookie)).status, 403);
+  // 바탕화면에서 연 로컬 개인 강의장도 실제 학습 순서와 완료 버튼을 사용한다.
+  const local = (path, init = {}) => mf.dispatchFetch('http://127.0.0.1' + path, { ...init, headers: { origin: 'http://127.0.0.1', ...init.headers }, redirect: 'manual' });
+  const localFirst = '/room/beta/01-start/01-first';
+  const localHtml = await (await local(localFirst)).text();
+  assert.match(localHtml, /class="nav-post lesson-locked"/);
+  assert.match(localHtml, /<button type="submit">학습 완료/);
+  assert.match(localHtml, /window\.__stamp=/);
+  const localStamp = await (await local('/room/beta/state')).text();
+  assert.equal((await local('/room/beta/01-start/02-second')).status, 303);
+  assert.equal((await local(localFirst + '/complete', { method: 'POST' })).status, 303);
+  assert.equal((await local('/room/beta/01-start/02-second')).status, 200);
+  assert.notEqual(await (await local('/room/beta/state')).text(), localStamp);
+  const localPreview = cookieOf(await request('/admin/students/' + beta.id + '/preview', {}, admin));
+  assert.equal((await local('/room/beta/01-start/03-last', { headers: { cookie: localPreview } })).status, 200);
+  assert.equal((await local('/room/beta/01-start/02-second/complete', { method: 'POST', headers: { cookie: localPreview } })).status, 403);
   console.log('수강자 HTTP: 인증, 파일 제출·다운로드, 다른 방 접근 차단, 피드백, 미리보기 기록 제외, 주소 변경 후 이력 보존 확인');
 } finally { await mf.dispose(); }
