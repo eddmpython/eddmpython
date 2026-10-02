@@ -155,8 +155,8 @@ article { font-size:1.125rem; }
 article img { cursor:zoom-in; }
 .lesson-progress{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin:1rem 0 1.5rem;font-size:.9rem;color:var(--eddm-text-muted)}
 .lesson-progress progress{width:8rem;accent-color:var(--eddm-accent)}
-.lesson-progress a{color:var(--eddm-accent)}
 .resume-link{display:inline-block;margin:.5rem 0 1rem;color:var(--eddm-accent)}
+.resume-link[hidden]{display:none}
 .page-loading{position:fixed;z-index:1000;right:1.5rem;top:1.5rem;width:1.4rem;height:1.4rem;border:2px solid var(--eddm-line);border-top-color:var(--eddm-accent);border-radius:50%;animation:course-spin .7s linear infinite}
 .page-loading[hidden]{display:none}
 .scene-canvas [data-media-state="loading"] .scene-media-status:before{content:"";width:1.4rem;height:1.4rem;border:2px solid var(--eddm-line);border-top-color:var(--eddm-accent);border-radius:50%;animation:course-spin .7s linear infinite}
@@ -993,11 +993,6 @@ const LECTURE_SCRIPT = `
         const line = document.createElement('p'); line.append(copy); resourceBody.append(line);
       });
     }
-    const homework = document.querySelector('.side a[href$="/homework"]');
-    if (homework) {
-      const link = homework.cloneNode(true); link.className = ''; link.target = '_blank'; link.rel = 'noopener';
-      const line = document.createElement('p'); line.append(link); resourceBody.append(line);
-    }
   };
   const closeResources = () => { resources.hidden = true; resourceButton.setAttribute('aria-expanded', 'false'); resourceButton.focus(); };
   resourceButton.addEventListener('click', () => {
@@ -1772,9 +1767,8 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
   if (typeof studentInfo?.enabled !== "boolean") return new Response("학습 기록을 불러오지 못했습니다. 잠시 뒤 다시 시도해 주세요", { status: 503 });
   const studentEnabled = studentInfo.enabled === true;
   const completed = new Set<string>(studentInfo.completed ?? []);
-  // 실제 방의 로컬 화면도 같은 순서를 따른다. 로컬 서버는 로컬 저장소에만 기록한다.
-  // 강사 미리보기와 room-test는 순서 제한 없이 교안을 검수한다.
-  const sequential = studentEnabled && !previewAccess;
+  // 수강생은 학습 완료 순서를 따르고, 로컬과 강사 미리보기는 배정된 전편을 감수한다.
+  const sequential = studentEnabled && !localAccess && !previewAccess;
   if (!roomTest && parts[1] === "state" && parts.length === 2) {
     // 지문만 준다. 본문도 카테고리 목록도 여기서 안 내려간다.
     return Response.json(
@@ -1822,7 +1816,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     return new Response(null, { status: 303, headers: { location: `${roomRoot}/${category.slug}/${post.id}#lesson-completion`, "cache-control": "no-store" } });
   }
 
-  if (parts[1] === "homework") return homeworkPage(request, env, url, room, parts, previewAccess, !localAccess && !previewAccess);
+  if (parts[1] === "homework") return homeworkPage(request, env, url, room, parts, localAccess || previewAccess, !localAccess && !previewAccess);
   if (parts[1] === "activity" && parts.length === 2 && request.method === "POST") {
     if (!sameOrigin(request, url)) return new Response("forbidden", { status: 403 });
     const body = await readJson(request, 2000);
@@ -1885,7 +1879,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
 
   const assigned = open.flatMap(c => c.posts.map(p => ({ lesson: c.slug + "/" + p.id, title: p.title, available: canOpen(c, p.id) })));
   const completedCount = assigned.filter(p => completed.has(p.lesson)).length;
-  const progress = studentEnabled ? `<div class="lesson-progress"><span>학습 완료 ${completedCount} / ${assigned.length}편</span><progress value="${completedCount}" max="${assigned.length || 1}" aria-label="완료한 수업"></progress><a href="${esc(roomRoot)}/homework">숙제와 피드백</a></div>` : "";
+  const progress = studentEnabled ? `<div class="lesson-progress"><span>학습 완료 ${completedCount} / ${assigned.length}편</span><progress value="${completedCount}" max="${assigned.length || 1}" aria-label="완료한 수업"></progress></div>` : "";
   if (parts.length === 1) {
     if (!localAccess && !previewAccess) await recordActivity(env, room, "visit", "수업 목록");
     const cards = open.length

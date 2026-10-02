@@ -52,6 +52,8 @@ try {
   const firstPage = await (await request(firstPath, {}, aCookie)).text();
   assert.equal((firstPage.match(/class="nav-post lesson-locked"/g) ?? []).length, 2);
   assert.match(firstPage, /class="nav-post lesson-locked" aria-disabled="true"/);
+  assert.doesNotMatch(firstPage, /숙제와 피드백/);
+  assert.doesNotMatch(await (await request('/room/alpha', {}, aCookie)).text(), /숙제와 피드백/);
   assert.doesNotMatch(firstPage, /href="\/room\/alpha\/01-start\/02-second"/);
   const lockedPage = await request(secondPath, {}, aCookie);
   assert.equal(lockedPage.status, 303);
@@ -128,21 +130,20 @@ try {
   assert.equal(legacy.status, 200);
   assert.doesNotMatch(await legacy.text(), /class="nav-post lesson-locked"/);
   assert.equal((await post('/room/legacy/01-start/03-last/complete', {}, legacyCookie)).status, 403);
-  // 바탕화면에서 연 로컬 개인 강의장도 실제 학습 순서와 완료 버튼을 사용한다.
+  // 로컬 감수에서는 배정된 전편을 열고 학습 완료와 제출 기록을 만들지 않는다.
   const local = (path, init = {}) => mf.dispatchFetch('http://127.0.0.1' + path, { ...init, headers: { origin: 'http://127.0.0.1', ...init.headers }, redirect: 'manual' });
   const localFirst = '/room/beta/01-start/01-first';
-  const localHtml = await (await local(localFirst)).text();
-  assert.match(localHtml, /class="nav-post lesson-locked"/);
-  assert.match(localHtml, /<button type="submit">학습 완료/);
-  assert.match(localHtml, /window\.__stamp=/);
   const localStamp = await (await local('/room/beta/state')).text();
-  assert.equal((await local('/room/beta/01-start/02-second')).status, 303);
-  assert.equal((await local(localFirst + '/complete', { method: 'POST' })).status, 303);
-  assert.equal((await local('/room/beta/01-start/02-second')).status, 200);
-  assert.notEqual(await (await local('/room/beta/state')).text(), localStamp);
-  const localPreview = cookieOf(await request('/admin/students/' + beta.id + '/preview', {}, admin));
-  assert.equal((await local('/room/beta/01-start/03-last', { headers: { cookie: localPreview } })).status, 200);
-  assert.equal((await local('/room/beta/01-start/02-second/complete', { method: 'POST', headers: { cookie: localPreview } })).status, 403);
+  const localEvents = await (await json('/admin/students/api', { action: 'studentEvents', roomId: beta.id }, admin)).text();
+  const localHtml = await (await local(localFirst)).text();
+  assert.doesNotMatch(localHtml, /class="nav-post lesson-locked"|action="[^"]*\/complete"|숙제와 피드백/);
+  assert.match(localHtml, /window\.__stamp=/);
+  for (const id of ['01-first', '02-second', '03-last']) assert.equal((await local('/room/beta/01-start/' + id)).status, 200);
+  assert.equal((await local(localFirst + '/complete', { method: 'POST' })).status, 403);
+  assert.equal(await (await local('/room/beta/state')).text(), localStamp);
+  assert.equal(await (await json('/admin/students/api', { action: 'studentEvents', roomId: beta.id }, admin)).text(), localEvents);
+  assert.equal((await local('/room/renamed/homework/' + assignment.id, { method: 'POST', body: form })).status, 403);
+  assert.equal((await request('/room/beta/01-start/02-second', {}, bCookie)).status, 303);
   // Project selections retain source IDs, student history and other rooms.
   const curriculum = [{ category: '02-next', posts: ['01-next'] }, { category: '01-start', posts: ['02-second', '01-first'] }];
   const betaBefore = (await (await json('/admin/api', { action: 'list' }, admin)).json()).rooms.find(r => r.id === beta.id);
