@@ -156,7 +156,9 @@ article img, article video { max-width:100%; height:auto; border-radius:.6rem; d
 article { font-size:1.125rem; }
 article img { cursor:zoom-in; }
 .lesson-progress{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin:1rem 0 1.5rem;font-size:.9rem;color:var(--eddm-text-muted)}
-.lesson-progress progress{width:8rem;accent-color:var(--eddm-accent)}
+.lesson-progress>span{white-space:nowrap}
+.lesson-progress progress{width:clamp(3rem,12vw,8rem);min-width:3rem;accent-color:var(--eddm-accent)}
+.lesson-progress .resume-link{margin:0 0 0 auto;white-space:nowrap}
 .resume-link{display:inline-block;margin:.5rem 0 1rem;color:var(--eddm-accent)}
 .resume-link[hidden]{display:none}
 .page-loading{position:fixed;z-index:1000;right:1.5rem;top:1.5rem;width:1.4rem;height:1.4rem;border:2px solid var(--eddm-line);border-top-color:var(--eddm-accent);border-radius:50%;animation:course-spin .7s linear infinite}
@@ -1582,11 +1584,11 @@ const ROOM_NAV_SCRIPT = `
  let saved;try{saved=JSON.parse(localStorage.getItem(key)||'null');}catch{}
  const resume=document.querySelector('[data-resume]');
  if(resume&&saved&&[...document.querySelectorAll('a.post')].some(a=>a.pathname===saved.path)){
-  resume.href=saved.path+'#'+saved.section;resume.textContent='이어서 읽기 · '+saved.title;
+  resume.href=saved.path+'#'+saved.section;resume.textContent='이어서 하기';resume.title=saved.title+'에서 이어서 하기';
  }
  const sectionLink=document.querySelector('[data-resume-section]');
  if(sectionLink&&saved?.path===location.pathname&&/^s[1-9][0-9]*$/.test(saved.section)&&document.getElementById(saved.section)){
-  sectionLink.hidden=false;sectionLink.href='#'+saved.section;sectionLink.textContent='이어서 읽기 · '+saved.title;
+  sectionLink.hidden=false;sectionLink.href='#'+saved.section;sectionLink.textContent='이어서 하기';sectionLink.title=saved.title+'에서 이어서 하기';
  }
  if(!('IntersectionObserver' in window))return;
  const remember=(section)=>{if(document.hidden||!section)return;try{localStorage.setItem(key,JSON.stringify({path:location.pathname,section:section.id,title:(section.querySelector('.section-title')||section).textContent.trim()}));}catch{}};
@@ -1892,7 +1894,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
 
   const assigned = open.flatMap(c => c.posts.map(p => ({ lesson: c.slug + "/" + p.id, title: p.title, available: canOpen(c, p.id) })));
   const completedCount = assigned.filter(p => completed.has(p.lesson)).length;
-  const progress = studentEnabled ? `<div class="lesson-progress"><span>학습 완료 ${completedCount} / ${assigned.length}편</span><progress value="${completedCount}" max="${assigned.length || 1}" aria-label="완료한 수업"></progress></div>` : "";
+  const progress = (resume: string) => studentEnabled ? `<div class="lesson-progress"><span>학습 완료 ${completedCount} / ${assigned.length}편</span><progress value="${completedCount}" max="${assigned.length || 1}" aria-label="완료한 수업"></progress>${resume}</div>` : resume;
   if (parts.length === 1) {
     if (!localAccess && !previewAccess) await recordActivity(env, room, "visit", "수업 목록");
     const cards = open.length
@@ -1927,7 +1929,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
              ? `${open.length}개 과정 ${total}편이 있습니다. ${sequential ? "한 편을 완료하면 다음 편이 열립니다." : "순서대로 따라오시면 됩니다."}`
              : "곧 시작합니다. 이 화면을 열어 두고 기다리시면 됩니다."
          }</p>
-       </section>${progress}<a class="resume-link" data-resume href="${esc(roomRoot)}/${esc(assigned.find(p => p.available && !completed.has(p.lesson))?.lesson ?? assigned[0]?.lesson ?? "")}" ${assigned.length ? "" : "hidden"}>${completedCount ? "학습 이어가기" : "학습 시작"}</a>${studentEnabled ? `<p class="wait" style="font-size:.8rem">강의장 접속, 수업 열람과 제출 기록은 강사가 학습 안내에 사용합니다.</p>` : ""}${cards}`,
+       </section>${progress(`<a class="resume-link" data-resume href="${esc(roomRoot)}/${esc(assigned.find(p => p.available && !completed.has(p.lesson))?.lesson ?? assigned[0]?.lesson ?? "")}" ${assigned.length ? "" : "hidden"}>${completedCount ? "이어서 하기" : "학습 시작"}</a>`)}${studentEnabled ? `<p class="wait" style="font-size:.8rem">강의장 접속, 수업 열람과 제출 기록은 강사가 학습 안내에 사용합니다.</p>` : ""}${cards}`,
       stamp,
     );
   }
@@ -2060,9 +2062,8 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
                ? `<div class="lecture-entry"><button type="button" class="lecture-open" data-lecture-watch hidden>▶ 영상으로 학습</button><button type="button" class="lecture-open" data-lecture-open><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="m9 21 3-4 3 4M8 9h8M8 12h5"/></svg>강의 모드</button></div>`
                : ""
            }</div>
-           ${progress}
+           ${progress('<a class="resume-link" data-resume-section hidden>이어서 하기</a>')}
            <p class="sub">${esc(post.summary)}</p>
-           <a class="resume-link" data-resume-section hidden>이어서 읽기</a>
            <article>${html}</article>
            ${completion}
            ${foot}
