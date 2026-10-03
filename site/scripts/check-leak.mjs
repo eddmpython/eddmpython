@@ -119,6 +119,10 @@ function phrasesFrom(text, isJson = false) {
       // 이 규칙을 넣어도 검사 대상 문장은 5,743 개에서 5,219 개로 줄 뿐이고, 빠지는 524 개는
       // 전부 코드 조각과 파이썬 예약어 목록과 공개 인용문이었다.
       if (!/[가-힣]/.test(phrase)) continue;
+      // 두 공개 제품 이름만 나열한 제목은 고유 설명이 아니다. 2026-10-04 에 기존 공개 글
+      // /blog/ai-environment 의 제품 소개를 오탐했다. 정확한 이름만 제외하며, 이 이름이
+      // 포함된 설명 문장은 그대로 검사한다 (testLeak.mjs).
+      if (phrase === "Codex와 Claude Code") continue;
       if (phrase.length >= MIN_PHRASE) found.push(phrase);
     }
   }
