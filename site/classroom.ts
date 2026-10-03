@@ -992,7 +992,6 @@ const LECTURE_SCRIPT = `
     title.textContent = scenes[sceneAt].querySelector('h2')?.textContent || '실습 자료';
     resourceBody.append(title);
     const hint = document.createElement('p');
-    hint.textContent = '명령을 복사해 내 컴퓨터에서 실행합니다. 영상을 계속 보려면 자료를 닫고 재생하세요.';
     resourceBody.append(hint);
     const seenLinks = new Set();
     for (const node of resourceNodes[sceneAt] || []) {
@@ -1006,6 +1005,14 @@ const LECTURE_SCRIPT = `
         const line = document.createElement('p'); line.append(copy); resourceBody.append(line);
       });
     }
+    const hasCommands = Boolean(resourceBody.querySelector('.command-box:not(.command-prompt)'));
+    const hasPrompts = Boolean(resourceBody.querySelector('.command-prompt'));
+    hint.textContent = hasCommands && hasPrompts ? '명령은 내 컴퓨터에서 실행하고, 요청은 AI에 전달합니다.'
+      : hasCommands ? '명령을 복사해 내 컴퓨터에서 실행합니다.'
+      : hasPrompts ? '요청 내용을 복사해 AI에 전달합니다.'
+      : seenLinks.size ? '이 섹션의 참고 자료를 확인하세요'
+      : '이 섹션에는 별도 실습 자료가 없습니다.';
+    if (videos[sceneAt]) hint.textContent += ' 영상을 계속 보려면 자료를 닫고 재생하세요';
   };
   const closeResources = () => { resources.hidden = true; resourceButton.setAttribute('aria-expanded', 'false'); resourceButton.focus(); };
   resourceButton.addEventListener('click', () => {
