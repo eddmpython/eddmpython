@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 
-import { course, roomCourse, validCurriculum } from "../course.ts";
+import { course, parseCourseText, roomCourse, validCurriculum } from "../course.ts";
 import type { Env } from "../env.ts";
 
 function courseEnv(bundle: unknown): Env {
@@ -56,3 +56,29 @@ assert.equal(validCurriculum([{ category: "01-a", posts: ["first", "first"] }]),
 assert.equal(validCurriculum([{ category: "01-a", posts: ["first"] }, { category: "01-a", posts: ["second"] }]), false);
 assert.equal(validCurriculum([{ category: "01-a", posts: [] }]), false);
 console.log("course: 프로젝트별 선택·순서, 공통 원본 보존, 기존 강의장 호환 확인");
+
+const introVideo = `room://${"e".repeat(64)}.mp4`;
+const introPoster = `room://${"f".repeat(64)}.webp`;
+const videoBundle = (schema: unknown, extra: Record<string, unknown> = {}) => JSON.stringify({
+  schema, sceneContract: 12, categories: [{ slug: "01-video", order: 1, title: "영상", posts: [
+    { id: "01-first", title: "첫 수업", summary: "설명", body: "본문", introVideo, introPoster, ...extra },
+  ] }],
+});
+for (const schema of [4, 5]) {
+  const parsed = parseCourseText(videoBundle(schema));
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.categories[0].posts[0].introVideo, introVideo);
+  assert.equal(parsed.categories[0].posts[0].introPoster, introPoster);
+}
+for (const schema of ["5", 6]) assert.equal(parseCourseText(videoBundle(schema)).ok, false);
+assert.equal(parseCourseText(videoBundle(5).replace('"sceneContract":12', '"sceneContract":99')).ok, false);
+for (const invalid of ["javascript:alert(1)", "https://example.com/video.mp4", `room://${"e".repeat(64)}.svg`, 1, null]) {
+  const parsed = parseCourseText(videoBundle(5, { introVideo: invalid }));
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.categories[0].posts[0].introVideo, undefined);
+  assert.equal(parsed.categories[0].posts[0].body, "본문");
+}
+for (const invalid of ["javascript:alert(1)", `room://${"f".repeat(64)}.mp4`, "room://bad.webp", null]) {
+  assert.equal(parseCourseText(videoBundle(5, { introPoster: invalid })).categories[0].posts[0].introPoster, undefined);
+}
+console.log("course: schema 4·5 상단 영상, 잘못된 미디어 제외와 본문 유지 확인");

@@ -57,6 +57,8 @@ const publicFile = `${"a".repeat(64)}.xlsx`;
 const alphaFile = `${"b".repeat(64)}.xlsx`;
 const betaFile = `${"c".repeat(64)}.xlsx`;
 const invalidSchemeFile = `${"d".repeat(64)}.xlsx`;
+const introFile = `${"e".repeat(64)}.mp4`;
+const introPoster = `${"f".repeat(64)}.webp`;
 const rooms = Object.fromEntries(["alpha", "beta"].map((slug) => [slug, {
   slug,
   title: `${slug} 강의방`,
@@ -67,7 +69,7 @@ const rooms = Object.fromEntries(["alpha", "beta"].map((slug) => [slug, {
   lockedUntil: 0,
 }]));
 const bundle = {
-  schema: 4,
+  schema: 5,
   sceneContract: 12,
   categories: [
     {
@@ -80,7 +82,7 @@ const bundle = {
       slug: "02-alpha",
       order: 2,
       title: "A 프로젝트 과정",
-      posts: [{ id: "01-alpha", title: "A 실습", summary: "A 자료 확인", body: `[A.xlsx](room://${alphaFile})` }],
+      posts: [{ id: "01-alpha", title: "A 실습", summary: "A 자료 확인", body: `[A.xlsx](room://${alphaFile})`, introVideo: `room://${introFile}`, introPoster: `room://${introPoster}` }],
     },
     {
       slug: "03-beta",
@@ -91,13 +93,14 @@ const bundle = {
   ],
 };
 const mediaReads = [];
+const student = { enabled: false, completed: [] };
 const env = {
   CLASSROOM: {
     idFromName: (name) => name,
     get: () => ({
       fetch: async (_url, init) => {
         const { action, slug } = JSON.parse(init.body);
-        if (action === "roomContext") return Response.json({ room: rooms[slug] ?? null, key: "test-sign-key", student: { enabled: false, completed: [] } });
+        if (action === "roomContext") return Response.json({ room: rooms[slug] ?? null, key: "test-sign-key", student });
         if (action === "get") return Response.json({ room: rooms[slug] ?? null });
         if (action === "login") return Response.json({ ok: true });
         if (action === "signKey") return Response.json({ key: "test-sign-key" });
@@ -145,6 +148,39 @@ assert.equal((await requestRoom(`/room/alpha/media/${publicFile}`, alphaCookie))
 assert.equal((await requestRoom(`/room/alpha/media/${alphaFile}`, alphaCookie)).status, 200);
 
 // 영상 탐색은 허용된 자료의 요청 구간을 돌려줘야 한다. 전체 파일로 응답하면 Chrome이 처음으로 돌아간다.
+const introHtml = await (await requestRoom("/room/alpha/02-alpha/01-alpha", alphaCookie)).text();
+assert.match(introHtml, /class="lesson-video"><video[^>]+controls playsinline preload="metadata"/);
+assert.ok(introHtml.indexOf('<figure class="lesson-video">') < introHtml.indexOf('<p class="sub">A 자료 확인'));
+assert.match(introHtml, new RegExp(`poster="/room/alpha/media/${introPoster}"`));
+assert.equal((await requestRoom(`/room/alpha/media/${introFile}`, alphaCookie, { range: "bytes=2-8" })).status, 206);
+assert.equal((await requestRoom(`/room/alpha/media/${introPoster}`, alphaCookie)).status, 200);
+const introReads = mediaReads.length;
+assert.equal((await requestRoom(`/room/beta/media/${introFile}`, betaCookie)).status, 404);
+assert.equal((await requestRoom(`/room/beta/media/${introPoster}`, betaCookie)).status, 404);
+assert.equal(mediaReads.length, introReads);
+const introPost = bundle.categories[1].posts[0];
+const validIntro = introPost.introVideo;
+introPost.introVideo = 'javascript:alert(1)';
+assert.doesNotMatch(await (await requestRoom('/room/alpha/02-alpha/01-alpha', alphaCookie)).text(), /<figure class="lesson-video">|javascript:alert/);
+assert.equal((await requestRoom(`/room/alpha/media/${introPoster}`, alphaCookie)).status, 404);
+introPost.introVideo = validIntro;
+// 같은 방에 배정된 글이어도 선수 수업이 끝나기 전에는 영상과 포스터를 읽을 수 없다.
+const prerequisite = { id: "00-before", title: "앞 수업", summary: "설명", body: "본문" };
+bundle.categories[1].posts.unshift(prerequisite);
+student.enabled = true;
+const lockedIntroReads = mediaReads.length;
+assert.equal((await requestRoom("/room/alpha/02-alpha/01-alpha", alphaCookie)).status, 303);
+for (const file of [introFile, introPoster]) {
+  assert.equal((await requestRoom(`/room/alpha/media/${file}`, alphaCookie, { range: "bytes=2-8" })).status, 404);
+}
+assert.equal(mediaReads.length, lockedIntroReads);
+student.completed.push("02-alpha/00-before");
+assert.equal((await requestRoom(`/room/alpha/media/${introFile}`, alphaCookie)).status, 200);
+assert.equal((await requestRoom(`/room/alpha/media/${introPoster}`, alphaCookie)).status, 200);
+student.enabled = false;
+student.completed.length = 0;
+bundle.categories[1].posts.shift();
+
 const mediaPath = `/room/alpha/media/${alphaFile}`;
 const original = `media/${alphaFile}`;
 for (const [range, start, end] of [["bytes=2-8", 2, 8], ["bytes=5-", 5, original.length - 1], ["bytes=-4", original.length - 4, original.length - 1]]) {

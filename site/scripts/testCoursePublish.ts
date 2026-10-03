@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 
-import { handleCoursePublish, mergeCourseCategory, verifyGitHubOidc } from "../coursePublish.ts";
+import { handleCoursePublish, mergeCourseCategory, validCourseBundle, verifyGitHubOidc } from "../coursePublish.ts";
 import type { Env } from "../env.ts";
 
 const issuer = "https://token.actions.githubusercontent.com";
@@ -133,6 +133,7 @@ const newCategory = {
 };
 const merged = mergeCourseCategory(before, newCategory);
 assert(merged);
+assert.equal(JSON.parse(merged).schema, 5);
 assert.equal(JSON.stringify(JSON.parse(merged).categories[1]), oldCategory);
 assert.equal(JSON.stringify(JSON.parse(merged).glossary), JSON.stringify(prior.glossary));
 assert.equal(mergeCourseCategory(before, { slug: "08-private-course", posts: "invalid" }), null);
@@ -198,5 +199,34 @@ const racing = await handleCoursePublish(new Request(audience, {
 }), racingEnv, { fetcher, now: now * 1000 });
 assert.equal(racing.status, 409);
 assert.equal(writes, 0);
+
+const videoBundle = JSON.parse(bundle);
+videoBundle.schema = 5;
+const videoPost = videoBundle.categories[0].posts[0];
+videoPost.introVideo = `room://${"e".repeat(64)}.mp4`;
+videoPost.introPoster = `room://${"f".repeat(64)}.webp`;
+assert.deepEqual(validCourseBundle(JSON.stringify(videoBundle)), { categories: 1, posts: 1 });
+for (const extra of [
+  { introVideo: "https://example.com/video.mp4" },
+  { introVideo: `room://${"e".repeat(64)}.svg` },
+  { introVideo: null },
+  { introPoster: `room://${"f".repeat(64)}.mp4` },
+  { introPoster: null },
+  { introVideo: undefined },
+]) {
+  const invalid = structuredClone(videoBundle);
+  Object.assign(invalid.categories[0].posts[0], extra);
+  const raw = JSON.stringify(invalid);
+  assert.equal(validCourseBundle(raw), null);
+  const rejectedHash = Buffer.from(await crypto.subtle.digest("SHA-256", encoder.encode(raw))).toString("hex");
+  const savedValues = [...values];
+  const response = await handleCoursePublish(new Request(audience, {
+    method: "POST", body: raw,
+    headers: { authorization: auth, "content-type": "application/json", "x-course-sha256": rejectedHash },
+  }), env, { fetcher, now: now * 1000 });
+  assert.equal(response.status, 400);
+  assert.deepEqual([...values], savedValues, "잘못된 영상 메타데이터는 기존 묶음을 바꾸면 안 됩니다");
+}
+assert.equal(validCourseBundle(JSON.stringify({ ...videoBundle, schema: "5" })), null);
 
 console.log("course publish: GitHub OIDC와 묶음 발행 계약 통과");

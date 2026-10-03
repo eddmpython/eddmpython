@@ -18,6 +18,7 @@ import {
   COURSE_SCENE_RUNTIME,
   esc,
   mediaContentType,
+  mediaSrc,
   renderLecture,
   renderPost,
   ROOM_MEDIA_KEY,
@@ -153,6 +154,8 @@ a.post:hover { color:var(--eddm-accent); }
 a.post:hover b { color:var(--eddm-accent-dim); }
 .wait { color:var(--eddm-text-dim); }
 article img, article video { max-width:100%; height:auto; border-radius:.6rem; display:block; margin:1.75rem 0; }
+.lesson-video { margin:1.5rem 0; }
+.lesson-video video { display:block; width:100%; aspect-ratio:16/9; object-fit:contain; border-radius:.6rem; background:var(--eddm-canvas); }
 article { font-size:1.125rem; }
 article img { cursor:zoom-in; }
 .lesson-progress{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin:1rem 0 1.5rem;font-size:.9rem;color:var(--eddm-text-muted)}
@@ -1426,7 +1429,7 @@ const LECTURE_SCRIPT = `
 
   const open = async (fromHash = false, watch = false) => {
     if (opened) return;
-    document.querySelectorAll("article video, article audio").forEach((media) => media.pause());
+    document.querySelectorAll(".lesson-video video, article video, article audio").forEach((media) => media.pause());
     opened = true;
     watching = watch && canWatch;
     deck.classList.toggle('lecture-watch', watching);
@@ -1858,7 +1861,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     const key = parts[2];
     if (!ROOM_MEDIA_KEY.test(key)) return new Response("not found", { status: 404 });
     const source = `room://${key}`;
-    if (!open.some((category) => category.posts.some((post) => canOpen(category, post.id) && post.body.includes(source)))) {
+    if (!open.some((category) => category.posts.some((post) => canOpen(category, post.id) && (post.body.includes(source) || post.introVideo === source || (post.introVideo && post.introPoster === source))))) {
       return new Response("없는 시각물입니다.", { status: 404 });
     }
     const bytes = await env.COURSE.get(`media/${key}`, { type: "arrayBuffer", cacheTtl: 3600 });
@@ -2068,6 +2071,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
                : ""
            }</div>
            ${progress('<a class="resume-link" data-resume-section hidden>이어서 하기</a>')}
+           ${post.introVideo ? `<figure class="lesson-video"><video src="${esc(mediaSrc(media.mediaBase, post.introVideo.slice(7)))}"${post.introPoster ? ` poster="${esc(mediaSrc(media.mediaBase, post.introPoster.slice(7)))}"` : ""} controls playsinline preload="metadata" aria-label="${esc(post.title)} 개념 영상"></video></figure>` : ""}
            <p class="sub">${esc(post.summary)}</p>
            <article>${html}</article>
            ${completion}
