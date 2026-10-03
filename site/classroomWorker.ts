@@ -23,7 +23,7 @@ function withClassroomHeaders(response: Response): Response {
 }
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     const pathname = url.pathname.replace(/\/$/, "") || "/";
 
@@ -34,10 +34,10 @@ export default {
       return withClassroomHeaders(await handleAdmin(request, env, url));
     }
     if (pathname === "/room" || pathname.startsWith("/room/")) {
-      return withClassroomHeaders(await handleRoom(request, env, url));
+      return withClassroomHeaders(await handleRoom(request, env, url, ctx));
     }
     if (pathname === "/room-test" || pathname.startsWith("/room-test/")) {
-      return withClassroomHeaders(await handleRoom(request, env, url));
+      return withClassroomHeaders(await handleRoom(request, env, url, ctx));
     }
     return withClassroomHeaders(new Response("Not Found", { status: 404 }));
   },

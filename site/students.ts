@@ -6,6 +6,7 @@ import { course, roomCourse, validCurriculum } from "./course";
 import { curriculumEditor, curriculumStyle, curriculumScript } from "./curriculumEditor";
 import { cookie, issueToken } from "./auth";
 import { githubLabels, verifyGithubRepository } from "./studentGithub";
+import { notebookAdminPage, notebookAdminAction, notebookAdminStyle, notebookAdminScript } from "./notebookAdmin";
 
 const methods: Record<string, string> = { any: "글·링크·파일 중 선택", link: "링크 제출", file: "파일 제출", text: "글로 제출" };
 const statuses: Record<string, string> = { pending: "검토 대기", revision: "수정 요청", accepted: "확인 완료" };
@@ -49,8 +50,8 @@ document.querySelector('[data-activity-filter]')?.addEventListener('change',even
 document.querySelector('[data-search]')?.addEventListener('input',event=>{const term=event.target.value.toLowerCase();document.querySelectorAll('[data-student]').forEach(row=>row.hidden=!row.dataset.student.includes(term));});
 document.querySelector('[data-more]')?.addEventListener('click',async event=>{const button=event.currentTarget;button.disabled=true;try{const r=await fetch('/admin/students/api',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'studentEvents',roomId:button.dataset.room,before:Number(button.dataset.before),kind:button.dataset.kind||''})});const data=await r.json();if(!r.ok)throw Error(data.error);document.querySelector('[data-events]').insertAdjacentHTML('beforeend',data.html);button.dataset.before=data.before;button.hidden=!data.more;}catch(error){document.querySelector('#message').textContent=error.message;}finally{button.disabled=false;}});
 `;
-function adminPage(title: string, body: string) {
-  return page({ title, style: STUDENT_STYLE + curriculumStyle, script, wide: true, inner: `${header()}<main class="students"><div class="topline"><h1>${esc(title)}</h1><form method="post" action="/admin/logout"><button>나가기</button></form></div><nav class="admin-nav"><a href="/admin/students" aria-current="page">수강자 관리</a><a href="/admin">강의장 설정</a></nav>${body}</main>` });
+function adminPage(title: string, body: string, questions = false, status = 200) {
+  return page({ title, status, style: STUDENT_STYLE + curriculumStyle + (questions ? notebookAdminStyle : ""), script: script + (questions ? notebookAdminScript : ""), wide: true, inner: `${header()}<main class="students"><div class="topline"><h1>${esc(title)}</h1><form method="post" action="/admin/logout"><button>나가기</button></form></div><nav class="admin-nav"><a href="/admin/students" ${questions ? "" : 'aria-current="page"'}>수강자 관리</a><a href="/admin/students/questions" ${questions ? 'aria-current="page"' : ""}>질문함</a><a href="/admin">강의장 설정</a></nav>${body}</main>` });
 }
 function hidden(name: string, value: string) { return `<input type="hidden" name="${name}" value="${esc(value)}">`; }
 function saveButton(text = "저장") { return `<div class="full actions"><button class="primary">${text}</button><span role="status" class="message" aria-live="polite"></span></div>`; }
@@ -64,6 +65,17 @@ export async function handleStudents(request: Request, env: Env, url: URL): Prom
   const parts = url.pathname.replace(/\/$/, "").split("/").slice(3);
   const listed = await call(env, { action: "list" });
   const rooms = listed.data.rooms as PublicRoom[];
+  if (parts[0] === "questions") {
+    if (parts.length === 2 && parts[1] === "api" && request.method === "POST") {
+      if (!sameOrigin(request, url)) return Response.json({ error: "이 화면에서 다시 시도해 주세요" }, { status: 403, headers: privateHeaders });
+      const body = await readJson(request, 64000);
+      if (!body) return Response.json({ error: "요청 내용을 확인해 주세요" }, { status: 400, headers: privateHeaders });
+      return notebookAdminAction(env, body, rooms);
+    }
+    if (parts.length !== 1 || request.method !== "GET") return new Response("not found", { status: 404 });
+    const inbox = await notebookAdminPage(env, url, rooms);
+    return adminPage("질문함", inbox.body, true, inbox.status);
+  }
   if (parts[0] === "api" && request.method === "POST") {
     if (!sameOrigin(request, url)) return Response.json({ error: "이 화면에서 다시 시도해 주세요" }, { status: 403 });
     const body = await readJson(request);
@@ -110,7 +122,16 @@ export async function handleStudents(request: Request, env: Env, url: URL): Prom
   if (!room) return new Response("없는 강의장입니다", { status: 404 });
   if (parts[1] === "preview" && parts.length === 2) {
     const { data } = await call(env, { action: "adminSession" });
-    return new Response(null, { status: 303, headers: { ...privateHeaders, location: `/room/${room.slug}`, "set-cookie": cookie("eddm_preview", await issueToken(data.key, `preview:${room.slug}:${room.gen}`, data.gen), `/room/${room.slug}`, url) } });
+    const lesson = url.searchParams.get("lesson");
+    let location = `/room/${room.slug}`;
+    if (lesson) {
+      const found = await course(env);
+      if (roomCourse(found.categories, room).some(category => category.posts.some(post => `${category.slug}/${post.id}` === lesson))) {
+        const section = url.searchParams.get("section") ?? "";
+        location += "/" + lesson + (/^[a-f0-9]{24}$/.test(section) ? "#note-" + section : "");
+      }
+    }
+    return new Response(null, { status: 303, headers: { ...privateHeaders, location, "set-cookie": cookie("eddm_preview", await issueToken(data.key, `preview:${room.slug}:${room.gen}`, data.gen), `/room/${room.slug}`, url) } });
   }
   if (parts[1] === "files" && parts.length === 3) return studentFile(env, room.id, parts[2]);
   if (parts.length !== 1) return new Response("not found", { status: 404 });
@@ -120,7 +141,7 @@ export async function handleStudents(request: Request, env: Env, url: URL): Prom
   let events = result.data.events as RecordRow[];
   const root = `/admin/students/${room.id}`;
   const tab = url.searchParams.get("tab") ?? "progress";
-  const nav = `<a class="backlink" href="/admin/students">← 수강자 목록</a><div class="topline"><div><p class="muted small">${esc(room.title)} · /room/${esc(room.slug)}</p></div><a class="button" href="${root}/preview" target="_blank" rel="noreferrer">강의장 미리보기</a></div><nav class="admin-nav">${[["progress", "학습 진행"], ["work", "숙제와 제출"], ["curriculum", "커리큘럼"], ["activity", "접속·활동 기록"], ["settings", "수강자 정보"]].map(([id, title]) => `<a href="${root}?tab=${id}" ${tab === id ? 'aria-current="page"' : ""}>${title}</a>`).join("")}</nav>`;
+  const nav = `<a class="backlink" href="/admin/students">← 수강자 목록</a><div class="topline"><div><p class="muted small">${esc(room.title)} · /room/${esc(room.slug)}</p></div><div class="actions"><a class="button" href="/admin/students/questions?room=${encodeURIComponent(room.id)}">이 강의방 질문</a><a class="button" href="${root}/preview" target="_blank" rel="noreferrer">강의장 미리보기</a></div></div><nav class="admin-nav">${[["progress", "학습 진행"], ["work", "숙제와 제출"], ["curriculum", "커리큘럼"], ["activity", "접속·활동 기록"], ["settings", "수강자 정보"]].map(([id, title]) => `<a href="${root}?tab=${id}" ${tab === id ? 'aria-current="page"' : ""}>${title}</a>`).join("")}</nav>`;
   let body = "";
   if (tab === "progress") {
     const found = await course(env);

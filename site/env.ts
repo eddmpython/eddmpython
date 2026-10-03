@@ -23,6 +23,11 @@ export type Env = {
   ADMIN_PASSWORD?: string;
   /** 지정한 비공개 실습 저장소에만 Administration 쓰기 권한을 가진 서버용 인증 정보. */
   GITHUB_INVITE_TOKEN?: string;
+  /** 강의 질문 알림. 발송 도메인과 수신 주소를 설정한 경우에만 사용한다. */
+  CLASSROOM_EMAIL?: SendEmail;
+  /** 수신 주소와 확인된 발신 주소는 Worker 시크릿으로만 보관한다. */
+  CLASSROOM_NOTIFY_TO?: string;
+  CLASSROOM_NOTIFY_FROM?: string;
   /** `npm run classroom:dev`가 preview 방과 `/room-test`에만 주입한다. 배포 환경에는 존재하지 않는다. */
   LOCAL_PREVIEW_BYPASS?: string;
 };

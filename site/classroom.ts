@@ -34,6 +34,9 @@ import { header, page, themeToggle } from "./shell";
 import type { Env } from "./env";
 import { homeworkPage, recordActivity, sameOrigin, readJson } from "./students";
 import { connectGithub, githubForm, githubPractice, githubScript, githubStyle } from "./studentGithub";
+import { notebookHeadings, notebookMarkup, notebookScript, notebookStyle } from "./classroomNotes";
+import { notebookSections } from "./notebookSections";
+import { handleNotebook } from "./notebookRoutes";
 
 
 
@@ -1613,7 +1616,7 @@ function roomPage(
 ): Response {
   return page({
     title,
-    style: CLASSROOM_STYLE,
+    style: CLASSROOM_STYLE + notebookStyle,
     inner,
     extraBody: `<div class="zoom" id="zoom"><img alt=""></div><div class="page-loading" data-page-loading role="status" aria-label="페이지 로딩" hidden></div>`,
     script: `${ZOOM_SCRIPT}${ROOM_NAV_SCRIPT}${extraScript}`,
@@ -1674,7 +1677,7 @@ async function stampOf(key: string, room: PublicRoom, version: string, completed
   return (await hmac(key, raw)).slice(0, 16);
 }
 
-export async function handleRoom(request: Request, env: Env, url: URL): Promise<Response> {
+export async function handleRoom(request: Request, env: Env, url: URL, ctx?: ExecutionContext): Promise<Response> {
   const path = url.pathname.replace(/\/$/, "") || "/room";
   const roomTestPath = path === "/room-test" || path.startsWith("/room-test/");
   const roomTest =
@@ -1767,7 +1770,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
 
   // 폴링도 들어온 사람만 한다. 앞에 두면 비밀번호 없이 방 상태를 감시할 수 있다.
   if (!localAccess && !previewAccess && !(await hasSession(key, request, room))) {
-    if (parts[1] === "state" && parts.length === 2) {
+    if (["state", "notes"].includes(parts[1]) && parts.length === 2) {
       return Response.json({ error: "로그인이 필요합니다" }, { status: 401 });
     }
     return loginPage(slug, room.title);
@@ -1815,6 +1818,10 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
     return required;
   };
   const canOpen = (category: CourseCategory, postId: string) => !sequential || requiredLessons(category, postId).every(lesson => completed.has(lesson));
+
+  if (parts[1] === "notes" && parts.length === 2) return handleNotebook(request, env, url, room, {
+    key, personal: studentEnabled, readOnly: previewAccess || roomTest, categories: open, canOpen, ctx,
+  });
 
   if (parts.length === 2 && parts[1] === "github" && request.method === "POST") {
     if (!sameOrigin(request, url) || !sequential) return Response.json({ error: "수강자 강의장에서 진행해 주세요" }, { status: 403 });
@@ -1965,6 +1972,7 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
       } : undefined,
     });
     const lecture = renderLecture(post.body, post.scenes ?? [], category.cells ?? {}, courseState.glossary, media);
+    const noteSections = await notebookSections(headings);
 
     // 왼쪽. 같은 과정의 글을 오간다. 강의 중에 앞 편으로 되돌아가는 일이 잦다.
     const nav = category.posts
@@ -2073,15 +2081,16 @@ export async function handleRoom(request: Request, env: Env, url: URL): Promise<
            ${progress('<a class="resume-link" data-resume-section hidden>이어서 하기</a>')}
            ${post.introVideo ? `<figure class="lesson-video"><video src="${esc(mediaSrc(media.mediaBase, post.introVideo.slice(7)))}"${post.introPoster ? ` poster="${esc(mediaSrc(media.mediaBase, post.introPoster.slice(7)))}"` : ""} controls playsinline preload="metadata" aria-label="${esc(post.title)} 개념 영상"></video></figure>` : ""}
            <p class="sub">${esc(post.summary)}</p>
-           <article>${html}</article>
+           <article>${notebookHeadings(html, noteSections)}</article>
            ${completion}
            ${foot}
          </main>
-         ${toc}
+         ${headings.length ? notebookMarkup(toc) : toc}
        </div>${lectureUi}`,
       stamp
         + (!localAccess && !previewAccess ? `(() => {const seen=new Set();const send=(kind,section)=>fetch(${JSON.stringify(`${roomRoot}/activity`)},{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({kind,section,category:${JSON.stringify(category.slug)},post:${JSON.stringify(post.id)}})});const observer=new IntersectionObserver(entries=>{for(const entry of entries){if(!entry.isIntersecting||seen.has(entry.target.id)||document.hidden)continue;seen.add(entry.target.id);send('section',Number(entry.target.id.slice(1))).catch(()=>{});}},{threshold:.5});document.querySelectorAll('article h2[id^="s"]').forEach(h=>observer.observe(h));document.querySelectorAll('[data-lecture-open],[data-lecture-watch]').forEach(button=>button.addEventListener('click',()=>send('lecture').catch(()=>{})));document.querySelector('[data-lecture-deck]')?.addEventListener('lectureframe',event=>{const section=event.detail.scene+1;const id='s'+section;if(!seen.has(id)){seen.add(id);send('section',section).catch(()=>{});}});})();` : "")
         + TOC_SCRIPT
+        + (headings.length ? notebookScript({ endpoint: `${roomRoot}/notes`, roomId: room.id, lesson: `${category.slug}/${post.id}`, sections: noteSections, personal: studentEnabled, readOnly: previewAccess || roomTest }) : "")
         + COMMAND_SCRIPT
         + (html.includes("data-github-form") ? githubScript : "")
         + (hasCells || lecture.hasCells ? CELL_SCRIPT : "")

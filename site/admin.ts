@@ -21,12 +21,28 @@ import { DESIGN } from "./src/design";
 import type { Env } from "./env";
 import { taxlyDownload } from "./taxlyDownload";
 import { handleStudents } from "./students";
+import { esc } from "./classroom-render";
 
 /** 운영자 쿠키. 수강생 쿠키와 이름도 경로도 겹치지 않는다. */
 const ADMIN_COOKIE = "eddm_admin";
 const ADMIN_PATH = "/admin";
 /** 세션 토큰이 자기가 어디에 쓰이는지 밝히는 값. 방 세션은 방 이름을 쓴다. */
 const SUBJECT = "admin";
+
+/** 메일의 질문 링크만 로그인 뒤 복원한다. 임의 경로나 작업 API로 이동시키지 않는다. */
+function questionReturnTo(value: unknown): string {
+  const fallback = "/admin/students";
+  if (typeof value !== "string" || value.length > 2000 || /[\\\u0000-\u0020\u007f]/.test(value)
+    || !/^\/admin\/students\/questions(?:\?|$)/.test(value)) return fallback;
+  try {
+    const target = new URL(value, "https://admin.invalid");
+    if (target.origin !== "https://admin.invalid" || target.pathname !== "/admin/students/questions" || target.hash
+      || [...target.searchParams.keys()].some(key => key !== "thread") || target.searchParams.getAll("thread").length > 1) return fallback;
+    const thread = target.searchParams.get("thread");
+    if (thread !== null && !/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(thread)) return fallback;
+    return target.pathname + (thread ? `?thread=${thread}` : "");
+  } catch { return fallback; }
+}
 
 /**
  * 운영장이 저장소에 넘길 수 있는 동작. 여기 없는 것은 로그인해도 안 넘긴다.
@@ -329,7 +345,7 @@ async function signedIn(env: Env, request: Request): Promise<boolean> {
  * 않는다. 공용 머리띠와 강의 관리 제목을 함께 보여 주되 로그인 전에는 비밀번호 입력 외의
  * 운영 정보나 강의방 상태를 보내지 않는다.
  */
-function loginPage(message = "", status = 200): Response {
+function loginPage(message = "", status = 200, returnTo = "/admin/students"): Response {
   return page({
     title: "강의 관리",
     style: ADMIN_STYLE,
@@ -337,6 +353,7 @@ function loginPage(message = "", status = 200): Response {
     inner: `${header()}<section class="gate adm">
        <h1>강의 관리</h1>
        <form method="post" action="/admin/login">
+         <input type="hidden" name="returnTo" value="${esc(questionReturnTo(returnTo))}">
          <input type="password" name="password" placeholder="비밀번호" aria-label="비밀번호" autofocus autocomplete="current-password">
          <button type="submit">들어가기</button>
        </form>${message ? `<p class="err">${message}</p>` : ""}
@@ -390,6 +407,7 @@ function consolePage(): Response {
 async function login(request: Request, env: Env, url: URL): Promise<Response> {
   const form = await request.formData();
   const given = String(form.get("password") ?? "");
+  const returnTo = questionReturnTo(form.get("returnTo"));
 
   /**
    * 비밀번호 비교는 여기서 하고 잠금은 저장소가 맨다.
@@ -411,13 +429,14 @@ async function login(request: Request, env: Env, url: URL): Promise<Response> {
         ? `너무 여러 번 틀렸습니다. ${Math.ceil(Number(data.retryAfter) / 60)}분 뒤에 다시 해 주세요.`
         : "비밀번호가 맞지 않습니다.",
       401,
+      returnTo,
     );
   }
 
   return new Response(null, {
     status: 303,
     headers: {
-      location: "/admin/students",
+      location: returnTo,
       "set-cookie": cookie(
         ADMIN_COOKIE,
         await issueToken(key, SUBJECT, String(data.gen)),
@@ -462,7 +481,7 @@ export async function handleAdmin(request: Request, env: Env, url: URL): Promise
 
   if (path === "/admin/students" || path.startsWith("/admin/students/")) {
     if (!(await signedIn(env, request))) {
-      return request.method === "GET" ? loginPage() : Response.json({ error: "로그인이 필요합니다" }, { status: 401 });
+      return request.method === "GET" ? loginPage("", 200, url.pathname + url.search) : Response.json({ error: "로그인이 필요합니다" }, { status: 401 });
     }
     return handleStudents(request, env, url);
   }

@@ -1,10 +1,12 @@
 /** 수강자 기록은 방 상태와 같은 SQLite 저장소에서 관리한다. 외부 권한은 HTTP 처리자가 확인한다. */
+import { NotebookStore } from "./notebookStore";
 type Row = Record<string, SqlStorageValue>;
 const fail = (error: string, status = 400) => Response.json({ error }, { status });
 const text = (value: unknown, max: number) => typeof value === "string" ? value.trim().slice(0, max) : "";
 
 export class StudentStore {
   private sql: SqlStorage;
+  private notebook: NotebookStore;
   constructor(private storage: DurableObjectStorage) {
     this.sql = storage.sql;
     this.sql.exec(`
@@ -26,7 +28,9 @@ export class StudentStore {
         username TEXT NOT NULL DEFAULT '', accountId INTEGER, status TEXT NOT NULL DEFAULT 'unlinked', error TEXT NOT NULL DEFAULT '',
         attempt TEXT NOT NULL DEFAULT '', attemptedAt INTEGER NOT NULL DEFAULT 0, updated INTEGER NOT NULL DEFAULT 0);
     `);
+    this.notebook = new NotebookStore(storage);
   }
+  handleNotebook(body: Record<string, unknown>): Promise<Response> { return this.notebook.handle(body); }
   private rows(query: string, ...values: SqlStorageValue[]): Row[] { return this.sql.exec(query, ...values).toArray(); }
   private one(query: string, ...values: SqlStorageValue[]): Row | undefined { return this.rows(query, ...values)[0]; }
   private event(roomId: string, kind: string, title: string, path = "") {

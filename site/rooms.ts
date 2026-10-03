@@ -132,6 +132,15 @@ export class Classroom {
     const slug = typeof body.slug === "string" ? body.slug : "";
     const now = Date.now();
 
+    if (action.startsWith("notebook")) {
+      const rooms = await this.rooms();
+      const roomId = typeof body.roomId === "string" ? body.roomId : "";
+      const room = [...rooms.values()].find(room => room.id === roomId);
+      if ((action !== "notebookInbox" || roomId) && !room) {
+        return Response.json({ error: "강의장을 찾을 수 없습니다" }, { status: 404 });
+      }
+      return this.students.handleNotebook({ ...body, roomSlug: room?.slug, roomTitle: room?.title, roomIds: [...rooms.values()].map(room => room.id) });
+    }
     if (action.startsWith("student")) return this.students.handle(body);
 
     if (action === "signKey") return Response.json({ key: await this.signKey() });
