@@ -103,6 +103,17 @@ export const SLIDES: Slide[] = [
     alt: "xlpod 시작 화면: Excel, Google Drive, OneDrive, SharePoint 연결",
     href: "https://xlpod.eddmpython.com/",
   },
+  {
+    id: "dongap",
+    productKey: "dongap",
+    product: "돈값",
+    dotClass: "bg-accent",
+    label: "낚시와 캠핑",
+    caption: "초보 낚시와 가족 캠핑, 직접 해보고 남기는 이야기",
+    shot: "/shots/heroDongap.webp",
+    alt: "돈값 홈페이지에서 가족 낚시와 캠핑 이야기를 소개하는 화면",
+    href: "https://dongap.eddmpython.com/",
+  },
 ];
 
 export function firstSlideIndex(productKey: ProductKey): number {

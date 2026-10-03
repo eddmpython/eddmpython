@@ -47,6 +47,8 @@ const ROUTE_RULES = [
       COUNT('img[src^="/brand/"]', { min: 4 }),
       VISIBLE("a[data-hero-product-link]"),
       VISIBLE("#products"),
+      TEXT("#dongap", "초보 낚시와 가족 캠핑"),
+      VISIBLE('#dongap a[href="https://dongap.eddmpython.com/"]'),
       TEXT("#data", "400 GB+"),
       TEXT("#data", "7,870"),
       VISIBLE(
@@ -61,6 +63,10 @@ const ROUTE_RULES = [
         selector: "a[data-hero-product-link]",
       },
       {
+        id: "dongap",
+        selector: "#dongap",
+      },
+      {
         id: "dartlab-data",
         selector: "#data article",
       },
@@ -70,6 +76,13 @@ const ROUTE_RULES = [
       },
     ],
     interactions: [
+      {
+        id: "select-dongap",
+        type: "click-until-text",
+        click: 'button[data-product-key="dongap"]',
+        target: 'a[data-hero-product-link][href="https://dongap.eddmpython.com/"]',
+        includes: "돈값 열기",
+      },
       {
         id: "select-dartlab-terminal",
         type: "click-until-text",

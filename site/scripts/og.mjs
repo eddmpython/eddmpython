@@ -26,6 +26,7 @@ const OUT = resolve(HERE, "..", "public", "og.png");
 
 /* styles.css 의 --eddm-* 토큰. Tailwind 클래스명에서 실제 값으로 옮긴다. */
 const DOT = {
+  "bg-accent": BRAND.dot,
   "bg-dartlab": "#7da2e8",
   "bg-codaro": "#dfa14e",
   "bg-xlpod": "#57b98a",

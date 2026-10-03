@@ -1,6 +1,7 @@
 export type Product = {
   id: string;
   name: string;
+  kind?: "content";
   /* Tailwind 색 유틸 클래스. 제품별 포인트 컬러 (브랜드 아키텍처 시트 기준). */
   dotClass: string;
   status: string;
@@ -188,5 +189,24 @@ sorted(k for k in globals() if not k.startswith("_"))`,
       "같은 머신을 페이지 전체가 나눠 씁니다. 위 제품 셀을 먼저 돌리고 여기서 확인해 보세요",
     primary: { label: "데모 열기", href: "https://eddmpython.github.io/pyproc/" },
     secondary: { label: "GitHub", href: "https://github.com/eddmpython/pyproc" },
+  },
+  {
+    id: "dongap",
+    name: "돈값",
+    kind: "content",
+    dotClass: "bg-accent",
+    status: "콘텐츠",
+    tagline: "잘 놀았다, 돈값 한다!",
+    description:
+      "초보 낚시와 가족 캠핑, 직접 해보고 배운 것을 쉽게 나누는 콘텐츠 프로젝트입니다.",
+    points: [
+      "처음 막히는 낚시 용어와 채비를 그림으로 차근차근",
+      "가족과 함께 다녀온 바다와 캠핑 이야기",
+      "직접 써 본 장비와 사용 기록을 한곳에서",
+    ],
+    heroShot: "/shots/heroDongap.webp",
+    shotAlt: "돈값 홈페이지에서 가족 낚시와 캠핑 이야기를 소개하는 화면",
+    primary: { label: "돈값 바로가기", href: "https://dongap.eddmpython.com/" },
+    secondary: { label: "인스타그램", href: "https://www.instagram.com/dongap.log/" },
   },
 ];

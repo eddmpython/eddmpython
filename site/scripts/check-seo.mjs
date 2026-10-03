@@ -158,8 +158,10 @@ function checkShared(html, path) {
   if (nodesOfType(structured, "Organization").length !== 1) {
     fail(scope, "작성자 조직이 페이지 안에서 한 번 정의되지 않았습니다");
   }
-  if (nodesOfType(structured, "WebSite").length !== 1) {
-    fail(scope, "WebSite가 페이지 안에서 한 번 정의되지 않았습니다");
+  const ownSites = nodesOfType(structured, "WebSite")
+    .filter((site) => site["@id"] === `${origin}/#site` && site.url === origin);
+  if (ownSites.length !== 1) {
+    fail(scope, "eddmpython WebSite가 페이지 안에서 한 번 정의되지 않았습니다");
   }
   return { ogTitle, ogImage, ogImageAlt, imageWidth, imageHeight, structured };
 }

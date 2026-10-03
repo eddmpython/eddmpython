@@ -88,14 +88,18 @@ const APPS = PRODUCTS.map((product, index) => ({
   "@type": "ListItem",
   position: index + 1,
   item: {
-    "@type": "SoftwareApplication",
+    "@type": product.kind === "content" ? "WebSite" : "SoftwareApplication",
     name: product.name,
     description: `${product.tagline} ${product.description}`,
     url: product.primary.href,
-    applicationCategory: "DeveloperApplication",
-    operatingSystem: product.install?.startsWith("pip")
-      ? "Windows, macOS, Linux"
-      : "Web",
+    ...(product.kind === "content"
+      ? { inLanguage: "ko-KR" }
+      : {
+          applicationCategory: "DeveloperApplication",
+          operatingSystem: product.install?.startsWith("pip")
+            ? "Windows, macOS, Linux"
+            : "Web",
+        }),
     author: { "@id": ORG_ID },
   },
 }));
@@ -139,7 +143,7 @@ export function homeMeta(): PageMeta {
     title,
     socialTitle: title,
     description:
-      `${DARTLAB_DATA_SNAPSHOT.publicSizeLabel} 공개 공시 데이터, Python 학습, 스프레드시트 자동화, 브라우저 Python 런타임. DartLab, Codaro, xlpod, pyproc을 만들고 바로 실행할 수 있게 연결합니다.`,
+      `${DARTLAB_DATA_SNAPSHOT.publicSizeLabel} 공개 공시 데이터와 Python 도구, 낚시와 캠핑 이야기. DartLab, Codaro, xlpod, pyproc, 돈값을 소개하고 바로 연결합니다.`,
     type: "website",
     image: DEFAULT_IMAGE,
     imageAlt: "eddmpython 로고와 DartLab, Codaro, xlpod, pyproc 제품 이름",

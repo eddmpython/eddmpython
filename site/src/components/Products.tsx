@@ -109,7 +109,7 @@ export function Products() {
       <div className="mx-auto w-full max-w-5xl px-6 py-16 md:py-24">
         <SectionHead
           title="만들고 있는 것들"
-          description="공시 데이터, Python 학습, 스프레드시트, 그리고 그 셋을 떠받치는 실행 런타임. 각 제품 아래 셀은 설명이 아니라 진짜입니다. 직접 눌러 볼 수 있고, 전부 pyproc 이 브라우저에 띄운 하나의 Python 머신에서 돕니다."
+          description="공시 데이터, Python 학습과 업무 도구부터 낚시와 캠핑 이야기까지. 직접 만들고 운영하는 프로젝트를 소개합니다. 도구 아래 실행 셀은 pyproc이 브라우저에 띄운 하나의 Python 머신에서 직접 눌러 볼 수 있습니다."
         />
         <div className="mt-12 space-y-16 md:mt-14 md:space-y-24">
           {PRODUCTS.map((p, i) => (

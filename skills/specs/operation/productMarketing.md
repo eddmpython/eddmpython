@@ -16,7 +16,7 @@ status: observed
 
 # 제품 마케팅 맥락
 
-**Document version: v4**
+**Document version: v5**
 
 블로그와 랜딩 카피가 공유하는 제품 맥락이다. **확인된 공개 표면만 적는다.**
 v4 에서 `blog/product-marketing.md` 를 이 문서로 합쳤다. 운영 절차와 맥락이 두 파일로
@@ -29,8 +29,8 @@ v4 에서 `blog/product-marketing.md` 를 이 문서로 합쳤다. 운영 절차
 
 | 항목 | 내용 |
 |---|---|
-| One-liner | Python 과 데이터로 일하는 독립 제품을 발견하고 바로 실행해 보게 하는 스튜디오 |
-| What it does | DartLab, Codaro, xlpod, pyproc 의 공개 진실과 공식 경로를 한 사이트에서 연결한다 |
+| One-liner | Python과 데이터 도구, 직접 경험한 레저 콘텐츠를 만들고 공식 경로로 연결하는 스튜디오 |
+| What it does | DartLab, Codaro, xlpod, pyproc, 돈값의 확인된 소개와 공식 경로를 한 사이트에서 연결한다 |
 | Not | 공용 고객 계정, 결제 허브, 제품 소스 모노레포 |
 | Conversion action | 제품 공식 경로 열기 또는 블로그에서 첫 실행 |
 
@@ -45,6 +45,7 @@ v4 에서 `blog/product-marketing.md` 를 이 문서로 합쳤다. 운영 절차
 | xlpod | 스프레드시트와 Python 을 한 작업 공간에서 연결하는 도구 | Excel 반복 작업은 알지만 xlpod 는 처음일 수 있음 | 표 반복 줄이기, 셀과 코드 연결 | 계정 없는 영구 무료 확정 |
 | DartLab | 공시와 재무를 Python 과 화면으로 읽는 분석 도구 | 종목과 공시는 알지만 DartLab 은 처음일 수 있음 | 기업 한 곳으로 열기, 공시 원문 확인, 400 GB+ 공개 데이터셋 받기 | 투자 수익 보장 |
 | pyproc | 브라우저에서 Python 을 돌리는 런타임 | 개발 용어에 익숙할 수 있음 | 페이지 안 실행 셀, 데모 | 모든 패키지 지원 단정 |
+| 돈값 (dongap) | 초보 낚시와 가족 캠핑, 직접 해보고 배운 것을 쉽게 나누는 콘텐츠 프로젝트 | 낚시 용어와 장비, 가족 캠핑이 낯설 수 있음 | 그림으로 기초 이해, 직접 다녀온 이야기와 사용 장비 확인 | 모든 장비의 최저가나 성능 보장, 아직 공개하지 않은 체험담 |
 
 ## 블로그 패키징 기본값
 
@@ -56,6 +57,7 @@ v4 에서 `blog/product-marketing.md` 를 이 문서로 합쳤다. 운영 절차
 ## 근거 위치
 
 - 홈 제품 문구: `site/src/products.ts`
+- 돈값 공개 콘텐츠와 이동 경로: `https://dongap.eddmpython.com/`, `https://www.instagram.com/dongap.log/`
 - DartLab 데이터 사실: `https://huggingface.co/datasets/eddmpython/dartlab-data`
 - DartLab 파일 목록: `https://huggingface.co/api/datasets/eddmpython/dartlab-data`
 - 블로그 사실: 해당 제품 공개 URL 과 직접 실행
@@ -98,6 +100,7 @@ v4 에서 `blog/product-marketing.md` 를 이 문서로 합쳤다. 운영 절차
 
 ## Changelog
 
+- v5 (2026-10-04): 돈값 라이브 사이트의 초보 낚시, 가족 캠핑 콘텐츠와 공식 경로를 확인해 홈 소개에 추가
 - v4 (2026-08-19): `blog/product-marketing.md` 를 이 문서로 합침. 운영규칙은 Skill OS 한곳에 둔다
 - v3 (2026-08-14): Hugging Face 소개문 대신 실제 파일 목록을 세어 DartLab 데이터 규모를 바로잡음
 - v2 (2026-08-14): DartLab 공개 데이터셋을 제품 근거와 전환 경로에 추가

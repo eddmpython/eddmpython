@@ -1,5 +1,5 @@
 /** 랜딩 히어로에 쓰는 제품 공개 마크. 각 제품 사이트의 brand/avatar 정본을 가져온 것이다. */
-export type ProductKey = "dartlab" | "codaro" | "xlpod" | "pyproc";
+export type ProductKey = "dartlab" | "codaro" | "xlpod" | "pyproc" | "dongap";
 
 export type ProductMark = {
   key: ProductKey;
@@ -45,5 +45,13 @@ export const PRODUCT_MARKS: ProductMark[] = [
     fit: "contain",
     ringClass: "ring-pyproc",
     glow: "color-mix(in srgb, var(--eddm-pyproc) 45%, transparent)",
+  },
+  {
+    key: "dongap",
+    name: "돈값",
+    src: "/brand/dongapMark.svg",
+    fit: "contain",
+    ringClass: "ring-accent",
+    glow: "color-mix(in srgb, var(--eddm-accent) 45%, transparent)",
   },
 ];
