@@ -12,7 +12,7 @@
     "test:code-indent": "node --experimental-strip-types scripts/testCodeIndent.ts",
     "shot:code-cell": "node scripts/codeCellShot.mjs",
     "test:visual-plan": "node scripts/test-visual-capture-plan.mjs",
-    "test:classroom-render": "node --experimental-strip-types scripts/test-classroom-render.ts",
+    "test:classroom-render": "node --experimental-strip-types scripts/test-classroom-render.ts && node scripts/testShellPolicy.mjs",
     "test:course": "node --experimental-strip-types scripts/testCourse.ts",
     "type:classroom-worker": "wrangler types --include-runtime false --config wrangler.classroom.jsonc classroomWorkerEnv.d.ts",
     "check:classroom-worker": "wrangler types --check --include-runtime false --config wrangler.classroom.jsonc classroomWorkerEnv.d.ts && wrangler deploy --dry-run --config wrangler.classroom.jsonc",

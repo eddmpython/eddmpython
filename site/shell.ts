@@ -327,7 +327,8 @@ ${opts.extraBody ?? ""}
         "font-src 'self' https://cdn.jsdelivr.net",
         // 실행 칸이 있는 글만 파이썬 배포판을 받아 온다. wasm 을 컴파일하므로 그 권한도 같이 연다.
         `script-src 'nonce-${nonce}'${cells ? " 'wasm-unsafe-eval' https://cdn.jsdelivr.net" : ""}`,
-        `connect-src 'self'${cells ? " https://cdn.jsdelivr.net" : ""}`,
+        // micropip은 PyPI에서 메타데이터를, pythonhosted에서 순수 Python wheel을 받는다.
+        `connect-src 'self'${cells ? " https://cdn.jsdelivr.net https://pypi.org https://files.pythonhosted.org" : ""}`,
         // course-embed 는 https 문서를 sandbox iframe 으로 격리한다. 교안의 raw HTML 은 실행하지 않는다.
         "frame-src 'self' https:",
         ...(cells ? ["worker-src 'self' blob:"] : []),
