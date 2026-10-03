@@ -144,14 +144,14 @@ export function validCourseBundle(raw: string): { categories: number; posts: num
   let source: {
     schema?: unknown;
     glossary?: unknown;
-    categories?: Array<{ slug?: unknown; posts?: Array<{ id?: unknown; introVideo?: unknown; introPoster?: unknown; scenes?: unknown[] }> }>;
+    categories?: Array<{ slug?: unknown; posts?: Array<{ id?: unknown; optional?: unknown; introVideo?: unknown; introPoster?: unknown; scenes?: unknown[] }> }>;
   };
   try {
     source = JSON.parse(raw) as typeof source;
   } catch {
     return null;
   }
-  if ((source.schema !== 4 && source.schema !== 5) || !Array.isArray(source.categories) || !source.categories.length) return null;
+  if ((source.schema !== 4 && source.schema !== 5 && source.schema !== 6) || !Array.isArray(source.categories) || !source.categories.length) return null;
   if (source.glossary !== undefined && (
     !source.glossary ||
     typeof source.glossary !== "object" ||
@@ -174,6 +174,7 @@ export function validCourseBundle(raw: string): { categories: number; posts: num
       postIds.add(post.id);
       const parsedPost = parsedCategory.posts.find((candidate) => candidate.id === post.id);
       if (!parsedPost) return null;
+      if (post.optional !== undefined && (typeof post.optional !== "boolean" || (post.optional && source.schema !== 6))) return null;
       if (post.introVideo !== undefined && post.introVideo !== parsedPost.introVideo) return null;
       if (post.introPoster !== undefined && (!parsedPost.introVideo || post.introPoster !== parsedPost.introPoster)) return null;
       if (Array.isArray(post.scenes) && parsedPost.scenes?.length !== post.scenes.length) return null;
@@ -197,7 +198,7 @@ export function mergeCourseCategory(baseRaw: string, category: unknown): string 
   const categories = [...prior];
   if (at < 0) categories.push(category as { slug: string });
   else categories[at] = category as { slug: string };
-  const merged = JSON.stringify({ ...base, schema: 5, categories });
+  const merged = JSON.stringify({ ...base, schema: 6, categories });
   if (!validCourseBundle(merged)) return null;
   const result = JSON.parse(merged) as { categories: Array<{ slug: string }>; glossary?: unknown };
   if (JSON.stringify(result.glossary) !== JSON.stringify(base.glossary)) return null;

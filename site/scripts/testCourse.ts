@@ -64,13 +64,13 @@ const videoBundle = (schema: unknown, extra: Record<string, unknown> = {}) => JS
     { id: "01-first", title: "첫 수업", summary: "설명", body: "본문", introVideo, introPoster, ...extra },
   ] }],
 });
-for (const schema of [4, 5]) {
+for (const schema of [4, 5, 6]) {
   const parsed = parseCourseText(videoBundle(schema));
   assert.equal(parsed.ok, true);
   assert.equal(parsed.categories[0].posts[0].introVideo, introVideo);
   assert.equal(parsed.categories[0].posts[0].introPoster, introPoster);
 }
-for (const schema of ["5", 6]) assert.equal(parseCourseText(videoBundle(schema)).ok, false);
+for (const schema of ["6", 7]) assert.equal(parseCourseText(videoBundle(schema)).ok, false);
 assert.equal(parseCourseText(videoBundle(5).replace('"sceneContract":12', '"sceneContract":99')).ok, false);
 for (const invalid of ["javascript:alert(1)", "https://example.com/video.mp4", `room://${"e".repeat(64)}.svg`, 1, null]) {
   const parsed = parseCourseText(videoBundle(5, { introVideo: invalid }));
@@ -81,4 +81,15 @@ for (const invalid of ["javascript:alert(1)", "https://example.com/video.mp4", `
 for (const invalid of ["javascript:alert(1)", `room://${"f".repeat(64)}.mp4`, "room://bad.webp", null]) {
   assert.equal(parseCourseText(videoBundle(5, { introPoster: invalid })).categories[0].posts[0].introPoster, undefined);
 }
-console.log("course: schema 4·5 상단 영상, 잘못된 미디어 제외와 본문 유지 확인");
+console.log("course: schema 4·5·6 상단 영상, 잘못된 미디어 제외와 본문 유지 확인");
+
+assert.equal(parseCourseText(videoBundle(6, { optional: true })).categories[0].posts[0].optional, true);
+for (const optional of [false, undefined, "true", 1, null]) {
+  assert.equal(parseCourseText(videoBundle(6, { optional })).categories[0].posts[0].optional, false);
+}
+for (const schema of [4, 5]) {
+  assert.equal(parseCourseText(videoBundle(schema, { optional: true })).categories[0].posts[0].optional, false);
+}
+const optionalCourse = parseCourseText(videoBundle(6, { optional: true })).categories;
+assert.equal(roomCourse(optionalCourse, { unlocked: [], curriculum: [{ category: "01-video", posts: ["01-first"] }] })[0].posts[0].optional, true);
+console.log("course: schema 6 선택편 boolean과 배정 시 메타데이터 유지 확인");

@@ -1807,12 +1807,13 @@ export async function handleRoom(request: Request, env: Env, url: URL, ctx?: Exe
   const open = roomCourse(courseState.categories, room);
   // 카테고리는 독립적으로 시작한다. 명시적으로 이어진 과정만 선수 관계를 따른다.
   const requiredLessons = (category: CourseCategory, postId: string): string[] => {
-    const required = category.posts.slice(0, category.posts.findIndex(p => p.id === postId)).map(p => `${category.slug}/${p.id}`);
+    if (category.posts.find(p => p.id === postId)?.optional) return [];
+    const required = category.posts.slice(0, category.posts.findIndex(p => p.id === postId)).filter(p => !p.optional).map(p => `${category.slug}/${p.id}`);
     const seen = new Set([category.slug]);
     let previous = open.find(c => c.nextCategory === category.slug);
     while (previous && !seen.has(previous.slug)) {
       seen.add(previous.slug);
-      required.push(...previous.posts.map(p => `${previous!.slug}/${p.id}`));
+      required.push(...previous.posts.filter(p => !p.optional).map(p => `${previous!.slug}/${p.id}`));
       previous = open.find(c => c.nextCategory === previous!.slug);
     }
     return required;
@@ -1905,9 +1906,10 @@ export async function handleRoom(request: Request, env: Env, url: URL, ctx?: Exe
     return new Response(bytes, { headers });
   }
 
-  const assigned = open.flatMap(c => c.posts.map(p => ({ lesson: c.slug + "/" + p.id, title: p.title, available: canOpen(c, p.id) })));
-  const completedCount = assigned.filter(p => completed.has(p.lesson)).length;
-  const progress = (resume: string) => studentEnabled ? `<div class="lesson-progress"><span>학습 완료 ${completedCount} / ${assigned.length}편</span><progress value="${completedCount}" max="${assigned.length || 1}" aria-label="완료한 수업"></progress>${resume}</div>` : resume;
+  const assigned = open.flatMap(c => c.posts.map(p => ({ lesson: c.slug + "/" + p.id, title: p.title, optional: p.optional, available: canOpen(c, p.id) })));
+  const required = assigned.filter(p => !p.optional);
+  const completedCount = required.filter(p => completed.has(p.lesson)).length;
+  const progress = (resume: string) => studentEnabled ? `<div class="lesson-progress"><span>${required.length < assigned.length ? "필수 " : ""}학습 완료 ${completedCount} / ${required.length}편</span><progress value="${completedCount}" max="${required.length || 1}" aria-label="완료한 필수 수업"></progress>${resume}</div>` : resume;
   if (parts.length === 1) {
     if (!localAccess && !previewAccess) await recordActivity(env, room, "visit", "수업 목록");
     const cards = open.length
@@ -1919,7 +1921,7 @@ export async function handleRoom(request: Request, env: Env, url: URL, ctx?: Exe
                 (p, j) =>
                   `${canOpen(c, p.id) ? `<a class="post" href="${esc(roomRoot)}/${esc(c.slug)}/${esc(p.id)}">` : '<span class="post lesson-locked" aria-disabled="true" title="앞 편의 학습을 완료하면 열립니다">'}<b>${String(
                     j + 1,
-                  ).padStart(2, "0")}</b><span>${esc(p.title)}</span>${completed.has(`${c.slug}/${p.id}`) ? '<em class="lesson-done" aria-label="학습 완료">✓</em>' : ""}${canOpen(c, p.id) ? "</a>" : "</span>"}`,
+                  ).padStart(2, "0")}</b><span>${esc(p.title)}${p.optional && !p.title.startsWith('(선택)') ? ' <small>(선택)</small>' : ""}</span>${completed.has(`${c.slug}/${p.id}`) ? '<em class="lesson-done" aria-label="학습 완료">✓</em>' : ""}${canOpen(c, p.id) ? "</a>" : "</span>"}`,
               )
               .join("");
             return `<div class="cat"><div class="cat-h"><span class="cat-n">${esc(n)}</span>
@@ -1939,10 +1941,10 @@ export async function handleRoom(request: Request, env: Env, url: URL, ctx?: Exe
          <h1>${esc(room.title)}</h1>
          <p class="sub">${
            total
-             ? `${open.length}개 과정 ${total}편이 있습니다. ${sequential ? "한 편을 완료하면 다음 편이 열립니다." : "순서대로 따라오시면 됩니다."}`
+             ? `${open.length}개 과정 ${total}편이 있습니다. ${sequential ? "필수 편을 완료하면 다음 필수 편이 열립니다." : "순서대로 따라오시면 됩니다."}${required.length < assigned.length ? " 선택편은 필수 진도에 포함되지 않으며 언제든 읽을 수 있습니다." : ""}`
              : "곧 시작합니다. 이 화면을 열어 두고 기다리시면 됩니다."
          }</p>
-       </section>${progress(`<a class="resume-link" data-resume href="${esc(roomRoot)}/${esc(assigned.find(p => p.available && !completed.has(p.lesson))?.lesson ?? assigned[0]?.lesson ?? "")}" ${assigned.length ? "" : "hidden"}>${completedCount ? "이어서 하기" : "학습 시작"}</a>`)}${studentEnabled ? `<p class="wait" style="font-size:.8rem">강의장 접속, 수업 열람과 제출 기록은 강사가 학습 안내에 사용합니다.</p>` : ""}${cards}`,
+       </section>${progress(`<a class="resume-link" data-resume href="${esc(roomRoot)}/${esc(required.find(p => p.available && !completed.has(p.lesson))?.lesson ?? assigned.find(p => p.available && !completed.has(p.lesson))?.lesson ?? assigned[0]?.lesson ?? "")}" ${assigned.length ? "" : "hidden"}>${completedCount ? "이어서 하기" : "학습 시작"}</a>`)}${studentEnabled ? `<p class="wait" style="font-size:.8rem">강의장 접속, 수업 열람과 제출 기록은 강사가 학습 안내에 사용합니다.</p>` : ""}${cards}`,
       stamp,
     );
   }
@@ -1980,7 +1982,7 @@ export async function handleRoom(request: Request, env: Env, url: URL, ctx?: Exe
         (p, i) =>
           canOpen(category, p.id) ? `<a class="nav-post${p.id === post.id ? " on" : ""}" href="${esc(roomRoot)}/${esc(
             category.slug,
-          )}/${esc(p.id)}" title="${esc(p.title)}"${p.id === post.id ? ' aria-current="page"' : ""}><b>${String(i + 1).padStart(2, "0")}</b><span>${esc(p.title)}</span>${completed.has(`${category.slug}/${p.id}`) ? '<em class="lesson-done" aria-label="학습 완료">✓</em>' : ""}</a>`
+          )}/${esc(p.id)}" title="${esc(p.title)}"${p.id === post.id ? ' aria-current="page"' : ""}><b>${String(i + 1).padStart(2, "0")}</b><span>${esc(p.title)}${p.optional && !p.title.startsWith('(선택)') ? ' <small>(선택)</small>' : ""}</span>${completed.has(`${category.slug}/${p.id}`) ? '<em class="lesson-done" aria-label="학습 완료">✓</em>' : ""}</a>`
           : `<span class="nav-post lesson-locked" aria-disabled="true" title="${esc(p.title)} · 앞 편의 학습을 완료하면 열립니다"><b>${String(i + 1).padStart(2, "0")}</b><span>${esc(p.title)}</span></span>`,
       )
       .join("");
@@ -2071,7 +2073,7 @@ export async function handleRoom(request: Request, env: Env, url: URL, ctx?: Exe
          </aside>
          <main class="body">
            <div class="body-top"><div class="body-title">
-             <p class="eyebrow">${esc(category.title)} · ${at + 1}편</p>
+             <p class="eyebrow">${esc(category.title)} · ${at + 1}편${post.optional ? " · 선택 학습 (필수 진도 제외)" : ""}</p>
              <h1>${esc(post.title)}</h1>
            </div>${
              lecture.ok

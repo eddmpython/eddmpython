@@ -133,7 +133,7 @@ const newCategory = {
 };
 const merged = mergeCourseCategory(before, newCategory);
 assert(merged);
-assert.equal(JSON.parse(merged).schema, 5);
+assert.equal(JSON.parse(merged).schema, 6);
 assert.equal(JSON.stringify(JSON.parse(merged).categories[1]), oldCategory);
 assert.equal(JSON.stringify(JSON.parse(merged).glossary), JSON.stringify(prior.glossary));
 assert.equal(mergeCourseCategory(before, { slug: "08-private-course", posts: "invalid" }), null);
@@ -228,5 +228,34 @@ for (const extra of [
   assert.deepEqual([...values], savedValues, "잘못된 영상 메타데이터는 기존 묶음을 바꾸면 안 됩니다");
 }
 assert.equal(validCourseBundle(JSON.stringify({ ...videoBundle, schema: "5" })), null);
+
+for (const schema of [4, 5, 6]) {
+  const candidate = structuredClone(videoBundle);
+  candidate.schema = schema;
+  candidate.categories[0].posts[0].optional = false;
+  assert.deepEqual(validCourseBundle(JSON.stringify(candidate)), { categories: 1, posts: 1 });
+}
+const optionalBundle = structuredClone(videoBundle);
+optionalBundle.schema = 6;
+optionalBundle.categories[0].posts[0].optional = true;
+assert.deepEqual(validCourseBundle(JSON.stringify(optionalBundle)), { categories: 1, posts: 1 });
+for (const [schema, optional] of [[4, true], [5, true], [6, "true"], [6, "false"], [6, 1], [6, null]]) {
+  const invalid = structuredClone(optionalBundle);
+  invalid.schema = schema;
+  invalid.categories[0].posts[0].optional = optional;
+  const raw = JSON.stringify(invalid);
+  assert.equal(validCourseBundle(raw), null);
+  const hash = Buffer.from(await crypto.subtle.digest("SHA-256", encoder.encode(raw))).toString("hex");
+  const savedValues = [...values];
+  const response = await handleCoursePublish(new Request(audience, {
+    method: "POST", body: raw,
+    headers: { authorization: auth, "content-type": "application/json", "x-course-sha256": hash },
+  }), env, { fetcher, now: now * 1000 });
+  assert.equal(response.status, 400);
+  assert.deepEqual([...values], savedValues, "잘못된 선택편 메타데이터는 기존 묶음을 바꾸면 안 됩니다");
+}
+const optionalMerged = JSON.parse(mergeCourseCategory(before, optionalBundle.categories[0])!);
+assert.equal(optionalMerged.schema, 6);
+assert.equal(optionalMerged.categories.find((c: { slug: string }) => c.slug === optionalBundle.categories[0].slug).posts[0].optional, true);
 
 console.log("course publish: GitHub OIDC와 묶음 발행 계약 통과");

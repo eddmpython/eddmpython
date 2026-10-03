@@ -14,7 +14,7 @@
 import type { Cells, CourseScene } from "./classroom-render";
 import type { Env } from "./env";
 
-export type CoursePost = { id: string; title: string; summary: string; body: string; introVideo?: string; introPoster?: string; scenes?: CourseScene[] };
+export type CoursePost = { id: string; title: string; summary: string; body: string; optional?: boolean; introVideo?: string; introPoster?: string; scenes?: CourseScene[] };
 export type CourseCategory = {
   slug: string;
   order: number;
@@ -45,12 +45,11 @@ type CourseBundle = {
 /**
  * 묶음의 모양은 eddmpython-course 와의 계약이다. 바꾸면 양쪽을 같은 날 같이 고친다.
  *
- * **두 판을 같이 받는다.** 하나만 받으면 발행과 배포 사이에 강의장이 빈 목록을 낸다.
- * 어느 쪽을 먼저 하든 그 틈이 생기고, 하필 강의 직전이면 그것이 사고다.
- * 5는 페이지 설명 위의 비공개 영상과 포스터를 추가한다. 발행과 배포 사이에는 4도
- * 함께 받는다. 기존 본문과 장면은 같은 계약으로 읽는다.
+ * 5는 페이지 설명 위의 비공개 영상과 포스터, 6은 필수 진도에서 빠지는 선택편을 추가한다.
+ * 기존 4·5도 함께 읽는다. 6의 선택편을 옛 런타임이 필수로 처리하지 않도록
+ * schema 6 교안을 발행하기 전에 이 런타임을 먼저 배포한다.
  */
-const COURSE_SCHEMA = new Set([1, 2, 3, 4, 5]);
+const COURSE_SCHEMA = new Set([1, 2, 3, 4, 5, 6]);
 /**
  * 3 은 첫 beat 자동 재생, enter/replace 다중 대상(셋까지), compare 개막을 더한 판이다.
  * 4 는 단독 annotate 를 없애고 판단 문장을 아무 beat 의 note 로 실은 판이다. 5 는 서로 다른
@@ -194,6 +193,7 @@ export function parseCourseText(raw: string | null): CourseState {
           : undefined,
       posts: c.posts.filter(isPost).map((post) => ({
         ...post,
+        optional: bundle.schema >= 6 && post.optional === true,
         introVideo: typeof post.introVideo === "string" && /^room:\/\/[a-f0-9]{64}\.(mp4|webm)$/.test(post.introVideo) ? post.introVideo : undefined,
         introPoster: typeof post.introPoster === "string" && /^room:\/\/[a-f0-9]{64}\.(png|webp|jpg)$/.test(post.introPoster) ? post.introPoster : undefined,
         scenes: Array.isArray(post.scenes) ? post.scenes.filter(isScene) : undefined,
