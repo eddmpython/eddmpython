@@ -56,12 +56,12 @@ article h2:has(.visual-carousel-controls):has(.section-notebook){grid-template-c
 `;
 
 export function notebookMarkup(toc: string) {
-  return `<aside class="notebook-rail" aria-label="목차와 내 기록"><div class="notebook-tabs" aria-label="학습 도구">${["목차", "메모·질문"].map((label, i) => `<button type="button" data-notebook-tab="${i ? "note" : "toc"}" aria-pressed="${i === 0}" aria-controls="${i === 0 ? "notebook-toc" : "notebook-panel"}">${label}</button>`).join("")}</div><div id="notebook-toc">${toc}</div><section id="notebook-panel" class="notebook-panel" aria-label="내 메모와 강사 질문" hidden></section></aside><button type="button" class="notebook-quick notebook-primary" data-notebook-current aria-controls="notebook-panel">메모·질문</button>`;
+  return `<aside class="notebook-rail" aria-label="목차와 메모"><div class="notebook-tabs" aria-label="학습 도구">${["목차", "메모"].map((label, i) => `<button type="button" data-notebook-tab="${i ? "note" : "toc"}" aria-pressed="${i === 0}" aria-controls="${i === 0 ? "notebook-toc" : "notebook-panel"}">${label}</button>`).join("")}</div><div id="notebook-toc">${toc}</div><section id="notebook-panel" class="notebook-panel" aria-label="메모" hidden></section></aside><button type="button" class="notebook-quick notebook-primary" data-notebook-current aria-controls="notebook-panel">메모</button>`;
 }
 
 export function notebookHeadings(html: string, sections: NotebookSection[]) {
   for (const section of sections) html = html.replace(new RegExp(`<h2 id="${section.anchor}">([\\s\\S]*?)</h2>`),
-    (_match, content: string) => `<span id="note-${section.key}" class="note-anchor"></span><h2 id="${section.anchor}">${content}<button type="button" class="section-notebook" data-notebook-open="${section.key}" aria-controls="notebook-panel" aria-expanded="false" aria-label="${esc(section.title)} 메모와 질문 열기">메모·질문</button></h2>`);
+    (_match, content: string) => `<span id="note-${section.key}" class="note-anchor"></span><h2 id="${section.anchor}">${content}<button type="button" class="section-notebook" data-notebook-open="${section.key}" aria-controls="notebook-panel" aria-expanded="false" aria-label="${esc(section.title)} 메모 열기">메모</button></h2>`);
   return html;
 }
 
@@ -119,13 +119,12 @@ function notebookClient(config: NotebookConfig, createCache: typeof createNotebo
     button.disabled = !body.trim() || Boolean(question.sending) || sent;
     button.textContent = question.sending ? "보내는 중…" : sent ? "강사에게 보낸 내용입니다" : "강사에게 질문 보내기";
   };
-  const updateCounts = () => document.querySelectorAll<HTMLButtonElement>("[data-notebook-open]").forEach(button => {
-    const key = button.dataset.notebookOpen!, note = drafts.get(key)?.body.trim(), count = threads.filter(t => t.sectionKey === key).length;
-    button.textContent = note || count ? [note ? "메모 1" : "", count ? `질문 ${count}` : ""].filter(Boolean).join(" · ") : "메모·질문";
+  const updateButtons = () => document.querySelectorAll<HTMLButtonElement>("[data-notebook-open]").forEach(button => {
+    const key = button.dataset.notebookOpen!;
     button.setAttribute("aria-expanded", String(!panel.hidden && key === selected));
   });
   const updateStatus = (key: string) => {
-    updateCounts();
+    updateButtons();
     if (selected !== key || tab !== "note") return;
     const draft = currentDraft(key), status = panel.querySelector<HTMLElement>("[data-note-status]");
     if (status) { status.textContent = draft.error ? `${draft.error} ${cacheOk ? "이 기기에 초안을 보관했습니다." : "임시 보관도 할 수 없습니다. 내용을 복사해 보관해 주세요"}` : !cacheOk && draft.body !== draft.saved ? "임시 보관 불가 · 서버 저장 확인 전에는 창을 닫지 마세요" : ""; status.dataset.error = String(Boolean(draft.error) || (!cacheOk && draft.body !== draft.saved)); }
@@ -186,7 +185,7 @@ function notebookClient(config: NotebookConfig, createCache: typeof createNotebo
         }
         loaded = true;
       } catch (error) { loadError = (error as Error).message; }
-      finally { loading = null; updateCounts(); }
+      finally { loading = null; updateButtons(); }
     })();
     return loading;
   };
@@ -223,11 +222,11 @@ function notebookClient(config: NotebookConfig, createCache: typeof createNotebo
     panel.hidden = tab === "toc";
     document.querySelector<HTMLElement>("[data-notebook-current]")!.hidden = !panel.hidden;
     document.querySelectorAll<HTMLButtonElement>("[data-notebook-tab]").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.notebookTab === tab)));
-    place(); updateCounts(); if (panel.hidden) return;
+    place(); updateButtons(); if (panel.hidden) return;
     const section = config.sections.find(s => s.key === selected), draft = currentDraft(selected);
     const sections = [...config.sections];
     for (const note of [...drafts.values(), ...threads]) if ((!("body" in note) || note.body) && !sections.some(s => s.key === note.sectionKey)) sections.push({ key: note.sectionKey, title: `이전 교안 · ${note.sectionTitle}`, anchor: "" });
-    panel.innerHTML = `<div class="notebook-head"><b>메모·질문</b><button type="button" class="notebook-link" data-note-close aria-label="메모와 질문 닫기">닫기 ×</button></div><div class="notebook-context"><span class="notebook-hint" data-note-context></span><strong data-note-title>${escape(section?.title || sections.find(s => s.key === selected)?.title || "이전 섹션")}</strong><details><summary>섹션 변경</summary><label class="sr-only" for="note-section">기록할 섹션</label><select id="note-section" data-note-section>${sections.map(s => `<option value="${s.key}" ${s.key === selected ? "selected" : ""}>${escape(s.title)}</option>`).join("")}</select><button type="button" class="notebook-link" data-note-follow>현재 읽는 섹션으로</button></details></div>`;
+    panel.innerHTML = `<div class="notebook-head"><b>메모</b><button type="button" class="notebook-link" data-note-close aria-label="메모 닫기">닫기 ×</button></div><div class="notebook-context"><span class="notebook-hint" data-note-context></span><strong data-note-title>${escape(section?.title || sections.find(s => s.key === selected)?.title || "이전 섹션")}</strong><details><summary>섹션 변경</summary><label class="sr-only" for="note-section">기록할 섹션</label><select id="note-section" data-note-section>${sections.map(s => `<option value="${s.key}" ${s.key === selected ? "selected" : ""}>${escape(s.title)}</option>`).join("")}</select><button type="button" class="notebook-link" data-note-follow>현재 읽는 섹션으로</button></details></div>`;
     if (config.readOnly) { panel.innerHTML += '<p class="notebook-empty">강사 미리보기입니다. 학습자의 개인 메모는 표시하지 않습니다.</p>'; bind(); return; }
     if (loadError) { panel.innerHTML += `<p role="alert">${escape(loadError)}</p><button type="button" class="notebook-primary" data-note-reload>다시 연결</button>`; bind(); return; }
     if (!loaded) { panel.innerHTML += '<p class="notebook-empty" role="status">내 기록을 불러오는 중…</p>'; bind(); return; }
@@ -236,7 +235,7 @@ function notebookClient(config: NotebookConfig, createCache: typeof createNotebo
       bind(); return;
     }
     {
-      panel.innerHTML += `<p class="notebook-hint">메모</p><div class="notebook-tools"><button type="button" data-insert="list">목록</button><button type="button" data-insert="code">코드</button><button type="button" data-note-preview>미리보기</button></div><label class="sr-only" for="note-body">메모 내용</label><textarea id="note-body" data-note-body maxlength="12000" ${!section ? "readonly" : ""}>${escape(draft.body)}</textarea><div class="notebook-preview" data-note-preview-body hidden></div><p class="notebook-status" data-note-status role="status" aria-live="polite"></p><button type="button" class="notebook-link" data-note-retry hidden>저장 다시 시도</button><div class="notebook-card" data-note-conflict hidden><p>다른 창에서 저장한 내용이 있습니다. 작성 중인 내용은 위에 유지됩니다.</p><details><summary>현재 저장된 내용 보기</summary><pre data-remote-note></pre></details><button type="button" class="notebook-link" data-note-overwrite>위의 내 내용으로 저장</button></div>${!section ? '<p class="notebook-hint">제목이 변경된 이전 섹션의 기록입니다. 내용을 복사해 현재 섹션에 이어 쓸 수 있습니다.</p>' : ""}`;
+      panel.innerHTML += `<div class="notebook-tools"><button type="button" data-insert="list">목록</button><button type="button" data-insert="code">코드</button><button type="button" data-note-preview>미리보기</button></div><label class="sr-only" for="note-body">메모 내용</label><textarea id="note-body" data-note-body maxlength="12000" ${!section ? "readonly" : ""}>${escape(draft.body)}</textarea><div class="notebook-preview" data-note-preview-body hidden></div><p class="notebook-status" data-note-status role="status" aria-live="polite"></p><button type="button" class="notebook-link" data-note-retry hidden>저장 다시 시도</button><div class="notebook-card" data-note-conflict hidden><p>다른 창에서 저장한 내용이 있습니다. 작성 중인 내용은 위에 유지됩니다.</p><details><summary>현재 저장된 내용 보기</summary><pre data-remote-note></pre></details><button type="button" class="notebook-link" data-note-overwrite>위의 내 내용으로 저장</button></div>${!section ? '<p class="notebook-hint">제목이 변경된 이전 섹션의 기록입니다. 내용을 복사해 현재 섹션에 이어 쓸 수 있습니다.</p>' : ""}`;
     }
     {
       const q = qDraft(`new:${selected}`), matches = threads.filter(t => t.sectionKey === selected);
@@ -273,7 +272,7 @@ function notebookClient(config: NotebookConfig, createCache: typeof createNotebo
       else question.id = crypto.randomUUID();
       if (!threadId) questions.set(key, { ...question, sent: true, sending: false, error: "" });
       persist(); threads = [result.thread, ...threads.filter(t => t.id !== result.thread.id)];
-      if (selected !== sectionKey || tab === "toc") { updateCounts(); return; }
+      if (selected !== sectionKey || tab === "toc") { updateButtons(); return; }
       render();
       panel.querySelector<HTMLDetailsElement>(`[data-thread="${result.thread.id}"]`)?.setAttribute("open", "");
       const done = panel.querySelector("[data-question-status]"); if (done) done.textContent = "질문을 보냈습니다. 강사 답변을 기다려 주세요";
