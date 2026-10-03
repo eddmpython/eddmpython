@@ -1,11 +1,21 @@
 import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
+import { mkdir, mkdtemp, rm } from 'node:fs/promises';
+import { homedir } from 'node:os';
+import { dirname, join, resolve } from 'node:path';
 import { build } from 'esbuild';
 import { fileURLToPath } from 'node:url';
+import { executionRoot } from './executionWorkspace.mjs';
 
 const result = await build({ entryPoints: [fileURLToPath(new URL('../studentStore.ts', import.meta.url))], bundle: true, platform: 'node', format: 'esm', write: false, logLevel: 'silent' });
 const { StudentStore } = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].contents).toString('base64')}`);
-const db = new DatabaseSync(':memory:');
+const shared = process.platform === 'win32'
+  ? join(process.env.LOCALAPPDATA || join(homedir(), 'AppData', 'Local'), 'dev-workspace')
+  : join(homedir(), '.local', 'share', 'dev-workspace');
+await mkdir(shared, { recursive: true });
+const workspace = executionRoot(await mkdtemp(join(shared, 'notebookStore-')));
+const databasePath = join(workspace, 'notebook.sqlite');
+let db = new DatabaseSync(databasePath);
 const storage = {
   sql: { exec(query, ...values) {
     if (!values.length && query.includes('CREATE TABLE')) { db.exec(query); return { toArray: () => [] }; }
@@ -140,9 +150,27 @@ try {
   assert.equal((await call('notebookClaimNotification', { messageId: followup.messageId })).notification, null);
   assert.ok((await call('notebookClaimNotification', { messageId: followup.messageId, retry: true })).notification);
 
-  // 저장소를 다시 만들더라도 DB 기록이 남고, 삭제된 학습자는 질문함에서도 제외된다.
+  // SQLite 파일 연결을 닫고 다시 열어도 계정과 저장 내용, 버전, 질문 대화가 남는다.
+  db.close();
+  db = new DatabaseSync(databasePath);
   const restored = new StudentStore(storage);
-  assert.equal((await (await restored.handleNotebook({ action: 'notebookRead', roomId: 'alpha', ownerId: 'personal', lesson: scope.lesson })).json()).notes[0].version, 3);
+  const restoredCall = async (action, body = {}) => {
+    const response = await restored.handleNotebook({ action, roomId: 'alpha', ownerId: 'personal', ...body });
+    assert.equal(response.status, 200);
+    return response.json();
+  };
+  const personalRestored = await restoredCall('notebookRead', { lesson: scope.lesson });
+  assert.equal(personalRestored.notes[0].version, 3);
+  assert.equal(personalRestored.notes[0].body, '강사에게 보이면 안 되는 내용');
+  assert.equal(personalRestored.threads[0].id, questionId);
+  assert.deepEqual(personalRestored.threads[0].messages.map(message => message.body), [question.body, reply.body, followup.body]);
+  assert.equal((await restoredCall('notebookLogin', group)).identity.id, ownerId);
+  const groupRestored = await restoredCall('notebookRead', { roomId: 'group', ownerId, lesson: scope.lesson });
+  assert.equal(groupRestored.notes[0].body, 'A만 읽을 메모');
+  assert.equal(groupRestored.notes[0].version, 1);
+  assert.equal(groupRestored.threads[0].id, groupQuestion.id);
+  assert.deepEqual((await restoredCall('notebookRead', { roomId: 'group', ownerId: peer.identity.id, lesson: scope.lesson })).notes, []);
+  // 삭제된 학습자는 질문함에서도 제외된다.
   db.prepare('DELETE FROM notebookMembers WHERE id=?').run(ownerId);
   assert.equal((await call('notebookReply', { roomId: 'group', id: groupQuestion.id, messageId: crypto.randomUUID(), body: '삭제된 사람' })).status, 404);
   assert.equal((await call('notebookClaimNotification', { roomId: 'group', messageId: groupQuestion.id })).status, 404);
@@ -151,4 +179,6 @@ try {
 } finally {
   Date.now = actualNow;
   db.close();
+  assert.equal(dirname(resolve(workspace)), resolve(shared), '이 테스트에서 만든 실행 공간만 정리한다');
+  await rm(workspace, { recursive: true });
 }

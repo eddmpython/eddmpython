@@ -156,7 +156,41 @@ try {
   const loggedOut = await note('group', 'logout', {}, groupACookie);
   assert.match(loggedOut.headers.get('set-cookie'), /Max-Age=0/);
   assert.equal((await readJson(await note('group', 'read', {}, groupRoomCookie))).identity, null);
-  console.log('메모 HTTP: 인증·방·계정·선수 수업·미리보기 분리, CAS, 질문함과 답변, 변경된 계정 쓰기 거부, 섹션 연결과 캐러셀 버튼 확인');
+
+  // 방의 주소와 표시 이름을 바꾼 뒤에도 UUID 기준으로 저장한 기록을 다시 읽는다.
+  await readJson(await json('/admin/api', { action: 'rename', slug: 'alpha', nextSlug: 'alpha-renamed', title: '이름을 바꾼 개인방' }, admin));
+  const personalRooms = (await readJson(await json('/admin/api', { action: 'list' }, admin))).rooms;
+  const renamedPersonal = personalRooms.find(room => room.slug === 'alpha-renamed');
+  assert.equal(renamedPersonal.id, alpha.id);
+  assert.notEqual(renamedPersonal.gen, alpha.gen);
+  assert.equal((await note('alpha', 'read', {}, aCookie)).status, 404);
+  assert.equal((await note('alpha-renamed', 'read', {}, aCookie)).status, 401);
+  const renamedPersonalCookie = cookieOf(await post('/room/alpha-renamed/login', { password }));
+  const personalAfterRename = await readJson(await note('alpha-renamed', 'read', {}, renamedPersonalCookie));
+  assert.equal(personalAfterRename.notes[0].body, save.body);
+  assert.equal(personalAfterRename.notes[0].version, 1);
+  assert.equal(personalAfterRename.threads[0].id, questionId);
+  assert.equal(personalAfterRename.threads[0].messages[1].body, reply.body);
+
+  const groupRoom = rooms.find(room => room.slug === 'group');
+  await readJson(await json('/admin/api', { action: 'rename', slug: 'group', nextSlug: 'group-renamed', title: '이름을 바꾼 공용방' }, admin));
+  const groupRooms = (await readJson(await json('/admin/api', { action: 'list' }, admin))).rooms;
+  assert.equal(groupRooms.find(room => room.slug === 'group-renamed').id, groupRoom.id);
+  assert.equal((await note('group-renamed', 'read', {}, groupACookie)).status, 401);
+  const renamedGroupCookie = cookieOf(await post('/room/group-renamed/login', { password }));
+  const oldMemberCookie = groupACookie.split('; ').find(value => value.startsWith('eddm_notebook='));
+  assert.equal((await readJson(await note('group-renamed', 'read', {}, `${renamedGroupCookie}; ${oldMemberCookie}`))).identity, null);
+  const renamedLogin = await note('group-renamed', 'login', { name: '공용 A', password: memberPassword }, renamedGroupCookie);
+  const renamedMemberCookie = `${renamedGroupCookie}; ${cookieOf(renamedLogin)}`;
+  assert.equal((await readJson(renamedLogin)).identity.id, groupA.id);
+  const groupAfterRename = await readJson(await note('group-renamed', 'read', {}, renamedMemberCookie));
+  assert.equal(groupAfterRename.notes[0].body, groupSave.body);
+  assert.equal(groupAfterRename.notes[0].version, 1);
+  assert.equal(groupAfterRename.threads[0].id, groupQuestion.id);
+  const renamedBLogin = await note('group-renamed', 'login', { name: '공용 B', password: memberPassword }, renamedGroupCookie);
+  const renamedBCookie = `${renamedGroupCookie}; ${cookieOf(renamedBLogin)}`;
+  assert.deepEqual((await readJson(await note('group-renamed', 'read', {}, renamedBCookie))).notes, []);
+  console.log('메모 HTTP: 인증·방·계정·선수 수업·미리보기 분리, CAS, 질문함과 답변, 계정 변경 쓰기 거부, 방 이름 변경과 재로그인 보존, 섹션 연결과 캐러셀 버튼 확인');
 } finally {
   if (mf) await mf.dispose();
   assert.equal(dirname(resolve(workspace)), resolve(shared), '이 테스트의 공통 실행 공간만 정리한다');

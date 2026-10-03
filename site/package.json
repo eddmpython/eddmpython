@@ -17,7 +17,7 @@
     "type:classroom-worker": "wrangler types --include-runtime false --config wrangler.classroom.jsonc classroomWorkerEnv.d.ts",
     "check:classroom-worker": "wrangler types --check --include-runtime false --config wrangler.classroom.jsonc classroomWorkerEnv.d.ts && wrangler deploy --dry-run --config wrangler.classroom.jsonc",
     "test:classroom-worker": "node scripts/testClassroomWorker.mjs",
-    "test:notebook": "node scripts/testNotebookStore.mjs && node scripts/testNotebookRoutes.mjs && node scripts/testNotebookAdmin.mjs && node scripts/testNotebookEmail.mjs && node scripts/testNotebookLogin.mjs",
+    "test:notebook": "node scripts/testNotebookDrafts.mjs && node scripts/testNotebookStore.mjs && node scripts/testNotebookRoutes.mjs && node scripts/testNotebookAdmin.mjs && node scripts/testNotebookEmail.mjs && node scripts/testNotebookLogin.mjs",
     "test:students": "node scripts/testStudents.mjs && node scripts/testStudentRoutes.mjs && node scripts/testStudentGithub.mjs",
     "test:course-publish": "node --experimental-strip-types scripts/testCoursePublish.ts",
     "test:qr": "node --experimental-strip-types ../blog/posts/003-python-qr/tool/test.ts",
