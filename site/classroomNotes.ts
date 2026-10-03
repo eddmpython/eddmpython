@@ -25,7 +25,7 @@ export const notebookStyle = `
 .notebook-panel select{flex-shrink:0;font-size:.82rem;margin:0 0 .5rem}
 .notebook-panel textarea{flex:1;min-height:8rem;resize:none;line-height:1.65;tab-size:4;white-space:pre-wrap;overflow-wrap:anywhere}
 .notebook-panel :is(textarea,input,select,button):focus-visible,.notebook-open:focus-visible,.notebook-titlebar:focus-visible{outline:2px solid var(--eddm-accent);outline-offset:-2px}
-.notebook-tools{display:flex;flex-shrink:0;gap:.6rem;margin:0 0 .4rem}.notebook-tools button{background:transparent;border:0;border-radius:.25rem;color:var(--eddm-text-muted);font-size:.76rem;padding:.2rem .1rem}.notebook-tools button:hover{color:var(--eddm-accent)}
+.notebook-back{align-self:flex-start;flex-shrink:0;margin:0 0 .4rem}
 .notebook-status{flex-shrink:0;font-size:.76rem;color:var(--eddm-text-muted);margin:.45rem 0;overflow-wrap:anywhere}.notebook-status:empty{display:none}.notebook-status[data-error=true]{color:var(--eddm-accent)}
 .notebook-link{border:0;background:none;color:var(--eddm-text-muted);font-size:.76rem;padding:.3rem}.notebook-link:hover{color:var(--eddm-accent)}
 .notebook-primary{background:var(--eddm-accent);color:var(--eddm-accent-contrast);border:0;border-radius:.4rem;padding:.6rem .85rem;font-family:inherit;font-size:.82rem}
@@ -34,8 +34,7 @@ export const notebookStyle = `
 .notebook-row{display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap;margin:.6rem 0}
 .notebook-card{flex-shrink:0;border-top:1px solid var(--eddm-line);padding-top:.7rem;margin-top:.7rem}.notebook-card summary{cursor:pointer;overflow-wrap:anywhere}
 .notebook-message{border-top:1px solid var(--eddm-line);padding-top:.7rem;margin-top:.7rem;overflow-wrap:anywhere}
-.notebook-message p,.notebook-preview p{white-space:pre-wrap}.notebook-message pre,.notebook-preview pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.8rem;padding:.7rem;border-radius:.4rem;background:var(--eddm-raise)}
-.notebook-preview{flex:1;min-height:8rem;overflow:auto;padding:.6rem;border:1px solid var(--eddm-line);border-radius:.4rem}
+.notebook-message p{white-space:pre-wrap}.notebook-message pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.8rem;padding:.7rem;border-radius:.4rem;background:var(--eddm-raise)}
 .notebook-ask-link{display:flex;flex-shrink:0;align-items:center;justify-content:space-between;gap:.5rem;margin-top:.7rem}.notebook-ask-link span{font-size:.76rem;color:var(--eddm-text-muted)}
 .notebook-ask-actions{display:flex;flex-shrink:0;justify-content:space-between;align-items:center;gap:.5rem;margin-top:.6rem}.notebook-ask-actions .notebook-primary{margin-left:auto}
 .notebook-question{flex:1 0 10rem!important}.notebook-badge{font-size:.72rem;color:var(--eddm-accent)}.notebook-message b{font-size:.78rem}.notebook-message time{font-size:.7rem;color:var(--eddm-text-muted);display:block}
@@ -212,11 +211,11 @@ function notebookClient(config: NotebookConfig, createCache: typeof createNotebo
       bind(); return;
     }
     if (!asking) {
-      work.innerHTML += `<div class="notebook-tools"><button type="button" data-insert="list">목록</button><button type="button" data-insert="code">코드</button><button type="button" data-note-preview>미리보기</button></div><label class="sr-only" for="note-body">메모 내용</label><textarea id="note-body" data-note-body maxlength="12000" ${!section ? "readonly" : ""}>${escape(draft.body)}</textarea><div class="notebook-preview" data-note-preview-body hidden></div><p class="notebook-status" data-note-status role="status" aria-live="polite"></p><button type="button" class="notebook-link" data-note-retry hidden>저장 다시 시도</button><div class="notebook-card" data-note-conflict hidden><p>다른 창에서 저장한 내용이 있습니다. 작성 중인 내용은 위에 유지됩니다.</p><details><summary>현재 저장된 내용 보기</summary><pre data-remote-note></pre></details><button type="button" class="notebook-link" data-note-overwrite>위의 내 내용으로 저장</button></div>${!section ? '<p class="notebook-hint">제목이 변경된 이전 섹션의 기록입니다. 내용을 복사해 현재 섹션에 이어 쓸 수 있습니다.</p>' : ""}`;
+      work.innerHTML += `<label class="sr-only" for="note-body">메모 내용</label><textarea id="note-body" data-note-body maxlength="12000" ${!section ? "readonly" : ""}>${escape(draft.body)}</textarea><p class="notebook-status" data-note-status role="status" aria-live="polite"></p><button type="button" class="notebook-link" data-note-retry hidden>저장 다시 시도</button><div class="notebook-card" data-note-conflict hidden><p>다른 창에서 저장한 내용이 있습니다. 작성 중인 내용은 위에 유지됩니다.</p><details><summary>현재 저장된 내용 보기</summary><pre data-remote-note></pre></details><button type="button" class="notebook-link" data-note-overwrite>위의 내 내용으로 저장</button></div>${!section ? '<p class="notebook-hint">제목이 변경된 이전 섹션의 기록입니다. 내용을 복사해 현재 섹션에 이어 쓸 수 있습니다.</p>' : ""}`;
     }
     if (asking) {
       const q = qDraft(`new:${selected}`), matches = threads.filter(t => t.sectionKey === selected);
-      work.innerHTML += `<div class="notebook-tools"><button type="button" data-question-back>← 메모</button></div><label class="sr-only" for="question-body">질문 내용</label><textarea id="question-body" class="notebook-question" data-question-body maxlength="12000" placeholder="궁금한건 그때그때 질문하세요!" ${!section ? "readonly" : ""}>${escape(q.body)}</textarea><div class="notebook-ask-actions"><button type="button" class="notebook-primary" data-question-send>보내기</button></div><p class="notebook-status" data-question-status role="status" aria-live="polite"></p>${matches.length ? `<div class="notebook-row"><b>답변</b><button type="button" class="notebook-link" data-question-refresh>새로고침</button></div>${matches.map(thread => `<details class="notebook-card" data-thread="${thread.id}" ${new URL(location.href).searchParams.get("question") === thread.id ? "open" : ""}><summary><span class="notebook-badge">${thread.status === "answered" ? "답변 도착" : "답변 대기"}</span><br>${escape(thread.messages[0]?.body.slice(0, 90) || "질문")}</summary>${thread.messages.map(message => `<div class="notebook-message"><b>${message.role === "instructor" ? "강사 답변" : "내 질문"}</b><time>${date(message.created)}</time>${prose(message.body)}</div>`).join("")}<label class="notebook-hint">이어서 질문<textarea class="notebook-question" data-followup="${thread.id}" maxlength="12000" >${escape(qDraft(thread.id).body)}</textarea></label><button type="button" class="notebook-primary" data-followup-send="${thread.id}">보내기</button><p class="notebook-status" role="status"></p></details>`).join("")}` : ""}`;
+      work.innerHTML += `<button type="button" class="notebook-link notebook-back" data-question-back>← 메모</button><label class="sr-only" for="question-body">질문 내용</label><textarea id="question-body" class="notebook-question" data-question-body maxlength="12000" placeholder="궁금한건 그때그때 질문하세요!" ${!section ? "readonly" : ""}>${escape(q.body)}</textarea><div class="notebook-ask-actions"><button type="button" class="notebook-primary" data-question-send>보내기</button></div><p class="notebook-status" data-question-status role="status" aria-live="polite"></p>${matches.length ? `<div class="notebook-row"><b>답변</b><button type="button" class="notebook-link" data-question-refresh>새로고침</button></div>${matches.map(thread => `<details class="notebook-card" data-thread="${thread.id}" ${new URL(location.href).searchParams.get("question") === thread.id ? "open" : ""}><summary><span class="notebook-badge">${thread.status === "answered" ? "답변 도착" : "답변 대기"}</span><br>${escape(thread.messages[0]?.body.slice(0, 90) || "질문")}</summary>${thread.messages.map(message => `<div class="notebook-message"><b>${message.role === "instructor" ? "강사 답변" : "내 질문"}</b><time>${date(message.created)}</time>${prose(message.body)}</div>`).join("")}<label class="notebook-hint">이어서 질문<textarea class="notebook-question" data-followup="${thread.id}" maxlength="12000" >${escape(qDraft(thread.id).body)}</textarea></label><button type="button" class="notebook-primary" data-followup-send="${thread.id}">보내기</button><p class="notebook-status" role="status"></p></details>`).join("")}` : ""}`;
     }
     else if (section) work.innerHTML += '<div class="notebook-ask-link"><span>궁금한건 그때그때 질문하세요!</span><button type="button" class="notebook-primary" data-question-open>질문하기</button></div>';
     if (!config.personal) work.innerHTML += '<div class="notebook-row"><button type="button" class="notebook-link" data-note-logout>로그아웃</button></div>';
@@ -275,14 +274,6 @@ function notebookClient(config: NotebookConfig, createCache: typeof createNotebo
     area?.addEventListener("blur", () => { if (!area.readOnly) void save(editorKey); });
     panel.querySelector("[data-note-retry]")?.addEventListener("click", async () => { if (currentDraft(selected).auth) { await load(); render(); } else void save(selected); });
     panel.querySelector("[data-note-overwrite]")?.addEventListener("click", () => { const draft = currentDraft(selected); if (!draft.conflict) return; draft.version = draft.conflict.version; draft.conflict = undefined; void save(selected); });
-    panel.querySelectorAll<HTMLElement>("[data-insert]").forEach(button => button.addEventListener("click", () => {
-      if (!area || area.readOnly) return; const start = area.selectionStart, end = area.selectionEnd, selectedText = area.value.slice(start, end);
-      const text = button.dataset.insert === "code" ? `\n\`\`\`\n${selectedText || "코드 또는 오류 메시지"}\n\`\`\`\n` : `\n- ${selectedText}`;
-      area.setRangeText(text, start, end, "end"); area.dispatchEvent(new Event("input", { bubbles: true })); area.focus();
-    }));
-    panel.querySelector("[data-note-preview]")?.addEventListener("click", event => {
-      const preview = panel.querySelector<HTMLElement>("[data-note-preview-body]")!; preview.hidden = !preview.hidden; area!.hidden = !preview.hidden; preview.innerHTML = prose(area!.value); (event.currentTarget as HTMLElement).textContent = preview.hidden ? "미리보기" : "편집으로";
-    });
     const questionArea = panel.querySelector<HTMLTextAreaElement>("[data-question-body]");
     questionArea?.addEventListener("input", () => { const draft = qDraft(`new:${editorKey}`); draft.body = questionArea.value; draft.error = ""; persist(); updateSend(); const status = panel.querySelector("[data-question-status]"); if (status) status.textContent = cacheOk ? "" : "임시 보관 불가 · 내용을 복사해 보관해 주세요"; });
     panel.querySelectorAll<HTMLElement>("[data-recover]").forEach(button => button.addEventListener("click", () => {
@@ -312,7 +303,7 @@ function notebookClient(config: NotebookConfig, createCache: typeof createNotebo
   const followSection = () => {
     const key = readingSection();
     if (key !== viewedSection) { viewedSection = key; pendingSection = key; }
-    if (!pendingSection || !opened || asking || panel.contains(document.activeElement) && document.activeElement?.matches("textarea,input,select,[data-insert],[data-note-preview]")) return;
+    if (!pendingSection || !opened || asking || panel.contains(document.activeElement) && document.activeElement?.matches("textarea,input,select")) return;
     const next = pendingSection; pendingSection = "";
     if (selected !== next) { selected = next; render(); }
   };
