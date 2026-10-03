@@ -34,13 +34,11 @@ try {
   assert.match(renderedHeadings[0][1], /data-carousel-prev/);
   assert.doesNotMatch(rendered, /data-notebook-open=/, '본문 제목에는 메모 버튼을 반복하지 않는다');
   for (const section of sections) assert.ok(rendered.includes(`id="note-${section.key}"`), '질문 링크의 섹션 앵커를 유지한다');
-  const toc = notebookMarkup(`<details class="toc"><summary>목차</summary>${sections.map(section => `<a href="#${section.anchor}" data-to="${section.anchor}">${section.title}</a>`).join('')}</details>`, sections);
-  for (const section of sections) {
-    assert.ok(toc.includes(`data-notebook-entry="${section.key}"`));
-    assert.ok(toc.includes(`data-notebook-open="${section.key}"`));
-    assert.ok(toc.includes(`href="#${section.anchor}"`), '목차 이동 링크와 메모 펼치기를 함께 제공한다');
-  }
-  assert.doesNotMatch(toc, /data-notebook-tab|data-notebook-current/);
+  const toc = notebookMarkup(`<details class="toc"><summary>목차</summary>${sections.map(section => `<a href="#${section.anchor}" data-to="${section.anchor}">${section.title}</a>`).join('')}</details>`);
+  for (const section of sections) assert.ok(toc.includes(`href="#${section.anchor}"`), '목차의 본문 이동 링크를 유지한다');
+  assert.equal((toc.match(/data-notebook-open/g) || []).length, 1, '목차 헤더에 메모 버튼 하나만 둔다');
+  assert.match(toc, /role="dialog" aria-modal="false"/);
+  assert.doesNotMatch(toc, /data-notebook-tab|data-notebook-current|data-notebook-entry/);
 
   const built = await build({ stdin: { contents: 'export {default} from "./classroomWorker.ts"; export {Classroom} from "./rooms.ts";', resolveDir: source }, bundle: true, format: 'esm', platform: 'browser', write: false, logLevel: 'silent' });
   const password = crypto.randomUUID();
@@ -111,7 +109,9 @@ try {
   const pageHeadings = [...page.matchAll(/<h2 id="s\d+">([\s\S]*?)<\/h2>/g)];
   assert.equal(pageHeadings.length, 2);
   assert.ok(pageHeadings.every(heading => !/data-notebook-open=/.test(heading[1])));
-  for (const section of sections) assert.ok(page.includes(`data-notebook-entry="${section.key}"`));
+  assert.match(page, /role="dialog" aria-modal="false"/);
+  assert.doesNotMatch(page, /data-notebook-entry/);
+  assert.doesNotMatch(page.replace(/<script\b[\s\S]*?<\/script>/g, ''), /data-question-body|data-question-send/, '기본 화면에는 질문 입력칸을 펼치지 않는다');
 
   const questionId = crypto.randomUUID(), question = { sectionKey, id: questionId, body: '입력 열을 바꾸면 <script>evil()</script> 어떻게 되나요?', expectedOwnerId: 'personal' };
   assert.equal((await readJson(await note('alpha', 'ask', question, aCookie))).created, true);

@@ -653,7 +653,7 @@ const TOC_SCRIPT = `
     links.forEach((a, id) => a.classList.toggle("on", id === top));
     if (top) {
       const a = links.get(top);
-      const box = toc.getBoundingClientRect();
+      const box = (toc.closest(".notebook-rail") || toc).getBoundingClientRect();
       const r = a.getBoundingClientRect();
       if (!narrow() && !toc.querySelector('[data-notebook-open][aria-expanded="true"]') && (r.top < box.top || r.bottom > box.bottom)) a.scrollIntoView({ block: "nearest" });
     }
@@ -2087,7 +2087,7 @@ export async function handleRoom(request: Request, env: Env, url: URL, ctx?: Exe
            ${completion}
            ${foot}
          </main>
-         ${headings.length ? notebookMarkup(toc, noteSections) : toc}
+         ${headings.length ? notebookMarkup(toc) : toc}
        </div>${lectureUi}`,
       stamp
         + (!localAccess && !previewAccess ? `(() => {const seen=new Set();const send=(kind,section)=>fetch(${JSON.stringify(`${roomRoot}/activity`)},{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({kind,section,category:${JSON.stringify(category.slug)},post:${JSON.stringify(post.id)}})});const observer=new IntersectionObserver(entries=>{for(const entry of entries){if(!entry.isIntersecting||seen.has(entry.target.id)||document.hidden)continue;seen.add(entry.target.id);send('section',Number(entry.target.id.slice(1))).catch(()=>{});}},{threshold:.5});document.querySelectorAll('article h2[id^="s"]').forEach(h=>observer.observe(h));document.querySelectorAll('[data-lecture-open],[data-lecture-watch]').forEach(button=>button.addEventListener('click',()=>send('lecture').catch(()=>{})));document.querySelector('[data-lecture-deck]')?.addEventListener('lectureframe',event=>{const section=event.detail.scene+1;const id='s'+section;if(!seen.has(id)){seen.add(id);send('section',section).catch(()=>{});}});})();` : "")
