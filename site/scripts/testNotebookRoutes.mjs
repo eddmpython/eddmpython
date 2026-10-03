@@ -15,8 +15,8 @@ await mkdir(shared, { recursive: true });
 const workspace = executionRoot(await mkdtemp(join(shared, 'notebookRoutes-')));
 let mf;
 try {
-  const helpers = await build({ stdin: { contents: 'export {notebookSections} from "./notebookSections.ts"; export {notebookHeadings} from "./classroomNotes.ts"; export {renderPost} from "./classroom-render.ts";', resolveDir: source }, bundle: true, format: 'esm', platform: 'node', write: false, logLevel: 'silent' });
-  const { notebookSections, notebookHeadings, renderPost } = await import(`data:text/javascript;base64,${Buffer.from(helpers.outputFiles[0].contents).toString('base64')}`);
+  const helpers = await build({ stdin: { contents: 'export {notebookSections} from "./notebookSections.ts"; export {notebookHeadings, notebookMarkup} from "./classroomNotes.ts"; export {renderPost} from "./classroom-render.ts";', resolveDir: source }, bundle: true, format: 'esm', platform: 'node', write: false, logLevel: 'silent' });
+  const { notebookSections, notebookHeadings, notebookMarkup, renderPost } = await import(`data:text/javascript;base64,${Buffer.from(helpers.outputFiles[0].contents).toString('base64')}`);
   const headings = ['원장 입력', '결과 비교'];
   const sections = await notebookSections(headings);
   const reversed = await notebookSections([...headings].reverse());
@@ -32,7 +32,15 @@ try {
   const renderedHeadings = [...rendered.matchAll(/<h2\b[^>]*>([\s\S]*?)<\/h2>/g)];
   assert.equal(renderedHeadings.length, 2);
   assert.match(renderedHeadings[0][1], /data-carousel-prev/);
-  for (const heading of renderedHeadings) assert.equal((heading[1].match(/data-notebook-open=/g) ?? []).length, 1, '캐러셀을 포함한 모든 섹션에서 메모를 열 수 있다');
+  assert.doesNotMatch(rendered, /data-notebook-open=/, '본문 제목에는 메모 버튼을 반복하지 않는다');
+  for (const section of sections) assert.ok(rendered.includes(`id="note-${section.key}"`), '질문 링크의 섹션 앵커를 유지한다');
+  const toc = notebookMarkup(`<details class="toc"><summary>목차</summary>${sections.map(section => `<a href="#${section.anchor}" data-to="${section.anchor}">${section.title}</a>`).join('')}</details>`, sections);
+  for (const section of sections) {
+    assert.ok(toc.includes(`data-notebook-entry="${section.key}"`));
+    assert.ok(toc.includes(`data-notebook-open="${section.key}"`));
+    assert.ok(toc.includes(`href="#${section.anchor}"`), '목차 이동 링크와 메모 펼치기를 함께 제공한다');
+  }
+  assert.doesNotMatch(toc, /data-notebook-tab|data-notebook-current/);
 
   const built = await build({ stdin: { contents: 'export {default} from "./classroomWorker.ts"; export {Classroom} from "./rooms.ts";', resolveDir: source }, bundle: true, format: 'esm', platform: 'browser', write: false, logLevel: 'silent' });
   const password = crypto.randomUUID();
@@ -102,7 +110,8 @@ try {
   const page = await (await request(`/room/alpha/${lesson}`, {}, aCookie)).text();
   const pageHeadings = [...page.matchAll(/<h2 id="s\d+">([\s\S]*?)<\/h2>/g)];
   assert.equal(pageHeadings.length, 2);
-  assert.ok(pageHeadings.every(heading => /data-notebook-open=/.test(heading[1])));
+  assert.ok(pageHeadings.every(heading => !/data-notebook-open=/.test(heading[1])));
+  for (const section of sections) assert.ok(page.includes(`data-notebook-entry="${section.key}"`));
 
   const questionId = crypto.randomUUID(), question = { sectionKey, id: questionId, body: '입력 열을 바꾸면 <script>evil()</script> 어떻게 되나요?', expectedOwnerId: 'personal' };
   assert.equal((await readJson(await note('alpha', 'ask', question, aCookie))).created, true);
