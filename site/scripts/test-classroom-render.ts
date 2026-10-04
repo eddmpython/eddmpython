@@ -1172,9 +1172,10 @@ check("실행 칸은 실행 전에 상태 글자와 자리 표시 출력을 두�
   assert.ok(html.includes('<button type="button" class="cell-reset" data-reset hidden>처음으로</button>'));
   assert.ok(html.includes('<button type="button" class="cell-run" data-run aria-label="실행"'));
   assert.ok(html.includes('aria-keyshortcuts="Shift+Enter"'));
-  assert.ok(html.includes('class="cell-body"><div class="cell-gutter"'));
+  assert.ok(html.includes('class="cell-body"><textarea'));
   assert.ok(html.indexOf('class="cell-run"') < html.indexOf('<textarea'));
-  assert.ok(html.indexOf('class="cell-run"') > html.indexOf('class="cell-body"'));
+  assert.ok(html.indexOf('class="cell-run"') > html.indexOf('class="cell-h"'));
+  assert.ok(html.indexOf('class="cell-run"') < html.indexOf('class="cell-body"'));
   assert.ok(html.includes('Tab 들여쓰기'));
   // 첫 높이는 줄 수와 같다. 스크립트가 맞춘 높이와 같아야 열릴 때 출렁이지 않는다.
   assert.ok(html.includes('rows="2"'));

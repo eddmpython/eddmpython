@@ -41,6 +41,15 @@ export const CODE_CELL_STYLE = `
 .eddm-cell .cell-s { margin-left:auto; font-size:.75rem; color:var(--eddm-text-muted); }
 .eddm-cell .cell-o { display:block; margin:0; padding:.5rem .85rem; border:0; border-radius:0; background:transparent; max-height:24rem; overflow:auto; font-family:var(--eddm-font-mono); font-size:.82rem; line-height:1.65; color:var(--eddm-text); white-space:pre-wrap; overflow-wrap:anywhere; }
 .eddm-cell[data-cell-state="error"] .cell-o, .eddm-cell[data-cell-state="unsupported"] .cell-o { color:var(--eddm-danger); }
+/* 강의장은 본문과 코드·출력의 좌우 끝을 맞추고 제목 오른쪽에서 실행한다. */
+.cell.eddm-cell { width:100%; }
+.cell.eddm-cell .cell-h { align-items:flex-start; }
+.cell.eddm-cell .cell-run { flex:none; width:2.25rem; height:2.25rem; border:1px solid var(--eddm-line-base); border-radius:.4rem; background:var(--eddm-raise); }
+.cell.eddm-cell .cell-run:hover { border-color:var(--eddm-accent); background:var(--eddm-accent-bg); }
+.cell.eddm-cell .cell-body { display:block; }
+.cell.eddm-cell .cell-c { border:1px solid var(--eddm-line-base); border-radius:.4rem; }
+.cell.eddm-cell .cell-c:focus { border-color:var(--eddm-accent); }
+.cell.eddm-cell .cell-help, .cell.eddm-cell .cell-out { margin-left:0; }
 @keyframes eddm-cell-pulse { to { opacity:.3; } }
 @media (prefers-reduced-motion:reduce) { .eddm-cell .cell-run[aria-busy="true"] svg { animation:none; } }
 `;

@@ -436,7 +436,7 @@ export function applyGlossary(html: string, glossary: Glossary, prefix: string):
  */
 function cellCard(id: string, cell: CourseCell): string {
   /**
-   * 블로그와 같은 코드셀이다. 설명 아래 코드 왼쪽에 실행 버튼을 둔다.
+   * 공용 코드셀에 강의장 배치를 적용한다. 실행 버튼은 제목 오른쪽에 둔다.
    * 내용만큼 자라는 코드 칸과 실행한 뒤에만 나타나는 출력이다. 상태 글자, 자리 표시
    * 문장, 크기 조절 손잡이처럼 실행 전에는 뜻이 없는 것은 두지 않는다.
    *
@@ -448,10 +448,10 @@ function cellCard(id: string, cell: CourseCell): string {
   const title = cell.title?.trim() || "";
   const label = title ? `${title} 실습` : "실습";
   return `<section class="cell eddm-cell" data-cell="${esc(id)}" aria-label="${esc(label)}">
-<div class="cell-h"><span class="cell-t">${esc(title || "실습")}</span></div>
+<div class="cell-h"><span class="cell-t">${esc(title || "실습")}</span><button type="button" class="cell-run" data-run aria-label="실행" title="실행 (Shift+Enter)" aria-keyshortcuts="Shift+Enter" aria-busy="false"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"/></svg></button></div>
 ${cell.description ? `<p class="cell-d">${esc(cell.description)}</p>` : ""}
 ${cell.hint ? `<p class="cell-hint">${esc(cell.hint)}</p>` : ""}
-<div class="cell-body"><div class="cell-gutter"><button type="button" class="cell-run" data-run aria-label="실행" title="실행 (Shift+Enter)" aria-keyshortcuts="Shift+Enter" aria-busy="false"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"/></svg></button></div><textarea class="cell-c" data-code spellcheck="false" wrap="off" rows="${rows}" aria-label="Python 코드" aria-describedby="${esc(id)}-keys">${esc(cell.code)}</textarea></div>
+<div class="cell-body"><textarea class="cell-c" data-code spellcheck="false" wrap="off" rows="${rows}" aria-label="Python 코드" aria-describedby="${esc(id)}-keys">${esc(cell.code)}</textarea></div>
 <div class="cell-help"><p class="cell-keys" id="${esc(id)}-keys">${esc(CODE_CELL_KEYS)}</p><button type="button" class="cell-reset" data-reset hidden>처음으로</button></div>
 <div class="cell-out" data-output hidden><div class="cell-out-h"><span>출력</span><span class="cell-s" data-state aria-live="polite"></span></div><pre class="cell-o" data-out></pre></div>
 </section>`;
