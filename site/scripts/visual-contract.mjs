@@ -49,6 +49,7 @@ const ROUTE_RULES = [
       VISIBLE("#products"),
       TEXT("#dongap", "초보 낚시와 가족 캠핑"),
       VISIBLE('#dongap a[href="https://dongap.eddmpython.com/"]'),
+      TEXT('#dongap a[href="https://dongap.eddmpython.com/tree"]', "돈값트리"),
       TEXT("#data", "400 GB+"),
       TEXT("#data", "7,870"),
       VISIBLE(

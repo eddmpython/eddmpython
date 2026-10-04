@@ -82,15 +82,16 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
           >
             {product.primary.label}
           </ButtonLink>
-          {product.secondary && (
+          {product.secondary?.map((link) => (
             <ButtonLink
-              href={product.secondary.href}
+              key={link.href}
+              href={link.href}
               variant="secondary"
               external
             >
-              {product.secondary.label}
+              {link.label}
             </ButtonLink>
-          )}
+          ))}
         </div>
       </div>
 

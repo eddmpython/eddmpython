@@ -20,7 +20,7 @@ export type Product = {
   cellKind?: "sheet";
   cellNote?: string;
   primary: { label: string; href: string };
-  secondary?: { label: string; href: string };
+  secondary?: Array<{ label: string; href: string }>;
 };
 
 export const PRODUCTS: Product[] = [
@@ -75,7 +75,7 @@ c.story()`,
     cellNote:
       "종목코드를 바꿔도 됩니다. 첫 실행은 런타임과 DartLab 을 받느라 30초쯤 걸립니다.",
     primary: { label: "문서 보기", href: "https://eddmpython.github.io/dartlab/" },
-    secondary: { label: "GitHub", href: "https://github.com/eddmpython/dartlab" },
+    secondary: [{ label: "GitHub", href: "https://github.com/eddmpython/dartlab" }],
   },
   {
     id: "codaro",
@@ -121,10 +121,10 @@ f"30만원 미만: {cheap}"`,
     ],
     cellNote: "Codaro 학습 카드와 같은 방식입니다. 고쳐서 바로 실행해 보세요",
     primary: { label: "Web Learn 열기", href: "https://eddmpython.github.io/codaro/" },
-    secondary: {
+    secondary: [{
       label: "Windows 런처",
       href: "https://github.com/eddmpython/codaro/releases/latest",
-    },
+    }],
   },
   {
     id: "xlpod",
@@ -188,7 +188,7 @@ sorted(k for k in globals() if not k.startswith("_"))`,
     cellNote:
       "같은 머신을 페이지 전체가 나눠 씁니다. 위 제품 셀을 먼저 돌리고 여기서 확인해 보세요",
     primary: { label: "데모 열기", href: "https://eddmpython.github.io/pyproc/" },
-    secondary: { label: "GitHub", href: "https://github.com/eddmpython/pyproc" },
+    secondary: [{ label: "GitHub", href: "https://github.com/eddmpython/pyproc" }],
   },
   {
     id: "dongap",
@@ -207,6 +207,9 @@ sorted(k for k in globals() if not k.startswith("_"))`,
     heroShot: "/shots/heroDongap.webp",
     shotAlt: "돈값 홈페이지에서 가족 낚시와 캠핑 이야기를 소개하는 화면",
     primary: { label: "돈값 바로가기", href: "https://dongap.eddmpython.com/" },
-    secondary: { label: "인스타그램", href: "https://www.instagram.com/dongap.log/" },
+    secondary: [
+      { label: "돈값트리", href: "https://dongap.eddmpython.com/tree" },
+      { label: "인스타그램", href: "https://www.instagram.com/dongap.log/" },
+    ],
   },
 ];

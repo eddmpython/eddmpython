@@ -16,7 +16,7 @@ status: observed
 
 # 제품 마케팅 맥락
 
-**Document version: v5**
+**Document version: v6**
 
 블로그와 랜딩 카피가 공유하는 제품 맥락이다. **확인된 공개 표면만 적는다.**
 v4 에서 `blog/product-marketing.md` 를 이 문서로 합쳤다. 운영 절차와 맥락이 두 파일로
@@ -58,6 +58,7 @@ v4 에서 `blog/product-marketing.md` 를 이 문서로 합쳤다. 운영 절차
 
 - 홈 제품 문구: `site/src/products.ts`
 - 돈값 공개 콘텐츠와 이동 경로: `https://dongap.eddmpython.com/`, `https://www.instagram.com/dongap.log/`
+- 돈값트리 상품 검색과 빠른 링크: `https://dongap.eddmpython.com/tree`
 - DartLab 데이터 사실: `https://huggingface.co/datasets/eddmpython/dartlab-data`
 - DartLab 파일 목록: `https://huggingface.co/api/datasets/eddmpython/dartlab-data`
 - 블로그 사실: 해당 제품 공개 URL 과 직접 실행
@@ -100,6 +101,7 @@ v4 에서 `blog/product-marketing.md` 를 이 문서로 합쳤다. 운영 절차
 
 ## Changelog
 
+- v6 (2026-10-04): 돈값트리의 공개 상품 목록으로 직접 이동하는 링크 추가
 - v5 (2026-10-04): 돈값 라이브 사이트의 초보 낚시, 가족 캠핑 콘텐츠와 공식 경로를 확인해 홈 소개에 추가
 - v4 (2026-08-19): `blog/product-marketing.md` 를 이 문서로 합침. 운영규칙은 Skill OS 한곳에 둔다
 - v3 (2026-08-14): Hugging Face 소개문 대신 실제 파일 목록을 세어 DartLab 데이터 규모를 바로잡음
