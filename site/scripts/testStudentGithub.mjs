@@ -54,6 +54,9 @@ try {
   assert.equal((await json('/room/unconfigured/github', input, cookies.get('unconfigured'))).status, 404);
   assert.equal((await json('/room/invite/github', { ...input, confirm: false }, cookies.get('invite'))).status, 400);
   assert.equal((await json('/room/invite/github', { ...input, username: '../evil' }, cookies.get('invite'))).status, 400);
+  for (const mode of [['save'], ['invite'], ['check']]) {
+    assert.equal((await json('/room/invite/github', { ...input, mode }, cookies.get('invite'))).status, 400, 'mode must be a string');
+  }
   assert.equal(calls.length, before, 'rejected requests must not contact GitHub');
   const page = await (await request('/room/invite/01-start/01-first', {}, cookies.get('invite'))).text();
   assert.match(page, /data-github-form/); assert.match(page, /practice\/invite\/README.md/); assert.ok(!page.includes(token));
@@ -68,8 +71,17 @@ try {
     assert.doesNotMatch(article, /data-github-form|notepad README.md|Set-Location/);
     assert.ok(!article.includes('practice/' + (slug === 'invite' ? 'active' : 'invite') + '/README.md'));
   }
+  const registered = await json('/room/invite/github', { username: 'first-name', mode: 'save', confirm: true }, cookies.get('invite'));
+  assert.equal(registered.status, 200);
+  const registeredHtml = (await registered.json()).html;
+  assert.match(registeredHtml, /강사 확인 대기/);
+  assert.match(registeredHtml, /value="invite"/);
+  assert.equal(calls.length, before, 'registration does not use GitHub even when a token is configured');
   const result = await json('/room/invite/github', { ...input, repository: 'attacker/other', roomId: rooms.get('active').id }, cookies.get('invite'));
-  assert.equal(result.status, 200); assert.match((await result.json()).html, /초대 수락 대기/);
+  assert.equal(result.status, 200);
+  const pendingHtml = (await result.json()).html;
+  assert.match(pendingHtml, /초대 수락 대기/);
+  assert.match(pendingHtml, /name="mode" value="check"/);
   assert.equal((await call({ action: 'studentGet', roomId: rooms.get('invite').id })).github.status, 'pending');
   assert.equal((await call({ action: 'studentGet', roomId: rooms.get('active').id })).github.status, 'unlinked');
   assert.equal((await json('/room/invite/github', input, cookies.get('invite'))).status, 429);
@@ -78,7 +90,7 @@ try {
   const changedRepo = await call({ action: 'studentGithubConfig', roomId: rooms.get('invite').id, repository: 'sample/other', lesson: '01-start/01-first' });
   assert.equal(changedRepo.status, 409);
   accepted = true;
-  const active = await json('/room/active/github', input, cookies.get('active'));
+  const active = await json('/room/active/github', { ...input, mode: 'check' }, cookies.get('active'));
   assert.equal(active.status, 200); assert.match((await active.json()).html, /연결 완료/);
   assert.equal(calls.filter(c => c.startsWith('PUT')).length, 1, 'existing collaborator is not reinvited');
   accepted = false;
@@ -95,3 +107,71 @@ try {
   assert.match(await (await request('/admin/students', {}, admin)).text(), /GitHub · 초대 수락 대기 · learner/);
   console.log('GitHub 연결: 초대·기존 접근·실패·개인 방 격리·중복·공개 저장소 차단·감수·관리자 상태 확인');
 } finally { await mf.dispose(); }
+
+const offline = new Miniflare({ modules: true, script: built.outputFiles[0].text, compatibilityDate: '2026-08-08', compatibilityFlags: ['nodejs_compat'], durableObjects: { CLASSROOM: { className: 'Classroom', useSQLite: true } }, kvNamespaces: ['COURSE'], bindings: { ADMIN_PASSWORD: password, LOCAL_PREVIEW_BYPASS: '1' }, outboundService: async () => { throw new Error('Saving a GitHub username must not make an external request'); } });
+const offlineRequest = (path, init = {}, cookie = '') => offline.dispatchFetch(origin + path, { ...init, headers: { origin, cookie, ...init.headers }, redirect: 'manual' });
+const offlineJson = (path, body, cookie = '', headers = {}) => offlineRequest(path, { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify(body) }, cookie);
+const offlineLogin = async path => (await offlineRequest(path, { method: 'POST', body: new URLSearchParams({ password }) })).headers.get('set-cookie').split(';')[0];
+const field = (html, name) => html.match(new RegExp('<input\\b(?=[^>]*\\bname="' + name + '")[^>]*>'))?.[0];
+const saveButton = html => html.match(/<button\b(?=[^>]*\bvalue="save")[^>]*>/)?.[0];
+try {
+  const kv = await offline.getKVNamespace('COURSE');
+  await kv.put('bundle', JSON.stringify({ schema: 4, sceneContract: 12, categories: [{ slug: '01-start', title: '환경', order: 1, posts: [
+    { id: '01-first', title: '연결', summary: '계정', body: '## 계정\n\n```course-github\nconnect\n```' },
+  ] }] }));
+  const ns = await offline.getDurableObjectNamespace('CLASSROOM'), stub = ns.get(ns.idFromName('main'));
+  const call = async body => { const res = await stub.fetch('https://classroom/do', { method: 'POST', body: JSON.stringify(body) }); return { status: res.status, ...await res.json() }; };
+  const roomIds = new Map();
+  for (const slug of ['register', 'other']) {
+    await call({ action: 'create', slug, title: slug, password });
+    await call({ action: 'toggle', slug, category: '01-start' });
+    await call({ action: 'open', slug, open: true });
+    const room = (await call({ action: 'list' })).rooms.find(r => r.slug === slug);
+    roomIds.set(slug, room.id);
+    await call({ action: 'studentSave', roomId: room.id, name: slug });
+    await call({ action: 'studentGithubConfig', roomId: room.id, repository: 'sample/practice', lesson: '01-start/01-first' });
+  }
+  const cookie = await offlineLogin('/room/register/login');
+  const page = await (await offlineRequest('/room/register/01-start/01-first', {}, cookie)).text();
+  assert.ok(field(page, 'username'), 'a student can enter a username without an invitation token');
+  assert.doesNotMatch(field(page, 'username'), /\bdisabled\b|type="hidden"/);
+  assert.ok(saveButton(page));
+  assert.doesNotMatch(saveButton(page), /\bdisabled\b/);
+  const save = { username: 'learner', mode: 'save', confirm: true };
+  const path = '/room/register/github';
+  assert.equal((await offlineJson(path, save, cookie, { origin: 'https://other.example' })).status, 403);
+  assert.equal((await offlineJson(path, { ...save, confirm: false }, cookie)).status, 400);
+  assert.equal((await offlineJson(path, { ...save, username: '../evil' }, cookie)).status, 400);
+  assert.equal((await offlineJson(path, { ...save, mode: 'unknown' }, cookie)).status, 400);
+  assert.equal((await offlineJson(path, { ...save, mode: 'invite' }, cookie)).status, 503);
+  const response = await offlineJson(path, { ...save, roomId: roomIds.get('other'), repository: 'attacker/other' }, cookie);
+  assert.equal(response.status, 200);
+  const html = (await response.json()).html;
+  assert.match(html, /강사 확인 대기/);
+  assert.ok(field(html, 'username'));
+  assert.match(field(html, 'username'), /value="learner"/);
+  assert.doesNotMatch(field(html, 'username'), /\bdisabled\b|type="hidden"/);
+  assert.doesNotMatch(saveButton(html), /\bdisabled\b/);
+  const info = await call({ action: 'studentGet', roomId: roomIds.get('register') });
+  assert.equal(info.github.status, 'registered');
+  assert.equal(info.github.accountId, null);
+  assert.equal(info.github.repository, 'sample/practice');
+  assert.equal((await call({ action: 'studentGet', roomId: roomIds.get('other') })).github.username, '');
+  assert.equal((await offlineJson(path, save, cookie)).status, 200);
+  assert.equal((await call({ action: 'studentGet', roomId: roomIds.get('register') })).events.filter(e => e.kind === 'github').length, 1);
+  assert.equal((await offlineJson(path, { ...save, username: 'corrected-name' }, cookie)).status, 200);
+  const admin = await offlineLogin('/admin/login');
+  const settings = await (await offlineRequest('/admin/students/' + roomIds.get('register') + '?tab=settings', {}, admin)).text();
+  assert.match(settings, /corrected-name/);
+  assert.match(settings, /강사 확인 대기/);
+  assert.match(await (await offlineRequest('/admin/students', {}, admin)).text(), /GitHub · 강사 확인 대기 · corrected-name/);
+  const preview = await offlineRequest('/admin/students/' + roomIds.get('register') + '/preview', {}, admin);
+  const previewCookie = preview.headers.get('set-cookie').split(';')[0];
+  assert.equal((await offlineJson(path, save, previewCookie)).status, 403);
+  const previewPage = await (await offlineRequest('/room/register/01-start/01-first', {}, previewCookie)).text();
+  const article = previewPage.match(/<article>([\s\S]*?)<\/article>/)[1];
+  assert.match(field(article, 'username'), /\bdisabled\b/);
+  assert.match(field(article, 'confirm'), /\bdisabled\b/);
+  assert.match(saveButton(article), /\bdisabled\b/);
+  console.log('GitHub 아이디 저장: 인증 없이 입력·수정·반복 저장, 관리자 표시, 방 격리, 미리보기 차단 확인');
+} finally { await offline.dispose(); }

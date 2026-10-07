@@ -76,12 +76,21 @@ export class StudentStore {
         ON CONFLICT(roomId) DO UPDATE SET repository=excluded.repository,lesson=excluded.lesson`, roomId, repository, lesson);
       return Response.json({ ok: true });
     }
-    if (action === "studentGithubStart") {
+    if (action === "studentGithubStart" || action === "studentGithubSave") {
       const github = this.one("SELECT * FROM studentGithub WHERE roomId=?", roomId);
       if (!github) return fail("연결할 저장소가 없습니다. 강사에게 알려 주세요", 404);
       const username = text(body.username, 40);
       if (!/^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/.test(username)) return fail("GitHub 사용자 이름을 확인해 주세요");
-      if (github.username && String(github.username).toLowerCase() !== username.toLowerCase()) return fail("이미 연결한 계정이 있습니다. 계정 변경은 강사에게 요청해 주세요", 409);
+      const editable = !github.accountId && !github.attempt && !["pending", "active"].includes(String(github.status));
+      if (!editable && github.username && String(github.username).toLowerCase() !== username.toLowerCase()) return fail("이미 연결한 계정이 있습니다. 계정 변경은 강사에게 요청해 주세요", 409);
+      if (action === "studentGithubSave") {
+        if (!editable) return fail("초대 또는 연결 확인 중인 계정은 변경할 수 없습니다. 강사에게 알려 주세요", 409);
+        if (github.username !== username || github.status !== "registered") this.storage.transactionSync(() => {
+          this.sql.exec("UPDATE studentGithub SET username=?,status='registered',error='',updated=? WHERE roomId=?", username, now, roomId);
+          this.event(roomId, "github", `GitHub 아이디 저장 · ${username}`);
+        });
+        return Response.json({ github: this.one("SELECT * FROM studentGithub WHERE roomId=?", roomId) });
+      }
       if (now - Number(github.attemptedAt) < 30000) return fail("30초 뒤에 다시 확인해 주세요", 429);
       const attempt = crypto.randomUUID();
       this.sql.exec("UPDATE studentGithub SET username=?,attempt=?,attemptedAt=? WHERE roomId=?", username, attempt, now, roomId);

@@ -62,5 +62,56 @@ try {
   assert.equal((await call('studentComplete', 'beta', nextLesson)).status, 409);
   assert.equal((await call('studentComplete', 'alpha', nextLesson)).status, 200);
   assert.equal(db.prepare('SELECT COUNT(*) AS n FROM lessonCompletions WHERE roomId=?').get('alpha').n, 2);
+  const progress = (await call('studentInfo')).completed;
+  const work = await call('studentWork');
+  const otherStudent = await call('studentGet', 'beta');
+  const githubInput = { repository: 'sample/practice', lesson: firstLesson.lesson };
+  assert.equal((await call('studentGithubSave', 'beta', { username: 'learner' })).status, 404);
+  await call('studentGithubConfig', 'alpha', githubInput);
+  const githubEvents = () => db.prepare("SELECT * FROM studentEvents WHERE roomId='alpha' AND kind='github' ORDER BY id").all();
+  for (const username of ['', '-learner', 'learner-', 'learn--er', '../evil', 'a'.repeat(40)]) {
+    assert.equal((await call('studentGithubSave', 'alpha', { username })).status, 400, username);
+  }
+  assert.equal(githubEvents().length, 0);
+  db.prepare("UPDATE studentGithub SET status='error',error='previous failure' WHERE roomId='alpha'").run();
+  const saved = await call('studentGithubSave', 'alpha', { username: 'learner' });
+  assert.equal(saved.status, 200);
+  assert.equal(saved.github.username, 'learner');
+  assert.equal(saved.github.status, 'registered');
+  assert.equal(saved.github.accountId, null);
+  assert.equal(saved.github.error, '');
+  assert.equal(githubEvents().length, 1);
+  const same = await call('studentGithubSave', 'alpha', { username: 'learner' });
+  assert.equal(same.status, 200);
+  assert.deepEqual(same.github, saved.github, 'repeat registration is a no-op');
+  assert.equal(githubEvents().length, 1);
+  assert.equal((await call('studentGithubSave', 'alpha', { username: 'corrected-name' })).status, 200);
+  assert.equal(githubEvents().length, 2);
+  assert.deepEqual((await call('studentInfo')).completed, progress);
+  assert.deepEqual(await call('studentWork'), work);
+  assert.deepEqual(await call('studentGet', 'beta'), otherStudent);
+
+  const started = await call('studentGithubStart', 'alpha', { username: 'learner' });
+  assert.equal(started.status, 200, 'an unverified registration can be corrected before inviting');
+  assert.equal(started.github.username, 'learner');
+  assert.ok(started.github.attempt);
+  assert.equal((await call('studentGithubStart', 'alpha', { username: 'learner' })).status, 429);
+  assert.equal((await call('studentGithubStart', 'alpha', { username: 'changed-name' })).status, 409);
+  const inFlight = (await call('studentInfo')).github;
+  assert.equal((await call('studentGithubSave', 'alpha', { username: 'learner' })).status, 409);
+  assert.equal((await call('studentGithubSave', 'alpha', { username: 'changed-name' })).status, 409);
+  assert.deepEqual((await call('studentInfo')).github, inFlight);
+  db.prepare("UPDATE studentGithub SET attemptedAt=0 WHERE roomId='alpha'").run();
+  assert.equal((await call('studentGithubSave', 'alpha', { username: 'changed-name' })).status, 409, 'a stale nonempty attempt still blocks registration');
+  assert.equal((await call('studentGithubStart', 'alpha', { username: 'changed-name' })).status, 409, 'elapsed cooldown cannot replace the account of a running invitation');
+  await call('studentGithubFinish', 'alpha', { attempt: started.github.attempt, status: 'pending', accountId: 123 });
+  for (const [status, accountId] of [['pending', null], ['active', null], ['error', 123], ['registered', 123]]) {
+    db.prepare("UPDATE studentGithub SET status=?,accountId=? WHERE roomId='alpha'").run(status, accountId);
+    const before = (await call('studentInfo')).github;
+    const count = githubEvents().length;
+    assert.equal((await call('studentGithubSave', 'alpha', { username: 'changed-name' })).status, 409, status);
+    assert.deepEqual((await call('studentInfo')).github, before);
+    assert.equal(githubEvents().length, count);
+  }
   console.log('수강자 저장소: 방 분리, 제출 검증, 중복 제출, 검토, 재제출, 보관, 기록 페이지 확인');
 } finally { db.close(); }

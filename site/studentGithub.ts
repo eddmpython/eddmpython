@@ -26,9 +26,14 @@ export async function verifyGithubRepository(env: Env, repository: string) {
 
 /** HTTP 처리자가 방 세션, 수업 접근, 미리보기와 Origin을 먼저 검사한다. */
 export async function connectGithub(env: Env, room: PublicRoom, body: Record<string, unknown>): Promise<Response> {
+  if (typeof body.mode !== "string" || !["save", "invite", "check"].includes(body.mode)) return fail("지원하지 않는 작업입니다");
+  if (body.mode !== "check" && body.confirm !== true) return fail("본인의 GitHub 사용자 이름인지 확인해 주세요");
+  if (body.mode === "save") {
+    const saved = await call(env, { action: "studentGithubSave", roomId: room.id, username: body.username });
+    if (saved.status !== 200) return fail(String(saved.data.error), saved.status);
+    return Response.json({ html: githubForm(saved.data.github, room, false, Boolean(env.GITHUB_INVITE_TOKEN)) }, { headers });
+  }
   if (!env.GITHUB_INVITE_TOKEN) return fail("GitHub 자동 초대 인증이 설정되지 않았습니다. 강사에게 알려 주세요", 503);
-  if (!["invite", "check"].includes(String(body.mode))) return fail("지원하지 않는 작업입니다");
-  if (body.mode === "invite" && body.confirm !== true) return fail("본인의 GitHub 사용자 이름인지 확인해 주세요");
   const started = await call(env, { action: "studentGithubStart", roomId: room.id, username: body.username });
   if (started.status !== 200) return fail(String(started.data.error), started.status);
   const link = started.data.github as GithubLink;
@@ -68,21 +73,28 @@ export async function connectGithub(env: Env, room: PublicRoom, body: Record<str
   return Response.json({ html: githubForm(finished.data.github, room, false, true), error }, { status: responseStatus, headers });
 }
 
-export const githubLabels: Record<string, string> = { unlinked: "아이디 입력 전", pending: "초대 수락 대기", active: "연결 완료", error: "확인 필요" };
+export const githubLabels: Record<string, string> = { unlinked: "아이디 입력 전", registered: "강사 확인 대기", pending: "초대 수락 대기", active: "연결 완료", error: "확인 필요" };
 export function githubForm(link: GithubLink | null, room: PublicRoom, readOnly: boolean, ready: boolean): string {
   if (!link) return '<p class="notice">연결할 실습 저장소가 없습니다. 강사에게 알려 주세요.</p>';
   const repositoryUrl = `https://github.com/${link.repository}`;
-  const disabled = readOnly || !ready;
+  const connected = ["active", "pending"].includes(link.status);
+  const editable = !link.accountId && !link.attempt && !connected;
+  const mode = connected ? "check" : ready ? "invite" : "save";
+  const disabled = readOnly || (!ready && !editable);
+  const message = readOnly ? "강사 미리보기에서는 아이디를 저장하거나 초대를 보내지 않습니다."
+    : link.status === "registered" ? ready ? "아이디가 저장되었습니다. 본인 계정을 확인한 뒤 초대받기를 클릭하세요." : "아이디가 저장되었습니다. 강사가 확인 후 초대합니다."
+    : !ready && editable ? "아이디를 저장하면 강사가 확인 후 초대합니다."
+    : !ready ? "연결 상태 확인은 강사에게 요청해 주세요." : link.error || "";
   return `<section class="github-connect" data-github-panel><p class="github-heading"><strong>실습 저장소 연결</strong><span>${esc(githubLabels[link.status] ?? "확인 필요")}</span></p>
     <p><a href="${esc(repositoryUrl)}" target="_blank" rel="noreferrer">${esc(link.repository)}</a> · Private</p>
     ${link.username ? `<p>GitHub 계정: <a href="https://github.com/${esc(link.username)}" target="_blank" rel="noreferrer">${esc(link.username)}</a></p>` : ""}
     ${link.status === "pending" ? `<p>초대를 보냈습니다. 아래에서 초대를 수락한 뒤 ‘연결 상태 확인’을 클릭하세요.</p><p><a class="github-button" href="${esc(repositoryUrl)}/invitations" target="_blank" rel="noreferrer">GitHub에서 초대 수락</a></p>` : ""}
     ${link.status === "active" ? `<p>저장소에 접근할 수 있습니다. 다음 섹션에서 실습을 진행하세요.</p><p><a class="github-button" href="${esc(repositoryUrl)}" target="_blank" rel="noreferrer">실습 저장소 열기</a></p>` : ""}
     <form data-github-form action="/room/${esc(room.slug)}/github" method="post">
-      ${link.username ? `<input type="hidden" name="username" value="${esc(link.username)}">` : `<label>GitHub 사용자 이름<input name="username" maxlength="39" autocomplete="off" autocapitalize="none" spellcheck="false" required ${disabled ? "disabled" : ""} placeholder="예: my-github-id"></label>`}
-      ${!["active", "pending"].includes(link.status) ? '<label class="github-confirm"><input type="checkbox" name="confirm" required> 본인의 GitHub 프로필에서 사용자 이름을 확인했습니다.</label>' : ""}
-      <button class="github-button" type="submit" name="mode" value="${["active", "pending"].includes(link.status) ? "check" : "invite"}" ${disabled ? "disabled" : ""}>${["active", "pending"].includes(link.status) ? "연결 상태 확인" : "이 계정으로 초대받기"}</button>
-      <p role="status" aria-live="polite" class="github-message">${esc(readOnly ? "강사 미리보기에서는 초대를 보내지 않습니다." : !ready ? "자동 초대 인증이 아직 설정되지 않았습니다. 강사에게 알려 주세요." : link.error || "")}</p>
+      ${editable ? `<label>GitHub 사용자 이름<input name="username" value="${esc(link.username)}" maxlength="39" autocomplete="off" autocapitalize="none" spellcheck="false" required ${disabled ? "disabled" : ""} placeholder="예: my-github-id"></label>` : `<input type="hidden" name="username" value="${esc(link.username)}">`}
+      ${!connected ? `<label class="github-confirm"><input type="checkbox" name="confirm" required ${disabled ? "disabled" : ""}> 본인의 GitHub 프로필에서 사용자 이름을 확인했습니다.</label>` : ""}
+      <button class="github-button" type="submit" name="mode" value="${mode}" ${disabled ? "disabled" : ""}>${mode === "check" ? "연결 상태 확인" : mode === "invite" ? "이 계정으로 초대받기" : "아이디 저장"}</button>
+      <p role="status" aria-live="polite" class="github-message">${esc(message)}</p>
     </form></section>`;
 }
 
