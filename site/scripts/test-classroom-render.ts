@@ -67,6 +67,22 @@ check("마크다운 단계의 이미지 하나는 시각물로 렌더링된다",
   assert.ok(html.includes('<img src="a.png"'));
 });
 
+check("이미지 설명·캡션의 문법 이스케이프를 풀고 HTML은 계속 격리한다", () => {
+  const html = renderMarkdown(String.raw`![메뉴 \[닫기\]와 \\](https://example.com/shot\(1\).png "\"확인\"을 누른 뒤 C:\\ 화면을 봅니다 <script>")`);
+  assert.ok(html.includes('src="https://example.com/shot(1).png"'));
+  assert.ok(html.includes('alt="메뉴 [닫기]와 \\"'));
+  assert.ok(html.includes('<figcaption>&quot;확인&quot;을 누른 뒤 C:\\ 화면을 봅니다 &lt;script&gt;</figcaption>'));
+  assert.ok(!html.includes("<script>"));
+});
+
+check("이스케이프한 이미지에도 출처 주소와 캡션을 보존한다", () => {
+  const html = renderMarkdown(String.raw`[![버튼 \[예\]](https://example.com/shot\(2\).png "\"예\"를 선택합니다")](https://example.com/guide\(2\))`);
+  assert.ok(html.includes('src="https://example.com/shot(2).png"'));
+  assert.ok(html.includes('alt="버튼 [예]"'));
+  assert.equal(html.match(/href="https:\/\/example\.com\/guide\(2\)"/g)?.length, 2);
+  assert.ok(html.includes('&quot;예&quot;를 선택합니다</a></figcaption>'));
+});
+
 check("영상은 재생기가 된다", () => {
   const html = renderMarkdown("![보기](https://example.com/x.mp4)");
   assert.ok(html.includes("<video"));
@@ -379,6 +395,28 @@ check("출처 링크가 없는 시각물은 예전 그대로다", () => {
   const html = renderMarkdown('![화면](a.webp "캡션")');
   assert.ok(html.includes('<figcaption>캡션</figcaption>'));
   assert.ok(!html.includes("media-src"));
+});
+
+check("편집기가 이스케이프한 일반 문자를 서식과 구분해 표시한다", () => {
+  assert.equal(inline(String.raw`20\~30분, \*문자\*, \_이름\_, **굵게**`), "20~30분, *문자*, _이름_, <strong>굵게</strong>");
+  assert.equal(inline(String.raw`\*\*문자\*\*와 **서식**`), "**문자**와 <strong>서식</strong>");
+  assert.equal(inline(String.raw`\<script\>와 \"따옴표\"`), "&lt;script&gt;와 &quot;따옴표&quot;");
+  assert.equal(inline('`\\*코드\\*`와 \\*본문\\*'), '<code>\\*코드\\*</code>와 *본문*');
+  assert.equal(inline('\uE000와 \\*문자\\*'), '\uE000와 *문자*');
+});
+
+check("이스케이프한 URL 괄호도 일반 링크 주소를 끊지 않는다", () => {
+  assert.equal(inline(String.raw`[참고](https://example.com/guide\(1\))`), '<a href="https://example.com/guide(1)" target="_blank" rel="noopener noreferrer">참고</a>');
+});
+
+check("표 셀의 이스케이프한 구분자는 새 열을 만들지 않는다", () => {
+  const html = renderMarkdown(String.raw`| 문장 | 코드 |
+|---|---|
+| A\|B와 **강조** | \`A\|B\` |`.replace(/\\`/g, '`'));
+  assert.equal(html.match(/<th scope=/g)?.length, 2);
+  assert.equal(html.match(/<td>/g)?.length, 2);
+  assert.ok(html.includes('<td>A|B와 <strong>강조</strong></td>'));
+  assert.ok(html.includes('<td><code>A|B</code></td>'));
 });
 
 check("번호 목록은 ol 로 그린다", () => {

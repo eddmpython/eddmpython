@@ -49,8 +49,16 @@ export const NEW_TAB = ' target="_blank" rel="noopener noreferrer"';
  * 수강생이 `a3f9....xlsx` 를 받고, 지시문이 부르는 `사업자명단.xlsx` 와 달라져 실습이 끊긴다.
  */
 export function inline(text: string, mediaBase?: string): string {
-  return esc(text)
-    .replace(/`([^`]+)`/g, "<code>$1</code>")
+  // Protect literal punctuation before looking for formatting. Code text keeps its own backslashes.
+  let marker = "\uE000";
+  while (text.includes(marker)) marker += "\uE000";
+  const literals: string[] = [];
+  const masked = text.replace(/`([^`]+)`|\\([!"#$%&'()*+,\-./:;<=>?@[\]\\^_`{|}~])/g,
+    (_match, code: string | undefined, punctuation: string | undefined) => {
+      const index = literals.push(code === undefined ? esc(punctuation!) : `<code>${esc(code)}</code>`) - 1;
+      return `${marker}${index}${marker}`;
+    });
+  return esc(masked)
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(
       /\[([^\]]+)\]\(([^)]+)\)/g,
@@ -72,10 +80,11 @@ export function inline(text: string, mediaBase?: string): string {
         }
         return `<a href="${href}"${NEW_TAB}>${label}</a>`;
       },
-    );
+    )
+    .replace(new RegExp(`${marker}(\\d+)${marker}`, "g"), (_match, index: string) => literals[Number(index)]);
 }
 
-const IMAGE = /^!\[([^\]]*)\]\(([^\s)]+)(?:\s+"([^"]*)")?\)$/;
+const IMAGE = /^!\[((?:\\.|[^\]\\])*)\]\(((?:\\.|[^\s)\\])+)(?:\s+"((?:\\.|[^"\\])*)")?\)$/;
 /**
  * 출처로 이어지는 시각물. 제품 화면을 캡처해 실었을 때 그 제품의 공식 주소를 붙인다.
  *
@@ -87,7 +96,11 @@ const IMAGE = /^!\[([^\]]*)\]\(([^\s)]+)(?:\s+"([^"]*)")?\)$/;
  * 같아야 한다.** 한쪽을 고치면 다른 쪽도 같은 날 고친다.
  */
 const LINKED_IMAGE =
-  /^\[!\[([^\]]*)\]\(([^\s)]+)(?:\s+"([^"]*)")?\)\]\((https?:\/\/[^\s)]+)\)$/;
+  /^\[!\[((?:\\.|[^\]\\])*)\]\(((?:\\.|[^\s)\\])+)(?:\s+"((?:\\.|[^"\\])*)")?\)\]\((https?:\/\/(?:\\.|[^\s)\\])+)\)$/;
+/** Markdown punctuation escapes are decoded before HTML escaping, exactly once. */
+function imageText(value: string): string {
+  return value.replace(/\\([!"#$%&'()*+,\-./:;<=>?@[\]\\^_`{|}~])/g, "$1");
+}
 const VIDEO = /\.(mp4|webm|mov)$/i;
 /** 링크 하나로만 이루어진 문단. 라벨을 캡션으로 쓴다. */
 const SOLO_LINK = /^\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)$/;
@@ -96,12 +109,23 @@ const LABEL = /^\*\*[^*\n]+\*\*$/;
 const TABLE_DIVIDER = /^\|?(?:\s*:?-{3,}:?\s*\|)+\s*:?-{3,}:?\s*\|?$/;
 
 function tableCells(line: string): string[] {
-  return line
-    .trim()
-    .replace(/^\|/, "")
-    .replace(/\|$/, "")
-    .split("|")
-    .map((cell) => cell.trim());
+  const text = line.trim();
+  const cells = [""];
+  let trailingDivider = false;
+  for (let index = 0; index < text.length; index++) {
+    const char = text[index];
+    trailingDivider = false;
+    if (char === "\\" && index + 1 < text.length) {
+      const next = text[++index];
+      cells[cells.length - 1] += next === "|" ? "|" : char + next;
+    } else if (char === "|") {
+      cells.push("");
+      trailingDivider = true;
+    } else cells[cells.length - 1] += char;
+  }
+  if (text.startsWith("|")) cells.shift();
+  if (trailingDivider) cells.pop();
+  return cells.map(cell => cell.trim());
 }
 
 /** 교안에서 쓰는 GFM 표. 셀 안의 코드와 링크도 문단과 같은 규칙으로 안전하게 그린다. */
@@ -574,9 +598,12 @@ function blocks(text: string, headings: string[], cells: Cells, state: RenderSta
     if (!b) continue;
     // 출처 링크가 붙은 시각물도 같은 자리에서 그린다. 링크만 벗겨 내면 나머지는 같은 그림이다.
     const linked = b.match(LINKED_IMAGE);
-    const source = linked ? linked[4] : "";
+    const source = linked ? imageText(linked[4]) : "";
     const img = linked ? ([b, linked[1], linked[2], linked[3]] as unknown as RegExpMatchArray) : b.match(IMAGE);
     if (img) {
+      img[1] = imageText(img[1]);
+      img[2] = imageText(img[2]);
+      if (img[3]) img[3] = imageText(img[3]);
       const waiting = img[2].match(PENDING);
       if (waiting) {
         images.push(visual(pendingMedia(waiting[1], img[1], img[3] ?? ""), state));
