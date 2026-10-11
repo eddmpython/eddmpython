@@ -34,8 +34,8 @@
       "at": "2026-09-01"
     },
     "004-dataframe-libraries/narwhals": {
-      "value": "2.26.0",
-      "at": "2026-09-08"
+      "value": "2.27.1",
+      "at": "2026-10-11"
     },
     "004-dataframe-libraries/pandas": {
       "value": "3.0.6",
@@ -58,8 +58,8 @@
       "at": "2026-10-10"
     },
     "005-python-history/python-latest": {
-      "value": "3.14.8",
-      "at": "2026-10-01"
+      "value": "3.15.0",
+      "at": "2026-10-11"
     }
   }
 }
