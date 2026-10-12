@@ -128,7 +128,7 @@ const ROUTE_RULES = [
     id: "brand",
     checks: [
       VISIBLE("main#content"),
-      TEXT("main#content h1", "한 획으로 그린 나선"),
+      TEXT("main#content h1", "EDDM 심볼"),
       COUNT("main#content h1", { exact: 1 }),
       // 심볼이 그려지려면 path 가 있어야 한다. 화면 전체에서 넉넉히 잡는다.
       COUNT("main#content svg path", { min: 12 }),

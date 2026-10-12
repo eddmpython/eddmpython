@@ -1,4 +1,4 @@
-import { SYMBOL, BRAND, ICON_FINISHES, ICON_TILE, type IconFinish } from "../brand";
+import { SYMBOL, BRAND, ICON_FINISHES, ICON_TILE, symbolMarkup, type IconFinish } from "../brand";
 
 /**
  * 브랜드 표기 4종. 넷을 섞어 쓰지 않는다.
@@ -17,13 +17,15 @@ import { SYMBOL, BRAND, ICON_FINISHES, ICON_TILE, type IconFinish } from "../bra
  * 워드마크만 짧은 표기를 쓴다. 본문의 브랜드 이름을 이 표기로 바꾸지 않는다.
  */
 
-/** 심볼 단독. 획은 currentColor 를 따르고 점만 고정 색이다. */
+/** 심볼 단독. 두 도형이 함께 currentColor를 따른다. */
 export function LogoSymbol({ className }: { className?: string }) {
   return (
-    <svg viewBox={SYMBOL.viewBox} className={className} aria-hidden="true">
-      <path d={SYMBOL.shape} fill="currentColor" />
-      <circle cx={SYMBOL.dot.cx} cy={SYMBOL.dot.cy} r={SYMBOL.dot.r} fill={BRAND.dot} />
-    </svg>
+    <svg
+      viewBox={SYMBOL.viewBox}
+      className={className}
+      aria-hidden="true"
+      dangerouslySetInnerHTML={{ __html: symbolMarkup() }}
+    />
   );
 }
 
@@ -32,7 +34,7 @@ export function Wordmark({ className }: { className?: string }) {
   return (
     <span className={`font-bold tracking-tight ${className ?? "text-[15px]"}`}>
       <span>eddm</span>
-      <span style={{ color: BRAND.dot }}>.py</span>
+      <span style={{ color: BRAND.accent }}>.py</span>
     </span>
   );
 }
@@ -51,18 +53,11 @@ const LOCKUP = {
 
 export type LockupSize = keyof typeof LOCKUP;
 
-/**
- * 로고 가로 락업.
- *
- * 심볼의 점이 오른쪽 위로 나가 있어서 심볼의 시각 중심은 잉크 상자의 가운데보다
- * 왼쪽 아래다. 워드마크를 잉크 상자에 그대로 맞추면 글자가 오른쪽으로 밀려 보인다.
- * 그래서 간격을 조금 좁게 잡는다.
- */
+/** 로고 가로 락업. 현재 사용하는 eddm.py 글자 표기를 유지한다. */
 export function Logo({ size = "nav" }: { size?: LockupSize } = {}) {
   const s = LOCKUP[size];
   return (
     <span className={`flex items-center ${s.gap}`}>
-      {/* 심볼이 가로로 1.27:1 이다. 높이를 글자에 맞추고 폭은 비율대로 둔다. */}
       <LogoSymbol className={`${s.symbol} w-auto text-ivory`} />
       <Wordmark className={s.word} />
     </span>
@@ -113,10 +108,10 @@ export function AppIcon({
           strokeWidth={t.edge.width}
         />
       ) : null}
-      <g transform={`translate(${t.x} ${t.y}) scale(${t.scale})`}>
-        <path d={SYMBOL.shape} fill={f.ink} />
-        <circle cx={SYMBOL.dot.cx} cy={SYMBOL.dot.cy} r={SYMBOL.dot.r} fill={f.dot} />
-      </g>
+      <g
+        transform={t.transform}
+        dangerouslySetInnerHTML={{ __html: symbolMarkup({ ink: f.ink }) }}
+      />
     </svg>
   );
 }
