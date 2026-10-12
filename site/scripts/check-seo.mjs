@@ -161,7 +161,7 @@ function checkShared(html, path) {
   const ownSites = nodesOfType(structured, "WebSite")
     .filter((site) => site["@id"] === `${origin}/#site` && site.url === origin);
   if (ownSites.length !== 1) {
-    fail(scope, "eddmpython WebSite가 페이지 안에서 한 번 정의되지 않았습니다");
+    fail(scope, "EDDM WebSite가 페이지 안에서 한 번 정의되지 않았습니다");
   }
   return { ogTitle, ogImage, ogImageAlt, imageWidth, imageHeight, structured };
 }
@@ -257,9 +257,11 @@ for (const { file, abs, slug, path } of postRoutes) {
   ) {
     fail(file, "공유 카드 이미지가 frontmatter와 다릅니다");
   }
+  const sourceAuthor = frontmatter.get("author");
+  const displayAuthor = !sourceAuthor || sourceAuthor === "eddmpython" ? "EDDM" : sourceAuthor;
   if (
     meta(html, "property", "article:section", file) !== frontmatter.get("section") ||
-    meta(html, "name", "author", file) !== frontmatter.get("author")
+    meta(html, "name", "author", file) !== displayAuthor
   ) {
     fail(file, "Article 메타가 frontmatter와 다릅니다");
   }

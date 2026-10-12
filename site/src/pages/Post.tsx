@@ -11,9 +11,9 @@ export function Post() {
   const post = slug ? findPost(slug) : undefined;
 
   useEffect(() => {
-    if (post) document.title = `${post.title} · eddmpython`;
+    if (post) document.title = `${post.title} · EDDM`;
     return () => {
-      document.title = "eddmpython · 복잡한 업무를, 실제로 작동하는 자동화로";
+      document.title = "EDDM · 복잡한 업무를, 실제로 작동하는 자동화로";
     };
   }, [post]);
 

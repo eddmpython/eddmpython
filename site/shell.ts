@@ -10,7 +10,7 @@
  * 옮기면 이상했다. 색 값은 여기서도 적지 않는다. `src/design.ts` 의 DESIGN이 정본이고
  * `scripts/check-brand.mjs` 가 이 파일에 hex 가 나타나면 배포를 막는다.
  */
-import { SYMBOL, symbolMarkup } from "./src/brand";
+import { LOGO, logoMarkup } from "./src/brand";
 import { DESIGN, designCssVars, themeColor } from "./src/design";
 import { SOCIAL } from "./src/social";
 import { esc } from "./classroom-render";
@@ -49,10 +49,7 @@ body { min-height:100vh; min-height:100dvh; margin:0; background:var(--eddm-carb
 /* 머리띠. 랜딩 Nav.tsx 의 실측값 그대로다. 값을 바꾸면 두 화면이 어긋난다 */
 .hd { display:flex; flex-direction:column; align-items:center; gap:20px; margin-bottom:56px; }
 .hd-logo { display:flex; align-items:center; gap:10px; text-decoration:none; border:0; color:inherit; }
-.hd-symbol { height:21px; width:auto; color:var(--eddm-ivory); display:block; }
-.hd-word { font-size:15px; letter-spacing:-.025em; line-height:1.5; color:var(--eddm-ivory); }
-.hd-word b { font-weight:700; }
-.hd-word i { font-style:normal; font-weight:700; color:var(--eddm-brand); }
+.hd-symbol { height:32px; width:auto; color:var(--eddm-ivory); display:block; }
 .hd-right { display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
   column-gap:20px; row-gap:10px; font-size:14px; line-height:1.4285714; color:var(--eddm-text); }
 .hd .nav-link { color:inherit; text-decoration:none; border:0; transition:color .15s cubic-bezier(.4,0,.2,1); }
@@ -242,9 +239,8 @@ export function header(): string {
       } rel="noreferrer" aria-label="${esc(i.label)}">${i.svg}</a>`,
   ).join("");
   return `<nav class="hd">
-  <a class="hd-logo" href="${esc(SITE)}" target="_blank" rel="noreferrer" aria-label="eddmpython 홈">
-    <svg class="hd-symbol" viewBox="${esc(SYMBOL.viewBox)}" aria-hidden="true">${symbolMarkup()}</svg>
-    <span class="hd-word"><b>eddm</b><i>.py</i></span>
+  <a class="hd-logo" href="${esc(SITE)}" target="_blank" rel="noreferrer" aria-label="EDDM 홈">
+    <svg class="hd-symbol" viewBox="${esc(LOGO.viewBox)}" aria-hidden="true">${logoMarkup()}</svg>
   </a>
   <div class="hd-right">${links}<span class="hd-icons">${icons}
     ${themeToggle()}
@@ -299,7 +295,7 @@ export function page(opts: PageOptions): Response {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="${esc(themeColor("light"))}">
-<title>${esc(opts.title)} | eddmpython</title>
+<title>${esc(opts.title)} | EDDM</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="${DESIGN.fontHref}">

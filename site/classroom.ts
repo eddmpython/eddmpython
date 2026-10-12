@@ -23,7 +23,7 @@ import {
   renderPost,
   ROOM_MEDIA_KEY,
 } from "./classroom-render";
-import { SYMBOL, symbolMarkup } from "./src/brand";
+import { SYMBOL, WORDMARK, symbolMarkup, wordmarkMarkup } from "./src/brand";
 import { editCodeIndent } from "./src/codeIndent";
 import { codeKeyAction, CODE_CELL_STYLE } from "./src/codeCell";
 import { DESIGN } from "./src/design";
@@ -359,8 +359,7 @@ body.lecture-on { overflow:hidden; }
 .lecture-symbol-wrap { flex:0 0 auto; display:grid; place-items:center; width:1.8rem; height:1.8rem; }
 .lecture-symbol { width:1.55rem; height:auto; color:var(--eddm-ivory); }
 .lecture-brand-copy { min-width:0; display:grid; gap:.1rem; }
-.lecture-brand-copy b { overflow:hidden; color:var(--eddm-ivory); font-size:.66rem; font-weight:650;
-  letter-spacing:.1em; text-transform:uppercase; white-space:nowrap; text-overflow:ellipsis; }
+.lecture-wordmark { display:block; width:4.6rem; height:auto; color:var(--eddm-ivory); }
 .lecture-brand-copy i { overflow:hidden; color:var(--eddm-text-faint); font-size:.68rem; font-style:normal;
   white-space:nowrap; text-overflow:ellipsis; }
 .lecture-map-list { min-height:0; overflow:auto; display:grid; align-content:start; gap:.48rem;
@@ -1636,7 +1635,7 @@ function loginPage(slug: string, title: string, message = ""): Response {
   return roomPage(
     title,
     `${header()}<section class="gate">
-       <p class="eyebrow">eddmpython course</p>
+       <p class="eyebrow">EDDM Course</p>
        <h1>${esc(title)}</h1>
        <p class="sub">등록된 수강생을 위한 비공개 과정입니다. 안내받은 비밀번호로 입장해 주세요</p>
        <form method="post" action="/room/${esc(slug)}/login">
@@ -1695,7 +1694,7 @@ export async function handleRoom(request: Request, env: Env, url: URL, ctx?: Exe
   if (path === "/room") {
     return roomPage(
       "course",
-      `${header()}<section class="gate"><p class="eyebrow">eddmpython course</p>
+      `${header()}<section class="gate"><p class="eyebrow">EDDM Course</p>
        <h1>비공개 과정</h1><p class="sub wait">안내받은 과정 주소로 들어오세요</p></section>`,
     );
   }
@@ -1804,7 +1803,7 @@ export async function handleRoom(request: Request, env: Env, url: URL, ctx?: Exe
   if (!room.open) {
     return roomPage(
       room.title,
-      `${header()}<section class="gate"><p class="eyebrow">eddmpython course</p>
+      `${header()}<section class="gate"><p class="eyebrow">EDDM Course</p>
        <h1>${esc(room.title)}</h1><p class="sub wait">아직 열리지 않았습니다. 이 화면을 열어 두세요</p></section>`,
       stamp,
     );
@@ -1944,7 +1943,7 @@ export async function handleRoom(request: Request, env: Env, url: URL, ctx?: Exe
       room.title,
       `${header()}
        <section class="hero">
-         <p class="eyebrow">eddmpython course</p>
+         <p class="eyebrow">EDDM Course</p>
          <h1>${esc(room.title)}</h1>
          <p class="sub">${
            total
@@ -2040,7 +2039,7 @@ export async function handleRoom(request: Request, env: Env, url: URL, ctx?: Exe
            <aside class="lecture-rail" aria-label="강의 화면 인덱스">
              <span class="lecture-brand">
                <span class="lecture-symbol-wrap"><svg class="lecture-symbol" viewBox="${esc(SYMBOL.viewBox)}" aria-hidden="true">${symbolMarkup()}</svg></span>
-               <span class="lecture-brand-copy"><b>eddmpython course</b><i>${esc(category.title)} · ${esc(post.title)}</i></span>
+               <span class="lecture-brand-copy"><svg class="lecture-wordmark" viewBox="${esc(WORDMARK.viewBox)}" role="img" aria-label="EDDM">${wordmarkMarkup()}</svg><i>${esc(category.title)} · ${esc(post.title)}</i></span>
              </span>
              <nav class="lecture-map-list" data-lecture-map-list aria-label="화면 바로가기"></nav>
              <div class="lecture-rail-foot">

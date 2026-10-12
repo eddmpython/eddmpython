@@ -1,4 +1,5 @@
 import { readdirSync, readFileSync } from "node:fs";
+import { BRAND_ASSETS } from "../src/brand.ts";
 
 /**
  * `/blog` 목록에 나갈 글 수를 파일에서 센다.
@@ -128,7 +129,7 @@ const ROUTE_RULES = [
     id: "brand",
     checks: [
       VISIBLE("main#content"),
-      TEXT("main#content h1", "EDDM 심볼"),
+      TEXT("main#content h1", "EDDM 브랜드"),
       COUNT("main#content h1", { exact: 1 }),
       // 심볼이 그려지려면 path 가 있어야 한다. 화면 전체에서 넉넉히 잡는다.
       COUNT("main#content svg path", { min: 12 }),
@@ -143,17 +144,9 @@ const ROUTE_RULES = [
       // 16px 부터 64px 까지 다섯 단계.
       COUNT("#size svg", { exact: 5 }),
       TEXT("#color", "#f56565"),
-      // 내려받는 파일은 빌드가 만든 실제 주소여야 한다. 화면은 `BRAND_ASSETS` 를 그대로
-      // 훑으므로 목록과 어긋날 수 없고, 여기서 확인하는 것은 그 목록 자체가 일곱 개를
-      // 그대로 들고 있는지다. 한때 빌드는 일곱 개를 내는데 화면은 네 개만 보여 줬다.
-      COUNT("#files a", { exact: 7 }),
-      VISIBLE('#files a[href="/brand/mark-dark.svg"]'),
-      VISIBLE('#files a[href="/brand/mark-light.svg"]'),
-      VISIBLE('#files a[href="/brand/icon-light.svg"]'),
-      VISIBLE('#files a[href="/brand/icon-dark.svg"]'),
-      VISIBLE('#files a[href="/brand/icon-brand.svg"]'),
-      VISIBLE('#files a[href="/brand/icon-outline.svg"]'),
-      VISIBLE('#files a[href="/favicon.svg"]'),
+      // 빌드와 화면이 공유하는 정본 목록 전체가 다운로드 링크로 표시된다.
+      COUNT("#files a", { exact: BRAND_ASSETS.length }),
+      ...BRAND_ASSETS.map((asset) => VISIBLE(`#files a[href="/${asset.file}"]`)),
     ],
     captures: [
       { id: "lockup", selector: "#lockup" },

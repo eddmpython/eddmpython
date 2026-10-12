@@ -30,7 +30,7 @@ const DEFAULT_IMAGE = `${ORIGIN}/og.png`;
 const ORG = {
   "@type": "Organization",
   "@id": ORG_ID,
-  name: "eddmpython",
+  name: "EDDM",
   url: ORIGIN,
   logo: `${ORIGIN}/favicon.svg`,
   image: DEFAULT_IMAGE,
@@ -49,7 +49,7 @@ const SITE = {
   "@type": "WebSite",
   "@id": SITE_ID,
   url: ORIGIN,
-  name: "eddmpython",
+  name: "EDDM",
   inLanguage: "ko-KR",
   publisher: { "@id": ORG_ID },
 };
@@ -58,7 +58,7 @@ const BLOG = {
   "@type": "Blog",
   "@id": BLOG_ID,
   url: `${ORIGIN}/blog`,
-  name: "eddmpython 블로그",
+  name: "EDDM 블로그",
   description:
     "제품을 만들면서 확인한 실패, 결정, 작업 방식을 독자가 다시 쓸 수 있는 판단 기준으로 설명합니다.",
   inLanguage: "ko-KR",
@@ -137,7 +137,7 @@ function postImage(post: Post, url: string) {
 }
 
 export function homeMeta(): PageMeta {
-  const title = "eddmpython · 복잡한 업무를, 실제로 작동하는 자동화로";
+  const title = "EDDM · 복잡한 업무를, 실제로 작동하는 자동화로";
   return {
     path: "/",
     title,
@@ -146,7 +146,7 @@ export function homeMeta(): PageMeta {
       `${DARTLAB_DATA_SNAPSHOT.publicSizeLabel} 공개 공시 데이터와 Python 도구, 낚시와 캠핑 이야기. DartLab, Codaro, xlpod, pyproc, 돈값을 소개하고 바로 연결합니다.`,
     type: "website",
     image: DEFAULT_IMAGE,
-    imageAlt: "eddmpython 로고와 DartLab, Codaro, xlpod, pyproc 제품 이름",
+    imageAlt: "EDDM 로고와 DartLab, Codaro, xlpod, pyproc 제품 이름",
     imageType: "image/png",
     imageWidth: 1200,
     imageHeight: 630,
@@ -155,7 +155,7 @@ export function homeMeta(): PageMeta {
       {
         "@context": "https://schema.org",
         "@type": "ItemList",
-        name: "eddmpython 제품",
+        name: "EDDM 제품",
         itemListElement: APPS,
       },
     ],
@@ -178,12 +178,12 @@ export function blogMeta(): PageMeta {
 
   return {
     path,
-    title: "블로그 · eddmpython",
-    socialTitle: "eddmpython 블로그",
+    title: "블로그 · EDDM",
+    socialTitle: "EDDM 블로그",
     description,
     type: "website",
     image: DEFAULT_IMAGE,
-    imageAlt: "eddmpython 블로그",
+    imageAlt: "EDDM 블로그",
     imageType: "image/png",
     imageWidth: 1200,
     imageHeight: 630,
@@ -196,7 +196,7 @@ export function blogMeta(): PageMeta {
           "@type": "CollectionPage",
           "@id": url,
           url,
-          name: "eddmpython 블로그",
+          name: "EDDM 블로그",
           description,
           inLanguage: "ko-KR",
           isPartOf: { "@id": SITE_ID },
@@ -204,7 +204,7 @@ export function blogMeta(): PageMeta {
           mainEntity: { "@id": BLOG_ID },
         },
         breadcrumbs(breadcrumbId, [
-          { name: "eddmpython", url: ORIGIN },
+          { name: "EDDM", url: ORIGIN },
           { name: "블로그", url },
         ]),
       ),
@@ -221,7 +221,7 @@ export function postMeta(post: Post): PageMeta {
 
   return {
     path,
-    title: `${post.title} · eddmpython`,
+    title: `${post.title} · EDDM`,
     socialTitle: post.title,
     description: post.summary,
     type: "article",
@@ -267,7 +267,7 @@ export function postMeta(post: Post): PageMeta {
           isAccessibleForFree: true,
         },
         breadcrumbs(breadcrumbId, [
-          { name: "eddmpython", url: ORIGIN },
+          { name: "EDDM", url: ORIGIN },
           { name: "블로그", url: `${ORIGIN}/blog` },
           { name: post.title, url },
         ]),
@@ -286,16 +286,16 @@ export function brandMeta(): PageMeta {
   const path = "/brand";
   const url = `${ORIGIN}${path}`;
   const description =
-    "eddmpython 심볼과 로고 락업, 앱 아이콘 마감, 강조색과 내려받을 파일. 심볼은 좌표가 아니라 작도 규칙으로 정의되어 있고 이 화면의 마크도 그 규칙이 계산해 낸 것입니다.";
+    "EDDM 심볼과 워드마크, 로고, 앱 아이콘과 강조색을 확인하고 SVG 파일을 내려받을 수 있습니다.";
   const breadcrumbId = `${url}#breadcrumb`;
   return {
     path,
-    title: "브랜드 · eddmpython",
-    socialTitle: "eddmpython 브랜드 자산",
+    title: "브랜드 · EDDM",
+    socialTitle: "EDDM 브랜드 자산",
     description,
     type: "website",
     image: DEFAULT_IMAGE,
-    imageAlt: "eddmpython 심볼과 eddm.py 워드마크",
+    imageAlt: "EDDM 심볼과 워드마크",
     imageType: "image/png",
     imageWidth: 1200,
     imageHeight: 630,
@@ -307,14 +307,14 @@ export function brandMeta(): PageMeta {
           "@type": "WebPage",
           "@id": url,
           url,
-          name: "eddmpython 브랜드 자산",
+          name: "EDDM 브랜드 자산",
           description,
           inLanguage: "ko-KR",
           isPartOf: { "@id": SITE_ID },
           breadcrumb: { "@id": breadcrumbId },
         },
         breadcrumbs(breadcrumbId, [
-          { name: "eddmpython", url: ORIGIN },
+          { name: "EDDM", url: ORIGIN },
           { name: "브랜드", url },
         ]),
       ),

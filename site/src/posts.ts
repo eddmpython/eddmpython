@@ -84,7 +84,7 @@ function parse(path: string, raw: string): Post {
     archived: meta.archived === "true",
     archivedNote: meta.archivedNote ?? "",
     title: meta.title ?? id,
-    author: meta.author ?? "eddmpython",
+    author: !meta.author || meta.author === "eddmpython" ? "EDDM" : meta.author,
     section: meta.section ?? "블로그",
     summary: meta.summary ?? "",
     ogImage: meta.ogImage || undefined,

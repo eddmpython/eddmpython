@@ -22,7 +22,7 @@ export function Nav() {
 
   return (
     <nav className="mb-14 flex flex-col items-center gap-5 md:mb-16 md:flex-row md:justify-between md:gap-0">
-      <a href="/" aria-label="eddmpython 홈">
+      <a href="/" aria-label="EDDM 홈">
         <Logo />
       </a>
       <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2.5 text-sm text-ivory/70">

@@ -20,7 +20,7 @@ import { fileURLToPath } from "node:url";
 import { PyProcControlClient } from "pyproc/control";
 import { executionRoot } from "./executionWorkspace.mjs";
 
-import { SYMBOL, BRAND, symbolMarkup } from "../src/brand.ts";
+import { SYMBOL, WORDMARK, BRAND, symbolMarkup, wordmarkMarkup } from "../src/brand.ts";
 import { PRODUCTS } from "../src/products.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -53,9 +53,8 @@ const html = `<!doctype html>
     -webkit-font-smoothing:antialiased;
     display:flex;align-items:center;gap:82px;padding:0 96px;
   }
-  .brand{font-size:31px;letter-spacing:-.02em;margin-bottom:30px}
-  .brand b{font-weight:700}
-  .brand span{font-weight:700;color:${BRAND.accent}}
+  .brand{margin-bottom:30px}
+  .brand svg{display:block;height:31px;width:auto}
   h1{font-size:63px;line-height:1.28;font-weight:700;letter-spacing:-.03em;word-break:keep-all}
   ul{display:flex;gap:30px;margin-top:38px;list-style:none;font-size:25px;color:${BRAND.ivory}cc}
   li{display:flex;align-items:center;gap:10px}
@@ -65,7 +64,7 @@ const html = `<!doctype html>
   <!-- 심볼과 워드마크가 떨어져 있어도 한 덩어리로 읽히는 로고 락업이다. -->
   <div style="flex:none">${symbolSvg(258)}</div>
   <div>
-    <div class="brand"><b>eddm</b><span>.py</span></div>
+    <div class="brand"><svg viewBox="${WORDMARK.viewBox}" role="img" aria-label="EDDM">${wordmarkMarkup({ ink: BRAND.ivory })}</svg></div>
     <h1>복잡한 업무를,<br>실제로 작동하는 자동화로.</h1>
     <ul>${PRODUCTS.map(
       (p) => `<li><i style="background:${DOT[p.dotClass]}"></i>${p.name}</li>`,

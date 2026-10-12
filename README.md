@@ -4,7 +4,7 @@
   </a>
 </p>
 
-<h1 align="center">eddmpython</h1>
+<h1 align="center">EDDM</h1>
 
 <p align="center">
   Python과 AI로 재무, 데이터, 반복 업무를 분석하고<br />
@@ -25,7 +25,7 @@
 
 <p align="center">
   <a href="https://eddmpython.com">
-    <img src="./site/public/og.png" width="100%" alt="eddmpython, 복잡한 업무를 실제로 작동하는 자동화로" />
+    <img src="./site/public/og.png" width="100%" alt="EDDM, 복잡한 업무를 실제로 작동하는 자동화로" />
   </a>
 </p>
 
@@ -102,16 +102,16 @@ DartLab은 Python에서 바로 기업을 열고, pyproc은 웹 제품 안에 영
   2026.08.14 파일 기준 · CC BY 4.0
 </p>
 
-## EDDM 심볼
+## EDDM 로고
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://eddmpython.com/brand/mark-dark.svg" />
-    <img src="https://eddmpython.com/brand/mark-light.svg" width="200" alt="eddmpython 심볼" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://eddmpython.com/brand/logo-dark.svg" />
+    <img src="https://eddmpython.com/brand/logo-light.svg" width="320" alt="EDDM 로고" />
   </picture>
 </p>
 
-두 도형 사이의 간격과 이어지는 곡선이 심볼을 만듭니다. 두 도형은 같은 색으로 쓰고, 크기와 간격을 함께 유지합니다. 사이트의 글자 표기는 기존 `eddm.py`를 사용합니다.
+두 도형의 심볼과 대문자 EDDM이 하나의 로고를 이룹니다. 심볼과 글자는 같은 색으로 쓰고, 크기와 간격을 함께 유지합니다. 글자는 승인된 SVG 윤곽선을 사용하므로 설치된 글꼴에 따라 달라지지 않습니다.
 
 <table>
   <tr>
@@ -122,10 +122,14 @@ DartLab은 Python에서 바로 기업을 열고, pyproc은 웹 제품 안에 영
   </tr>
 </table>
 
-심볼의 두 경로와 배치는 `site/src/brand.ts` 하나에서 정의합니다. 파비콘, 앱 아이콘, OG 이미지, 강의 화면 머리띠가 같은 도형을 사용합니다. 강조색 칩에서는 심볼 전체를 밝게 반전합니다.
+심볼, 워드마크와 조합은 `site/src/brand.ts` 하나에서 정의합니다. 파비콘, 앱 아이콘, OG 이미지, 강의 화면 머리띠가 같은 도형을 사용합니다. 강조색 칩에서는 심볼 전체를 밝게 반전합니다.
 
 <p align="center">
   <strong><a href="https://eddmpython.com/brand">브랜드 자산 보기</a></strong>
+  &nbsp;·&nbsp;
+  <a href="https://eddmpython.com/brand/logo-dark.svg">로고 SVG</a>
+  &nbsp;·&nbsp;
+  <a href="https://eddmpython.com/brand/wordmark-dark.svg">워드마크 SVG</a>
   &nbsp;·&nbsp;
   <a href="https://eddmpython.com/brand/mark-dark.svg">심볼 SVG</a>
   &nbsp;·&nbsp;
@@ -170,18 +174,18 @@ DartLab은 Python에서 바로 기업을 열고, pyproc은 웹 제품 안에 영
 - 설명용 모형보다 지금 실행되는 제품 화면을 먼저 보여 줍니다.
 - 확인하지 않은 기능과 숫자는 랜딩에 쓰지 않습니다.
 - 같은 사실을 두 곳에서 소유하지 않습니다. 심볼도 색도 정본 하나에서 계산되어 나옵니다.
-- 각 제품은 자신의 인증, 데이터, 배포 경계를 소유하고 eddmpython은 발견과 공식 진입점을 연결합니다.
+- 각 제품은 자신의 인증, 데이터, 배포 경계를 소유하고 EDDM은 발견과 공식 진입점을 연결합니다.
 - 실패와 결정은 감추지 않고 [블로그](https://eddmpython.com/blog)에 다시 쓸 수 있는 판단 기준으로 남깁니다.
 
 <details>
 <summary><strong>이 저장소가 궁금하다면</strong></summary>
 
-이 저장소는 eddmpython의 공개 브랜드 표면입니다. 제품 소스는 각 저장소에 분리되어 있고, 여기에는 랜딩과 제품 카탈로그, 블로그, 공개용 AI 작업 환경 템플릿이 있습니다.
+이 저장소는 EDDM의 공개 브랜드 표면입니다. 제품 소스는 각 저장소에 분리되어 있고, 여기에는 랜딩과 제품 카탈로그, 블로그, 공개용 AI 작업 환경 템플릿이 있습니다.
 
 | 경로 | 역할 |
 |---|---|
 | `site/` | React 19, TypeScript, Vite 기반 랜딩과 Cloudflare Worker |
-| `site/src/brand.ts` | 심볼 정본. 승인된 두 경로와 배치를 보존하고 파비콘과 브랜드 자산을 만든다 |
+| `site/src/brand.ts` | 심볼과 EDDM 워드마크, 가로 조합의 정본. 파비콘과 브랜드 자산을 만든다 |
 | `site/src/design.ts` | 색과 테마 정본. 강조색은 이 파일의 한 줄에서 갈라진다 |
 | `blog/` | 발행 글. **글 하나가 폴더 하나**이고 그 글에 딸린 이미지 계획과 도구가 같은 폴더에 있다 |
 | `skills/` | 배포, 도메인, SEO, 브랜드 자산, 발행 절차의 정본 |

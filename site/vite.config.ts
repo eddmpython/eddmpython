@@ -164,7 +164,7 @@ function prerender(): Plugin {
           )
           .replace(
             /<meta name="author" content="[\s\S]*?"\s*\/>/,
-            `<meta name="author" content="${escape(meta.author ?? "eddmpython")}" />`,
+            `<meta name="author" content="${escape(meta.author ?? "EDDM")}" />`,
           )
           .replace(
             /<meta property="og:title" content="[\s\S]*?"\s*\/>/,
@@ -249,7 +249,7 @@ function prerender(): Plugin {
       const posts = pages.filter((p) => p.type === "article");
       writeFileSync(
         join(dist, "rss.xml"),
-        `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n  <channel>\n    <title>eddmpython 블로그</title>\n    <link>${ORIGIN}/blog</link>\n    <atom:link href="${ORIGIN}/rss.xml" rel="self" type="application/rss+xml" />\n    <description>제품을 만들면서 확인한 실패, 결정, 작업 방식을 독자가 다시 쓸 수 있는 판단 기준으로 설명합니다.</description>\n    <language>ko-KR</language>\n${posts
+        `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n  <channel>\n    <title>EDDM 블로그</title>\n    <link>${ORIGIN}/blog</link>\n    <atom:link href="${ORIGIN}/rss.xml" rel="self" type="application/rss+xml" />\n    <description>제품을 만들면서 확인한 실패, 결정, 작업 방식을 독자가 다시 쓸 수 있는 판단 기준으로 설명합니다.</description>\n    <language>ko-KR</language>\n${posts
           .map(
             (p) =>
               `    <item>\n      <title>${escape(p.socialTitle)}</title>\n      <link>${ORIGIN}${p.path}</link>\n      <guid isPermaLink="true">${ORIGIN}${p.path}</guid>${p.section ? `\n      <category>${escape(p.section)}</category>` : ""}\n      <description>${escape(p.description)}</description>\n    </item>`,

@@ -1,6 +1,6 @@
 import { Nav } from "../components/Nav";
 import { Footer } from "../components/Footer";
-import { AppIcon, Logo, LogoStacked, LogoSymbol, Wordmark } from "../components/Logo";
+import { AppIcon, Logo, LogoSymbol, Wordmark } from "../components/Logo";
 import { SYMBOL, BRAND_ASSETS, ICON_FINISHES, symbolMarkup, type IconFinish } from "../brand";
 import { DESIGN } from "../design";
 
@@ -13,8 +13,7 @@ import { DESIGN } from "../design";
  *
  * 내려받는 파일 목록은 `src/brand.ts` 의 `BRAND_ASSETS` 가 정본이고 빌드가 그 목록을
  * 그대로 dist 에 쓴다. 이 화면은 같은 목록을 읽어서 보여 주므로 빌드가 내는 파일과
- * 화면이 안내하는 파일이 어긋날 수 없다. 한때 목록이 두 곳에 있어서 빌드는 일곱 개를
- * 내는데 화면은 네 개만 보여 줬다.
+ * 화면이 안내하는 파일이 어긋날 수 없다.
  */
 
 const PANEL =
@@ -56,7 +55,7 @@ const SWATCHES = [
   {
     value: DESIGN.palette.brand,
     name: "brand",
-    role: "강조색. .py, 버튼, 링크, 진행선이 같은 색을 쓴다",
+    role: "강조색. 버튼, 링크, 진행선에 쓴다",
   },
   { value: DESIGN.palette.carbon, name: "carbon", role: "다크 바탕" },
   { value: DESIGN.palette.ivory, name: "ivory", role: "다크 위의 글자" },
@@ -75,16 +74,16 @@ export function Brand() {
         <div className="mx-auto w-full max-w-5xl px-6 pb-14 md:pb-20">
           <p className="eddm-kicker">brand</p>
           <h1 className="mt-3 text-3xl leading-tight font-medium tracking-tight md:text-5xl">
-            EDDM 심볼
+            EDDM 브랜드
           </h1>
           <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-ivory/60 md:text-base">
-            두 도형 사이의 간격과 이어지는 곡선이 EDDM의 심볼을 만듭니다.
-            밝은 바탕과 어두운 바탕에 맞는 SVG 파일을 내려받을 수 있습니다.
+            두 도형의 심볼과 대문자 EDDM이 하나의 로고를 이룹니다.
+            로고, 워드마크, 심볼과 앱 아이콘을 SVG로 내려받을 수 있습니다.
           </p>
           <div
             className={`${PANEL} mt-10 flex items-center justify-center px-6 py-14 md:py-20`}
           >
-            <LogoSymbol className="h-32 w-auto text-ivory md:h-44" />
+            <Logo size="display" />
           </div>
         </div>
 
@@ -101,27 +100,26 @@ export function Brand() {
 
         <Section
           id="lockup"
-          title="로고 락업"
-          description="현재 사이트에서 사용하는 심볼과 글자 표기입니다. 이름을 함께 보여 줄 때는 가로 조합을, 작은 영역에는 심볼만 씁니다."
+          title="로고와 워드마크"
+          description="로고는 심볼과 글자를 정해진 비율로 함께 씁니다. 밝은 바탕에서는 어둡게, 어두운 바탕에서는 밝게 반전합니다."
         >
           <div className="grid gap-3 sm:grid-cols-2">
             <div className={`${PANEL} flex min-h-44 items-center justify-center px-6 py-10`}>
               <Logo size="display" />
             </div>
-            <div className={`${PANEL} flex min-h-44 items-center justify-center px-6 py-10`}>
-              <LogoStacked />
+            <div className="flex min-h-44 items-center justify-center rounded-2xl bg-[var(--eddm-foreground)] px-6 py-10">
+              <Logo size="display" className="text-[var(--eddm-canvas)]" />
             </div>
             <div className={`${PANEL} flex min-h-44 items-center justify-center px-6 py-10`}>
-              <LogoSymbol className="h-[34px] w-auto text-ivory" />
+              <LogoSymbol className="h-[72px] w-auto text-ivory" />
             </div>
             <div className={`${PANEL} flex min-h-44 items-center justify-center px-6 py-10`}>
-              <Wordmark className="text-[25px]" />
+              <Wordmark className="h-10 text-ivory" />
             </div>
           </div>
           <p className="mt-4 text-sm leading-relaxed text-ivory/50">
-            워드마크는 <code className="font-mono">eddm.py</code> 입니다. 문서와 도메인에서
-            부르는 이름은 <code className="font-mono">eddmpython</code> 그대로이고 짧은
-            표기는 워드마크에서만 씁니다.
+            워드마크는 대문자 <code className="font-mono">EDDM</code>입니다.
+            글자를 다시 입력하거나 글꼴을 바꾸지 않고 제공된 SVG를 사용하세요
           </p>
         </Section>
 
@@ -169,7 +167,7 @@ export function Brand() {
         <Section
           id="color"
           title="색"
-          description="심볼은 놓이는 바탕에 맞춰 한 색으로 씁니다. 워드마크의 .py, 버튼, 링크, 선택 상태는 같은 강조색을 씁니다."
+          description="로고와 워드마크는 놓이는 바탕에 맞춰 한 색으로 씁니다. 버튼, 링크, 선택 상태에는 브랜드 강조색을 씁니다."
         >
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {SWATCHES.map((s) => (
@@ -191,7 +189,7 @@ export function Brand() {
         <Section
           id="files"
           title="파일"
-          description="심볼 단독과 네 가지 앱 아이콘을 SVG로 내려받을 수 있습니다. 밝은 바탕과 어두운 바탕에 맞는 파일을 선택하세요"
+          description="로고, 워드마크, 심볼과 네 가지 앱 아이콘입니다. 밝은 바탕과 어두운 바탕에 맞는 파일을 선택하세요"
         >
           <div className="grid gap-3 sm:grid-cols-2">
             {BRAND_ASSETS.map((a) => (
@@ -216,8 +214,7 @@ export function Brand() {
             ))}
           </div>
           <p className="mt-4 text-sm leading-relaxed text-ivory/50">
-            심볼의 viewBox는 <code className="font-mono">{SYMBOL.viewBox}</code>입니다.
-            두 도형의 위치와 간격을 유지하고, 색을 바꿀 때는 두 도형에 함께 적용하세요
+            로고 전체의 비율과 간격을 유지하고, 색을 바꿀 때는 심볼과 글자에 함께 적용하세요
           </p>
         </Section>
 

@@ -104,7 +104,7 @@ export function Footer() {
 
       <div className="border-t border-[var(--eddm-line)]">
         <div className="mx-auto w-full max-w-5xl px-6 py-6 text-xs text-ivory/55">
-          © 2026 eddmpython
+          © 2026 EDDM
         </div>
       </div>
     </footer>
