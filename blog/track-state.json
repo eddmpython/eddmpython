@@ -10,8 +10,8 @@
       "at": "2026-10-07"
     },
     "004-dataframe-libraries/cudf": {
-      "value": "26.8.1",
-      "at": "2026-09-01"
+      "value": "26.10.0",
+      "at": "2026-10-09"
     },
     "004-dataframe-libraries/daft": {
       "value": "0.7.26",
@@ -34,8 +34,8 @@
       "at": "2026-09-01"
     },
     "004-dataframe-libraries/narwhals": {
-      "value": "2.26.0",
-      "at": "2026-09-08"
+      "value": "2.27.1",
+      "at": "2026-10-11"
     },
     "004-dataframe-libraries/pandas": {
       "value": "3.0.6",
@@ -54,12 +54,12 @@
       "at": "2026-09-01"
     },
     "005-python-history/insider": {
-      "value": "https://blog.python.org/2026/10/python-3150-rc3/",
-      "at": "2026-10-03"
+      "value": "https://blog.python.org/2026/10/python-3150-final-is-here/",
+      "at": "2026-10-10"
     },
     "005-python-history/python-latest": {
-      "value": "3.14.8",
-      "at": "2026-10-01"
+      "value": "3.15.0",
+      "at": "2026-10-11"
     }
   }
 }
