@@ -6,8 +6,8 @@
       "at": "2026-08-26"
     },
     "004-dataframe-libraries/bigframes": {
-      "value": "2.50.0",
-      "at": "2026-10-07"
+      "value": "2.51.0",
+      "at": "2026-10-13"
     },
     "004-dataframe-libraries/cudf": {
       "value": "26.10.0",
@@ -22,8 +22,8 @@
       "at": "2026-09-01"
     },
     "004-dataframe-libraries/datafusion": {
-      "value": "54.1.0",
-      "at": "2026-10-06"
+      "value": "55.0.0",
+      "at": "2026-10-13"
     },
     "004-dataframe-libraries/geopandas": {
       "value": "1.2.0",
