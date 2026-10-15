@@ -83,6 +83,12 @@ for (const invalid of ["javascript:alert(1)", `room://${"f".repeat(64)}.mp4`, "r
 }
 console.log("course: schema 4·5·6 상단 영상, 잘못된 미디어 제외와 본문 유지 확인");
 
+assert.deepEqual(parseCourseText(videoBundle(6, { glossarySkip: ["상자", "", 1, "끈"] })).categories[0].posts[0].glossarySkip, ["상자", "끈"]);
+for (const glossarySkip of [undefined, "상자", null]) {
+  assert.equal(parseCourseText(videoBundle(6, { glossarySkip })).categories[0].posts[0].glossarySkip, undefined);
+}
+console.log("course: 글 단위 용어 제외는 글자 목록만 받고 없는 묶음도 그대로 읽음");
+
 assert.equal(parseCourseText(videoBundle(6, { optional: true })).categories[0].posts[0].optional, true);
 for (const optional of [false, undefined, "true", 1, null]) {
   assert.equal(parseCourseText(videoBundle(6, { optional })).categories[0].posts[0].optional, false);

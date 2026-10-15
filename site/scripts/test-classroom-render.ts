@@ -16,6 +16,7 @@ import {
   inline,
   esc,
   mediaContentType,
+  postGlossary,
   ROOM_MEDIA_KEY,
   type CourseScene,
 } from "../classroom-render.ts";
@@ -489,6 +490,18 @@ check("용어 마커에는 새 탭 속성을 붙이지 않는다", () => {
   assert.ok(html.includes('<span class="term"'));
   assert.ok(!html.includes("term://"));
   assert.ok(!html.includes('target="_blank"'));
+});
+
+check("글이 뺀 용어는 그 글에서만 툴팁을 붙이지 않는다", () => {
+  const glossary = { 상자: "물건을 담는 통", 끈: "묶는 줄" };
+  assert.equal(postGlossary(glossary, undefined), glossary);
+  assert.equal(postGlossary(glossary, []), glossary);
+  const skipped = postGlossary(glossary, ["상자"]);
+  assert.deepEqual(skipped, { 끈: "묶는 줄" });
+  assert.deepEqual(glossary, { 상자: "물건을 담는 통", 끈: "묶는 줄" });
+  const html = renderPost("상자를 끈으로 묶습니다.", {}, skipped).html;
+  assert.ok(!html.includes("물건을 담는 통"));
+  assert.ok(html.includes("묶는 줄"));
 });
 
 check("정의가 없는 용어 마커도 새 탭 속성 없이 맨글자로 돌아간다", () => {

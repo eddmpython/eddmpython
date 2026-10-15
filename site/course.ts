@@ -14,7 +14,7 @@
 import type { Cells, CourseScene } from "./classroom-render";
 import type { Env } from "./env";
 
-export type CoursePost = { id: string; title: string; summary: string; body: string; optional?: boolean; introVideo?: string; introPoster?: string; scenes?: CourseScene[] };
+export type CoursePost = { id: string; title: string; summary: string; body: string; optional?: boolean; introVideo?: string; introPoster?: string; scenes?: CourseScene[]; glossarySkip?: string[] };
 export type CourseCategory = {
   slug: string;
   order: number;
@@ -197,6 +197,8 @@ export function parseCourseText(raw: string | null): CourseState {
         introVideo: typeof post.introVideo === "string" && /^room:\/\/[a-f0-9]{64}\.(mp4|webm)$/.test(post.introVideo) ? post.introVideo : undefined,
         introPoster: typeof post.introPoster === "string" && /^room:\/\/[a-f0-9]{64}\.(png|webp|jpg)$/.test(post.introPoster) ? post.introPoster : undefined,
         scenes: Array.isArray(post.scenes) ? post.scenes.filter(isScene) : undefined,
+        // 이 글에서 다른 뜻으로 쓰여 툴팁을 붙이지 않을 용어. 추가 필드라 없는 묶음도 그대로 읽는다.
+        glossarySkip: Array.isArray(post.glossarySkip) ? post.glossarySkip.filter((term): term is string => typeof term === "string" && term.length > 0) : undefined,
       })),
     }))
     .sort((a, b) => a.order - b.order);

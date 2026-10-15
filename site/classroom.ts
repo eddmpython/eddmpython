@@ -19,6 +19,7 @@ import {
   esc,
   mediaContentType,
   mediaSrc,
+  postGlossary,
   renderLecture,
   renderPost,
   ROOM_MEDIA_KEY,
@@ -1970,7 +1971,9 @@ export async function handleRoom(request: Request, env: Env, url: URL, ctx?: Exe
     // 비공개 시각물은 이 방의 경로로 붙는다. 쿠키가 방 경로에 묶여 있어 그 아래 주소에만 실린다.
     const media = { mediaBase: `${roomRoot}/media` };
     const githubLesson = studentInfo.github?.lesson === `${category.slug}/${post.id}`;
-    const { html, headings, hasCells } = renderPost(post.body, category.cells ?? {}, courseState.glossary, {
+    // 글이 다른 뜻으로 쓰는 용어는 이 글의 툴팁에서만 뺀다.
+    const glossary = postGlossary(courseState.glossary, post.glossarySkip);
+    const { html, headings, hasCells } = renderPost(post.body, category.cells ?? {}, glossary, {
       ...media,
       scenes: post.scenes ?? [],
       github: studentInfo.github ? {
@@ -1979,7 +1982,7 @@ export async function handleRoom(request: Request, env: Env, url: URL, ctx?: Exe
         file: githubPractice(room, false),
       } : undefined,
     });
-    const lecture = renderLecture(post.body, post.scenes ?? [], category.cells ?? {}, courseState.glossary, media);
+    const lecture = renderLecture(post.body, post.scenes ?? [], category.cells ?? {}, glossary, media);
     const noteSections = await notebookSections(headings);
 
     // 왼쪽. 같은 과정의 글을 오간다. 강의 중에 앞 편으로 되돌아가는 일이 잦다.

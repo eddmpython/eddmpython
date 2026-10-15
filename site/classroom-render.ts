@@ -350,6 +350,17 @@ export type Cells = Record<string, CourseCell>;
 export type Glossary = Record<string, string>;
 
 /**
+ * 한 글에 넘길 용어집. 글이 다른 뜻으로 쓰는 용어(파일 보관 위치의 '저장소', 로그인의 '로그')를
+ * 뺀다. 정의를 고치면 그 용어를 쓰는 모든 강의장 화면이 바뀌므로 글 단위로 뺀다.
+ * 뺄 용어가 없는 글은 같은 용어집을 그대로 받아 화면이 바뀌지 않는다.
+ */
+export function postGlossary(glossary: Glossary, skip: string[] | undefined): Glossary {
+  if (!skip?.length) return glossary;
+  const skipped = new Set(skip);
+  return Object.fromEntries(Object.entries(glossary).filter(([term]) => !skipped.has(term)));
+}
+
+/**
  * 본문의 용어 자리를 `[용어](term://용어)` 마커로 감싼다. **감싸는 자리의 정본은 여기다.**
  *
  * 발행 시점이 아니라 렌더 시점에 감싸는 이유는 배포 독립성이다. 발행이 마커를 심으면
