@@ -137,6 +137,14 @@ assert.equal(JSON.parse(merged).schema, 6);
 assert.equal(JSON.stringify(JSON.parse(merged).categories[1]), oldCategory);
 assert.equal(JSON.stringify(JSON.parse(merged).glossary), JSON.stringify(prior.glossary));
 assert.equal(mergeCourseCategory(before, { slug: "08-private-course", posts: "invalid" }), null);
+// 카테고리 용어집은 그 카테고리와 함께 들어가고 최상위 운영 용어집은 그대로 남는다.
+const withGlossary = mergeCourseCategory(before, { ...newCategory, glossary: { "수업": "새 정의" } });
+assert(withGlossary);
+assert.deepEqual(JSON.parse(withGlossary).categories.at(-1).glossary, { "수업": "새 정의" });
+assert.equal(JSON.stringify(JSON.parse(withGlossary).glossary), JSON.stringify(prior.glossary));
+for (const glossary of [{ "수업": "" }, { "수업": 1 }, ["수업"], "수업", null]) {
+  assert.equal(mergeCourseCategory(before, { ...newCategory, glossary }), null);
+}
 const patchBody = JSON.stringify({ category: newCategory });
 const patchHash = await crypto.subtle.digest("SHA-256", encoder.encode(patchBody));
 const patchDigest = [...new Uint8Array(patchHash)].map((byte) => byte.toString(16).padStart(2, "0")).join("");

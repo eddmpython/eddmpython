@@ -144,20 +144,22 @@ export function validCourseBundle(raw: string): { categories: number; posts: num
   let source: {
     schema?: unknown;
     glossary?: unknown;
-    categories?: Array<{ slug?: unknown; posts?: Array<{ id?: unknown; optional?: unknown; introVideo?: unknown; introPoster?: unknown; scenes?: unknown[] }> }>;
+    categories?: Array<{ slug?: unknown; glossary?: unknown; posts?: Array<{ id?: unknown; optional?: unknown; introVideo?: unknown; introPoster?: unknown; scenes?: unknown[] }> }>;
   };
   try {
     source = JSON.parse(raw) as typeof source;
   } catch {
     return null;
   }
+  const badGlossary = (value: unknown) => value !== undefined && (
+    !value ||
+    typeof value !== "object" ||
+    Array.isArray(value) ||
+    Object.entries(value).some(([term, def]) => !term || typeof def !== "string" || !def)
+  );
   if ((source.schema !== 4 && source.schema !== 5 && source.schema !== 6) || !Array.isArray(source.categories) || !source.categories.length) return null;
-  if (source.glossary !== undefined && (
-    !source.glossary ||
-    typeof source.glossary !== "object" ||
-    Array.isArray(source.glossary) ||
-    Object.entries(source.glossary).some(([term, def]) => !term || typeof def !== "string" || !def)
-  )) return null;
+  // 카테고리마다 발행할 때의 용어집이 올 수 있다. 최상위와 같은 모양만 받는다.
+  if (badGlossary(source.glossary) || source.categories.some((category) => badGlossary(category?.glossary))) return null;
 
   const parsed = parseCourseText(raw);
   if (!parsed.ok || parsed.categories.length !== source.categories.length) return null;

@@ -89,6 +89,20 @@ for (const glossarySkip of [undefined, "상자", null]) {
 }
 console.log("course: 글 단위 용어 제외는 글자 목록만 받고 없는 묶음도 그대로 읽음");
 
+{
+  const withCategoryGlossary = JSON.parse(videoBundle(6));
+  withCategoryGlossary.glossary = { "상자": "운영 정의" };
+  withCategoryGlossary.categories[0].glossary = { "상자": "새 정의", "빈칸": "", "숫자": 1 };
+  const parsed = parseCourseText(JSON.stringify(withCategoryGlossary));
+  assert.deepEqual(parsed.glossary, { "상자": "운영 정의" });
+  assert.deepEqual(parsed.categories[0].glossary, { "상자": "새 정의" });
+  for (const invalid of [undefined, "상자", ["상자"], null]) {
+    withCategoryGlossary.categories[0].glossary = invalid;
+    assert.equal(parseCourseText(JSON.stringify(withCategoryGlossary)).categories[0].glossary, undefined);
+  }
+}
+console.log("course: 카테고리 용어집은 글자 쌍만 받고 없으면 최상위 용어집을 씀");
+
 assert.equal(parseCourseText(videoBundle(6, { optional: true })).categories[0].posts[0].optional, true);
 for (const optional of [false, undefined, "true", 1, null]) {
   assert.equal(parseCourseText(videoBundle(6, { optional })).categories[0].posts[0].optional, false);

@@ -1971,8 +1971,8 @@ export async function handleRoom(request: Request, env: Env, url: URL, ctx?: Exe
     // 비공개 시각물은 이 방의 경로로 붙는다. 쿠키가 방 경로에 묶여 있어 그 아래 주소에만 실린다.
     const media = { mediaBase: `${roomRoot}/media` };
     const githubLesson = studentInfo.github?.lesson === `${category.slug}/${post.id}`;
-    // 글이 다른 뜻으로 쓰는 용어는 이 글의 툴팁에서만 뺀다.
-    const glossary = postGlossary(courseState.glossary, post.glossarySkip);
+    // 카테고리가 발행할 때 실은 용어집을 먼저 쓰고, 글이 다른 뜻으로 쓰는 용어는 이 글의 툴팁에서만 뺀다.
+    const glossary = postGlossary(category.glossary ?? courseState.glossary, post.glossarySkip);
     const { html, headings, hasCells } = renderPost(post.body, category.cells ?? {}, glossary, {
       ...media,
       scenes: post.scenes ?? [],

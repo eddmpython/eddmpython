@@ -27,6 +27,11 @@ export type CourseCategory = {
   nextCategory?: string;
   /** 실행 칸 예제. schema 3 부터 온다. 교안이 링크로 부르고 렌더러가 칸으로 그린다 */
   cells?: Cells;
+  /**
+   * 이 카테고리를 발행할 때의 용어 정의. 있으면 최상위 용어집 대신 쓴다. 다시 발행하지 않은
+   * 카테고리는 최상위 운영 용어집을 그대로 써서 정의를 고쳐도 화면이 바뀌지 않는다. 추가 필드다.
+   */
+  glossary?: Record<string, string>;
   posts: CoursePost[];
 };
 type CourseBundle = {
@@ -176,12 +181,15 @@ export function parseCourseText(raw: string | null): CourseState {
     return { ok: false, categories: [], glossary: {} };
   }
   // 문자열 쌍만 받는다. 묶음의 다른 부분이 멀쩡한데 용어집만 깨졌으면 툴팁 없이 그린다.
-  const glossary: Record<string, string> = {};
-  if (bundle.glossary && typeof bundle.glossary === "object" && !Array.isArray(bundle.glossary)) {
-    for (const [term, def] of Object.entries(bundle.glossary)) {
-      if (typeof def === "string" && term && def) glossary[term] = def;
+  const terms = (value: unknown): Record<string, string> | undefined => {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
+    const kept: Record<string, string> = {};
+    for (const [term, def] of Object.entries(value)) {
+      if (typeof def === "string" && term && def) kept[term] = def;
     }
-  }
+    return kept;
+  };
+  const glossary = terms(bundle.glossary) ?? {};
   const categories = bundle.categories
     .filter((c) => c && typeof c.slug === "string" && Array.isArray(c.posts))
     .map((c) => ({
@@ -191,6 +199,7 @@ export function parseCourseText(raw: string | null): CourseState {
         typeof c.displayNumber === "string" && /^\d{2}(?:-\d{2})?$/.test(c.displayNumber)
           ? c.displayNumber
           : undefined,
+      glossary: terms(c.glossary),
       posts: c.posts.filter(isPost).map((post) => ({
         ...post,
         optional: bundle.schema >= 6 && post.optional === true,
