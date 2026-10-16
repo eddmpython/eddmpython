@@ -71,7 +71,7 @@ export class StudentStore {
       const repository = text(body.repository, 140), lesson = text(body.lesson, 300);
       if (!/^[A-Za-z0-9-]+\/[A-Za-z0-9_.-]+$/.test(repository) || !/^[a-z0-9-]+\/[a-z0-9-]+$/.test(lesson)) return fail("저장소와 연결할 수업을 확인해 주세요");
       const previous = this.one("SELECT * FROM studentGithub WHERE roomId=?", roomId);
-      if (previous?.username && previous.repository !== repository) return fail("계정이 연결된 저장소는 변경할 수 없습니다", 409);
+      if (previous?.repository !== repository && (previous?.accountId || previous?.attempt || ["pending", "active"].includes(String(previous?.status)))) return fail("초대 또는 연결된 저장소는 변경할 수 없습니다", 409);
       this.sql.exec(`INSERT INTO studentGithub(roomId,repository,lesson) VALUES(?,?,?)
         ON CONFLICT(roomId) DO UPDATE SET repository=excluded.repository,lesson=excluded.lesson`, roomId, repository, lesson);
       return Response.json({ ok: true });

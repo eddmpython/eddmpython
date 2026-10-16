@@ -89,6 +89,7 @@ export function githubForm(link: GithubLink | null, room: PublicRoom, readOnly: 
     <p><a href="${esc(repositoryUrl)}" target="_blank" rel="noreferrer">${esc(link.repository)}</a> · Private</p>
     ${link.username ? `<p>GitHub 계정: <a href="https://github.com/${esc(link.username)}" target="_blank" rel="noreferrer">${esc(link.username)}</a></p>` : ""}
     ${link.status === "pending" ? `<p>초대를 보냈습니다. 아래에서 초대를 수락한 뒤 ‘연결 상태 확인’을 클릭하세요.</p><p><a class="github-button" href="${esc(repositoryUrl)}/invitations" target="_blank" rel="noreferrer">GitHub에서 초대 수락</a></p>` : ""}
+    ${link.status === "registered" && !ready ? `<p><a class="github-button" href="${esc(repositoryUrl)}/invitations" target="_blank" rel="noreferrer">GitHub에서 초대 확인</a></p>` : ""}
     ${link.status === "active" ? `<p>저장소에 접근할 수 있습니다. 다음 섹션에서 실습을 진행하세요.</p><p><a class="github-button" href="${esc(repositoryUrl)}" target="_blank" rel="noreferrer">실습 저장소 열기</a></p>` : ""}
     <form data-github-form action="/room/${esc(room.slug)}/github" method="post">
       ${editable ? `<label>GitHub 사용자 이름<input name="username" value="${esc(link.username)}" maxlength="39" autocomplete="off" autocapitalize="none" spellcheck="false" required ${disabled ? "disabled" : ""} placeholder="예: my-github-id"></label>` : `<input type="hidden" name="username" value="${esc(link.username)}">`}

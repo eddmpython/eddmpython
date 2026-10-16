@@ -148,6 +148,8 @@ try {
   assert.equal(response.status, 200);
   const html = (await response.json()).html;
   assert.match(html, /강사 확인 대기/);
+  assert.match(html, /href="https:\/\/github.com\/sample\/practice\/invitations"[^>]*>GitHub에서 초대 확인/);
+  assert.doesNotMatch(html, /초대를 보냈습니다/);
   assert.ok(field(html, 'username'));
   assert.match(field(html, 'username'), /value="learner"/);
   assert.doesNotMatch(field(html, 'username'), /\bdisabled\b|type="hidden"/);
@@ -164,6 +166,14 @@ try {
   const settings = await (await offlineRequest('/admin/students/' + roomIds.get('register') + '?tab=settings', {}, admin)).text();
   assert.match(settings, /corrected-name/);
   assert.match(settings, /강사 확인 대기/);
+  assert.doesNotMatch(field(settings, 'repository'), /\breadonly\b/);
+  const reconfigured = await offlineJson('/admin/students/api', { action: 'studentGithubConfig', roomId: roomIds.get('register'), repository: 'sample/individual', lesson: '01-start/01-first' }, admin);
+  assert.equal(reconfigured.status, 200);
+  const updatedPage = await (await offlineRequest('/room/register/01-start/01-first', {}, cookie)).text();
+  assert.match(updatedPage, /href="https:\/\/github.com\/sample\/individual\/invitations"/);
+  assert.doesNotMatch(updatedPage, /href="https:\/\/github.com\/sample\/practice/);
+  assert.equal((await call({ action: 'studentGet', roomId: roomIds.get('register') })).github.username, 'corrected-name');
+  assert.equal((await call({ action: 'studentGet', roomId: roomIds.get('other') })).github.repository, 'sample/practice');
   assert.match(await (await offlineRequest('/admin/students', {}, admin)).text(), /GitHub · 강사 확인 대기 · corrected-name/);
   const preview = await offlineRequest('/admin/students/' + roomIds.get('register') + '/preview', {}, admin);
   const previewCookie = preview.headers.get('set-cookie').split(';')[0];

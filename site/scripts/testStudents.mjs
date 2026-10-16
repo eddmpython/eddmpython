@@ -87,6 +87,12 @@ try {
   assert.equal(githubEvents().length, 1);
   assert.equal((await call('studentGithubSave', 'alpha', { username: 'corrected-name' })).status, 200);
   assert.equal(githubEvents().length, 2);
+  assert.equal((await call('studentGithubConfig', 'alpha', { ...githubInput, repository: 'sample/individual' })).status, 200);
+  const moved = (await call('studentInfo')).github;
+  assert.equal(moved.repository, 'sample/individual');
+  assert.equal(moved.username, 'corrected-name');
+  assert.equal(moved.status, 'registered');
+  assert.equal(githubEvents().length, 2, 'changing the repository must not claim an invitation was sent');
   assert.deepEqual((await call('studentInfo')).completed, progress);
   assert.deepEqual(await call('studentWork'), work);
   assert.deepEqual(await call('studentGet', 'beta'), otherStudent);
@@ -98,6 +104,8 @@ try {
   assert.equal((await call('studentGithubStart', 'alpha', { username: 'learner' })).status, 429);
   assert.equal((await call('studentGithubStart', 'alpha', { username: 'changed-name' })).status, 409);
   const inFlight = (await call('studentInfo')).github;
+  assert.equal((await call('studentGithubConfig', 'alpha', { ...githubInput, repository: 'sample/other' })).status, 409);
+  assert.equal((await call('studentGithubConfig', 'alpha', { ...githubInput, repository: 'sample/individual' })).status, 200);
   assert.equal((await call('studentGithubSave', 'alpha', { username: 'learner' })).status, 409);
   assert.equal((await call('studentGithubSave', 'alpha', { username: 'changed-name' })).status, 409);
   assert.deepEqual((await call('studentInfo')).github, inFlight);
@@ -109,6 +117,7 @@ try {
     db.prepare("UPDATE studentGithub SET status=?,accountId=? WHERE roomId='alpha'").run(status, accountId);
     const before = (await call('studentInfo')).github;
     const count = githubEvents().length;
+    assert.equal((await call('studentGithubConfig', 'alpha', { ...githubInput, repository: 'sample/other' })).status, 409, status);
     assert.equal((await call('studentGithubSave', 'alpha', { username: 'changed-name' })).status, 409, status);
     assert.deepEqual((await call('studentInfo')).github, before);
     assert.equal(githubEvents().length, count);
