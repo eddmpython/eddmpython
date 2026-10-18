@@ -106,6 +106,19 @@ const VIDEO = /\.(mp4|webm|mov)$/i;
 const SOLO_LINK = /^\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)$/;
 /** 굵은 글씨 한 줄만 있는 문단. 섹션 안에서 사례를 가르는 라벨이다. */
 const LABEL = /^\*\*[^*\n]+\*\*$/;
+/** `---`만 있는 문단은 한 글 안의 구간을 나누는 선이다. 뒤에 문구를 붙이면 선 가운데에 보인다. */
+const DIVIDER = /^-{3,}(?:[ \t]+(\S[^\n]*))?$/;
+
+/**
+ * 필수 범위가 끝나고 심화가 시작되는 자리처럼 수강생이 멈춰도 되는 경계를 보여 준다.
+ * 2026-10-18 운영자 지시. 예전에는 `---`가 글자로 나가 교안에서 지웠고 경계가 화면에서 사라졌다.
+ * 모양을 표시와 함께 실어 별도 스타일 없이 읽기 화면과 미리보기에서 같게 보인다.
+ */
+function lessonDivider(label: string): string {
+  const line = '<span aria-hidden="true" style="flex:1;border-top:2px solid var(--eddm-accent,#c4473a)"></span>';
+  const text = label.trim();
+  return `<div class="lesson-divider" role="separator"${text ? ` aria-label="${esc(text)}"` : ""} style="display:flex;align-items:center;gap:.75rem;margin:3rem 0 1.5rem;color:var(--eddm-accent,#c4473a);font-size:.9rem;font-weight:700;letter-spacing:.02em">${line}${text ? `<span>${esc(text)}</span>${line}` : ""}</div>`;
+}
 const TABLE_DIVIDER = /^\|?(?:\s*:?-{3,}:?\s*\|)+\s*:?-{3,}:?\s*\|?$/;
 
 function tableCells(line: string): string[] {
@@ -666,7 +679,9 @@ function blocks(text: string, headings: string[], cells: Cells, state: RenderSta
     flush();
     const table = markdownTable(b, state.mediaBase);
     const list = markdownList(b, state.mediaBase);
-    if (b.startsWith("## ")) {
+    const divider = b.match(DIVIDER);
+    if (divider) out.push(lessonDivider(divider[1] ?? ""));
+    else if (b.startsWith("## ")) {
       // 목차가 여기로 뛴다. 번호로 거는 이유는 제목이 한글이라 slug 를 만들면 깨지기 때문이다.
       const title = b.slice(3);
       headings.push(title);

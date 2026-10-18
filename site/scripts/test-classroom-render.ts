@@ -1242,4 +1242,18 @@ check("제목이 없거나 비어 있는 실행 칸은 실습이라는 이름 �
   }
 });
 
+check("--- 문단은 구간을 나누는 선이 되고, 뒤에 붙인 문구는 선 가운데에 보인다", () => {
+  const labeled = renderMarkdown("앞말\n\n--- 필수는 여기까지 · 아래는 심화\n\n뒷말");
+  assert.ok(labeled.includes('class="lesson-divider" role="separator" aria-label="필수는 여기까지 · 아래는 심화"'));
+  assert.ok(labeled.includes("<span>필수는 여기까지 · 아래는 심화</span>"));
+  assert.ok(labeled.indexOf("앞말") < labeled.indexOf("lesson-divider") && labeled.indexOf("lesson-divider") < labeled.indexOf("뒷말"));
+  const plain = renderMarkdown("앞말\n\n---\n\n뒷말");
+  assert.ok(plain.includes('<div class="lesson-divider" role="separator" style='));
+  assert.ok(!plain.includes("<p>---</p>"));
+  assert.ok(renderMarkdown("--- <b>심화</b>").includes("&lt;b&gt;심화&lt;/b&gt;"));
+  // 표 구분 줄과 목록은 그대로다.
+  assert.ok(renderMarkdown("| 가 | 나 |\n|---|---|\n| 1 | 2 |").includes("<table"));
+  assert.ok(!renderMarkdown("- 항목").includes("lesson-divider"));
+});
+
 console.log(`classroom render: 코드 분할과 escape 등 ${count} cases`);
