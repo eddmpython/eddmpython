@@ -54,12 +54,12 @@
       "at": "2026-09-01"
     },
     "005-python-history/insider": {
-      "value": "https://blog.python.org/2026/10/python-3160-alpha-1-is-now-available/",
-      "at": "2026-10-14"
+      "value": "https://blog.python.org/2026/10/python-3151-3149-31317/",
+      "at": "2026-10-21"
     },
     "005-python-history/python-latest": {
-      "value": "3.15.0",
-      "at": "2026-10-11"
+      "value": "3.15.1",
+      "at": "2026-10-21"
     }
   }
 }
