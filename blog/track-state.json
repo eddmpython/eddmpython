@@ -10,8 +10,8 @@
       "at": "2026-10-13"
     },
     "004-dataframe-libraries/cudf": {
-      "value": "26.10.0",
-      "at": "2026-10-09"
+      "value": "26.10.2",
+      "at": "2026-10-22"
     },
     "004-dataframe-libraries/daft": {
       "value": "0.7.26",
@@ -38,8 +38,8 @@
       "at": "2026-10-11"
     },
     "004-dataframe-libraries/pandas": {
-      "value": "3.0.6",
-      "at": "2026-09-17"
+      "value": "3.1.0",
+      "at": "2026-10-22"
     },
     "004-dataframe-libraries/polars": {
       "value": "2.0.0",
