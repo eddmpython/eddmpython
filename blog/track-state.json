@@ -42,8 +42,8 @@
       "at": "2026-10-22"
     },
     "004-dataframe-libraries/polars": {
-      "value": "2.0.0",
-      "at": "2026-10-07"
+      "value": "2.1.0",
+      "at": "2026-10-25"
     },
     "004-dataframe-libraries/pyspark": {
       "value": "4.2.0",
