@@ -46,8 +46,8 @@
       "at": "2026-10-25"
     },
     "004-dataframe-libraries/pyspark": {
-      "value": "4.2.1",
-      "at": "2026-10-28"
+      "value": "4.3.0",
+      "at": "2026-10-31"
     },
     "004-dataframe-libraries/vaex": {
       "value": "4.19.0",
