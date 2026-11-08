@@ -19,10 +19,14 @@ assert.deepEqual(
     "eddmpython.com/admin/*",
     "eddmpython.com/room",
     "eddmpython.com/room/*",
+    "eddmpython.com/master",
+    "eddmpython.com/master/*",
     "www.eddmpython.com/admin",
     "www.eddmpython.com/admin/*",
     "www.eddmpython.com/room",
     "www.eddmpython.com/room/*",
+    "www.eddmpython.com/master",
+    "www.eddmpython.com/master/*",
   ]),
 );
 

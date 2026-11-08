@@ -10,6 +10,7 @@ import { handleAdmin } from "./admin";
 import { handleRoom } from "./classroom";
 import { handleCoursePublish } from "./coursePublish";
 import type { Env } from "./env";
+import { handleMaster } from "./master";
 import { securityHeaders } from "./securityHeaders";
 
 function withClassroomHeaders(response: Response): Response {
@@ -29,6 +30,10 @@ export default {
 
     if (pathname === "/admin/course-publish") {
       return withClassroomHeaders(await handleCoursePublish(request, env));
+    }
+    // 운영자 바로 보기. 화면은 운영 세션 쿠키가 닿는 /admin 아래에 둔다.
+    if (pathname === "/master" || pathname.startsWith("/master/") || pathname === "/admin/master") {
+      return withClassroomHeaders(await handleMaster(request, env, url));
     }
     if (pathname === "/admin" || pathname.startsWith("/admin/")) {
       return withClassroomHeaders(await handleAdmin(request, env, url));

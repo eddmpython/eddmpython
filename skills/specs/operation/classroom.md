@@ -210,6 +210,16 @@ course-scene 선언
 
 노트북을 잃어버렸으면 운영장 아래쪽 **모든 운영 세션 끊기** 를 누른다. 그 자리에서 전부 끊긴다.
 
+### 구글 계정으로 바로 보기
+
+`eddmpython.com/master` 는 운영자가 비밀번호 없이 eddmpython 구글 계정(`eddmpython@gmail.com`)으로
+들어와 강의방마다 넣은 수업을 바로 여는 주소다. 구글이 확인한 메일이 그 계정 하나일 때만 운영 세션을
+내고, 그 세션은 비밀번호 로그인과 같아 **모든 운영 세션 끊기** 가 함께 끊는다. 화면은 `/admin/master`
+이고 수업 링크는 관리자 미리보기로 열려 수강생 기록을 남기지 않는다. 구글 로그인은 이 강의장이 가진
+웹 OAuth 클라이언트로 하며(돌아올 주소 `https://eddmpython.com/master/callback`), 클라이언트 값이
+없으면 이 주소는 닫히고 비밀번호 로그인만 남는다. 코드는 `site/master.ts`, 시험은
+`site/scripts/testMasterRoute.mjs` 다.
+
 ### 운영장에서 하는 일
 
 강의방 만들기, URL과 이름 옮기기, 수강 비밀번호 바꾸기, 수강생 입장 허용, 커리큘럼 포함 체크,
@@ -340,8 +350,9 @@ schema 6은 `CoursePost.optional: true`인 선택 수업을 지원한다. 배정
 | 세션 쿠키 서명 키 | Durable Object 가 처음 필요할 때 만든다 | 자동 |
 | 운영자 비밀번호 `ADMIN_PASSWORD` | Worker secret | 배포 때 한 번. `npx wrangler secret put ADMIN_PASSWORD` 로 언제든 바꾼다 |
 | 운영 세션 세대 | Durable Object. 비밀번호가 바뀌거나 운영자가 끊으면 새로 뽑는다 | 자동 |
+| 구글 로그인 `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Worker secret | 바로 보기를 쓸 때 한 번. 없으면 구글 로그인만 닫힌다 |
 
-**배포 때 넣는 비밀값은 `ADMIN_PASSWORD` 하나다.** 방과 수강 비밀번호는 배포와 무관하다.
+**배포 때 꼭 넣는 비밀값은 `ADMIN_PASSWORD` 하나다.** 방과 수강 비밀번호는 배포와 무관하다.
 검수 스크립트도 사람과 같은 문으로 들어간다. 그 비밀번호를 `site/.dev.vars` 에 같은 이름으로
 두면 `admin:shot`, `classroom:shot`, `classroom:audit` 이 쓴다. 그 파일은 추적하지 않는다.
 

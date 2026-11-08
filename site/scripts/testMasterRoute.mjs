@@ -1,0 +1,197 @@
+// 운영자 바로 보기(master.ts)의 구글 로그인과 화면을 실제 Worker로 확인한다. 구글 토큰 끝점은 가짜로 답한다.
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { build } from 'esbuild';
+import { Miniflare } from 'miniflare';
+import { fileURLToPath } from 'node:url';
+
+const built = await build({ stdin: { contents: 'export {default} from "./classroomWorker.ts"; export {Classroom} from "./rooms.ts";', resolveDir: fileURLToPath(new URL('../', import.meta.url)) }, bundle: true, format: 'esm', platform: 'browser', write: false, logLevel: 'silent' });
+const password = crypto.randomUUID();
+const clientId = 'test-client.apps.googleusercontent.com';
+const clientSecret = crypto.randomUUID();
+const origin = 'https://classroom.example';
+const b64 = value => Buffer.from(JSON.stringify(value)).toString('base64url');
+
+// 구글 토큰 끝점이 받은 요청과 돌려줄 값. 시험마다 claims를 바꾼다.
+let claims = {};
+let tokenStatus = 200;
+const tokenRequests = [];
+const outboundService = async request => {
+  const url = new URL(request.url);
+  if (url.origin !== 'https://oauth2.googleapis.com' || url.pathname !== '/token') return new Response('blocked', { status: 599 });
+  tokenRequests.push(Object.fromEntries(new URLSearchParams(await request.text())));
+  if (tokenStatus !== 200) return Response.json({ error: 'invalid_grant' }, { status: tokenStatus });
+  return Response.json({ access_token: 'unused', id_token: `${b64({ alg: 'RS256' })}.${b64(claims)}.sig` });
+};
+const good = () => ({ iss: 'https://accounts.google.com', aud: clientId, exp: Math.floor(Date.now() / 1000) + 600, email: 'eddmpython@gmail.com', email_verified: true });
+
+const worker = bindings => new Miniflare({ modules: true, script: built.outputFiles[0].text, compatibilityDate: '2026-08-08', compatibilityFlags: ['nodejs_compat'], durableObjects: { CLASSROOM: { className: 'Classroom', useSQLite: true } }, kvNamespaces: ['COURSE'], r2Buckets: ['SUBMISSIONS'], bindings: { ADMIN_PASSWORD: password, ...bindings }, outboundService });
+const client = mf => {
+  const request = (path, init = {}, cookie = '', base = origin) => mf.dispatchFetch(base + path, { ...init, headers: { origin: base, cookie, ...init.headers }, redirect: 'manual' });
+  return {
+    request,
+    json: (path, data, cookie) => request(path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data) }, cookie),
+    post: (path, data, cookie) => request(path, { method: 'POST', body: new URLSearchParams(data) }, cookie),
+  };
+};
+const cookies = r => r.headers.getSetCookie?.() ?? [r.headers.get('set-cookie')].filter(Boolean);
+const cookieNamed = (r, name) => cookies(r).find(c => c.startsWith(name + '='));
+
+// 구글 값을 넣지 않은 강의장은 이 길을 닫고 로그인 화면에도 보이지 않는다.
+const closed = worker({});
+try {
+  const { request } = client(closed);
+  const login = await request('/master/login');
+  assert.equal(login.status, 503);
+  assert.match(await login.text(), /구글 로그인 연결 전입니다/);
+  assert.equal(cookieNamed(login, 'eddm_master'), undefined);
+  assert.doesNotMatch(await (await request('/admin')).text(), /master\/login/);
+  assert.equal((await request('/master/callback?code=x&state=y')).status, 503);
+} finally {
+  await closed.dispose();
+}
+
+const mf = worker({ GOOGLE_CLIENT_ID: clientId, GOOGLE_CLIENT_SECRET: clientSecret });
+try {
+  const { request, json, post } = client(mf);
+  const kv = await mf.getKVNamespace('COURSE');
+  await kv.put('bundle', JSON.stringify({ schema: 4, sceneContract: 12, categories: [
+    { slug: '01-start', title: '시작', order: 1, posts: [
+      { id: '01-first', title: '첫 수업', summary: '실습', body: '## 준비\n\n설명입니다.' },
+      { id: '02-second', title: '두 번째 수업', summary: '실습', body: '## 다음\n\n두 번째 본문입니다.' },
+    ] },
+    { slug: '02-next', title: '잠근 과정', order: 2, posts: [{ id: '01-next', title: '잠근 수업', summary: '다음', body: '## 연결\n\n다음 과정입니다.' }] },
+  ] }));
+  await kv.put('version', 'test');
+  const admin = cookieNamed(await post('/admin/login', { password }), 'eddm_admin').split(';')[0];
+  assert.equal((await json('/admin/api', { action: 'create', slug: 'alpha', title: '알파 강의방', password }, admin)).status, 200);
+  await json('/admin/api', { action: 'toggle', slug: 'alpha', category: '01-start' }, admin);
+  await json('/admin/api', { action: 'open', slug: 'alpha', open: true }, admin);
+  assert.equal((await json('/admin/api', { action: 'create', slug: 'empty', title: '빈 강의방', password }, admin)).status, 200);
+  const alpha = (await (await json('/admin/api', { action: 'list' }, admin)).json()).rooms.find(r => r.slug === 'alpha');
+
+  // 주소와 화면 문. 로그인하지 않으면 구글 로그인으로 보낸다.
+  assert.equal((await request('/master')).headers.get('location'), '/admin/master');
+  const anonymous = await request('/admin/master');
+  assert.equal(anonymous.status, 303);
+  assert.equal(anonymous.headers.get('location'), '/master/login');
+  const www = await request('/master/login', {}, '', 'https://www.classroom.example');
+  assert.equal(www.status, 308);
+  assert.equal(www.headers.get('location'), 'https://classroom.example/master/login');
+  assert.equal((await request('/master/login', { method: 'POST' })).status, 404);
+  assert.match(await (await request('/admin')).text(), /href="\/master\/login\?returnTo=%2Fadmin%2Fstudents">eddmpython 구글 계정으로 들어가기/);
+
+  // 구글로 보내는 주소와 상태 쿠키.
+  const begin = async (returnTo = '') => {
+    const r = await request('/master/login' + (returnTo ? '?returnTo=' + encodeURIComponent(returnTo) : ''));
+    assert.equal(r.status, 303);
+    const target = new URL(r.headers.get('location'));
+    const state = cookieNamed(r, 'eddm_master');
+    assert.match(state, /Path=\/master; HttpOnly; Secure; SameSite=Lax/);
+    return { target, cookie: state.split(';')[0] };
+  };
+  const { target, cookie: stateCookie } = await begin();
+  assert.equal(target.origin + target.pathname, 'https://accounts.google.com/o/oauth2/v2/auth');
+  const params = target.searchParams;
+  assert.equal(params.get('client_id'), clientId);
+  assert.equal(params.get('redirect_uri'), origin + '/master/callback');
+  assert.equal(params.get('response_type'), 'code');
+  assert.equal(params.get('scope'), 'openid email');
+  assert.equal(params.get('code_challenge_method'), 'S256');
+  assert.equal(params.get('login_hint'), 'eddmpython@gmail.com');
+  assert.ok(!params.has('client_secret'));
+  const [stateValue, verifier] = stateCookie.slice('eddm_master='.length).split('.');
+  assert.equal(params.get('state'), stateValue);
+  assert.equal(params.get('code_challenge'), createHash('sha256').update(verifier).digest('base64url'));
+
+  const back = (cookie, query) => request('/master/callback?' + new URLSearchParams(query), {}, cookie);
+  const refused = async (r, status) => {
+    assert.equal(r.status, status);
+    assert.equal(cookieNamed(r, 'eddm_admin'), undefined);
+    assert.match(cookieNamed(r, 'eddm_master'), /Max-Age=0/);
+    return r.text();
+  };
+
+  // 요청을 시작한 창이 아니거나 구글이 거절하면 토큰을 받으러 가지 않는다.
+  await refused(await back('', { code: 'c', state: stateValue }), 400);
+  await refused(await back(stateCookie, { code: 'c', state: 'other' }), 400);
+  await refused(await back(stateCookie, { error: 'access_denied', state: stateValue }), 400);
+  assert.equal(tokenRequests.length, 0);
+
+  // 구글 계정 확인.
+  const tries = [
+    [{ ...good(), email: 'someone@gmail.com' }, 403],
+    [{ ...good(), email_verified: false }, 403],
+    [{ ...good(), aud: 'other-client' }, 502],
+    [{ ...good(), iss: 'https://evil.example' }, 502],
+    [{ ...good(), exp: Math.floor(Date.now() / 1000) - 5 }, 502],
+  ];
+  for (const [next, status] of tries) {
+    claims = next;
+    const html = await refused(await back(stateCookie, { code: 'c', state: stateValue }), status);
+    if (status === 403) assert.match(html, /eddmpython 구글 계정으로만/);
+  }
+  tokenStatus = 400;
+  await refused(await back(stateCookie, { code: 'c', state: stateValue }), 502);
+  tokenStatus = 200;
+
+  // 맞는 계정이면 운영 세션을 받고 바로 보기 화면으로 간다.
+  claims = { ...good(), email: 'EddmPython@gmail.com', email_verified: 'true' };
+  const signed = await back(stateCookie, { code: 'the-code', state: stateValue });
+  assert.equal(signed.status, 303);
+  assert.equal(signed.headers.get('location'), '/admin/master');
+  assert.match(cookieNamed(signed, 'eddm_master'), /Max-Age=0/);
+  assert.match(cookieNamed(signed, 'eddm_admin'), /Path=\/admin; HttpOnly; Secure; SameSite=Lax/);
+  const sent = tokenRequests.at(-1);
+  assert.deepEqual(sent, { code: 'the-code', client_id: clientId, client_secret: clientSecret, redirect_uri: origin + '/master/callback', grant_type: 'authorization_code', code_verifier: verifier });
+  const google = cookieNamed(signed, 'eddm_admin').split(';')[0];
+
+  // 바로 보기 화면: 강의방마다 넣은 수업만 미리보기 링크로 보인다.
+  const view = await request('/admin/master', {}, google);
+  assert.equal(view.status, 200);
+  assert.match(view.headers.get('cache-control'), /no-store/);
+  const html = await view.text();
+  assert.match(html, /알파 강의방/);
+  assert.match(html, /\/room\/alpha/);
+  assert.match(html, new RegExp(`href="/admin/students/${alpha.id}/preview" target="_blank"`));
+  assert.match(html, new RegExp(`href="/admin/students/${alpha.id}/preview\\?lesson=01-start%2F02-second" target="_blank" rel="noreferrer">두 번째 수업`));
+  assert.doesNotMatch(html, /잠근 수업/);
+  // 닫힌 강의방은 열린 강의방 뒤에 보이고 미리보기 링크가 없다(수강생 화면이 '아직 열리지 않았습니다'만 보인다).
+  assert.match(html, /알파 강의방[\s\S]*빈 강의방<\/h2><p class="muted small">\/room\/empty · 닫힘<\/p><p class="muted">닫힌 강의방이라 미리보기가 열리지 않습니다/);
+  const emptyRoom = (await (await json('/admin/api', { action: 'list' }, admin)).json()).rooms.find(r => r.slug === 'empty');
+  assert.doesNotMatch(html, new RegExp(`/admin/students/${emptyRoom.id}/preview`));
+  assert.doesNotMatch(html, /\/room\/alpha · 닫힘/);
+  assert.doesNotMatch(html, new RegExp(password));
+
+  // 화면의 링크는 비밀번호 없이 수강생 화면을 연다. 미리보기라 차례 잠금을 건너뛴다.
+  const preview = await request(`/admin/students/${alpha.id}/preview?lesson=01-start%2F02-second`, {}, google);
+  assert.equal(preview.status, 303);
+  assert.equal(preview.headers.get('location'), '/room/alpha/01-start/02-second');
+  const previewCookie = cookieNamed(preview, 'eddm_preview').split(';')[0];
+  const lesson = await request('/room/alpha/01-start/02-second', {}, previewCookie);
+  assert.equal(lesson.status, 200);
+  assert.match(await lesson.text(), /두 번째 본문입니다/);
+  assert.equal((await request('/admin/students', {}, google)).status, 200);
+
+  // 메일의 질문 링크는 로그인 뒤 그 질문으로 돌아가고, 다른 주소는 바로 보기로 간다.
+  const thread = crypto.randomUUID();
+  for (const [returnTo, location] of [
+    [`/admin/students/questions?thread=${thread}`, `/admin/students/questions?thread=${thread}`],
+    ['/admin/students', '/admin/master'],
+    ['/admin/api', '/admin/master'],
+    ['https://evil.example/admin/students/questions', '/admin/master'],
+  ]) {
+    const started = await begin(returnTo);
+    claims = good();
+    const done = await back(started.cookie, { code: 'c', state: started.target.searchParams.get('state') });
+    assert.equal(done.status, 303);
+    assert.equal(done.headers.get('location'), location);
+  }
+
+  // 모든 운영 세션 끊기는 구글로 받은 세션도 끊는다.
+  assert.equal((await json('/admin/api', { action: 'adminRotate' }, google)).status, 200);
+  assert.equal((await request('/admin/master', {}, google)).headers.get('location'), '/master/login');
+} finally {
+  await mf.dispose();
+}
+console.log('master route ok');

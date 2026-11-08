@@ -11,10 +11,14 @@
     { "pattern": "eddmpython.com/admin/*", "zone_name": "eddmpython.com" },
     { "pattern": "eddmpython.com/room", "zone_name": "eddmpython.com" },
     { "pattern": "eddmpython.com/room/*", "zone_name": "eddmpython.com" },
+    { "pattern": "eddmpython.com/master", "zone_name": "eddmpython.com" },
+    { "pattern": "eddmpython.com/master/*", "zone_name": "eddmpython.com" },
     { "pattern": "www.eddmpython.com/admin", "zone_name": "eddmpython.com" },
     { "pattern": "www.eddmpython.com/admin/*", "zone_name": "eddmpython.com" },
     { "pattern": "www.eddmpython.com/room", "zone_name": "eddmpython.com" },
-    { "pattern": "www.eddmpython.com/room/*", "zone_name": "eddmpython.com" }
+    { "pattern": "www.eddmpython.com/room/*", "zone_name": "eddmpython.com" },
+    { "pattern": "www.eddmpython.com/master", "zone_name": "eddmpython.com" },
+    { "pattern": "www.eddmpython.com/master/*", "zone_name": "eddmpython.com" }
   ],
   "kv_namespaces": [
     { "binding": "COURSE", "id": "4ff8960b8706499cba4e05069b74c532" }

@@ -19,7 +19,7 @@
     "test:classroom-worker": "node scripts/testClassroomWorker.mjs",
     "test:notebook": "node scripts/testNotebookDrafts.mjs && node scripts/testNotebookStore.mjs && node scripts/testNotebookRoutes.mjs && node scripts/testNotebookAdmin.mjs && node scripts/testNotebookEmail.mjs && node scripts/testNotebookLogin.mjs",
     "test:notebook-client": "node scripts/testNotebookClient.mjs",
-    "test:students": "node scripts/testStudents.mjs && node scripts/testStudentRoutes.mjs && node scripts/testStudentGithub.mjs && node scripts/testOptionalLessons.mjs",
+    "test:students": "node scripts/testStudents.mjs && node scripts/testStudentRoutes.mjs && node scripts/testStudentGithub.mjs && node scripts/testOptionalLessons.mjs && node scripts/testMasterRoute.mjs",
     "test:course-publish": "node --experimental-strip-types scripts/testCoursePublish.ts",
     "test:qr": "node --experimental-strip-types ../blog/posts/003-python-qr/tool/test.ts",
     "test:csv-parquet": "node scripts/projectPython.mjs ../blog/posts/006-csv-parquet/test.py",

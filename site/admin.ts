@@ -30,7 +30,7 @@ const ADMIN_PATH = "/admin";
 const SUBJECT = "admin";
 
 /** 메일의 질문 링크만 로그인 뒤 복원한다. 임의 경로나 작업 API로 이동시키지 않는다. */
-function questionReturnTo(value: unknown): string {
+export function questionReturnTo(value: unknown): string {
   const fallback = "/admin/students";
   if (typeof value !== "string" || value.length > 2000 || /[\\\u0000-\u0020\u007f]/.test(value)
     || !/^\/admin\/students\/questions(?:\?|$)/.test(value)) return fallback;
@@ -330,10 +330,16 @@ async function session(env: Env): Promise<{ key: string; gen: string }> {
   return { key: String(data.key ?? ""), gen: String(data.gen ?? "") };
 }
 
-async function signedIn(env: Env, request: Request): Promise<boolean> {
+export async function signedIn(env: Env, request: Request): Promise<boolean> {
   const { key, gen } = await session(env);
   if (!key || !gen) return false;
   return checkToken(key, readCookie(request, ADMIN_COOKIE), SUBJECT, gen);
+}
+
+/** 운영 세션 쿠키. 구글 로그인(master.ts)도 비밀번호 로그인과 같은 세션을 받는다. */
+export async function adminCookie(env: Env, url: URL): Promise<string> {
+  const { key, gen } = await session(env);
+  return cookie(ADMIN_COOKIE, await issueToken(key, SUBJECT, gen), ADMIN_PATH, url);
 }
 
 /* 화면 ------------------------------------------------------------------ */
@@ -345,7 +351,8 @@ async function signedIn(env: Env, request: Request): Promise<boolean> {
  * 않는다. 공용 머리띠와 강의 관리 제목을 함께 보여 주되 로그인 전에는 비밀번호 입력 외의
  * 운영 정보나 강의방 상태를 보내지 않는다.
  */
-function loginPage(message = "", status = 200, returnTo = "/admin/students"): Response {
+function loginPage(message = "", status = 200, returnTo = "/admin/students", google = false): Response {
+  const back = questionReturnTo(returnTo);
   return page({
     title: "강의 관리",
     style: ADMIN_STYLE,
@@ -353,12 +360,17 @@ function loginPage(message = "", status = 200, returnTo = "/admin/students"): Re
     inner: `${header()}<section class="gate adm">
        <h1>강의 관리</h1>
        <form method="post" action="/admin/login">
-         <input type="hidden" name="returnTo" value="${esc(questionReturnTo(returnTo))}">
+         <input type="hidden" name="returnTo" value="${esc(back)}">
          <input type="password" name="password" placeholder="비밀번호" aria-label="비밀번호" autofocus autocomplete="current-password">
          <button type="submit">들어가기</button>
-       </form>${message ? `<p class="err">${message}</p>` : ""}
+       </form>${message ? `<p class="err">${message}</p>` : ""}${google ? `<p class="note"><a href="/master/login?returnTo=${encodeURIComponent(back)}">eddmpython 구글 계정으로 들어가기</a></p>` : ""}
      </section>`,
   });
+}
+
+/** 구글 로그인(master.ts)을 쓸 수 있을 때만 로그인 화면에 그 길을 보인다. */
+export function googleReady(env: Env): boolean {
+  return Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET);
 }
 
 function consolePage(): Response {
@@ -430,6 +442,7 @@ async function login(request: Request, env: Env, url: URL): Promise<Response> {
         : "비밀번호가 맞지 않습니다.",
       401,
       returnTo,
+      googleReady(env),
     );
   }
 
@@ -481,7 +494,7 @@ export async function handleAdmin(request: Request, env: Env, url: URL): Promise
 
   if (path === "/admin/students" || path.startsWith("/admin/students/")) {
     if (!(await signedIn(env, request))) {
-      return request.method === "GET" ? loginPage("", 200, url.pathname + url.search) : Response.json({ error: "로그인이 필요합니다" }, { status: 401 });
+      return request.method === "GET" ? loginPage("", 200, url.pathname + url.search, googleReady(env)) : Response.json({ error: "로그인이 필요합니다" }, { status: 401 });
     }
     return handleStudents(request, env, url);
   }
@@ -513,5 +526,5 @@ export async function handleAdmin(request: Request, env: Env, url: URL): Promise
 
   if (path !== ADMIN_PATH) return new Response("not found", { status: 404 });
 
-  return (await signedIn(env, request)) ? consolePage() : loginPage();
+  return (await signedIn(env, request)) ? consolePage() : loginPage("", 200, "/admin/students", googleReady(env));
 }

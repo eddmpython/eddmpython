@@ -21,6 +21,12 @@ export type Env = {
    * 비밀번호이고, 방 비밀번호와 같은 잠금 규칙 아래에서 검사한다.
    */
   ADMIN_PASSWORD?: string;
+  /**
+   * 운영자 바로 보기(`master.ts`)의 구글 로그인. 이 강의장이 가진 웹 클라이언트 값이고
+   * Worker 시크릿에만 둔다. 둘 중 하나라도 없으면 구글 로그인은 닫히고 비밀번호 로그인만 남는다.
+   */
+  GOOGLE_CLIENT_ID?: string;
+  GOOGLE_CLIENT_SECRET?: string;
   /** 지정한 비공개 실습 저장소에만 Administration 쓰기 권한을 가진 서버용 인증 정보. */
   GITHUB_INVITE_TOKEN?: string;
   /** 강의 질문 알림. 발송 도메인과 수신 주소를 설정한 경우에만 사용한다. */
