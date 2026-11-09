@@ -1,21 +1,21 @@
 /**
- * 운영자 바로 보기. eddmpython.com/master.
+ * 운영자 강의방. eddmpython.com/room/master.
  *
- * 운영자가 비밀번호를 치지 않고 eddmpython 구글 계정으로 들어와, 강의방마다 열린 수업을
- * 미리보기로 바로 연다. 구글이 확인해 준 메일이 `MASTER_EMAIL` 하나일 때만 운영 세션을 낸다.
- * 세션은 비밀번호 로그인과 같은 운영 세션이라 `모든 운영 세션 끊기`가 함께 끊는다.
+ * 운영자가 비밀번호를 치지 않고 eddmpython 구글 계정으로 들어와, 강의방 화면 그대로 전체 수업을
+ * 본다. 구글이 확인해 준 메일이 `MASTER_EMAIL` 하나일 때만 이 강의방 세션을 낸다. 세션은 운영
+ * 세션 세대에 묶여 `모든 운영 세션 끊기`가 함께 끊는다.
+ *
+ * 강의방 화면은 `classroom.ts`의 `handleRoom`이 가상 방(`master`)으로 그린다. 이 파일은 그 앞에서
+ * 구글 로그인과 세션 확인만 한다. 가상 방은 읽기만 하고 수강생 기록을 남기지 않으며 차례 잠금을
+ * 건너뛴다.
  *
  * 구글 로그인은 이 강의장이 가진 웹 클라이언트로 한다. 인증은 제품마다 따로 가진다.
  * 클라이언트 값은 Worker 시크릿 `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`에만 두고,
- * 둘 중 하나라도 없으면 이 주소는 들어가지 않고 비밀번호 로그인만 남는다.
- *
- * 수업 링크는 운영장의 미리보기(`/admin/students/<방>/preview`)로 간다. 미리보기는 읽기만
- * 하고 수강생 기록을 남기지 않으며 차례 잠금을 건너뛴다. 화면을 새로 만들지 않고 그 길을 쓴다.
+ * 둘 중 하나라도 없으면 이 강의방은 들어가지 않는다.
  */
-import { call, type PublicRoom } from "./rooms";
-import { course, roomCourse } from "./course";
-import { clearCookie, cookie, randomHex, readCookie, safeEqual } from "./auth";
-import { adminCookie, googleReady, questionReturnTo, signedIn } from "./admin";
+import { call } from "./rooms";
+import { checkToken, clearCookie, cookie, issueToken, randomHex, readCookie, safeEqual } from "./auth";
+import { adminCookie, googleReady, questionReturnTo } from "./admin";
 import { esc } from "./classroom-render";
 import { header, page } from "./shell";
 import { STUDENT_STYLE } from "./students";
@@ -23,23 +23,19 @@ import type { Env } from "./env";
 
 /** 들어올 수 있는 구글 계정. 공개 연락처와 같은 eddmpython 계정 하나다. */
 export const MASTER_EMAIL = "eddmpython@gmail.com";
-const MASTER_PATH = "/master";
-const VIEW_PATH = "/admin/master";
-const STATE_COOKIE = "eddm_master";
+/** 운영자 강의방의 방 이름과 주소. 저장된 강의방은 이 이름을 쓰지 못한다(`rooms.ts` RESERVED). */
+export const MASTER_SLUG = "master";
+export const MASTER_ROOT = `/room/${MASTER_SLUG}`;
+const SESSION_COOKIE = "eddm_master";
+const STATE_COOKIE = "eddm_master_state";
+const SUBJECT = "master";
 const GOOGLE_AUTH = "https://accounts.google.com/o/oauth2/v2/auth";
 const GOOGLE_TOKEN = "https://oauth2.googleapis.com/token";
 const ISSUERS = new Set(["https://accounts.google.com", "accounts.google.com"]);
 const privateHeaders = { "cache-control": "private, no-store", "x-robots-tag": "noindex, nofollow" };
 
-const MASTER_STYLE = `
-.master-room{margin:1.2rem 0}
-.master-room h2{margin:0}
-.master-room details{margin:.6rem 0}
-.master-posts{margin:.3rem 0 .6rem;padding-left:1.4rem;line-height:1.9}
-`;
-
 function callback(url: URL): string {
-  return `${url.origin}${MASTER_PATH}/callback`;
+  return `${url.origin}${MASTER_ROOT}/callback`;
 }
 
 function base64url(bytes: ArrayBuffer): string {
@@ -63,7 +59,7 @@ function idClaims(token: unknown): Record<string, unknown> | null {
 
 function gatePage(title: string, message: string, status: number, link: string, linkText: string, setCookie?: string): Response {
   return page({
-    title: "강의방 바로 보기",
+    title: "운영자 강의방",
     style: STUDENT_STYLE,
     status,
     headers: { ...privateHeaders, ...(setCookie ? { "set-cookie": setCookie } : {}) },
@@ -71,14 +67,28 @@ function gatePage(title: string, message: string, status: number, link: string, 
   });
 }
 
+const notReady = (setCookie?: string) => gatePage("구글 로그인 연결 전입니다", "구글 로그인을 연결하면 이 주소에서 eddmpython 구글 계정으로 바로 들어갑니다.", 503, "/admin", "강의 관리로 가기", setCookie);
+
 function redirect(location: string, setCookie?: string[]): Response {
   const headers = new Headers({ ...privateHeaders, location });
   for (const value of setCookie ?? []) headers.append("set-cookie", value);
   return new Response(null, { status: 303, headers });
 }
 
+/** 로그인 뒤 돌아갈 곳. 이 강의방 안의 주소와 운영장 질문 링크만 받는다. */
+function returnPath(returnTo: string): string {
+  if (returnTo.startsWith("/admin/students/questions") && questionReturnTo(returnTo) === returnTo) return returnTo;
+  const inRoom = returnTo === MASTER_ROOT || (returnTo.startsWith(`${MASTER_ROOT}/`) && /^[a-zA-Z0-9/_.-]*$/.test(returnTo) && !returnTo.includes("//") && !returnTo.includes(".."));
+  return inRoom && !/^\/room\/master\/(login|callback)$/.test(returnTo) ? returnTo : MASTER_ROOT;
+}
+
+async function adminSession(env: Env): Promise<{ key: string; gen: string }> {
+  const { data } = await call(env, { action: "adminSession" });
+  return { key: String(data.key ?? ""), gen: String(data.gen ?? "") };
+}
+
 async function start(env: Env, url: URL): Promise<Response> {
-  if (!googleReady(env)) return gatePage("구글 로그인 연결 전입니다", "지금은 강의 관리에서 비밀번호로 들어갑니다.", 503, "/admin", "강의 관리로 가기");
+  if (!googleReady(env)) return notReady();
   const state = randomHex(16);
   const verifier = randomHex(32);
   const challenge = base64url(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier)));
@@ -94,13 +104,13 @@ async function start(env: Env, url: URL): Promise<Response> {
     login_hint: MASTER_EMAIL,
   }).toString();
   const returnTo = url.searchParams.get("returnTo") ?? "";
-  return redirect(target.href, [cookie(STATE_COOKIE, `${state}.${verifier}.${encodeURIComponent(returnTo)}`, MASTER_PATH, url)]);
+  return redirect(target.href, [cookie(STATE_COOKIE, `${state}.${verifier}.${encodeURIComponent(returnTo)}`, MASTER_ROOT, url)]);
 }
 
 async function finish(request: Request, env: Env, url: URL): Promise<Response> {
-  const clear = clearCookie(STATE_COOKIE, MASTER_PATH, url);
-  const retry = (title: string, message: string, status: number) => gatePage(title, message, status, `${MASTER_PATH}/login`, "다시 들어가기", clear);
-  if (!googleReady(env)) return gatePage("구글 로그인 연결 전입니다", "지금은 강의 관리에서 비밀번호로 들어갑니다.", 503, "/admin", "강의 관리로 가기", clear);
+  const clear = clearCookie(STATE_COOKIE, MASTER_ROOT, url);
+  const retry = (title: string, message: string, status: number) => gatePage(title, message, status, `${MASTER_ROOT}/login`, "다시 들어가기", clear);
+  if (!googleReady(env)) return notReady(clear);
   if (url.searchParams.get("error")) return retry("구글 로그인을 마치지 못했습니다", "구글 화면에서 로그인을 끝내지 않았습니다.", 400);
   const [state = "", verifier = "", ...rest] = (readCookie(request, STATE_COOKIE) ?? "").split(".");
   const code = url.searchParams.get("code") ?? "";
@@ -129,47 +139,39 @@ async function finish(request: Request, env: Env, url: URL): Promise<Response> {
   }
   let returnTo = "";
   try { returnTo = decodeURIComponent(rest.join(".")); } catch { returnTo = ""; }
-  // 메일의 질문 링크로 왔으면 그 질문으로, 아니면 바로 보기 화면으로 간다.
-  const location = returnTo.startsWith("/admin/students/questions") && questionReturnTo(returnTo) === returnTo ? returnTo : VIEW_PATH;
-  return redirect(location, [clear, await adminCookie(env, url)]);
+  const { key, gen } = await adminSession(env);
+  // 운영장 세션도 같이 준다. 메일의 질문 링크로 온 운영자는 그 질문으로 돌아간다.
+  return redirect(returnPath(returnTo), [clear, cookie(SESSION_COOKIE, await issueToken(key, SUBJECT, gen), MASTER_ROOT, url), await adminCookie(env, url)]);
 }
 
-function roomHtml(room: PublicRoom, categories: ReturnType<typeof roomCourse>): string {
-  const title = `<h2>${esc(room.title)}</h2><p class="muted small">/room/${esc(room.slug)}${room.open ? "" : " · 닫힘"}</p>`;
-  // 닫힌 강의방은 수강생 화면이 '아직 열리지 않았습니다'만 보여 미리보기 링크를 걸지 않는다.
-  if (!room.open) return `<section class="panel master-room">${title}<p class="muted">닫힌 강의방이라 미리보기가 열리지 않습니다.</p></section>`;
-  const root = `/admin/students/${encodeURIComponent(room.id)}/preview`;
-  const groups = categories.map(c => `<details><summary>${esc(c.title)} <span class="muted small">${c.posts.length}편</span></summary><ol class="master-posts">${c.posts.map(p => `<li><a href="${root}?lesson=${encodeURIComponent(`${c.slug}/${p.id}`)}" target="_blank" rel="noreferrer">${esc(p.title)}</a></li>`).join("")}</ol></details>`).join("");
-  return `<section class="panel master-room"><div class="topline"><div>${title}</div><a class="button" href="${root}" target="_blank" rel="noreferrer">강의방 첫 화면</a></div>${groups || '<p class="muted">이 강의방에 넣은 수업이 없습니다.</p>'}</section>`;
-}
-
-async function view(env: Env): Promise<Response> {
-  const listed = await call(env, { action: "list" });
-  // 열린 강의방을 먼저 보이고 닫힌 강의방은 뒤에 둔다.
-  const rooms = ((listed.data.rooms ?? []) as PublicRoom[]).slice().sort((a, b) => Number(b.open) - Number(a.open));
-  const found = await course(env);
-  const body = rooms.map(room => roomHtml(room, roomCourse(found.categories, room))).join("");
-  return page({
-    title: "강의방 바로 보기",
-    style: STUDENT_STYLE + MASTER_STYLE,
-    wide: true,
-    headers: privateHeaders,
-    inner: `${header()}<main class="students"><div class="topline"><h1>강의방 바로 보기</h1><form method="post" action="/admin/logout"><button>나가기</button></form></div><nav class="admin-nav"><a href="${VIEW_PATH}" aria-current="page">바로 보기</a><a href="/admin/students">수강자 관리</a><a href="/admin/students/questions">질문함</a><a href="/admin">강의장 설정</a></nav><p class="muted">수업을 누르면 수강생 화면 그대로 새 탭에 열립니다. 미리보기는 읽기만 하고 수강생 기록을 남기지 않습니다.</p>${found.ok ? "" : '<p class="message">교안 묶음을 읽지 못했습니다.</p>'}${body || '<p class="empty">아직 강의방이 없습니다.</p>'}</main>`,
-  });
-}
-
-export async function handleMaster(request: Request, env: Env, url: URL): Promise<Response> {
-  const path = url.pathname.replace(/\/$/, "") || "/";
-  if (request.method !== "GET") return new Response("not found", { status: 404, headers: privateHeaders });
-  if (path === VIEW_PATH) return (await signedIn(env, request)) ? view(env) : redirect(`${MASTER_PATH}/login`);
+/**
+ * `/room/master` 아래 요청의 문. 로그인과 돌아오는 주소는 여기서 끝내고, 세션이 맞으면
+ * `null`을 돌려 `handleRoom`이 가상 방을 그리게 한다.
+ */
+export async function masterGate(request: Request, env: Env, url: URL): Promise<Response | null> {
+  const path = url.pathname.replace(/\/$/, "");
   // 구글에 적어 둔 돌아올 주소는 eddmpython.com 하나다. www로 들어오면 그 주소로 옮긴다.
   if (url.hostname.startsWith("www.")) {
     const apex = new URL(url.href);
     apex.hostname = url.hostname.slice(4);
     return new Response(null, { status: 308, headers: { ...privateHeaders, location: apex.href } });
   }
-  if (path === MASTER_PATH) return redirect(VIEW_PATH);
-  if (path === `${MASTER_PATH}/login`) return start(env, url);
-  if (path === `${MASTER_PATH}/callback`) return finish(request, env, url);
+  if (path === `${MASTER_ROOT}/login` || path === `${MASTER_ROOT}/callback`) {
+    if (request.method !== "GET") return new Response("not found", { status: 404, headers: privateHeaders });
+    return path.endsWith("/login") ? start(env, url) : finish(request, env, url);
+  }
+  const { key, gen } = await adminSession(env);
+  if (key && gen && await checkToken(key, readCookie(request, SESSION_COOKIE), SUBJECT, gen)) return null;
+  if (request.method !== "GET") return Response.json({ error: "로그인이 필요합니다" }, { status: 401, headers: privateHeaders });
+  if (!googleReady(env)) return notReady();
+  return redirect(`${MASTER_ROOT}/login?returnTo=${encodeURIComponent(path)}`);
+}
+
+/** 옛 주소(`/master`, `/admin/master`)는 운영자 강의방으로 옮긴다. */
+export async function handleMaster(request: Request, url: URL): Promise<Response> {
+  const path = url.pathname.replace(/\/$/, "") || "/";
+  if (request.method !== "GET") return new Response("not found", { status: 404, headers: privateHeaders });
+  if (path === "/master/login") return redirect(`${MASTER_ROOT}/login${url.search}`);
+  if (path === "/master" || path === "/admin/master") return redirect(MASTER_ROOT);
   return new Response("not found", { status: 404, headers: privateHeaders });
 }

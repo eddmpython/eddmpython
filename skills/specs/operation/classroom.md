@@ -212,12 +212,15 @@ course-scene 선언
 
 ### 구글 계정으로 바로 보기
 
-`eddmpython.com/master` 는 운영자가 비밀번호 없이 eddmpython 구글 계정(`eddmpython@gmail.com`)으로
-들어와 강의방마다 넣은 수업을 바로 여는 주소다. 구글이 확인한 메일이 그 계정 하나일 때만 운영 세션을
-내고, 그 세션은 비밀번호 로그인과 같아 **모든 운영 세션 끊기** 가 함께 끊는다. 화면은 `/admin/master`
-이고 수업 링크는 관리자 미리보기로 열려 수강생 기록을 남기지 않는다. 구글 로그인은 이 강의장이 가진
-웹 OAuth 클라이언트로 하며(돌아올 주소 `https://eddmpython.com/master/callback`), 클라이언트 값이
-없으면 이 주소는 닫히고 비밀번호 로그인만 남는다. 코드는 `site/master.ts`, 시험은
+`eddmpython.com/room/master` 는 운영자 강의방이다. 운영자가 비밀번호 없이 eddmpython 구글 계정
+(`eddmpython@gmail.com`)으로 들어와 강의방 화면 그대로 전체 수업을 본다. 저장된 강의방이 아니라
+`handleRoom` 이 그리는 가상 방이라 읽기만 하고 수강생 기록을 남기지 않으며 차례 잠금을 건너뛴다.
+`master` 는 저장된 강의방 이름으로 쓰지 못한다. 구글이 확인한 메일이 그 계정 하나일 때만 이 강의방
+세션(경로 `/room/master`)과 운영 세션을 함께 내고, 둘 다 운영 세션 세대에 묶여 **모든 운영 세션
+끊기** 가 함께 끊는다. 구글 로그인은 이 강의장이 가진 웹 OAuth 클라이언트로 하며(돌아올 주소
+`https://eddmpython.com/room/master/callback`), 클라이언트 값이 없으면 이 주소는 '구글 로그인 연결
+전입니다'만 보이고 비밀번호 로그인만 남는다. 옛 주소 `/master`, `/admin/master` 는 이 강의방으로
+옮긴다. 코드는 `site/master.ts` 와 `site/classroom.ts` 의 `handleRoom`, 시험은
 `site/scripts/testMasterRoute.mjs` 다.
 
 ### 운영장에서 하는 일

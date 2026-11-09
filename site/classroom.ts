@@ -38,6 +38,7 @@ import { connectGithub, githubForm, githubPractice, githubScript, githubStyle } 
 import { notebookHeadings, notebookMarkup, notebookScript, notebookStyle } from "./classroomNotes";
 import { notebookSections } from "./notebookSections";
 import { handleNotebook } from "./notebookRoutes";
+import { MASTER_ROOT, MASTER_SLUG, masterGate } from "./master";
 
 
 
@@ -1691,6 +1692,14 @@ export async function handleRoom(request: Request, env: Env, url: URL, ctx?: Exe
     roomTestPath &&
     String(env.LOCAL_PREVIEW_BYPASS) === "1";
   if (roomTestPath && !roomTest) return new Response("not found", { status: 404 });
+  // /room/master 는 운영자 강의방이다. eddmpython 구글 계정으로 들어온 운영자만 전체 수업을 본다.
+  const master = path === MASTER_ROOT || path.startsWith(`${MASTER_ROOT}/`);
+  if (master) {
+    const gate = await masterGate(request, env, url);
+    if (gate) return gate;
+  }
+  // 저장된 방 없이 전체 카테고리를 여는 가상 방: 로컬 검수(/room-test)와 운영자 강의방.
+  const virtual = roomTest || master;
 
   if (path === "/room") {
     return roomPage(
@@ -1706,28 +1715,28 @@ export async function handleRoom(request: Request, env: Env, url: URL, ctx?: Exe
     ? ["room-test", ...path.split("/").slice(2)]
     : path.split("/").slice(2);
   const slug = parts[0] ?? "";
-  if (!validSlug(slug)) return new Response("not found", { status: 404 });
+  if (!master && !validSlug(slug)) return new Response("not found", { status: 404 });
   // 로컬 실행기가 준비한 방은 운영과 같은 주소로 연다. 인증 생략은 개발 플래그와
   // 루프백 주소가 모두 있어야 하며 운영 도메인에는 적용하지 않는다.
   const localPreview =
     ["127.0.0.1", "localhost", "[::1]"].includes(url.hostname) &&
     String(env.LOCAL_PREVIEW_BYPASS) === "1";
-  const localAccess = roomTest || localPreview;
+  const localAccess = virtual || localPreview;
   const roomRoot = roomTest ? "/room-test" : roomPath(slug);
 
   let cachedCourse: Awaited<ReturnType<typeof course>> | null = null;
   let room: PublicRoom;
   let context: any = null;
   const previewToken = readCookie(request, "eddm_preview");
-  if (roomTest) {
+  if (virtual) {
     cachedCourse = await course(env);
     room = {
-      id: "local-test",
+      id: roomTest ? "local-test" : MASTER_SLUG,
       slug,
-      title: "강의장 전체 검수",
+      title: roomTest ? "강의장 전체 검수" : "운영자 강의방",
       open: true,
       unlocked: cachedCourse.categories.map((category) => category.slug),
-      gen: "local",
+      gen: roomTest ? "local" : MASTER_SLUG,
       created: 0,
       lockedUntil: 0,
     };
@@ -1772,7 +1781,7 @@ export async function handleRoom(request: Request, env: Env, url: URL, ctx?: Exe
     });
   }
 
-  const key = roomTest ? "" : context.key;
+  const key = virtual ? "" : context.key;
   const previewAccess = Boolean(context?.adminGen && await checkToken(key, previewToken, `preview:${room.slug}:${room.gen}`, context.adminGen));
 
   // 폴링도 들어온 사람만 한다. 앞에 두면 비밀번호 없이 방 상태를 감시할 수 있다.
@@ -1783,13 +1792,13 @@ export async function handleRoom(request: Request, env: Env, url: URL, ctx?: Exe
     return loginPage(slug, room.title);
   }
 
-  const studentInfo = roomTest ? { enabled: false, completed: [] } : context.student;
+  const studentInfo = virtual ? { enabled: false, completed: [] } : context.student;
   if (typeof studentInfo?.enabled !== "boolean") return new Response("학습 기록을 불러오지 못했습니다. 잠시 뒤 다시 시도해 주세요", { status: 503 });
   const studentEnabled = studentInfo.enabled === true;
   const completed = new Set<string>(studentInfo.completed ?? []);
   // 수강생은 학습 완료 순서를 따르고, 로컬과 강사 미리보기는 배정된 전편을 감수한다.
   const sequential = studentEnabled && !localAccess && !previewAccess;
-  if (!roomTest && parts[1] === "state" && parts.length === 2) {
+  if (!virtual && parts[1] === "state" && parts.length === 2) {
     // 지문만 준다. 본문도 카테고리 목록도 여기서 안 내려간다.
     return Response.json(
       { stamp: await stampOf(key, room, await courseVersion(env), [...completed]) },
@@ -1797,7 +1806,7 @@ export async function handleRoom(request: Request, env: Env, url: URL, ctx?: Exe
     );
   }
 
-  const stamp = roomTest || request.method !== "GET" || ["media", "activity", "files"].includes(parts[1])
+  const stamp = virtual || request.method !== "GET" || ["media", "activity", "files"].includes(parts[1])
     ? ""
     : `window.__stamp=${JSON.stringify(await stampOf(key, room, await courseVersion(env), [...completed]))};${poll(slug)}`;
 
@@ -1828,7 +1837,7 @@ export async function handleRoom(request: Request, env: Env, url: URL, ctx?: Exe
   const canOpen = (category: CourseCategory, postId: string) => !sequential || requiredLessons(category, postId).every(lesson => completed.has(lesson));
 
   if (parts[1] === "notes" && parts.length === 2) return handleNotebook(request, env, url, room, {
-    key, personal: studentEnabled, readOnly: previewAccess || roomTest, categories: open, canOpen, ctx,
+    key, personal: studentEnabled, readOnly: previewAccess || virtual, categories: open, canOpen, ctx,
   });
 
   if (parts.length === 2 && parts[1] === "github" && request.method === "POST") {
@@ -2101,7 +2110,7 @@ export async function handleRoom(request: Request, env: Env, url: URL, ctx?: Exe
       stamp
         + (!localAccess && !previewAccess ? `(() => {const seen=new Set();const send=(kind,section)=>fetch(${JSON.stringify(`${roomRoot}/activity`)},{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({kind,section,category:${JSON.stringify(category.slug)},post:${JSON.stringify(post.id)}})});const observer=new IntersectionObserver(entries=>{for(const entry of entries){if(!entry.isIntersecting||seen.has(entry.target.id)||document.hidden)continue;seen.add(entry.target.id);send('section',Number(entry.target.id.slice(1))).catch(()=>{});}},{threshold:.5});document.querySelectorAll('article h2[id^="s"]').forEach(h=>observer.observe(h));document.querySelectorAll('[data-lecture-open],[data-lecture-watch]').forEach(button=>button.addEventListener('click',()=>send('lecture').catch(()=>{})));document.querySelector('[data-lecture-deck]')?.addEventListener('lectureframe',event=>{const section=event.detail.scene+1;const id='s'+section;if(!seen.has(id)){seen.add(id);send('section',section).catch(()=>{});}});})();` : "")
         + TOC_SCRIPT
-        + (headings.length ? notebookScript({ endpoint: `${roomRoot}/notes`, roomId: room.id, lesson: `${category.slug}/${post.id}`, sections: noteSections, personal: studentEnabled, readOnly: previewAccess || roomTest }) : "")
+        + (headings.length ? notebookScript({ endpoint: `${roomRoot}/notes`, roomId: room.id, lesson: `${category.slug}/${post.id}`, sections: noteSections, personal: studentEnabled, readOnly: previewAccess || virtual }) : "")
         + COMMAND_SCRIPT
         + (html.includes("data-github-form") ? githubScript : "")
         + (hasCells || lecture.hasCells ? CELL_SCRIPT : "")

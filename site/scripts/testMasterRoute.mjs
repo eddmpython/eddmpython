@@ -1,4 +1,4 @@
-// 운영자 바로 보기(master.ts)의 구글 로그인과 화면을 실제 Worker로 확인한다. 구글 토큰 끝점은 가짜로 답한다.
+// 운영자 강의방(/room/master, master.ts)의 구글 로그인과 화면을 실제 Worker로 확인한다. 구글 토큰 끝점은 가짜로 답한다.
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { build } from 'esbuild';
@@ -36,17 +36,27 @@ const client = mf => {
 };
 const cookies = r => r.headers.getSetCookie?.() ?? [r.headers.get('set-cookie')].filter(Boolean);
 const cookieNamed = (r, name) => cookies(r).find(c => c.startsWith(name + '='));
+const bundle = JSON.stringify({ schema: 4, sceneContract: 12, categories: [
+  { slug: '01-start', title: '시작', order: 1, posts: [
+    { id: '01-first', title: '첫 수업', summary: '실습', body: '## 준비\n\n설명입니다.' },
+    { id: '02-second', title: '두 번째 수업', summary: '실습', body: '## 다음\n\n두 번째 본문입니다.' },
+  ] },
+  { slug: '02-next', title: '다른 과정', order: 2, posts: [{ id: '01-next', title: '다른 수업', summary: '다음', body: '## 연결\n\n다음 과정입니다.' }] },
+] });
 
 // 구글 값을 넣지 않은 강의장은 이 길을 닫고 로그인 화면에도 보이지 않는다.
 const closed = worker({});
 try {
   const { request } = client(closed);
-  const login = await request('/master/login');
+  const login = await request('/room/master/login');
   assert.equal(login.status, 503);
   assert.match(await login.text(), /구글 로그인 연결 전입니다/);
-  assert.equal(cookieNamed(login, 'eddm_master'), undefined);
+  assert.equal(cookieNamed(login, 'eddm_master_state'), undefined);
   assert.doesNotMatch(await (await request('/admin')).text(), /master\/login/);
-  assert.equal((await request('/master/callback?code=x&state=y')).status, 503);
+  assert.equal((await request('/room/master/callback?code=x&state=y')).status, 503);
+  const room = await request('/room/master');
+  assert.equal(room.status, 503);
+  assert.match(await room.text(), /구글 로그인 연결 전입니다/);
 } finally {
   await closed.dispose();
 }
@@ -55,60 +65,59 @@ const mf = worker({ GOOGLE_CLIENT_ID: clientId, GOOGLE_CLIENT_SECRET: clientSecr
 try {
   const { request, json, post } = client(mf);
   const kv = await mf.getKVNamespace('COURSE');
-  await kv.put('bundle', JSON.stringify({ schema: 4, sceneContract: 12, categories: [
-    { slug: '01-start', title: '시작', order: 1, posts: [
-      { id: '01-first', title: '첫 수업', summary: '실습', body: '## 준비\n\n설명입니다.' },
-      { id: '02-second', title: '두 번째 수업', summary: '실습', body: '## 다음\n\n두 번째 본문입니다.' },
-    ] },
-    { slug: '02-next', title: '잠근 과정', order: 2, posts: [{ id: '01-next', title: '잠근 수업', summary: '다음', body: '## 연결\n\n다음 과정입니다.' }] },
-  ] }));
+  await kv.put('bundle', bundle);
   await kv.put('version', 'test');
   const admin = cookieNamed(await post('/admin/login', { password }), 'eddm_admin').split(';')[0];
   assert.equal((await json('/admin/api', { action: 'create', slug: 'alpha', title: '알파 강의방', password }, admin)).status, 200);
   await json('/admin/api', { action: 'toggle', slug: 'alpha', category: '01-start' }, admin);
   await json('/admin/api', { action: 'open', slug: 'alpha', open: true }, admin);
-  assert.equal((await json('/admin/api', { action: 'create', slug: 'empty', title: '빈 강의방', password }, admin)).status, 200);
-  const alpha = (await (await json('/admin/api', { action: 'list' }, admin)).json()).rooms.find(r => r.slug === 'alpha');
+  // 저장된 강의방은 master 이름을 쓰지 못한다.
+  assert.notEqual((await json('/admin/api', { action: 'create', slug: 'master', title: '겹치는 방', password }, admin)).status, 200);
 
-  // 주소와 화면 문. 로그인하지 않으면 구글 로그인으로 보낸다.
-  assert.equal((await request('/master')).headers.get('location'), '/admin/master');
-  const anonymous = await request('/admin/master');
+  // 주소와 화면 문. 로그인하지 않으면 구글 로그인으로 보내고 그 수업으로 돌아올 주소를 단다.
+  assert.equal((await request('/master')).headers.get('location'), '/room/master');
+  assert.equal((await request('/admin/master')).headers.get('location'), '/room/master');
+  assert.equal((await request('/master/login?returnTo=%2Fadmin%2Fstudents')).headers.get('location'), '/room/master/login?returnTo=%2Fadmin%2Fstudents');
+  const anonymous = await request('/room/master');
   assert.equal(anonymous.status, 303);
-  assert.equal(anonymous.headers.get('location'), '/master/login');
-  const www = await request('/master/login', {}, '', 'https://www.classroom.example');
+  assert.equal(anonymous.headers.get('location'), '/room/master/login?returnTo=%2Froom%2Fmaster');
+  assert.equal((await request('/room/master/01-start/02-second')).headers.get('location'), '/room/master/login?returnTo=%2Froom%2Fmaster%2F01-start%2F02-second');
+  assert.equal((await json('/room/master/notes', { action: 'read' })).status, 401);
+  const www = await request('/room/master/login', {}, '', 'https://www.classroom.example');
   assert.equal(www.status, 308);
-  assert.equal(www.headers.get('location'), 'https://classroom.example/master/login');
-  assert.equal((await request('/master/login', { method: 'POST' })).status, 404);
-  assert.match(await (await request('/admin')).text(), /href="\/master\/login\?returnTo=%2Fadmin%2Fstudents">eddmpython 구글 계정으로 들어가기/);
+  assert.equal(www.headers.get('location'), 'https://classroom.example/room/master/login');
+  assert.equal((await request('/room/master/login', { method: 'POST' })).status, 404);
+  assert.match(await (await request('/admin')).text(), /href="\/room\/master\/login\?returnTo=%2Fadmin%2Fstudents">eddmpython 구글 계정으로 들어가기/);
 
   // 구글로 보내는 주소와 상태 쿠키.
   const begin = async (returnTo = '') => {
-    const r = await request('/master/login' + (returnTo ? '?returnTo=' + encodeURIComponent(returnTo) : ''));
+    const r = await request('/room/master/login' + (returnTo ? '?returnTo=' + encodeURIComponent(returnTo) : ''));
     assert.equal(r.status, 303);
     const target = new URL(r.headers.get('location'));
-    const state = cookieNamed(r, 'eddm_master');
-    assert.match(state, /Path=\/master; HttpOnly; Secure; SameSite=Lax/);
+    const state = cookieNamed(r, 'eddm_master_state');
+    assert.match(state, /Path=\/room\/master; HttpOnly; Secure; SameSite=Lax/);
     return { target, cookie: state.split(';')[0] };
   };
   const { target, cookie: stateCookie } = await begin();
   assert.equal(target.origin + target.pathname, 'https://accounts.google.com/o/oauth2/v2/auth');
   const params = target.searchParams;
   assert.equal(params.get('client_id'), clientId);
-  assert.equal(params.get('redirect_uri'), origin + '/master/callback');
+  assert.equal(params.get('redirect_uri'), origin + '/room/master/callback');
   assert.equal(params.get('response_type'), 'code');
   assert.equal(params.get('scope'), 'openid email');
   assert.equal(params.get('code_challenge_method'), 'S256');
   assert.equal(params.get('login_hint'), 'eddmpython@gmail.com');
   assert.ok(!params.has('client_secret'));
-  const [stateValue, verifier] = stateCookie.slice('eddm_master='.length).split('.');
+  const [stateValue, verifier] = stateCookie.slice('eddm_master_state='.length).split('.');
   assert.equal(params.get('state'), stateValue);
   assert.equal(params.get('code_challenge'), createHash('sha256').update(verifier).digest('base64url'));
 
-  const back = (cookie, query) => request('/master/callback?' + new URLSearchParams(query), {}, cookie);
+  const back = (cookie, query) => request('/room/master/callback?' + new URLSearchParams(query), {}, cookie);
   const refused = async (r, status) => {
     assert.equal(r.status, status);
     assert.equal(cookieNamed(r, 'eddm_admin'), undefined);
-    assert.match(cookieNamed(r, 'eddm_master'), /Max-Age=0/);
+    assert.equal(cookieNamed(r, 'eddm_master'), undefined);
+    assert.match(cookieNamed(r, 'eddm_master_state'), /Max-Age=0/);
     return r.text();
   };
 
@@ -135,51 +144,51 @@ try {
   await refused(await back(stateCookie, { code: 'c', state: stateValue }), 502);
   tokenStatus = 200;
 
-  // 맞는 계정이면 운영 세션을 받고 바로 보기 화면으로 간다.
+  // 맞는 계정이면 운영자 강의방 세션과 운영 세션을 받고 운영자 강의방으로 간다.
   claims = { ...good(), email: 'EddmPython@gmail.com', email_verified: 'true' };
   const signed = await back(stateCookie, { code: 'the-code', state: stateValue });
   assert.equal(signed.status, 303);
-  assert.equal(signed.headers.get('location'), '/admin/master');
-  assert.match(cookieNamed(signed, 'eddm_master'), /Max-Age=0/);
+  assert.equal(signed.headers.get('location'), '/room/master');
+  assert.match(cookieNamed(signed, 'eddm_master_state'), /Max-Age=0/);
+  assert.match(cookieNamed(signed, 'eddm_master'), /Path=\/room\/master; HttpOnly; Secure; SameSite=Lax/);
   assert.match(cookieNamed(signed, 'eddm_admin'), /Path=\/admin; HttpOnly; Secure; SameSite=Lax/);
   const sent = tokenRequests.at(-1);
-  assert.deepEqual(sent, { code: 'the-code', client_id: clientId, client_secret: clientSecret, redirect_uri: origin + '/master/callback', grant_type: 'authorization_code', code_verifier: verifier });
+  assert.deepEqual(sent, { code: 'the-code', client_id: clientId, client_secret: clientSecret, redirect_uri: origin + '/room/master/callback', grant_type: 'authorization_code', code_verifier: verifier });
+  const master = cookieNamed(signed, 'eddm_master').split(';')[0];
   const google = cookieNamed(signed, 'eddm_admin').split(';')[0];
 
-  // 바로 보기 화면: 강의방마다 넣은 수업만 미리보기 링크로 보인다.
-  const view = await request('/admin/master', {}, google);
+  // 운영자 강의방: 강의방 화면 그대로 모든 과정이 열리고, 차례 잠금 없이 바로 읽는다.
+  const view = await request('/room/master', {}, master);
   assert.equal(view.status, 200);
-  assert.match(view.headers.get('cache-control'), /no-store/);
   const html = await view.text();
-  assert.match(html, /알파 강의방/);
-  assert.match(html, /\/room\/alpha/);
-  assert.match(html, new RegExp(`href="/admin/students/${alpha.id}/preview" target="_blank"`));
-  assert.match(html, new RegExp(`href="/admin/students/${alpha.id}/preview\\?lesson=01-start%2F02-second" target="_blank" rel="noreferrer">두 번째 수업`));
-  assert.doesNotMatch(html, /잠근 수업/);
-  // 닫힌 강의방은 열린 강의방 뒤에 보이고 미리보기 링크가 없다(수강생 화면이 '아직 열리지 않았습니다'만 보인다).
-  assert.match(html, /알파 강의방[\s\S]*빈 강의방<\/h2><p class="muted small">\/room\/empty · 닫힘<\/p><p class="muted">닫힌 강의방이라 미리보기가 열리지 않습니다/);
-  const emptyRoom = (await (await json('/admin/api', { action: 'list' }, admin)).json()).rooms.find(r => r.slug === 'empty');
-  assert.doesNotMatch(html, new RegExp(`/admin/students/${emptyRoom.id}/preview`));
-  assert.doesNotMatch(html, /\/room\/alpha · 닫힘/);
+  assert.match(html, /운영자 강의방/);
+  assert.match(html, /href="\/room\/master\/01-start\/02-second"/);
+  assert.match(html, /href="\/room\/master\/02-next\/01-next"/);
   assert.doesNotMatch(html, new RegExp(password));
-
-  // 화면의 링크는 비밀번호 없이 수강생 화면을 연다. 미리보기라 차례 잠금을 건너뛴다.
-  const preview = await request(`/admin/students/${alpha.id}/preview?lesson=01-start%2F02-second`, {}, google);
-  assert.equal(preview.status, 303);
-  assert.equal(preview.headers.get('location'), '/room/alpha/01-start/02-second');
-  const previewCookie = cookieNamed(preview, 'eddm_preview').split(';')[0];
-  const lesson = await request('/room/alpha/01-start/02-second', {}, previewCookie);
+  const lesson = await request('/room/master/01-start/02-second', {}, master);
   assert.equal(lesson.status, 200);
   assert.match(await lesson.text(), /두 번째 본문입니다/);
+  assert.match(await (await request('/room/master/02-next/01-next', {}, master)).text(), /다음 과정입니다/);
+  // 읽기만 한다. 메모는 비어 있고 저장되지 않는다.
+  assert.deepEqual(await (await json('/room/master/notes', { action: 'read' }, master)).json(), { readOnly: true, identity: null, notes: [], threads: [] });
+  assert.equal((await json('/room/master/notes', { action: 'save' }, master)).status, 403);
+  // 운영장 세션 쿠키로는 운영자 강의방에 들어가지 못하고, 운영장은 그대로 열린다.
+  assert.equal((await request('/room/master', {}, google)).status, 303);
   assert.equal((await request('/admin/students', {}, google)).status, 200);
+  // 운영자 강의방은 저장된 강의방을 만들지 않는다.
+  const listed = (await (await json('/admin/api', { action: 'list' }, admin)).json()).rooms;
+  assert.deepEqual(listed.map(r => r.slug), ['alpha']);
 
-  // 메일의 질문 링크는 로그인 뒤 그 질문으로 돌아가고, 다른 주소는 바로 보기로 간다.
+  // 메일의 질문 링크는 로그인 뒤 그 질문으로, 강의방 안 주소는 그 주소로, 다른 주소는 강의방 첫 화면으로 간다.
   const thread = crypto.randomUUID();
   for (const [returnTo, location] of [
     [`/admin/students/questions?thread=${thread}`, `/admin/students/questions?thread=${thread}`],
-    ['/admin/students', '/admin/master'],
-    ['/admin/api', '/admin/master'],
-    ['https://evil.example/admin/students/questions', '/admin/master'],
+    ['/room/master/01-start/02-second', '/room/master/01-start/02-second'],
+    ['/admin/students', '/room/master'],
+    ['/admin/api', '/room/master'],
+    ['/room/master/callback', '/room/master'],
+    ['/room/master/../alpha', '/room/master'],
+    ['https://evil.example/admin/students/questions', '/room/master'],
   ]) {
     const started = await begin(returnTo);
     claims = good();
@@ -188,9 +197,9 @@ try {
     assert.equal(done.headers.get('location'), location);
   }
 
-  // 모든 운영 세션 끊기는 구글로 받은 세션도 끊는다.
+  // 모든 운영 세션 끊기는 구글로 받은 운영자 강의방 세션도 끊는다.
   assert.equal((await json('/admin/api', { action: 'adminRotate' }, google)).status, 200);
-  assert.equal((await request('/admin/master', {}, google)).headers.get('location'), '/master/login');
+  assert.equal((await request('/room/master', {}, master)).headers.get('location'), '/room/master/login?returnTo=%2Froom%2Fmaster');
 } finally {
   await mf.dispose();
 }

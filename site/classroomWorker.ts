@@ -31,9 +31,9 @@ export default {
     if (pathname === "/admin/course-publish") {
       return withClassroomHeaders(await handleCoursePublish(request, env));
     }
-    // 운영자 바로 보기. 화면은 운영 세션 쿠키가 닿는 /admin 아래에 둔다.
+    // 옛 운영자 바로 보기 주소. 운영자 강의방 /room/master 로 옮긴다.
     if (pathname === "/master" || pathname.startsWith("/master/") || pathname === "/admin/master") {
-      return withClassroomHeaders(await handleMaster(request, env, url));
+      return withClassroomHeaders(await handleMaster(request, url));
     }
     if (pathname === "/admin" || pathname.startsWith("/admin/")) {
       return withClassroomHeaders(await handleAdmin(request, env, url));

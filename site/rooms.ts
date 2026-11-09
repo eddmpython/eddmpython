@@ -63,9 +63,9 @@ const ROOM_SLUG = /^[a-z0-9][a-z0-9_-]{1,30}$/;
  * 방 이름으로 쓸 수 없는 말.
  *
  * `login` 과 `state` 는 방 주소 아래의 경로라 방 이름이 되면 그 방에 못 들어간다.
- * `admin` 은 운영장이고 `api` 는 예약해 둔다.
+ * `admin` 은 운영장이고 `api` 는 예약해 둔다. `master` 는 운영자 강의방(`master.ts`)이다.
  */
-const RESERVED = new Set(["api", "login", "state", "admin"]);
+const RESERVED = new Set(["api", "login", "state", "admin", "master"]);
 
 export function validSlug(slug: string): boolean {
   return ROOM_SLUG.test(slug) && !RESERVED.has(slug);
