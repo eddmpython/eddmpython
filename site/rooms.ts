@@ -188,6 +188,28 @@ export class Classroom {
       return Response.json({ ok: true, gen: auth.gen });
     }
 
+    /**
+     * 운영자 강의방(`master.ts`) 비밀번호 판정. 비교는 Worker 가 하고 여기는 잠금만 맨다.
+     * 운영장 잠금과 따로 세어, 이 비밀번호를 두드려도 운영장 로그인은 잠기지 않는다.
+     */
+    if (action === "masterLogin") {
+      const auth = (await this.state.storage.get<{ fails: number; lockedUntil: number }>("masterAuth")) ?? { fails: 0, lockedUntil: 0 };
+      if (auth.lockedUntil > now) {
+        return Response.json({ ok: false, retryAfter: Math.ceil((auth.lockedUntil - now) / 1000) });
+      }
+      if (!body.ok) {
+        auth.fails += 1;
+        if (auth.fails >= MAX_FAILS) {
+          auth.fails = 0;
+          auth.lockedUntil = now + LOCK_MS;
+        }
+        await this.state.storage.put("masterAuth", auth);
+        return Response.json({ ok: false });
+      }
+      await this.state.storage.put("masterAuth", { fails: 0, lockedUntil: 0 });
+      return Response.json({ ok: true });
+    }
+
     /** 운영자가 직접 모든 운영 세션을 끊는다. 노트북을 잃어버린 자리에 쓴다. */
     if (action === "adminRotate") {
       const auth = await this.adminAuth();

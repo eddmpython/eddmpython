@@ -363,7 +363,7 @@ function loginPage(message = "", status = 200, returnTo = "/admin/students", goo
          <input type="hidden" name="returnTo" value="${esc(back)}">
          <input type="password" name="password" placeholder="비밀번호" aria-label="비밀번호" autofocus autocomplete="current-password">
          <button type="submit">들어가기</button>
-       </form>${message ? `<p class="err">${message}</p>` : ""}${google ? `<p class="note"><a href="/room/master/login?returnTo=${encodeURIComponent(back)}">eddmpython 구글 계정으로 들어가기</a></p>` : ""}
+       </form>${message ? `<p class="err">${message}</p>` : ""}${google ? `<p class="note"><a href="/room/master/google?returnTo=${encodeURIComponent(back)}">eddmpython 구글 계정으로 들어가기</a></p>` : ""}
      </section>`,
   });
 }

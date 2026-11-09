@@ -27,6 +27,8 @@ export type Env = {
    */
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;
+  /** 운영자 강의방(`/room/master`)의 비밀번호. Worker 시크릿에만 두고, 없으면 비밀번호 로그인은 닫힌다. */
+  MASTER_PASSWORD?: string;
   /** 지정한 비공개 실습 저장소에만 Administration 쓰기 권한을 가진 서버용 인증 정보. */
   GITHUB_INVITE_TOKEN?: string;
   /** 강의 질문 알림. 발송 도메인과 수신 주소를 설정한 경우에만 사용한다. */

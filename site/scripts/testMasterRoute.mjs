@@ -1,4 +1,4 @@
-// 운영자 강의방(/room/master, master.ts)의 구글 로그인과 화면을 실제 Worker로 확인한다. 구글 토큰 끝점은 가짜로 답한다.
+// 운영자 강의방(/room/master, master.ts)의 비밀번호 로그인, 구글 로그인과 화면을 실제 Worker로 확인한다. 구글 토큰 끝점은 가짜로 답한다.
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { build } from 'esbuild';
@@ -47,18 +47,84 @@ const bundle = JSON.stringify({ schema: 4, sceneContract: 12, categories: [
 // 구글 값을 넣지 않은 강의장은 이 길을 닫고 로그인 화면에도 보이지 않는다.
 const closed = worker({});
 try {
-  const { request } = client(closed);
+  const { request, post } = client(closed);
   const login = await request('/room/master/login');
   assert.equal(login.status, 503);
   assert.match(await login.text(), /구글 로그인 연결 전입니다/);
-  assert.equal(cookieNamed(login, 'eddm_master_state'), undefined);
-  assert.doesNotMatch(await (await request('/admin')).text(), /master\/login/);
+  const google = await request('/room/master/google');
+  assert.equal(google.status, 503);
+  assert.equal(cookieNamed(google, 'eddm_master_state'), undefined);
+  assert.doesNotMatch(await (await request('/admin')).text(), /room\/master/);
   assert.equal((await request('/room/master/callback?code=x&state=y')).status, 503);
+  assert.equal((await post('/room/master/login', { password: '' })).status, 503);
   const room = await request('/room/master');
   assert.equal(room.status, 503);
   assert.match(await room.text(), /구글 로그인 연결 전입니다/);
 } finally {
   await closed.dispose();
+}
+
+// 비밀번호만 넣은 강의장. 구글 로그인 전에는 이 비밀번호로 들어온다.
+const masterPassword = crypto.randomUUID().slice(0, 4);
+const passwordOnly = worker({ MASTER_PASSWORD: masterPassword });
+try {
+  const { request, json, post } = client(passwordOnly);
+  const kv = await passwordOnly.getKVNamespace('COURSE');
+  await kv.put('bundle', bundle);
+  await kv.put('version', 'test');
+  // 운영장 첫 로그인은 비밀번호 지문을 적으며 세대를 돌린다. 운영처럼 지문이 적힌 뒤에 시험한다.
+  const admin = cookieNamed(await post('/admin/login', { password }), 'eddm_admin');
+  const anonymous = await request('/room/master/01-start/02-second');
+  assert.equal(anonymous.status, 303);
+  assert.equal(anonymous.headers.get('location'), '/room/master/login?returnTo=%2Froom%2Fmaster%2F01-start%2F02-second');
+  const form = await request('/room/master/login?returnTo=%2Froom%2Fmaster%2F01-start%2F02-second');
+  assert.equal(form.status, 200);
+  const formHtml = await form.text();
+  assert.match(formHtml, /<form method="post" action="\/room\/master\/login">/);
+  assert.match(formHtml, /name="returnTo" value="\/room\/master\/01-start\/02-second"/);
+  assert.doesNotMatch(formHtml, /구글 계정으로 들어가기/);
+  assert.equal((await request('/room/master/google')).status, 503);
+
+  // 틀리면 세션을 주지 않는다.
+  const wrong = await post('/room/master/login', { password: masterPassword + 'x' });
+  assert.equal(wrong.status, 401);
+  assert.match(await wrong.text(), /비밀번호가 맞지 않습니다/);
+  assert.equal(cookieNamed(wrong, 'eddm_master'), undefined);
+
+  // 맞으면 운영자 강의방 세션만 받고 가려던 수업으로 간다. 운영장 세션은 주지 않는다.
+  const signed = await post('/room/master/login', { password: masterPassword, returnTo: '/room/master/01-start/02-second' });
+  assert.equal(signed.status, 303);
+  assert.equal(signed.headers.get('location'), '/room/master/01-start/02-second');
+  assert.match(cookieNamed(signed, 'eddm_master'), /Path=\/room\/master; HttpOnly; Secure; SameSite=Lax/);
+  assert.equal(cookieNamed(signed, 'eddm_admin'), undefined);
+  const master = cookieNamed(signed, 'eddm_master').split(';')[0];
+  const view = await request('/room/master', {}, master);
+  assert.equal(view.status, 200);
+  const html = await view.text();
+  assert.match(html, /href="\/room\/master\/01-start\/02-second"/);
+  assert.match(html, /href="\/room\/master\/02-next\/01-next"/);
+  assert.match(await (await request('/room/master/01-start/02-second', {}, master)).text(), /두 번째 본문입니다/);
+  assert.deepEqual(await (await json('/room/master/notes', { action: 'read' }, master)).json(), { readOnly: true, identity: null, notes: [], threads: [] });
+  assert.match(await (await request('/admin/students', {}, master)).text(), /<form method="post" action="\/admin\/login">/);
+  // 운영장 질문 링크나 바깥 주소로 돌아가지 않고 이 강의방 첫 화면으로 간다.
+  for (const returnTo of ['/admin/students/questions?thread=' + crypto.randomUUID(), 'https://evil.example/room/master', '/room/master/login']) {
+    assert.equal((await post('/room/master/login', { password: masterPassword, returnTo })).headers.get('location'), '/room/master');
+  }
+
+  // 여덟 번 틀리면 맞는 비밀번호도 잠시 받지 않는다. 운영장 로그인은 따로 세어 잠기지 않는다.
+  for (let i = 0; i < 8; i += 1) assert.equal((await post('/room/master/login', { password: masterPassword + i })).status, 401);
+  const locked = await post('/room/master/login', { password: masterPassword });
+  assert.equal(locked.status, 401);
+  assert.match(await locked.text(), /너무 여러 번 틀렸습니다/);
+  assert.equal(cookieNamed(locked, 'eddm_master'), undefined);
+  assert.ok(cookieNamed(await post('/admin/login', { password }), 'eddm_admin'));
+
+  // 받은 세션은 모든 운영 세션 끊기로 끊긴다.
+  assert.equal((await request('/room/master', {}, master)).status, 200);
+  assert.equal((await json('/admin/api', { action: 'adminRotate' }, admin.split(';')[0])).status, 200);
+  assert.equal((await request('/room/master', {}, master)).status, 303);
+} finally {
+  await passwordOnly.dispose();
 }
 
 const mf = worker({ GOOGLE_CLIENT_ID: clientId, GOOGLE_CLIENT_SECRET: clientSecret });
@@ -86,12 +152,16 @@ try {
   const www = await request('/room/master/login', {}, '', 'https://www.classroom.example');
   assert.equal(www.status, 308);
   assert.equal(www.headers.get('location'), 'https://classroom.example/room/master/login');
-  assert.equal((await request('/room/master/login', { method: 'POST' })).status, 404);
-  assert.match(await (await request('/admin')).text(), /href="\/room\/master\/login\?returnTo=%2Fadmin%2Fstudents">eddmpython 구글 계정으로 들어가기/);
+  assert.equal((await request('/room/master/google', { method: 'POST' })).status, 404);
+  assert.match(await (await request('/admin')).text(), /href="\/room\/master\/google\?returnTo=%2Fadmin%2Fstudents">eddmpython 구글 계정으로 들어가기/);
+  // 비밀번호를 넣지 않았으면 로그인 화면에는 구글 길만 있다.
+  const googleOnly = await (await request('/room/master/login?returnTo=%2Froom%2Fmaster%2F01-start%2F02-second')).text();
+  assert.match(googleOnly, /href="\/room\/master\/google\?returnTo=%2Froom%2Fmaster%2F01-start%2F02-second">eddmpython 구글 계정으로 들어가기/);
+  assert.doesNotMatch(googleOnly, /type="password"/);
 
   // 구글로 보내는 주소와 상태 쿠키.
   const begin = async (returnTo = '') => {
-    const r = await request('/room/master/login' + (returnTo ? '?returnTo=' + encodeURIComponent(returnTo) : ''));
+    const r = await request('/room/master/google' + (returnTo ? '?returnTo=' + encodeURIComponent(returnTo) : ''));
     assert.equal(r.status, 303);
     const target = new URL(r.headers.get('location'));
     const state = cookieNamed(r, 'eddm_master_state');
