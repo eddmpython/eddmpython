@@ -6,8 +6,8 @@
       "at": "2026-08-26"
     },
     "004-dataframe-libraries/bigframes": {
-      "value": "2.52.0",
-      "at": "2026-11-05"
+      "value": "2.53.0",
+      "at": "2026-11-12"
     },
     "004-dataframe-libraries/cudf": {
       "value": "26.10.2",
